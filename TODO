@@ -1,0 +1,318 @@
+short-id assignment: two simultaneous requests should not
+interfere.
+
+
+
+Documentation to fix:
+
+  - "RePEc" -- eliminate
+
+  - configuration:
+
+    - umask parameter
+
+    - requests-log parameter
+
+    - echo-arpu-mails parameter
+
+  - add new files to the filelist
+
+
+Web-App
+
+  $app -> handle_request( $request );
+
+  $app -> handle_cgi_request();
+
+
+Understand and fix "Not satisfied with search results"
+problem on research/autosearch in Opera 7.23
+
+RePEc-Index: 
+
+  series data shall not be processed unless the series
+  template exists and the series shall not be processed
+  unless the archive template exists
+
+Validating email addresses:
+   giuseppe.carone.@cec.eu.int (? maybe this one is OK)
+   cat@asb..dk
+
+
+Forgotten password: when there is no such account in the
+system we still shall show what exactly did user enter to
+see this message.
+
+
+It looks like Encode module's MIME-Q implementation can
+sometimes split an email address at position 79 just for the
+paragraph right margin's sake.
+
+
+It turns out many people remove items from their profile
+thinking it removes them from the database or from
+EconWPA. We should put something to this effect, like
+"removing items from your profile does not erase them from
+the database". (Christian)
+
+
+Christian suggests that when there is an error loging in,
+the script suggests the following:
+
+  "This email address does not correspond to an existing
+  account in the RePEc Author Service. Check its
+  spelling. If you have changed your email address, please
+  enter your old address, and then modify your settings. To
+  create your account, go here(hyperlink)."
+
+
+Automatic research profile search and name variations:
+
+  Christian's suggestion that I have to convert accents and
+  dashes in names before storing them to database and before
+  searching the database.
+
+  I discussed with Ivan various issues regarding the performance of the
+  search engine for the authors, and I am not sure this was echoed here.
+
+  The first thing I noticed, and Ivan dealt with it already,
+  is the treatment of "." with initials. In the data, they
+  sometimes appears, sometimes they do not. Ivan has not
+  uniformized that. However there are still other issues
+  that appear as I watch people using the system:
+
+  - accents: the data sometimes has them, some not, and
+    sometimes partially (in the first name, but not in the
+    last name). We cannot expect authors to think of all the
+    name variations. This should be done like on EconPapers
+    where everything is converted to non-accented letters
+    for search purposes.
+
+  - hyphens: Jean-Marc cannot find works listed as authored
+    by Jean Marc.
+
+  - suffixes not preceded by a comma: Lucas, Jr. does not
+    find Lucas Jr.
+
+  and we will probably discover others. All this can be
+  solved by applying some regexp like rules to that names
+  searched on. We cannot and should expect of the authors to
+  be able to dream up all the silly things we may have in
+  the database.
+
+
+
+
+process-on-POST screen configuration parameter
+
+/adm/search: replace records search button on the user
+search screen with the <a>records</a> link
+
+
+Deceased people's profiles (discussion on RePEc-run around
+2003-10-17)
+
+
+Remove error message when session expired, but not
+neccessary (??)
+
+make new-user session lifetime a configuration parameter
+
+
+
+typography in generated HTML: apostrophe
+
+make the "required" word on all forms -- in red color text ??
+
+A user deletes his record.  Do we clear ALL his data from
+the databases?  What about the suggestions table?  What
+about the sysprof table?
+
+Background search fails and leaves a thread record.  The
+thread record blocks the new user in the contributions
+screen.
+
+  - monitor threads table?
+  - remove outdated items?
+
+
+Wishes:
+
+- settings screen: move cookie options to a group of its own
+
+- settings: cookie clear button
+
+- check for XXX in the sources
+
+
+
+
+QUESTIONS: 
+
+- Advertise welcome page URL to users?  Suggest them
+  bookmarking it?
+
+
+
+EVENTS LOGGING
+
+- log request IPs
+
+may be:
+
+- separate each event details into main and secondary, show
+  secondary on request
+
+
+
+ADMINISTERING
+
+- editing a userdata
+
+- upgrading a user
+
+
+
+SERVICE ANNOUNCEMENTS, A FEATURE REQUESTED BY CHRISTIAN
+
+- a database table
+
+- a presentation strategy
+
+- an presentation implementation
+
+- submit interface
+
+
+
+ADVANCED USER:
+
+- advanced user's "delete record" function.  Shall only
+  delete a particular record.
+
+- "new person record" screen
+
+
+
+
+GENERAL THINGS:
+
+- a way to see acis.users table ?  -- what for?
+
+- make system software version visible for the end-users
+
+- compile thread-safe mysql client libraries on nebka
+  (-with-thread-safe-client configuration option)
+
+- install mysql 4.1 on acis.openlib.org 
+
+
+- identifiers search - automatically select phrase search
+  (on the page, HTML/JavaScript)
+
+- an idea for additional research items search (???):
+  
+  -- decompose the name variations into a set of words
+  -- search mysql by the last name
+  -- scan the results for word matches with the variations
+     words
+  -- sort in accordance with matches
+
+
+
+
+RePEc-Index:
+
+- write a log file of new/changed/disappeared files and
+  records
+
+
+
+
+WOULD BE NICE TO HAVE, BUT NOT ESSENTIAL:
+
+- make BCC-ing admin on the confirmation mails a
+  configurable option
+
+- /research/claim screen which could be used to add a
+  specific item (from Ideas, e.g.) to the research profile,
+  one-click.
+
+
+- accessibility
+
+  -- make a link to skip navigation ?
+
+- New-user registration.  Would be nice to have "Abandon"
+  link near to the "Continue!" link on the INDEX page.
+
+- Help section 
+  - privacy policy
+  - cookie-based login and welcome URL
+
+
+
+NOT URGENT, BUT IMPORTANT
+
+- confirm by email
+
+- RePEc database
+
+
+
+
+OTHER ISSUES, NOT URGENT AND QUESTIONABLE.
+
+- Data::DumpXML: dumping zero character should not be, or should be
+  escaped ?
+
+- ACIS user records identification strategy
+
+- store submited institutions as individual records in
+  userdata:/data/records and process them accordingly in userdata
+  processing: store them in ARDB, in institutions table... ???
+
+- move account deletion to log off stage?
+
+- form checking and processing: partial processing when some of the
+  parameters need not to be asked again, like the password on the
+  initial page ??
+
+- bin/setup script should look at a file before writing to it and only
+  write it if admin hasn't edited it himself ?
+
+- RePEc-Index: wrap custom-processing into eval with logging the
+  problems in it
+
+
+
+OTHER ITEMS OR IDEAS OR PROBLEMS
+
+- new-user registration account locking: if a user started
+  to register, we shall lock the account AND if someone
+  starts to register for the same email address, shall give
+  an option to continue the registration?  -- I don't know.
+  Too difficult, too complex.
+
+
+- RePEc::Index: Notice when userdata is edited by admin, not
+  by the owner.  How?
+
+    Yes, look at the last-login-date.  If it is near, then it is
+    probably the user.  If it is not, then it means nothing.
+    RI-processing of the userdata file might have been deferred.
+    Another similar approach is to look at date difference between
+    last-login-date and the timestamp of the file's last
+    modification.  Normally, when user edits the file, it will be
+    saved within seconds of the last-login-date.
+
+    Also, I need: offline person profile update, based on userdata
+    changes.  Oh, yeah, that I have already, basically.
+
+
+- should I not make ACIS::Web::Person a class for person records?
+
+- name/last-change-date is based on: last, latin, and full names only?
+
+  \-> either fix the documentation (id: name-variations) or the code
+  (Person.pm)

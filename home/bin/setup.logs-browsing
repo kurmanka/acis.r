@@ -1,0 +1,84 @@
+if test $perllib
+then 
+    perlparams="-I$homelib -I$perllib"
+fi
+
+echo "#!$perlbin $perlparams"
+echo 
+echo "use lib qw( $perllib $homelib );"
+echo
+echo 'my $homedir = ' "'$homedir';"
+echo
+
+cat - <<'the_script_end'
+
+my $logs = {
+   main => "$homedir/acis.log",
+   err  => "$homedir/acis-err.log",
+   sql  => "$homedir/sql.log",
+   rid  => "$homedir/RI/daemon.log",
+   sid  => "$homedir/SID/daemon.log",
+};
+
+
+use CGI qw/:standard/;
+
+
+my $log    = param( 'log'  ) || 'main';
+my $tail   = param( 'tail' ) || 40 ;
+my $search = param( 'key'  ) || '';
+
+print <<_THE_FORM_;
+Content-Type: text/html; charset=utf-8
+
+<html>
+ <head>
+  <title>ACIS logs: $log</title>
+ </head>
+ <body>
+
+  <h1 id='top'>ACIS logs: $log</h1>
+
+  <form action=''>
+    <p>Log: 
+    <input type='text' name='log' value='$log' /><br />
+    how much: <input type='text' name='tail' value='$tail' /> <br />
+    search: <input type='text' name='key' value='$search' />
+    <input type='submit' name='do' value='do' />
+    </p>
+  </form>
+
+_THE_FORM_
+
+
+$log    = quotemeta $log;
+$tail   = quotemeta $tail;
+$search = quotemeta $search;
+
+
+my $logfile = $logs ->{$log};
+my $command = '';
+
+if( $logfile ) {
+
+  if( $search ) {
+    $command = " grep \"$search\" $logfile | tail -n $tail";
+  } else {
+    $command = "tail -n $tail $logfile";
+  }
+}
+
+if( $command ) {
+
+  print "<h2>The log:</h2>\n<pre>\n";
+
+  system( $command ) ;
+  print "\n</pre>\n",
+    "<p><a href='#top'>Return to top</a></p>\n";
+
+}
+
+print "\n </body>\n</html>\n";
+
+the_script_end
+

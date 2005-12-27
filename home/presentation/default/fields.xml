@@ -1,0 +1,90 @@
+<fields>
+
+  <!-- 
+
+  This is for fields, which are either required or have very specific 
+  syntax rules, so that a user may enter an "invalid" value.
+
+  -->
+
+
+ <field name='login'>
+  <desc>login name (email address)</desc>
+ </field>
+
+ <field name='pass'>
+    <desc>password (must be at least 6 characters long)</desc>
+ </field>
+
+ <field name='pass-confirm'>
+    <desc>password confirmation (must match the password)</desc>
+ </field>
+
+
+ <field name='first-name'>
+  <desc>first name</desc>
+ </field>
+
+ <field name='middle-name'>
+  <desc>middle name</desc>
+ </field>
+ 
+ <field name='last-name'>
+  <desc>last name</desc>
+ </field>
+ 
+ <field name='name-suffix'>
+  <desc>name suffix</desc>
+ </field>
+ 
+ <field name='email'>
+  <desc>email address</desc>
+ </field>
+
+ <field name='homepage'>
+  <desc>personal homepage address</desc>
+ </field>
+
+
+ <field name='phone'>
+  <desc>phone number</desc>
+ </field>
+ 
+ <field name='full-name'>
+  <desc>personal full name</desc>
+ </field>
+ 
+ <field name='postal'>
+  <desc>postal address</desc>
+ </field>
+
+ <field name='name-variations'>
+  <desc>variations of the name</desc>
+ </field>
+
+ <field name='name-latin'>
+  <desc>personal name in latin letters</desc>
+ </field>
+
+ <field name='name'>
+  <desc>account owner name</desc>
+ </field>
+
+
+ <field name='id-date-year'>
+  <desc>year number of the identification date</desc>
+ </field>
+
+ <field name='id-date-month'>
+  <desc>month number of the identification date</desc>
+ </field>
+
+ <field name='id-date-day'>
+  <desc>day number of the identification date</desc>
+ </field>
+
+ <field name='iddate-unreal'>
+   <desc>identification date is not a real date</desc>
+ </field>
+
+</fields>

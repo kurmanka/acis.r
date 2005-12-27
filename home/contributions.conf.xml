@@ -1,0 +1,74 @@
+<data>
+
+  <types>
+
+    <text>
+      <roles>
+        <list-item>author</list-item>
+        <list-item>editor</list-item>
+      </roles>
+    </text>
+
+    <paper>
+      <aliases>
+        <list-item>ReDIF-Paper 1.0</list-item>
+      </aliases>
+      <roles>
+        <list-item>author</list-item>
+      </roles>
+    </paper>
+
+
+    <article>
+      <aliases>
+        <list-item>ReDIF-Article 1.0</list-item>
+      </aliases>
+      <roles>
+        <list-item>author</list-item>
+      </roles>
+    </article>
+
+    <book>
+      <aliases>
+        <list-item>ReDIF-Book 1.0</list-item>
+      </aliases>
+      <roles>
+        <list-item>author</list-item>
+        <list-item>editor</list-item>
+      </roles>
+    </book>
+
+
+    <chapter>
+      <aliases>
+        <list-item>ReDIF-Chapter 1.0</list-item>
+      </aliases>
+      <roles>
+        <list-item>author</list-item>
+        <list-item>editor</list-item>
+      </roles>
+    </chapter>  
+
+    <series>
+      <aliases>
+        <list-item>ReDIF-Series 1.0</list-item>
+        <list-item>AMF:collection</list-item>
+      </aliases>
+      <roles>
+        <list-item>editor</list-item>
+      </roles>
+
+    </series>
+
+    <software>
+      <aliases>
+        <list-item>ReDIF-Software 1.0</list-item>
+      </aliases>
+      <roles>
+        <list-item>author</list-item>
+      </roles>
+    </software>      
+
+  </types>
+
+</data>

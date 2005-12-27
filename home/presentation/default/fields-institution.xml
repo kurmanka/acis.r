@@ -1,0 +1,43 @@
+<fields>
+
+  <!-- 
+
+  This is for fields, which are either required or have very specific 
+  syntax rules, so that a user may enter an "invalid" value.
+
+  -->
+
+ <field name='name'>
+  <desc>name in original language</desc>
+ </field>
+
+ <field name='name-english'>
+  <desc>name in English</desc>
+ </field>
+
+ <field name='email'>
+  <desc>email address</desc>
+ </field>
+
+ <field name='homepage'>
+  <desc>website address</desc>
+ </field>
+
+ <field name='phone'>
+  <desc>phone number</desc>
+ </field>
+ 
+ 
+ <field name='postal'>
+  <desc>postal address</desc>
+ </field>
+
+ <field name='location'>
+  <desc>geographical location</desc>
+ </field>
+
+ <field name='id'>
+  <desc>identifier</desc>
+ </field>
+ 
+</fields>

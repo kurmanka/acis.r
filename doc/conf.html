@@ -1,0 +1,417 @@
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<title>ACIS configuration / ACIS documentation</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+      
+
+   <h1 id="id2597951">ACIS configuration</h1>
+
+<h3><i>Table of contents</i></h3>
+<p class="toc">   <a href="#mainconf"><code class="C">main.conf</code> file</a><br>   <a href="#id2598002"><code>[ACIS]</code> section of <code>main.conf</code></a><br>   <a href="#id2598562">General parameters</a><br>   <a href="#binsetup">Updating a running system’s configuration — <code class="C">bin/setup</code> utility</a><br>
+</p>
+
+<h2 id="mainconf" C="main.conf">
+<code class="C">main.conf</code> file</h2>
+
+<p>The primary configuration file of an ACIS installation is
+<code>main.conf</code>.  This file is an AppConfig file,
+which means it has a simple parameter=value syntax,
+described in detail in <a href="http://search.cpan.org/~abw/AppConfig/lib/AppConfig.pm">AppConfig
+manpage</a>.
+In addition to the obvious parameter=value syntax it has
+.ini-like sections, started by “<code>[section]</code>”
+lines.</p>
+
+<p>ACIS distribution contains an example of this file in
+<code class="f BROKEN">{HOME}/main.conf.eg</code>.</p>
+
+
+   <h2 id="id2598002">
+<code>[ACIS]</code> section of <code>main.conf</code>
+</h2>
+
+<dl>
+
+<dt id="site-name" C="site-name"><code class="C">site-name</code></dt>
+
+<dd>
+Short name of your website.  Will be used in generated page
+titles as a prefix, in emails as [part] of subject lines.
+Required.
+</dd>
+
+<dt id="site-name-long" C="site-name-long"><code class="C">site-name-long</code></dt>
+
+<dd>
+Full name of the website.  Will be shown at the top of each
+page and used in emails to refer back to the service.
+Required.
+</dd>
+
+<dt id="admin-email" C="admin-email"><code class="C">admin-email</code></dt>
+
+<dd>Email address of the site administrator, i.e. yourself.
+Required.</dd>
+
+
+<dt id="base-url" C="base-url"><code class="C">base-url</code></dt>
+
+<dd>URL of the ACIS CGI script.  If you want ACIS to respond
+at the top-level URL of your website, set this to something
+like <code>http://web.site.org</code>.  But then you need to
+configure your web server accordingly.  <a href="apache-conf.html#acis-site-top">How to do that in
+Apache.</a> Do not put a trailing slash into this value.  If
+you get this value wrong, ACIS will not correctly interpret
+users’ requests.  Required.</dd>
+
+<dt id="base-cgi-script-filename" C="base-cgi-script-filename"><code class="C">base-cgi-script-filename</code></dt>
+
+<dd>Filename of the CGI script, which ACIS creates and which
+is accessible through the <a class="c" href="conf.html#base-url">base-url</a> URL.
+Required.</dd>
+
+<dt id="home-url" C="home-url"><code class="C">home-url</code></dt>
+
+<dd>URL of the public homepage of the service.  Value of
+<a class="c" href="conf.html#site-name-long">site-name-long</a>, displayed on each page will link to
+it.  May be the same as base-url or different.  Required.</dd>
+
+
+<dt id="static-base-url" C="static-base-url"><code class="C">static-base-url</code></dt>
+
+<dd>URL of web-accessible directory for ACIS to store its
+static web-accessible files.  ACIS will use it for
+JavaScript and CSS files, personal profile pages, et cetera.
+
+It may be the same as <a class="c" href="conf.html#base-url">base-url</a>, but you’ll need to
+configure your webserver accordingly.  It has to serve
+static files by itself, and call ACIS for everything
+else.
+
+Required.</dd>
+
+
+<dt id="static-base-dir" C="static-base-dir"><code class="C">static-base-dir</code></dt>
+
+<dd>
+Path to the directory, corresponding to the <a class="c" href="conf.html#static-base-url">static-base-url</a>.
+Required.
+</dd>
+
+
+<dt id="compact-redirected-profile-urls" C="compact-redirected-profile-urls"><code class="C">compact-redirected-profile-urls</code></dt>
+
+<dd>This either contains a true value (e.g. <code>1</code>)
+or false.  Set to true if you want shorter personal profile
+URLs and <a href="apache-conf.html#redirect-profile-urls">have setup your webserver accordingly</a>.
+
+URL of a profile page is built as follows:
+<a class="c" href="conf.html#static-base-url">static-base-url</a> + <a class="c" href="conf.html#profile-pages-dir">profile-pages-dir</a> +
+profile’s unique part + <code>&quot;/&quot;</code>.  Profile’s unique
+part is its short-id in slash-separated form:
+e.g. <code>&quot;p/s/i/d/3&quot;</code>.  If you enable this option,
+this part will instead be just short-id,
+e.g. <code>&quot;psid3&quot;</code> and the whole URL will be shorter
+and cleaner.
+
+Default value: undef, i.e. false;
+</dd>
+
+<dt id="profile-pages-dir" C="profile-pages-dir"><code class="C">profile-pages-dir</code></dt>
+
+<dd>Prefix of the profile pages URLs.  Terminate it with a
+slash.  See previous item for an explanation.  Default
+value: <code>“profile/”</code>.</dd>
+
+
+<dt id="session-lifetime" C="session-lifetime"><code class="C">session-lifetime</code></dt>
+
+<dd>For how many minutes a session lives without a user
+action, untill it expires.  Default value: 15.</dd>
+
+
+<dt id="system-email" C="system-email"><code class="C">system-email</code></dt>
+
+<dd>Value for the “From:” header of email messages, that
+ACIS will send.  Required.</dd>
+
+
+<dt id="sendmail" C="sendmail"><code class="C">sendmail</code></dt>
+
+<dd> A mail-sending program name.  May be something like
+<code>/usr/sbin/sendmail -t</code> .  Required.</dd>
+
+
+<dt id="person-id-prefix" C="person-id-prefix"><code class="C">person-id-prefix</code></dt>
+
+<dd> Prefix to generated personal record identifiers (not
+short-ids, if you care).  Required.</dd>
+
+
+<dt id="metadata-ReDIF-output-dir" C="metadata-ReDIF-output-dir"><code class="C">metadata-ReDIF-output-dir</code></dt>
+
+<dd>
+Directory to put generated ReDIF files into.
+Optional.
+</dd>
+
+
+<dt id="metadata-AMF-output-dir" C="metadata-AMF-output-dir"><code class="C">metadata-AMF-output-dir</code></dt>
+
+<dd>
+Directory to put generated AMF files into.
+Optional.
+</dd>
+
+
+<dt id="institutions-maintainer-email" C="institutions-maintainer-email"><code class="C">institutions-maintainer-email</code></dt>
+
+<dd>Email address of the person maintaining the institutions
+database.  When users submit an institution’s data, message
+will be sent to this address.  Required.</dd>
+
+
+<dt id="admin-access-pass" C="admin-access-pass"><code class="C">admin-access-pass</code></dt>
+
+<dd>Special administrator’s password to access the <a href="adm.html#adm-slash">administrator’s screens</a>.  Must
+be at least 6 characters long.  Optional.  When not
+specified only users which have admin privileges can access
+the screens and only while they are logged in.  <a href="adm.html#amd-slash-access">Read more about it.</a>
+</dd>
+
+
+
+<dt id="template-set" C="template-set"><code class="C">template-set</code></dt>
+
+<dd>Name of a set of XSLT presentation files to use.  A set
+of XSLT presentation files is a directory, path, relative to
+<code>{HOME}/presentation/</code> directory.  Default value:
+“<code>default</code>”.  So by default XSLT templates are read
+from <code>{HOME}/presentation/default/</code>.
+</dd>
+
+
+
+<dt id="umask" C="umask"><code class="C">umask</code></dt>
+
+<dd>The umask to use when creating files and directories.
+This value directly influences the access permissions of the
+created files.  Read perl’s <code>perldoc -f umask</code>
+and/or Unix’ <code>man umask</code>.  Optional.</dd>
+
+
+
+<dt id="debug-info-visible" C="debug-info-visible"><code class="C">debug-info-visible</code></dt>
+
+<dd>Whether or not to append debuging info to each generated
+web page.  Do not enable this on production systems: it can
+be used by hackers to gain knowledge of the internal site
+configuration, which is not a safe thing.  Also, makes pages
+much bigger and system slower.
+
+Default: undef, ie. feature is off.</dd>
+
+
+
+<dt id="debug-log" C="debug-log"><code class="C">debug-log</code></dt>
+
+<dd>When specified to a writeable file name, each ACIS
+request’s processing will be debug-logged to this file.
+Verbose.
+
+Default: undef, ie. the feature is off.</dd>
+
+
+<dt id="extreme-debug" C="extreme-debug"><code class="C">extreme-debug</code></dt>
+
+<dd>Enables printing of the internal debugging messages on
+every web page immediately, as ACIS processes a request.
+
+Default: undef, ie. feature is off.</dd>
+
+
+<dt id="debug-transformations" C="debug-transformations"><code class="C">debug-transformations</code></dt>
+
+<dd>ACIS uses XSLT stylesheets to produce HTML pages (and
+email messages).  For each request ACIS generates an XML
+document and then pipes it to the appropriate XSLT
+stylesheet.  When this option is enabled, ACIS will save
+intermediate XML file into
+<code>{HOME}/presenter_data.xml</code> and the XSLT result into
+<code>{HOME}/presenter_result.xml</code>.  If the files exist,
+ACIS will overwrite it silently, so at any given time these
+files will contain only the last request’ data.  This option
+might be helpful for debugging the XSLT stylesheets.
+
+Default: undef, ie. feature is off.</dd>
+
+
+<dt id="echo-arpu-mails" C="echo-arpu-mails"><code class="C">echo-arpu-mails</code></dt>
+
+<dd>Whether or not send a copy of all ARPU mails to the
+service admin.  If set to true, admin’s email will be added
+into the <code>BCC:</code> field.
+</dd>
+
+
+<dt id="log-profiling-data" C="log-profiling-data"><code class="C">log-profiling-data</code></dt>
+
+<dd>Boolean parameter.  Enables logging of system profiling
+data to the <code class="f BROKEN">{HOME}/profiling.log</code>.  Default: off.</dd>
+
+
+<dt id="show-profiling-data" C="show-profiling-data"><code class="C">show-profiling-data</code></dt>
+
+<dd>Boolean parameter.  Enables display of system profiling
+data (timings) at the end of each page.  Default: off.</dd>
+
+
+<dt id="requests-log" C="requests-log"><code class="C">requests-log</code></dt>
+
+<dd>Name of file to log every incoming request to.  Defaults
+to string <code>&quot;*stderr*&quot;</code> which means “log to
+standard error output filehandle”.  Usually, Apache
+redirects stderr output of CGI scripts to the error
+log of the website.</dd>
+
+
+<dt id="require-modules" C="require-modules"><code class="C">require-modules</code></dt>
+
+<dd>List of perl modules or simply “.pl” files to load
+(<code>require</code>) upon system start.  Whitespace
+separated.</dd>
+
+
+<dt id="research-additional-searches" C="research-additional-searches"><code class="C">research-additional-searches</code></dt>
+
+<dd>Type: boolean.  Whether or not to run additional, disk
+and CPU-consuming database queries as part of automatic
+research searches.  They are not required as it is, but
+increase quality of search under certain conditions;
+sometimes they would find works for the users, which would
+not have been found otherwise.  Default: off.</dd>
+
+
+</dl>
+
+
+   <h2 id="id2598562">General parameters</h2>
+
+<dl>
+
+<dt id="RePEc-data-dir" C="RePEc-data-dir"><code class="C">RePEc-data-dir</code></dt>
+
+<dd>Directory where a local mirror of RePEc data is stored
+for ACIS to process and keep track of.  Optional.</dd>
+
+
+<dt id="metadata-db-name" C="metadata-db-name"><code class="C">metadata-db-name</code></dt>
+
+<dd>This is name of a MySQL database that ACIS will use to
+store document data and institutions data and some other
+data of that kind.
+Required.</dd>
+
+<dt id="sid-db-name" C="sid-db-name"><code class="C">sid-db-name</code></dt>
+
+<dd>Name of a MySQL database that ACIS will use to keep track
+of assigned short-ids and their corresponding full
+identifiers and numbers involved in short-ids composition.
+It can be pretty safely be the same as
+<a class="c" href="conf.html#metadata-db-name">metadata-db-name</a>.  
+Required.</dd>
+
+<dt id="acis-db-name" C="acis-db-name"><code class="C">acis-db-name</code></dt>
+
+<dd>Name of a MySQL database that ACIS will use to store its
+own data, data about the users and created records, and
+alike.  Its better if you use a separate database from
+<a class="c" href="conf.html#metadata-db-name">metadata-db-name</a>, although right now the table names
+will not clash.  Required.</dd>
+
+<dt id="db-user" C="db-user"><code class="C">db-user</code></dt>
+
+<dd>Name of the MySQL database user to use when connecting
+to MySQL server.
+Required.
+</dd>
+
+<dt id="db-pass" C="db-pass"><code class="C">db-pass</code></dt>
+
+<dd>Password to use when connecting to MySQL server.
+Required.</dd>
+
+
+<dt id="metadata-collections" C="metadata-collections"><code class="C">metadata-collections</code></dt>
+
+<dd>Additional metadata collections to monitor and process
+with the RI daemon.  The variable contains space-delimited
+collection identifiers for ACIS to process.  Each collection
+must be further defined with a pair of corresponding
+<a class="c" href="conf.html#metadata--home">metadata-<i>X</i>-home</a> and
+<a class="c" href="conf.html#metadata--type">metadata-<i>X</i>-type</a> parameters, where <i>X</i> is
+the identifier.  The identifiers must be unique.
+Optional.</dd>
+
+<dt id="metadata--type" C="metadata-"><code class="C">metadata-<i>X</i>-type</code></dt>
+
+<dd>Type of data collection <i>X</i>.  Useful possible
+values: “<code>RePEcRec</code>” or “<code>AMF</code>”.</dd>
+
+
+<dt id="metadata--home" C="metadata-"><code class="C">metadata-<i>X</i>-home</code></dt>
+
+<dd>Directory where the files of collection <i>X</i> are.</dd>
+
+
+
+
+<dt id="perlbin" C="perlbin"><code class="C">perlbin</code></dt>
+
+<dd>Perl binary to use for ACIS and its utilities.  Default:
+taken from <code>`which perl`</code> during
+<a class="c" href="conf.html#binsetup">bin/setup</a>.</dd>
+
+
+
+
+</dl>
+
+<h2 id="binsetup" C="bin/setup">Updating a running system’s configuration — <code class="C">bin/setup</code> utility</h2>
+
+<p>
+<a class="c" href="conf.html#mainconf">main.conf</a> file is the main ACIS configuration file.
+Yet it is not directly read by ACIS and any of its’
+components during normal operation.  Instead they read their
+own separate configuration files.  For instance,
+<code>ardb.conf</code>, <code>acis.conf</code>,
+<code>RI/collections</code>, <code>thisconf.sh</code>, et
+cetera.</p>
+
+<p>All these files are created and updated from
+<a class="c" href="conf.html#mainconf">main.conf</a>’s contents by the <code>bin/setup</code>
+utility.</p>
+
+<p>
+<code>bin/setup</code> reads <a class="c" href="conf.html#mainconf">main.conf</a> and generates
+other necessary files.  You need to run it every time after
+changing <a class="c" href="conf.html#mainconf">main.conf</a> to make configuration changes get
+reflected in the installation.  You may also need to restart
+the <a href="daemon.html#ri-daemon">daemon program</a> so that it is
+aware of the changes you made.</p>
+
+<p>About the other utilities read the <a href="adm.html#utils">respective section</a> in the <a href="adm.html">administrator’s guide</a>.</p>
+
+  
+<address class="footer">
+<p>Generated: Sun Nov 27 15:26:53 2005</p>
+<p>
+<a href="http://acis.openlib.org/">ACIS project</a>,
+          acis<i>@</i>openlib<span>.org</span>
+</p>
+</address>
+</body>
+</html>

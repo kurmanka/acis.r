@@ -1,0 +1,340 @@
+<?xml version="1.0"?>
+
+<!-- 
+
+    that is a working ARDB core configuration file.  Produces:
+    documents table, collections table, authors table.
+
+    $Id: configuration.xml,v 2.0 2005/12/27 19:47:37 ivan Exp $
+
+-->
+
+<configuration>
+
+
+<relation-type name="written-by" reverse="wrote" default-retrieve="record">
+    <view name='nothing' retrieve='nothing' />
+    <view name='brief' retrieve="name,handle" />
+</relation-type>
+
+<relation-type 
+        name="wrote"
+        reverse="written-by"
+        default-retrieve="record">
+
+        <view name="brief" retrieve="title,handle,authors:author/name" />
+
+        <view name="brief-with-creation-date" retrieve="title,handle,authors:author/name,creation-date"/>
+
+</relation-type>
+
+<relation-type 
+        name="cited-by"
+        reverse="cites" 
+    default-retrieve='title,handle,authors:author/name'
+        >
+</relation-type>
+
+<relation-type 
+    name="cites"
+    reverse="cited-by" 
+    default-retrieve='title,handle,authors:author/name'
+        >
+</relation-type>
+
+<relation-type
+    name='part-of'
+    reverse='has-part' 
+    default-retrieve='nothing'>
+
+    <view name='extended' retrieve='name,title,type,handle' />
+
+</relation-type>
+
+<relation-type
+    name='has-part'
+    reverse='part-of' 
+    default-retrieve='nothing'>
+    <view name='extended' retrieve='id' />
+
+</relation-type>
+
+<relation-type
+    name='has-shortid'
+    default-retrieve='id' />
+
+<!-- reverse='is-shortid-of' -->
+
+
+<relation-type
+    name='classified-under'
+    default-retrieve='id,title' />
+
+
+<relation-type 
+    name='affiliated-with'
+    default-retrieve='title,location'
+/>
+
+
+<relation-type
+        name="related"
+        undirected="yes"
+        default-retrieve="handle"
+         />
+
+
+<!--
+        A table element configures an SQL table. 
+
+        It only defines table structure and SQL details.
+
+        What it does not define is mapping from template data to table
+        records.
+
+-->
+
+
+
+<field-attribute-mapping name="person">
+   <field-associations
+      name="name-full"
+      fname='name-first'
+      mname='name-middle'
+      lname='name-last'
+      email='email'
+      handle='handle'
+      />
+</field-attribute-mapping>
+
+<!-- we don't need it.  And it conflicts with acis-record-person, because they share the id namespace. 2005-10-31 17:29 -->
+<!-- 
+<put-processing record-type="ReDIF-Person 1.0">
+
+    <build-forward-relation
+      type='wrote'
+      attributes='author-paper,author-article,author-book,author-software,author-chapter'/>
+
+</put-processing>
+
+<delete-processing record-type="ReDIF-Person 1.0">
+</delete-processing>
+
+-->
+
+
+<use-perl-module>ARDB::ReDIF::Processing</use-perl-module>
+
+
+<!-- ReDIF document template-types -->
+
+
+<table name="resources"> 
+
+        <field name="id"       sql-type=" CHAR(200) NOT NULL PRIMARY KEY" />
+        <field name="sid"      sql-type=" CHAR(12) NOT NULL" />
+        <field name="type"     sql-type=" CHAR(20) NOT NULL" />
+        <field name="title"    sql-type=" VARCHAR(255) NOT NULL"/>
+        <field name="classif"  sql-type=" CHAR(50)" />
+
+        <create-table-sql>
+          INDEX title_i ( title ),
+          FULLTEXT INDEX title_ft ( title ),
+          INDEX sid_i ( sid )
+        </create-table-sql>
+
+</table>
+
+
+
+
+<!-- ReDIF-Institution 1.0 processing -->
+
+<!-- institutions table -->
+
+<table name='institutions'>
+    <field name='id'       sql-type="VARCHAR(200) NOT NULL PRIMARY KEY" />
+    <field name='name'     sql-type="VARCHAR(255) NOT NULL" />
+    <field name='location' sql-type="VARCHAR(200)" />
+    <field name='data'     sql-type="BLOB NOT NULL" />
+
+    <create-table-sql>
+      FULLTEXT INDEX ( name ),
+      FULLTEXT INDEX ( location )
+    </create-table-sql>
+</table>
+
+<field-attribute-mapping name="institution_obj">
+     <field-associations
+       name="name"
+       name_en="name-en"
+       email="primary/email,secondary/email,tertiary/email"
+       postal="primary/postal,secondary/postal"
+       phone='primary/phone,secondary/phone'
+       fax="primary/fax,secondary/fax"
+       homepage="primary/homepage,secondary/homepage,tertiary/homepage"
+       location="primary/location,secondary/location"
+       id="handle"
+       />
+</field-attribute-mapping>
+
+
+<put-processing record-type='ReDIF-Institution 1.0'>
+
+    <call-perl-function
+          name='ARDB::ReDIF::Processing::process_institution' />
+
+    <call-perl-function
+      name='ARDB::ReDIF::Processing::extract_part_of_relationships' />
+
+</put-processing>
+
+<delete-processing record-type="ReDIF-Institution 1.0">
+  <delete-from-table table='institutions' by='id'/>
+</delete-processing>
+
+
+
+
+ <!--  3rd generation authors/editors/... data -->
+
+ <table name='res_creators_bulk'>
+   <field name='sid'    sql-type="CHAR(12) NOT NULL" />
+   <field name='role'   sql-type='char(15) NOT NULL' />
+   <field name='names'  sql-type='VARCHAR(250) NOT NULL'/>
+
+   <create-table-sql>
+     PRIMARY KEY ( sid, role ),
+     FULLTEXT INDEX creatorsft ( names ),
+     index( role(5) )
+   </create-table-sql>
+ </table>
+
+ <table name='res_creators_separate'>
+   <field name='sid'   sql-type="CHAR(12) NOT NULL" />
+   <field name='role'  sql-type="char(15) NOT NULL" />
+   <field name='name'  sql-type="CHAR(100) NOT NULL" />   
+   <field name='email' sql-type="CHAR(100) " />
+
+   <create-table-sql>
+     PRIMARY KEY ( sid, role, name ),
+     INDEX ( email(10) )
+   </create-table-sql>
+ </table>
+
+
+
+
+
+
+ <put-processing record-type='ReDIF-Series 1.0,ReDIF-Paper 1.0,ReDIF-Article 1.0,ReDIF-Book 1.0,ReDIF-Chapter 1.0,ReDIF-Software 1.0'>
+   
+    <call-perl-function
+      name='ARDB::ReDIF::Processing::process_resource' />
+
+    <call-perl-function
+      name='ARDB::ReDIF::Processing::extract_part_of_relationships' />
+   
+ </put-processing>
+
+
+ <delete-processing 
+  record-type=
+  'ReDIF-Series 1.0,ReDIF-Paper 1.0,ReDIF-Article 1.0,ReDIF-Book 1.0,ReDIF-Chapter 1.0,ReDIF-Software 1.0,paper,article,book,chapter,software,series'>
+   
+   <call-perl-function
+    name='ARDB::ReDIF::Processing::process_resource_lost' />
+   
+   <delete-from-table table='resources' by='id'/>
+
+ </delete-processing>
+
+
+ <!-- end -->
+
+
+ <table name='objects'>
+   <field name='id'    sql-type="CHAR(250) NOT NULL PRIMARY KEY" />
+   <field name='data'  sql-type='blob' />
+ </table>
+
+
+
+ <!-- ============================================================
+        A M F  
+      ============================================================  -->
+
+
+ <use-perl-module>ARDB::AMF::Processing</use-perl-module>
+ 
+
+ <put-processing record-type='collection,text,organization'>
+   
+   <call-perl-function
+    name='ARDB::AMF::Processing::prepare' />
+   
+ </put-processing>
+
+
+
+
+
+ <put-processing record-type='organization'>
+
+   <call-perl-function
+       name='ARDB::AMF::Processing::process_organization' />
+   
+ </put-processing>
+ 
+ <delete-processing record-type="organization">
+   <delete-from-table table='institutions' by='id'/>
+ </delete-processing>
+
+
+
+ 
+ <put-processing record-type='text'>
+   
+    <call-perl-function
+          name='ARDB::AMF::Processing::process_text' />
+   
+ </put-processing>
+
+
+ <put-processing record-type='collection'>
+   
+    <call-perl-function
+          name='ARDB::AMF::Processing::process_collection' />
+   
+ </put-processing>
+
+
+
+ <put-processing record-type='collection,text,organization'>
+   
+    <call-perl-function
+          name='ARDB::AMF::Processing::extract_part_of_relationships' />
+   
+ </put-processing>
+
+
+
+ <!-- adding ReDIF archives for completeness and for RAS' meta/update -->
+
+<put-processing record-type="ReDIF-Archive 1.0">
+</put-processing>
+
+<delete-processing record-type="ReDIF-Archive 1.0">
+</delete-processing>
+
+
+
+
+
+
+</configuration>
+
+
+
+
+

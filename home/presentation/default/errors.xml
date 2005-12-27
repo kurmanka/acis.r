@@ -1,0 +1,108 @@
+<?xml version='1.0' encoding='utf-8'?>
+<errors>
+
+ <!-- from ACIS::Web -->
+
+ <error id='screen-presentation-invalid'>There was an internal error
+ while generating the page.  Please let administrator know.</error>
+
+  <error id='sesssion-failure'>Your session can't be loaded.  It is probably
+    expired already.</error>
+
+
+ <!-- from ACIS::Web::Handler::Authenticate -->
+ <error id='login-authentication-failed'>Check your password.</error>
+
+
+ <error id='login-unknown-user'>There is no such account in our service.
+ Please check the email address you typed.
+ Is it the one you used to register here?<br/><br/>
+ You have to register (see link below) before you can
+ login.</error>
+
+
+ <error id='login-bad-password'>Please check your password.  What you just
+ entered is incorrect for this account.</error>
+
+
+ <error id='password-confirmation-mismatch'>You typed different 
+ things in password and password confirmation. They must match.</error>
+ 
+ <error id='confirmation-bad'>Sorry, this confirmation is wrong.  Maybe you or
+ somebody else have already confirmed your registration?</error>
+
+ <error id='confirmation-account-clash'>Sorry, your registration cannot be
+ confirmed, because such account already exists.  Did you try to do two
+ registrations in parallel (for the same email address)?  Tell the
+ administrator why would you want to do it.</error>
+
+
+ <error id='confirmation-obstructed' >Your registration cannot be finalized
+ now.  You did everything correctly, but an internal technical problem
+ happened.  Administrator will have to clear the issue.  We logged details of
+ the problem and your email address.  <strong>Administrator will contact you as
+ soon as the issue is resolved.</strong>  
+ </error>
+
+ <error id='login-taken'>The login you tried to change your account to is
+ occupied already.  You can't do that.</error>
+
+ <error id='login-account-damaged'>Your account record in the system is
+ damaged.  Please notify system administrator.  He should be able to restore
+ it.</error>
+
+ <error id='login-account-locked'>Your account is now locked by some other user
+ (or may be yourself). Try again later.</error>
+
+ 
+
+ <error id='session-wrong-type'>Either there is a serious
+ system-misconfiguration or you are trying to see what you shouldn't.
+ Please report to administrator if you didn't do anything special to see this.
+ </error>
+
+
+ <error id='db-select-error'>Internal database error.</error>
+
+ <error id='photo-cgi-error'>Sorry, internal CGI error.  May be try again or
+ ask admin for help.</error>
+
+ <error id='photo-cannot-open-file'>Sorry, there is a system
+ misconfiguration problem.  Please report to administrator.</error>
+
+ <error id='photo-image-unknown-format'>Please upload GIF, JPEG, PNG or BMP
+ picture.  The name of the file must have a corresponding extension.</error>
+
+ <error id='short-id-required'>This operation cannot be done now, due
+ to an internal problem.  You didn't do anything wrong.  Administrator
+ should check your account and come back to you when its
+ fixed.</error>
+
+<!--
+ <error id='screen-not-found'>Invalid page address.  There is no door on this
+ side of the house.  Why knock?</error>
+-->
+
+<error id='screen-not-found'>Invalid page address.  Such screen doesn't exist.
+<br/><br/> If you don't understand why you might be shown this error, <big>take
+note of the address of this page</big> and report it to administrator.</error>
+
+
+ <error id='bad-old-pass'>Please give your actual current password.
+ If you want to change it, there's no other way.</error>
+
+ <error id='session-failure'>This session has already been closed.  If you had
+ any changes in your account, they have been saved.  Please, login
+ again.</error>
+
+ <error id='back-search-contributions-failed'>We failed when tried to launch
+ the automatic search for your research works.  It is not your fault.  You may
+ contact the administrator for quicker resolution.  We are sorry.</error>
+
+ <error id='account-exists-already'>Account with such name (email) already
+ exists in the system.</error>
+
+ <error id='auto-search-start-failed'>An attempt to start automatic search for
+ your works failed.</error>
+
+</errors>

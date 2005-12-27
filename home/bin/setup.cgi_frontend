@@ -1,0 +1,33 @@
+if test $perllibprepend
+then 
+    perlparams="-I$perllibprepend"
+fi
+echo "#!$perlbin $perlparams"
+echo 
+echo "use lib qw( $homelib );"
+echo
+if [[ $perllibadd ]]; then
+  echo "push @INC, '$perllibadd';"      
+  echo ""                               
+fi
+echo 'use strict;'
+echo 'use warnings;'
+echo
+if test $ACIS_extreme_debug
+then 
+  echo 'BEGIN {'
+  echo '    print "Content-Type: text/html; charset=utf-8\nCache-Control: no-cache\n\n";'
+  echo '    $Web::App::DEBUGIMMEDIATELY = "on";'
+  echo '    $ACIS::DEBUGIMMEDIATELY = "on";'
+  echo '    undef $\;'
+  echo '}'
+fi
+echo
+echo 'BEGIN { $Web::App::DEBUG = "on"; }'
+echo
+echo 'use ACIS::Web;'
+echo 'my $acis = new ACIS::Web( );'
+echo
+echo '$acis -> handle_request;'
+echo
+

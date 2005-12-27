@@ -1,0 +1,102 @@
+#!/bin/sh
+#
+#  Kill RePEc-Index Control Daemon
+#
+
+homedir=
+
+if test -z $homedir; then
+  echo "This script must be installed before usage"
+  exit 1
+fi
+
+cd $homedir
+
+. ./thisconf.sh
+
+
+pid_file=$ri_pid_file
+
+
+
+function start() {
+
+    socket=$repec_index_socket
+
+    echo "going to start RI daemon ($ri_daemon)"
+
+    
+    if test -f $ri_pid_file 
+    then 
+        echo pid file $ri_pid_file is present
+        echo aborting
+        exit
+    fi
+
+#    echo $perlbin -I$homelib $ri_daemon -d -f $socket -H $ri_home
+    $perlbin -I$homelib $ri_daemon -d -f $socket -H $ri_home
+
+    sleep 1
+    if test -f $ri_pid_file
+    then 
+        echo ' done'
+    else 
+        echo " failed"
+        echo " here is the log's tail:"
+        tail $ri_log
+    fi
+
+}
+
+
+function stop() {
+
+#  The following snippet adopted from MySQL's support-files/mysql.server
+#  Copyright Abandoned 1996 TCX DataKonsult AB & Monty Program KB & Detron HB
+#  About MySQL see: http://mysql.com
+    
+    if test -f $pid_file
+    then 
+        pid=`cat $pid_file`
+        
+        echo "Killing control_daemon with pid $pid"
+        kill $pid
+        
+        sleep 1
+        while [ -s $pid_file -a "$flags" != aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa ]
+        do
+          [ -z "$flags" ] && echo -n "Wait for control_daemon to exit" || echo -n "."
+          flags=a$flags
+          sleep 1
+        done
+        if [ -s $pid_file ]
+            then echo " gave up waiting! Probably the daemon is busy."
+        elif [ -n "$flags" ]
+            then echo " done"
+        fi
+    fi
+    
+}
+
+
+
+
+case "$1" in
+    stop)
+        stop
+        ;;
+
+    start)
+        start
+        ;;
+
+    restart)
+	stop
+        start
+        ;;
+esac
+
+
+
+
+

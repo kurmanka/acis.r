@@ -1,0 +1,282 @@
+<h1 id='apache-conf'>Apache configuration and URLs in
+ACIS</h1>
+
+<toc/>
+
+
+## Introduction
+
+
+ACIS is a pretty complicated application.  It both gives a
+web interface to users and it produces web-accessible
+objects.  For all this to work, it needs to know how to
+reference itself and where to create other objects and how
+to reference them.
+
+
+If you are making a real-world public ACIS-based service,
+you'll want ACIS to be available via a short URL and you'll
+want it to produce short and nice URLs.  Then you'll need to
+adapt Apache configuration.  Particular adaptation depends
+on your choices for the ACIS configuration parameters.  In
+most simple case you don't need to do that, but then your
+URLs will be a bit messy.
+
+Exact reasons to touch Apache configuration:
+
+1. You may want ACIS to sit at the root address of a
+   website.  E.g. <code>http://web.site.org/</code> versus
+   <code>http://web.site.org/cgi-bin/acis.pl</code> .  See
+   configuration parameter <c>base-url</c>.
+
+2. You may want ACIS to generate short and clean URLs for
+   the users' profile pages.  Short and clean would be
+   something like <co>http://web.site.org/pro/pcl2/</co>,
+   long and dirty would be like
+   <co>http://web.site.org/pro/p/c/l/2/</co> or even worse.
+   See configuration options
+   <c>compact-redirected-profile-urls</c> and
+   <c>profile-pages-dir</c>.
+
+3. You may want to have the same URL value as your
+   <c>static-base-url</c> and your <c>base-url</c>.  Which
+   means simply shorter and nicier URLs.
+
+
+##  What to do
+
+Here are the instructions for Apache 1.3+.  If you want ACIS
+to work with Apache 2, there is <a ref='apache2'>a little
+difference</a>.
+
+OK, let's say you have <co>web.site.org</co> website and
+want to run ACIS on it and you have default settings for
+most parameters.
+
+<p id='acis-site-top'>A normal CGI script has address
+of something like, <co>.../cgi-bin/script.pl</co>, but you
+want your users to access ACIS through the shortest, niciest
+<co>http://web.site.org/</co> address.  Then we have to do
+the following.</p>
+
+First, we enable mod_rewrite in our &lt;VirtualHost> section:
+
+      RewriteEngine on
+
+Second, we rewrite all incomming requests so that Apache
+transfers them all to ACIS.  Let's assume the actual ACIS
+CGI script is at
+<co>http://web.site.org/cgi-bin/acis.pl</co> address.  Add
+this:
+
+      RewriteRule ^(/.*)$ /cgi-bin/acis.pl$1 [L,T=application/x-httpd-cgi]
+
+Let us call this line "the terminal rule line"; although it
+is the first rule we introduce, it actually always must be
+the last one of all rewrite rules used.  This rule means:
+pass _all_ requests for the website to ACIS.
+
+But ACIS includes and produces some static files, which also
+have to be web-accessible.  Personal profile pages -- most
+important of all.  We need to configure Apache to serve
+those requests by itself, without involving ACIS.  One of
+the ways to do that is to add
+
+      RewriteRule ^/static/ - [L]
+
+before the previous RewriteRule.  So together that may look
+like this:
+
+      RewriteEngine on
+      # static files:
+      RewriteRule ^/static/ - [L]
+      # terminal rule:
+      RewriteRule ^(/.*)$ /cgi-bin/acis.pl$1 [L,T=application/x-httpd-cgi]
+
+Then Apache will pass to <co>/cgi-bin/acis.pl</co> all
+requests, but those starting with <co>/static/</co>.  So you
+can set <c>static-base-url</c> to
+<co>http://web.site.org/static</co> and
+<c>static-base-dir</c> to a corresponding directory name.
+
+
+The personal profile URLs will then have form of
+<co>http://web.site.org/static/profile/p/s/i/d/1/</co>,
+which is not very nice, but if its OK for you, let it be so.
+In case you don't like that, read on.
+
+
+###  Making personal profile URLs shorter
+
+First thing we could do is remove <co>static/</co> part.
+For that we replace the respective RewriteRule with several
+others.  
+
+      RewriteEngine on
+
+      # static files:
+      RewriteRule ^/style/   - [L]
+      RewriteRule ^/script/  - [L]
+      RewriteRule ^/profile/ - [L]
+
+      # terminal rule:
+      RewriteRule ^(/.*)$ /cgi-bin/acis.pl$1 [L,T=application/x-httpd-cgi]
+ 
+This will make requests for stylesheets, javascript files
+and for profile pages served directly by Apache, and
+everything else will be taken by ACIS.  Now we can set
+<c>static-base-url</c> to <co>http://web.site.org</co> and
+<c>static-base-dir</c> to its apporpriate docroot,
+e.g. <co>/home/user/public_html</co>.  
+
+<p id='redirect-profile-urls'>Second thing we could
+do to make personal profile URLs human friendly is eliminate
+the slash characters in <co>p/s/i/d/1</co> part.  Here comes
+the next set of rewrite rules:</p>
+
+      RewriteRule ^/profile/p([a-z][a-z0-9]+[0-9])(/(.*))?$ /P/$1/$3
+      RewriteRule ^/P/(.)(.)(.)(.)(.)/(.*) /profile/p/$1/$2/$3/$4/$5/$6 [L]
+      RewriteRule ^/P/(.)(.)(.)(.)/(.*)    /profile/p/$1/$2/$3/$4/$5    [L]
+      RewriteRule ^/P/(.)(.)(.)/(.*)       /profile/p/$1/$2/$3/$4       [L]
+
+If placed before our static files rules in Apache conf, it
+will make requests like <co>/profile/psid1/</co> map to
+actual files as if it was a request for
+<co>/profile/p/s/i/d/1/</co>.  Now to let ACIS know we did
+that, we set <c>compact-redirected-profile-urls</c> to a
+true value.
+
+Now we have a reasonably good setup: the URLs are clean of
+cruft.  To summarize we have the foolowing in our Apache
+conf &lt;VirtualHost> section:
+
+      RewriteEngine on
+
+      # compact-redirected unique part of personal profile URLs
+      RewriteRule ^/profile/p([a-z][a-z0-9]+[0-9])(/(.*))?$ /P/$1/$3
+      RewriteRule ^/P/(.)(.)(.)(.)(.)/(.*) /profile/p/$1/$2/$3/$4/$5/$6 [L]
+      RewriteRule ^/P/(.)(.)(.)(.)/(.*)    /profile/p/$1/$2/$3/$4/$5    [L]
+      RewriteRule ^/P/(.)(.)(.)/(.*)       /profile/p/$1/$2/$3/$4       [L]
+
+      # static files:
+      RewriteRule ^/style/   - [L]
+      RewriteRule ^/script/  - [L]
+      RewriteRule ^/profile/ - [L]
+
+      # terminal rule:
+      RewriteRule ^(/.*)$ /cgi-bin/acis.pl$1 [L,T=application/x-httpd-cgi]
+
+
+And we have something like the following in our
+<c>main.conf</c>:
+
+      base-url        = http://web.site.org
+      base-cgi-script-filename = /var/apache/htdoc/user-cgi-bin/acis.pl
+      home-url        = http://web.site.org/
+      static-base-url = http://web.site.org
+      static-base-dir = /home/user/public_html
+
+      +compact-redirected-profile-urls
+    
+
+###  A note on suEXEC 
+
+For security and common-sense considerations it makes a lot
+of sense to run ACIS CGI under suexec in Apache.  This way
+you avoid a lot of permissions trouble.  
+
+One of the things you need to use suexec is your CGI scripts
+must reside somewhere below global DocumentRoot directory.
+That's why in <c>main.conf</c> snippet above the
+<c>base-cgi-script-filename</c> param points to a file in
+<co>/var/apache/htdoc/user-cgi-bin/</co> (assuming that the
+global DocumentRoot is <co>/var/apache/htdoc</co>).  To make
+this directory correspond to your virtual host's
+<co>/cgi-bin/</co> you use the following in apache conf
+&lt;VirtualHost> section:
+
+       ScriptAlias /cgi-bin/ /var/apache/htdoc/user-cgi-bin/
+
+
+###  Even shorter profile URLs
+
+With all the above you have a very reasonable setup.  But
+there is one more little thing to know about making URLs
+short and clean.
+
+We could do to make personal profile URLs even shorter by
+replacing <code>"/profile/"</code> part with something like
+<code>"/pro/"</code>.  For that, we use <c>profile-pages-dir</c>
+parameter.  We set it to <code>"pro/"</code> and we rewrite the
+Apache conf to read:
+
+      ...
+      # compact-redirected unique part of personal profile URLs
+      RewriteRule ^/pro/p([a-z][a-z0-9]+[0-9])(/(.*))?$ /P/$1/$3
+      RewriteRule ^/P/(.)(.)(.)(.)(.)/(.*) /pro/p/$1/$2/$3/$4/$5/$6 [L]
+      RewriteRule ^/P/(.)(.)(.)(.)/(.*)    /pro/p/$1/$2/$3/$4/$5    [L]
+      RewriteRule ^/P/(.)(.)(.)/(.*)       /pro/p/$1/$2/$3/$4       [L]
+
+      # static files:
+      RewriteRule ^/style/   - [L]
+      RewriteRule ^/script/  - [L]
+      RewriteRule ^/pro/ - [L]
+      ...
+
+Which is a straight <code>"profile/"</code> -> <code>"pro/"</code>
+replacement.  Off you go.
+
+
+###  Changing configuration of a running sytem
+
+An important thing to know about personal profile URLs is
+that once system generates and assigns a profile URL, is
+stores it in the user's profile and uses it since.  If you
+change your setup, the previously-assigned profile URLs will
+still have the old format and ACIS will not rebuild them.
+The only case when ACIS rebuilds a profile URL is when it
+finds that it can't write the profile page file to its
+place.  Then it tries to generate new URL and new file
+pathname for it (using current configuration) and uses that.
+
+That's why you better settle <c>static-base-dir</c>,
+<c>static-base-url</c>, <c>profile-pages-dir</c> and
+<c>compact-redirected-profile-urls</c> configuration values
+from the start.  And, of course, <c>base-url</c> and
+<c>home-url</c>.
+
+
+
+###  Other files that might need to be served statically
+
+If you run ACIS at a website's top address, you may need or
+prefer to serve some other files by Apache itself, without
+involving ACIS.  For instance, you may want to create
+favourites icon <co>/favicon.ico</co> for your website, or
+you want to create <co>/robots.txt</co> file.  ACIS will not
+serve such files and such requests will only burden the
+system and clutter the logs.  You have to serve these files
+with Apache.  For that you simply have to add appropriate
+RewriteRules to your config, before the terminal rule line:
+
+      RewriteRule ^/favicon.ico   - [L]
+      RewriteRule ^/robots.txt    - [L]
+
+
+<h2 id='apache2'>Apache 2 specific configuration</h2>
+
+Do everything as described above.
+
+If you have lines
+
+      # terminal rule:
+      RewriteRule ^(/.*)$ /cgi-bin/acis.pl$1 [L,T=application/x-httpd-cgi]
+
+replace it with
+
+      # terminal rule:
+      RewriteRule ^/(.*)$ /cgi/acis.cgi/$1  [NS,PT]
+
+It worked for me.  I hope it helps you as well.
+
+

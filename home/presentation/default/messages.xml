@@ -1,0 +1,42 @@
+<table>
+
+  <message id='personal-data-saved'>We saved your personal and contact information.</message>
+
+  <message id='forgotten-password-email-sent'>We have sent you an email
+  message, containing your password.</message>
+
+  <message id='must-relogin'>You must re-enter your password before you can
+  continue.  This is because you now come from a different network
+  address.</message>
+
+  <message id='photo-uploaded'>Photo upload was succesful.  If you do
+  not see the new picture, this is because of your browser's cache.
+  Open profile overview and <i>reload</i> it.</message>
+
+  <message id='test'>This is <i>a test</i> message.</message>
+
+  <message id='account-deleted'>Your account has been deleted.</message>
+
+  <message id='saved'>We saved your changes.</message>
+
+
+  <message id='research-items-added'>Added the chosen research items.</message>
+
+  <message id='research-items-replaced'>Your decisions were processed and saved.</message>
+
+  <message id='research-items-refused'>Your decisions were processed and saved.</message>
+
+  <message id='research-decisions-processed'
+  >Your decisions were processed and saved.</message>
+
+  <message id='research-items-removed'>Removed the chosen research items.</message>
+
+
+  <message id='screen-reload-soon'>Your browser must reload the page
+  soon (automatically).  <small>If it does not, do it yourself;  use
+  &#x2018;Refresh&#x2019; button.</small></message>
+
+  <message id='institution-submission-accepted'>The submitted
+  institution data is saved, thank you.</message>
+
+</table>

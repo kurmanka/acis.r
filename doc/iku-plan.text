@@ -1,0 +1,45 @@
+Iku's Current Workplan
+======================
+
+Last update: 2005-11-17 21:30
+
+ACIS
+
+ - add a phrase to the research/identified page per
+   Christian's request
+
+ - update RAS' phrase-local.xml with that phrase
+
+
+#### Pidaid
+
+ - Report the Safari problem to Apple (Crashes if I re-use
+   DOM fragments of the XmlHttpRequest's response, after I
+   create a new XMLHttpRequest and get a new response.)
+
+    - abandon or continue?
+
+      - if continue, look again to pidaid.js before I fixed it
+        and try to make the testcase as close as possible.
+ 
+      - find someone with Safari who will crash on the
+        testpage
+
+      - report to Apple
+ 
+
+#### Dues to the ACIS documentation
+
+- update the annotated distribution files list in
+  internal.html
+
+
+#### acis.openlib.org website
+
+  - maintain http://acis.openlib.org/stage3/ (an ongoing task)
+
+
+<id>
+$Id: iku-plan.text,v 2.0 2005/12/27 19:47:36 ivan Exp $
+</id>
+  
