@@ -25,7 +25,7 @@ package Web::App;   ### -*-perl-*-
 #  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 #
 #  ---
-#  $Id: App.pm,v 2.0 2005/12/27 19:47:40 ivan Exp $
+#  $Id: App.pm,v 2.1 2005/12/28 22:47:03 ivan Exp $
 #  ---
 
 
@@ -754,14 +754,15 @@ sub handle_request {
   
   my $query = new CGI;
   
-  my $unescaped_url = $ENV{REQUEST_URI};
+  my $unescaped_url = $ENV{REQUEST_URI} || '';
 
   ### this needs to be fixed to take care of non-ascii chars (in an encoding)
   ### and unicode-specified chars (%u[\da-z]{4}) if they are to be used in
   ### screen names:
   $unescaped_url =~ s/%(\w\w)/chr(hex($1))/eg;
-  
-  my $requested_url = "http://$ENV{HTTP_HOST}$unescaped_url";
+
+  my $hostname  = $ENV{HTTP_HOST} || '';
+  my $requested_url = "http://$hostname$unescaped_url";
 
   my $request = $self -> {request} = {
     CGI     => $query,
@@ -769,7 +770,7 @@ sub handle_request {
     agent   => $ENV{HTTP_USER_AGENT},
   };
 
-  if ( $ENV{QUERY_STRING} ) { 
+  if ( $ENV{QUERY_STRING} ) {
     $request -> {querystring} = $ENV{QUERY_STRING};
   }
 
@@ -1229,7 +1230,7 @@ sub add_to_process_queue {
   if ( not defined $screen ) { 
     return undef;
   }
-   
+
   my $process;
 
   if ( $screen -> {'process-on-POST'} ) {
