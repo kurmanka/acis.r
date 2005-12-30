@@ -315,14 +315,13 @@ given time, if any at all.  If all 5 channels are busy and a
 new request comes in, it would have to wait till one of the
 channels becomes available.
 
-Each of the channels has its own logfile.  These are named
+<p>Each of the channels has its own logfile.  These are named
 from <f>RI/update_ch0.log</f> for channel no. 0 through
 <f>RI/update_ch4.log</f> for channel no. 4.  A channel's log
 includes all the details of the requests taken and the
 processing details.  If any problems or errors happen during
 processing, they would normally be reported to the channel's
-log.
-
+log.</p>
 
 The actual metadata processing also involves ARDB.  That
 work is logged into the <f>ardb.log</f> file.
@@ -481,20 +480,18 @@ may be the same database).  Backup all the tables in these
 databases.
 
 Consult MySQL documentation on the topic: <a
-href='http://dev.mysql.com/doc/refman/4.1/en/backup.html'
->Database Backups</a> and all the section <a
-href='http://dev.mysql.com/doc/refman/4.1/en/disaster-prevention.html'
->Backup and Recovery</a>. (These links are for MySQL version
-4.1.)
+href='http://dev.mysql.com/doc/refman/4.1/en/backup.html'>Database Backups</a>
+and all the section <a
+href='http://dev.mysql.com/doc/refman/4.1/en/disaster-prevention.html' >Backup
+and Recovery</a>. (These links are for MySQL version 4.1.)
 
 
 #### Update daemon database
 
-The update daemon uses Berkeley DB for storing its data.
-Consult its documentation for backup instructions: 
-<a
-href='http://www.sleepycat.com/docs/ref/transapp/archival.html'
->Database and log file archival</a>.
+The update daemon uses Berkeley DB for storing its data.  Consult its
+documentation for backup instructions: <a
+href='http://www.sleepycat.com/docs/ref/transapp/archival.html'>Database and
+log file archival</a>.
 
 If you want to backup that, you should intergrate it into <a
 ref='db-house'>the database housekeeping</a>.  It would be

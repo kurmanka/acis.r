@@ -245,7 +245,7 @@ from the Berkeley DB library package.  Some care you need
 here. Becaust you may have these utilities installed
 system-wide.  And those can be of wrong version of BDB than
 you actually use.  If you have installed a <a
-ref='private-bdb'>private copy</a> of Berkeley DB, then
+ref='bdb-private'>private copy</a> of Berkeley DB, then
 you'll have to refer to these utilities by full path.
 
 

@@ -12,11 +12,10 @@ ACIS / ACIS documentation</title>
 ACIS</h1>
 
 <h3><i>Table of contents</i></h3>
-<p class="toc">   <a href="#id2598884">Introduction</a><br>   <a href="#id2598988">What to do</a><br>      <a href="#id2599160">Making personal profile URLs shorter</a><br>      <a href="#id2599300">A note on suEXEC</a><br>      <a href="#id2599353">Even shorter profile URLs</a><br>      <a href="#id2599414">Changing configuration of a running sytem</a><br>      <a href="#id2599475">Other files that might need to be served statically</a><br>   <a href="#apache2">Apache 2 specific configuration</a><br>
-</p>
+<p class="toc">   <a href="#id2246705">Introduction</a><br>   <a href="#id2246792">What to do</a><br>      <a href="#id2246936">Making personal profile URLs shorter</a><br>      <a href="#id2247056">A note on suEXEC</a><br>      <a href="#id2247102">Even shorter profile URLs</a><br>      <a href="#id2247156">Changing configuration of a running sytem</a><br>      <a href="#id2247208">Other files that might need to be served statically</a><br>   <a href="#apache2">Apache 2 specific configuration</a><br></p>
 
 
-   <h2 id="id2598884">Introduction</h2>
+   <h2 id="id2246705">Introduction</h2>
 
 <p>ACIS is a pretty complicated application.  It both gives a
 web interface to users and it produces web-accessible
@@ -53,7 +52,7 @@ means simply shorter and nicier URLs.</p></li>
 </ol>
 
 
-   <h2 id="id2598988">What to do</h2>
+   <h2 id="id2246792">What to do</h2>
 
 <p>Here are the instructions for Apache 1.3+.  If you want ACIS
 to work with Apache 2, there is <a href="apache-conf.html#apache2">a little
@@ -119,7 +118,7 @@ which is not very nice, but if its OK for you, let it be so.
 In case you don’t like that, read on.</p>
 
 
-   <h3 id="id2599160">Making personal profile URLs shorter</h3>
+   <h3 id="id2246936">Making personal profile URLs shorter</h3>
 
 <p>First thing we could do is remove <code>static/</code> part.
 For that we replace the respective RewriteRule with several
@@ -195,7 +194,7 @@ conf &lt;VirtualHost&gt; section:</p>
 </code></pre>
 
 
-   <h3 id="id2599300">A note on suEXEC</h3>
+   <h3 id="id2247056">A note on suEXEC</h3>
 
 <p>For security and common-sense considerations it makes a lot
 of sense to run ACIS CGI under suexec in Apache.  This way
@@ -215,16 +214,16 @@ this directory correspond to your virtual host’s
 </code></pre>
 
 
-   <h3 id="id2599353">Even shorter profile URLs</h3>
+   <h3 id="id2247102">Even shorter profile URLs</h3>
 
 <p>With all the above you have a very reasonable setup.  But
 there is one more little thing to know about making URLs
 short and clean.</p>
 
 <p>We could do to make personal profile URLs even shorter by
-replacing <code>&quot;/profile/&quot;</code> part with something like
-<code>&quot;/pro/&quot;</code>.  For that, we use <a class="c" href="conf.html#profile-pages-dir">profile-pages-dir</a>
-parameter.  We set it to <code>&quot;pro/&quot;</code> and we rewrite the
+replacing <code>"/profile/"</code> part with something like
+<code>"/pro/"</code>.  For that, we use <a class="c" href="conf.html#profile-pages-dir">profile-pages-dir</a>
+parameter.  We set it to <code>"pro/"</code> and we rewrite the
 Apache conf to read:</p>
 
 <pre><code>  ...
@@ -241,11 +240,11 @@ Apache conf to read:</p>
   ...
 </code></pre>
 
-<p>Which is a straight <code>&quot;profile/&quot;</code> -&gt; <code>&quot;pro/&quot;</code>
+<p>Which is a straight <code>"profile/"</code> -&gt; <code>"pro/"</code>
 replacement.  Off you go.</p>
 
 
-   <h3 id="id2599414">Changing configuration of a running sytem</h3>
+   <h3 id="id2247156">Changing configuration of a running sytem</h3>
 
 <p>An important thing to know about personal profile URLs is
 that once system generates and assigns a profile URL, is
@@ -264,7 +263,7 @@ from the start.  And, of course, <a class="c" href="conf.html#base-url">base-url
 <a class="c" href="conf.html#home-url">home-url</a>.</p>
 
 
-   <h3 id="id2599475">Other files that might need to be served statically</h3>
+   <h3 id="id2247208">Other files that might need to be served statically</h3>
 
 <p>If you run ACIS at a website’s top address, you may need or
 prefer to serve some other files by Apache itself, without
@@ -301,11 +300,9 @@ RewriteRules to your config, before the terminal rule line:</p>
 
   
 <address class="footer">
-<p>Generated: Sun Nov 27 15:26:53 2005</p>
-<p>
-<a href="http://acis.openlib.org/">ACIS project</a>,
-          acis<i>@</i>openlib<span>.org</span>
-</p>
+<p>Generated: Fri Dec 30 18:17:53 2005</p>
+<p><a href="http://acis.openlib.org/">ACIS project</a>,
+          acis<i>@</i>openlib<span>.org</span></p>
 </address>
 </body>
 </html>

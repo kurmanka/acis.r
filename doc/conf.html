@@ -7,11 +7,10 @@
 <body>
       
 
-   <h1 id="id2597951">ACIS configuration</h1>
+   <h1 id="id2247775">ACIS configuration</h1>
 
 <h3><i>Table of contents</i></h3>
-<p class="toc">   <a href="#mainconf"><code class="C">main.conf</code> file</a><br>   <a href="#id2598002"><code>[ACIS]</code> section of <code>main.conf</code></a><br>   <a href="#id2598562">General parameters</a><br>   <a href="#binsetup">Updating a running system’s configuration — <code class="C">bin/setup</code> utility</a><br>
-</p>
+<p class="toc">   <a href="#mainconf"><code class="C">main.conf</code> file</a><br>   <a href="#id2247819"><code>[ACIS]</code> section of <code>main.conf</code></a><br>   <a href="#id2248295">General parameters</a><br>   <a href="#binsetup">Updating a running system’s configuration — <code class="C">bin/setup</code> utility</a><br></p>
 
 <h2 id="mainconf" C="main.conf">
 <code class="C">main.conf</code> file</h2>
@@ -29,7 +28,7 @@ lines.</p>
 <code class="f BROKEN">{HOME}/main.conf.eg</code>.</p>
 
 
-   <h2 id="id2598002">
+   <h2 id="id2247819">
 <code>[ACIS]</code> section of <code>main.conf</code>
 </h2>
 
@@ -110,11 +109,11 @@ URLs and <a href="apache-conf.html#redirect-profile-urls">have setup your webser
 
 URL of a profile page is built as follows:
 <a class="c" href="conf.html#static-base-url">static-base-url</a> + <a class="c" href="conf.html#profile-pages-dir">profile-pages-dir</a> +
-profile’s unique part + <code>&quot;/&quot;</code>.  Profile’s unique
+profile’s unique part + <code>"/"</code>.  Profile’s unique
 part is its short-id in slash-separated form:
-e.g. <code>&quot;p/s/i/d/3&quot;</code>.  If you enable this option,
+e.g. <code>"p/s/i/d/3"</code>.  If you enable this option,
 this part will instead be just short-id,
-e.g. <code>&quot;psid3&quot;</code> and the whole URL will be shorter
+e.g. <code>"psid3"</code> and the whole URL will be shorter
 and cleaner.
 
 Default value: undef, i.e. false;
@@ -272,7 +271,7 @@ data (timings) at the end of each page.  Default: off.</dd>
 <dt id="requests-log" C="requests-log"><code class="C">requests-log</code></dt>
 
 <dd>Name of file to log every incoming request to.  Defaults
-to string <code>&quot;*stderr*&quot;</code> which means “log to
+to string <code>"*stderr*"</code> which means “log to
 standard error output filehandle”.  Usually, Apache
 redirects stderr output of CGI scripts to the error
 log of the website.</dd>
@@ -298,7 +297,7 @@ not have been found otherwise.  Default: off.</dd>
 </dl>
 
 
-   <h2 id="id2598562">General parameters</h2>
+   <h2 id="id2248295">General parameters</h2>
 
 <dl>
 
@@ -382,8 +381,7 @@ taken from <code>`which perl`</code> during
 
 <h2 id="binsetup" C="bin/setup">Updating a running system’s configuration — <code class="C">bin/setup</code> utility</h2>
 
-<p>
-<a class="c" href="conf.html#mainconf">main.conf</a> file is the main ACIS configuration file.
+<p><a class="c" href="conf.html#mainconf">main.conf</a> file is the main ACIS configuration file.
 Yet it is not directly read by ACIS and any of its’
 components during normal operation.  Instead they read their
 own separate configuration files.  For instance,
@@ -395,8 +393,7 @@ cetera.</p>
 <a class="c" href="conf.html#mainconf">main.conf</a>’s contents by the <code>bin/setup</code>
 utility.</p>
 
-<p>
-<code>bin/setup</code> reads <a class="c" href="conf.html#mainconf">main.conf</a> and generates
+<p><code>bin/setup</code> reads <a class="c" href="conf.html#mainconf">main.conf</a> and generates
 other necessary files.  You need to run it every time after
 changing <a class="c" href="conf.html#mainconf">main.conf</a> to make configuration changes get
 reflected in the installation.  You may also need to restart
@@ -407,11 +404,9 @@ aware of the changes you made.</p>
 
   
 <address class="footer">
-<p>Generated: Sun Nov 27 15:26:53 2005</p>
-<p>
-<a href="http://acis.openlib.org/">ACIS project</a>,
-          acis<i>@</i>openlib<span>.org</span>
-</p>
+<p>Generated: Fri Dec 30 18:17:53 2005</p>
+<p><a href="http://acis.openlib.org/">ACIS project</a>,
+          acis<i>@</i>openlib<span>.org</span></p>
 </address>
 </body>
 </html>

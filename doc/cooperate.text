@@ -134,14 +134,15 @@ daemon</a> is what ACIS uses to process document and other
 metadata, that is coming from outside.  It monitors data,
 processes it and puts it into ACIS database.
 
-In terms of the ACIS update daemon, a <a ref='collection'
->metadata collection</a> is a set of files with stable names
-with data in it.  Files may be grouped into a voluntarily
-built directory structure.  (Exception: no circular symbolic
-links are allowed.)  Each file contains zero, one or more
-metadata records.  Each record has a unique identifier.
-Identifiers are treated in case-insensitive manner.  Having
-been lowercased they must still be unique.
+In terms of the ACIS update daemon, a <a
+ref='collection'>metadata collection</a> is a set of files
+with stable names with data in it.  Files may be grouped
+into a voluntarily built directory structure.  (Exception:
+no circular symbolic links are allowed.)  Each file contains
+zero, one or more metadata records.  Each record has a
+unique identifier.  Identifiers are treated in
+case-insensitive manner.  Having been lowercased they must
+still be unique.
 
 The data records which have colliding (non-unique) record
 identifiers are excluded from ACIS database.
@@ -399,11 +400,11 @@ string "too many" if more than <co>max_results</co> records
 found.
 
 
-If the LASTNAME value ends with an asterisk character
+<p>If the LASTNAME value ends with an asterisk character
 "<co>*</co>", then it is assumed to be just the beginning of
 the names to search.  For instance, if <co>$last</co> is
 <code>"Mendel*"</code>, it would match both "Mendel" and
-"Mendelssohn" surnames.
+"Mendelssohn" surnames.</p>
 
 The FIRSTNAME, if non-empty, will always be matched in the
 same manner -- against beginnings of the first name &
@@ -973,5 +974,5 @@ will be accompanied by date and time of the request.
 
 
 <id>
-$Id: cooperate.text,v 2.0 2005/12/27 19:47:36 ivan Exp $
+$Id: cooperate.text,v 2.1 2005/12/30 20:55:37 ivan Exp $
 </id>

@@ -61,7 +61,7 @@ call that <i>ACIS home directory</i> or simply <i>home</i>.
 3. Run <code>tmp/ACIS-.../install.sh home</code> to install
 into <code>home</code> directory.
 
-4. Take a look into <a href='bdb-private'>Berkeley DB:
+4. Take a look into <a ref='bdb-private'>Berkeley DB:
    private installation</a>.  This may be the next step to
    do.
 

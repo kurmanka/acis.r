@@ -63,11 +63,12 @@ A typical parameter setting looks like this:
     # If 1, users can request the removal of their submissions from the archive
     $c->{allow_user_removal_request} = 1;
 
-If you need to add a configuration parameter, you'd want to
+<p>If you need to add a configuration parameter, you'd want to
 add a line like this, with your parameter name instead of
 the <co>allow_user_removal_request</co>.  You can do it
 right before the return statement of the <co>get_conf()</co>
 function, or, maybe, right after the initial lines:
+</p>
 
     sub get_conf
     {
@@ -79,8 +80,8 @@ Choose your topping.
 A link on the topic:
 
 <ul><li><a
-href='http://software.eprints.org/docs/php/configarchive.php'
->The Archive Configuration Files</a> from the EPrints online
+href='http://software.eprints.org/docs/php/configarchive.php'>The
+Archive Configuration Files</a> from the EPrints online
 documentation</li>
 </ul>
 
@@ -407,9 +408,7 @@ modify the &lt;ep:phrase&gt; items identified
 <code>eprint\_fieldname\_editors\_id</code>.  The first one
 looks like this:
 
-      <ep:phrase ref="eprint_fieldname_creators_id">Creators email (if known)</ep:phrase>
-
-
+    <ep:phrase ref="eprint_fieldname_creators_id">Creators email (if known)</ep:phrase>
 
 If your installation of EPrints does not have this field,
 you need to enable it in your archive's
@@ -1376,7 +1375,7 @@ server.  All what is left is to notify ACIS about it.
 
 
 <id>
-$Id: eprints.text,v 2.0 2005/12/27 19:47:36 ivan Exp $
+$Id: eprints.text,v 2.1 2005/12/30 20:55:37 ivan Exp $
 </id>
 
 

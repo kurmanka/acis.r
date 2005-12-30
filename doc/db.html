@@ -19,12 +19,11 @@ table tr th {
 <body>
       
 
-   <h1 id="id2602129">Database Tables</h1>
+   <h1 id="id2260090">Database Tables</h1>
 
 <h3><i>Table of contents</i></h3>
-<p class="toc">   <a href="#records-table">Records table</a><br>   <a href="#names-table">Names table</a><br>   <a href="#id2602496">Misc</a><br>      <a href="#pidaid-db-expose">How to expose ACIS database for Person Identification
-Aid</a><br>
-</p>
+<p class="toc">   <a href="#records-table">Records table</a><br>   <a href="#names-table">Names table</a><br>   <a href="#id2260394">Misc</a><br>      <a href="#pidaid-db-expose">How to expose ACIS database for Person Identification
+Aid</a><br></p>
 
 
 
@@ -88,19 +87,19 @@ usually “Firstname Middlename Lastname”</td> </tr>
 
 <tr>
 <td>profile_url</td>
-<td>char(100) binary not null default &quot;&quot;</td>
+<td>char(100) binary not null default ""</td>
 <td>absolute URL of the personal profile page (on the site of the installation)</td>
 </tr>
 
 <tr>
 <td>homepage</td>
-<td>char(130) binary not null default &quot;&quot;</td>
+<td>char(130) binary not null default ""</td>
 <td>URL of the personal homepage, if known</td>
 </tr>
 
 <tr>
 <td>emailmd5</td>
-<td>char(16) binary not null default &quot;&quot;</td>
+<td>char(16) binary not null default ""</td>
 <td>128 bit MD5 digest of the person’s email in lower case, if it is
 known; empty string otherwise.  Calculated as:
 
@@ -154,11 +153,10 @@ equals 255
 
 </table>
 
-<p>An index:  <code> PRIMARY KEY ( shortid, name ) </code>
-</p>
+<p>An index:  <code> PRIMARY KEY ( shortid, name ) </code></p>
 
 
-   <h2 id="id2602496">Misc</h2>
+   <h2 id="id2260394">Misc</h2>
 
 
    <h3 id="pidaid-db-expose">How to expose ACIS database for Person Identification
@@ -196,7 +194,7 @@ the names table.  Here is what statements to run:</p>
 
 <pre><code>GRANT SELECT (shortid,id,namelast,namefull,profile_url,homepage,emailmd5)
   ON <span class="red">acisDatabase</span>.records
-  TO <span class="red">frank@eprints.super.edu</span> IDENTIFIED BY &quot;<span class="red">goblin</span>&quot;;</code>
+  TO <span class="red">frank@eprints.super.edu</span> IDENTIFIED BY "<span class="red">goblin</span>";</code>
 </pre>
 
 <pre><code>GRANT SELECT
@@ -273,11 +271,9 @@ collectively referred to as “MySQL access parameters” in
 
   
 <address class="footer">
-<p>Generated: Sun Nov 27 15:26:53 2005</p>
-<p>
-<a href="http://acis.openlib.org/">ACIS project</a>,
-          acis<i>@</i>openlib<span>.org</span>
-</p>
+<p>Generated: Fri Dec 30 18:17:53 2005</p>
+<p><a href="http://acis.openlib.org/">ACIS project</a>,
+          acis<i>@</i>openlib<span>.org</span></p>
 </address>
 </body>
 </html>

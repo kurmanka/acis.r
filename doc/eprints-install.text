@@ -28,7 +28,7 @@ of the process, you may have to do part of it by yourself.
 
 **For all the levels.**
 
-This includes copying sql_helper, EPrints/{perl_lib,cgi},
+This includes copying sql\_helper, EPrints/{perl\_lib,cgi},
 AMF-perl, EPrints/{pidaid.*,images} to appropriate
 directories of your EPrints.
 
@@ -291,6 +291,6 @@ instructions in the package.
 
 
 <Id>
-$Id: eprints-install.text,v 2.0 2005/12/27 19:47:36 ivan Exp $
+$Id: eprints-install.text,v 2.1 2005/12/30 20:55:37 ivan Exp $
 </Id>
 

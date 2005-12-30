@@ -7,14 +7,13 @@
 <body>
       
 
-   <h1 id="id2589040">ACIS Installation</h1>
+   <h1 id="id2252144">ACIS Installation</h1>
 
 <h3><i>Table of contents</i></h3>
-<p class="toc">   <a href="#id2588877">Requirements</a><br>   <a href="#id2590456">The Files</a><br>   <a href="#id2590473">Installation</a><br>      <a href="#id2590694">Setting up the basic utilities</a><br>   <a href="#id2590750">Upgrading</a><br>   <a href="#id2590800">Miscellaneous troubleshooting</a><br>      <a href="#libxslt">XML::LibXSLT-related difficulties</a><br>
-</p>
+<p class="toc">   <a href="#id2252150">Requirements</a><br>   <a href="#id2252234">The Files</a><br>   <a href="#id2252249">Installation</a><br>      <a href="#id2252436">Setting up the basic utilities</a><br>   <a href="#id2252486">Upgrading</a><br>   <a href="#id2252528">Miscellaneous troubleshooting</a><br>      <a href="#libxslt">XML::LibXSLT-related difficulties</a><br></p>
 
 
-   <h2 id="id2588877">Requirements</h2>
+   <h2 id="id2252150">Requirements</h2>
 
 <p>To use ACIS you need a Unix/Linux system with Perl 5.8,
 MySQL and Apache.  To install ACIS and to perform
@@ -45,13 +44,13 @@ Probably newer versions will work as well.  We have had
 problems with newer XML::LibXSLT versions though, <a href="#libxslt">see below</a>.</p>
 
 
-   <h2 id="id2590456">The Files</h2>
+   <h2 id="id2252234">The Files</h2>
 
 <p>ACIS distribution packages are available from
 <a href="http://acis.openlib.org/code/">http://acis.openlib.org/code/</a>.</p>
 
 
-   <h2 id="id2590473">Installation</h2>
+   <h2 id="id2252249">Installation</h2>
 
 <p>You can run ACIS as a usual Unix user.  For some
 installation steps you will probably need root access.  For
@@ -66,7 +65,7 @@ and shall do as an unprivileged user.</p>
 call that <i>ACIS home directory</i> or simply <i>home</i>.</p></li>
 <li><p>Run <code>tmp/ACIS-.../install.sh home</code> to install
 into <code>home</code> directory.</p></li>
-<li><p>Take a look into <a href="bdb-private">Berkeley DB:
+<li><p>Take a look into <a href="bdb-private.html#bdb-private">Berkeley DB:
 private installation</a>.  This may be the next step to
 do.</p></li>
 <li><p>Configure MySQL. Create a MySQL user with a password, if
@@ -77,18 +76,15 @@ metadata and one for ACIS’ own data.</p></li>
 <li><p>Open <code>main.conf.eg</code> file, edit it to adapt it to
 your system and save as <code>main.conf</code>.  See
 <a href="conf.html">configuration guide</a> for details.</p></li>
-<li><p>
-<a href="apache-conf.html">Configure Apache
+<li><p><a href="apache-conf.html">Configure Apache
 appropriately</a> and restart it, if neccessary.</p></li>
 <li>
-<p>Run <code>bin/setup</code>
-</p>
+<p>Run <code>bin/setup</code></p>
 
 <p>At this stage web interface must respond already.</p>
 </li>
 <li>
-<p>Run <code><a class="c" href="adm.html#binrid">bin/rid</a> start</code>
-</p>
+<p>Run <code><a class="c" href="adm.html#binrid">bin/rid</a> start</code></p>
 
 <p>At this stage, if everything above was done correctly,
 the system is almost ready for a grand opening.  Users
@@ -110,7 +106,7 @@ regularly via crontab.  (See next section.)</p></li>
 </ol>
 
 
-   <h3 id="id2590694">Setting up the basic utilities</h3>
+   <h3 id="id2252436">Setting up the basic utilities</h3>
 
 <p>Configure your machine to start <a class="c" href="adm.html#binrid">bin/rid</a><code>
 start</code> (relative to ACIS home dir) on boot and
@@ -129,7 +125,7 @@ intervals and redirect its output into a log, e.g.:</p>
 batch job to be executed regularly or at low-load periods.</p>
 
 
-   <h2 id="id2590750">Upgrading</h2>
+   <h2 id="id2252486">Upgrading</h2>
 
 <p>If you already have a version of ACIS installed, and want to
 upgrade it to the latest version, the procedure is simple.
@@ -148,7 +144,7 @@ automatically.</p>
 <a class="c" href="adm.html#binrid">bin/rid</a> <code>restart</code>.</p>
 
 
-   <h2 id="id2590800">Miscellaneous troubleshooting</h2>
+   <h2 id="id2252528">Miscellaneous troubleshooting</h2>
 
 
    <h3 id="libxslt">XML::LibXSLT-related difficulties</h3>
@@ -193,11 +189,9 @@ reliable, fast and professional opensource software.</p>
 
   
 <address class="footer">
-<p>Generated: Sun Nov 27 15:26:53 2005</p>
-<p>
-<a href="http://acis.openlib.org/">ACIS project</a>,
-          acis<i>@</i>openlib<span>.org</span>
-</p>
+<p>Generated: Fri Dec 30 18:17:53 2005</p>
+<p><a href="http://acis.openlib.org/">ACIS project</a>,
+          acis<i>@</i>openlib<span>.org</span></p>
 </address>
 </body>
 </html>

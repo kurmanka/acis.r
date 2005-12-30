@@ -7,17 +7,16 @@
 <body>
       
 
-   <h1 id="id2599707">Interoperability with document submission services</h1>
+   <h1 id="id2243201">Interoperability with document submission services</h1>
 
 <h3><i>Table of contents</i></h3>
-<p class="toc">   <a href="#id2599715">Introduction and cooperation levels</a><br>   <a href="#level1">Level 1.  Export document metadata</a><br>      <a href="#id2600080">Generating AMF</a><br>      <a href="#id2600218">Configuring a collection in ACIS</a><br>   <a href="#level2">Level 2. Personal identification fields in
-document metadata</a><br>   <a href="#level3">Level 3. Personal identification aid</a><br>      <a href="#id2600341">The tools</a><br>         <a href="#id2600345">ACIS’ names and records database table</a><br>         <a href="#acis-pidaid">ACIS::PIDAID module</a><br>         <a href="#acis-pidaid-xml">ACIS::PIDAID::XML module</a><br>   <a href="#level4">Level 4.  Metadata update request</a><br>      <a href="#id2601087">Logic of interaction</a><br>      <a href="#meta-update-screen">The <code>/meta/update</code>
-screen</a><br>         <a href="#level4-conf">Configuration</a><br>         <a href="#id2601369">Processing requests (Implementation technical details)</a><br>         <a href="#id2601509">Response</a><br>      <a href="#fetch-func">Data mirroring function (in perl)</a><br>      <a href="#metaupdate-request">Update request helper module
-ACIS::MetaUpdate::Request</a><br>         <a href="#metaupdate-request-conf">Configuration</a><br>         <a href="#id2602025">The acis_metaupdate_request( OBJECT, [PARAMETERS] ) function</a><br>
-</p>
+<p class="toc">   <a href="#id2243084">Introduction and cooperation levels</a><br>   <a href="#level1">Level 1.  Export document metadata</a><br>      <a href="#id2244718">Generating AMF</a><br>      <a href="#id2244837">Configuring a collection in ACIS</a><br>   <a href="#level2">Level 2. Personal identification fields in
+document metadata</a><br>   <a href="#level3">Level 3. Personal identification aid</a><br>      <a href="#id2244940">The tools</a><br>         <a href="#id2244944">ACIS’ names and records database table</a><br>         <a href="#acis-pidaid">ACIS::PIDAID module</a><br>         <a href="#acis-pidaid-xml">ACIS::PIDAID::XML module</a><br>   <a href="#level4">Level 4.  Metadata update request</a><br>      <a href="#id2245575">Logic of interaction</a><br>      <a href="#meta-update-screen">The <code>/meta/update</code>
+screen</a><br>         <a href="#level4-conf">Configuration</a><br>         <a href="#id2245815">Processing requests (Implementation technical details)</a><br>         <a href="#id2245934">Response</a><br>      <a href="#fetch-func">Data mirroring function (in perl)</a><br>      <a href="#metaupdate-request">Update request helper module
+ACIS::MetaUpdate::Request</a><br>         <a href="#metaupdate-request-conf">Configuration</a><br>         <a href="#id2243810">The acis_metaupdate_request( OBJECT, [PARAMETERS] ) function</a><br></p>
 
 
-   <h2 id="id2599715">Introduction and cooperation levels</h2>
+   <h2 id="id2243084">Introduction and cooperation levels</h2>
 
 <p>ACIS <a href="http://acis.openlib.org/documents/saskatoon/">stage 3
 plan</a> (“Saskatoon”) sets the development goal: to make
@@ -34,13 +33,11 @@ submission service are possible.  The higher the level,
 the easier will be user experience and/or more precise and
 complete will be the metadata collected.</p>
 
-<p>
-<strong>Level 0</strong>: A submission service and an ACIS service exist and
+<p><strong>Level 0</strong>: A submission service and an ACIS service exist and
 function completely independently.  There’s no data exchange
 between them.  Nothing interesting happens.</p>
 
-<p>
-<strong>Level 1</strong>: A submission service provides all of its
+<p><strong>Level 1</strong>: A submission service provides all of its
 document metadata to an ACIS system.  The data is in a
 stable simple directory and file structure and is in a
 compatible format.  ACIS processes it on a regular basis,
@@ -52,8 +49,7 @@ source).  Compatible metadata formats for ACIS are <a href="http://amf.openlib.o
 to get them to the ACIS machine, but that’s out of scope of
 ACIS.</p>
 
-<p>
-<strong>Level 2</strong>: A submission service includes personal
+<p><strong>Level 2</strong>: A submission service includes personal
 identification data into its author and editor sections of
 the document metadata.  Personal identification data is one
 of:</p>
@@ -76,8 +72,7 @@ So on this level the service must allow its users to enter
 such information and it must include it into the generated
 metadata.</p>
 
-<p>
-<strong>Level 3</strong>: A submission service helps its users to find
+<p><strong>Level 3</strong>: A submission service helps its users to find
 personal identification data and include it into the
 document metadata.</p>
 
@@ -101,8 +96,7 @@ an easy method to choose an option.</p>
 can the user interface of a document submission service be
 enhanced.</p>
 
-<p>
-<strong>Level 4</strong>: Submission service immediately notifies an ACIS
+<p><strong>Level 4</strong>: Submission service immediately notifies an ACIS
 service about each new document submission.  ACIS service in
 real-time requests this data via web (http or ftp), stores
 it locally and processes it.  If known personal identifiers
@@ -132,20 +126,20 @@ you want an ACIS service to consume document metadata that
 your service is collecting.  Then you need to build a
 metadata collection.</p>
 
-<p>
-<a href="daemon.html#collection">Metadata collections</a> is what ACIS
+<p><a href="daemon.html#collection">Metadata collections</a> is what ACIS
 update daemon keeps track of.  <a href="daemon.html#ri-daemon">Update
 daemon</a> is what ACIS uses to process document and other
 metadata, that is coming from outside.  It monitors data,
 processes it and puts it into ACIS database.</p>
 
-<p>In terms of the ACIS update daemon, a <a href="daemon.html#collection">metadata collection</a> is a set of files with stable names
-with data in it.  Files may be grouped into a voluntarily
-built directory structure.  (Exception: no circular symbolic
-links are allowed.)  Each file contains zero, one or more
-metadata records.  Each record has a unique identifier.
-Identifiers are treated in case-insensitive manner.  Having
-been lowercased they must still be unique.</p>
+<p>In terms of the ACIS update daemon, a <a href="daemon.html#collection">metadata collection</a> is a set of files
+with stable names with data in it.  Files may be grouped
+into a voluntarily built directory structure.  (Exception:
+no circular symbolic links are allowed.)  Each file contains
+zero, one or more metadata records.  Each record has a
+unique identifier.  Identifiers are treated in
+case-insensitive manner.  Having been lowercased they must
+still be unique.</p>
 
 <p>The data records which have colliding (non-unique) record
 identifiers are excluded from ACIS database.</p>
@@ -178,7 +172,7 @@ it.  So ACIS won’t have to read and process them every time,
 which is especially good if there are a lot of files.</p>
 
 
-   <h3 id="id2600080">Generating AMF</h3>
+   <h3 id="id2244718">Generating AMF</h3>
 
 <p>AMF is an XML-based format for academic metadata.  It is
 documented 
@@ -203,16 +197,16 @@ use AMF::Record;
 
 my $new  = AMF::Record -&gt; new( ID =&gt; 'GFIO:ZXCVBN', TYPE =&gt; 'text' );  # create a record
 
-$new -&gt; adjective( 'title', { 'xml:lang' =&gt; 'en' }, &quot;New AMF text noun&quot; );  # assign english-language title
+$new -&gt; adjective( 'title', { 'xml:lang' =&gt; 'en' }, "New AMF text noun" );  # assign english-language title
 
 my $person = AMF::Record -&gt; new( TYPE =&gt; 'person' );                   # create a person record
-$person -&gt; adjective( 'givenname',  {}, &quot;Joe&quot;   );
-$person -&gt; adjective( 'familyname', {}, &quot;Spark&quot; );
-$new -&gt; verb( &quot;hasauthor&quot;, {}, $person );                              # assign author to the record
+$person -&gt; adjective( 'givenname',  {}, "Joe"   );
+$person -&gt; adjective( 'familyname', {}, "Spark" );
+$new -&gt; verb( "hasauthor", {}, $person );                              # assign author to the record
 
 my $file = AMF::AdjContainer -&gt; new;                                   # create an  adjective container
-$file -&gt; adjective( 'url',    {}, &quot;http://file.service.site/great/file.pdf&quot; );
-$file -&gt; adjective( 'format', {}, &quot;application/pdf&quot; );
+$file -&gt; adjective( 'url',    {}, "http://file.service.site/great/file.pdf" );
+$file -&gt; adjective( 'format', {}, "application/pdf" );
 
 $new -&gt; adjcontainer( 'file', {}, $file );                             # assign the file container to the record
 
@@ -236,7 +230,7 @@ It looks like this:</p>
 (case-insensitive) to be processed by ACIS.</p>
 
 
-   <h3 id="id2600218">Configuring a collection in ACIS</h3>
+   <h3 id="id2244837">Configuring a collection in ACIS</h3>
 
 <p>For an ACIS service to use a metadata collection it needs to
 be added to the <a href="daemon.html#ri-collections">collections
@@ -266,8 +260,7 @@ exported to ACIS (see <a href="#level1">level 1</a>).</p>
 
    <h2 id="level3">Level 3. Personal identification aid</h2>
 
-<p>
-<a href="http://acis.openlib.org/documents/saskatoon/">Saskatoon</a>
+<p><a href="http://acis.openlib.org/documents/saskatoon/">Saskatoon</a>
 document says:</p>
 
 <blockquote>
@@ -289,13 +282,12 @@ EPrints</a>.  In this section we describe some general
 tools, which can be used by anyone who steps on this path.</p>
 
 
-   <h3 id="id2600341">The tools</h3>
+   <h3 id="id2244940">The tools</h3>
 
 
-   <h4 id="id2600345">ACIS’ names and records database table</h4>
+   <h4 id="id2244944">ACIS’ names and records database table</h4>
 
-<p>
-<a href="db.html">The <var>names</var> and
+<p><a href="db.html">The <var>names</var> and
 <var>records</var> tables</a> of an ACIS service database is
 the most basic tool you’ll need.  An ACIS administrator
 controls who and how can access the tables.  See <a href="db.html#pidaid-db-expose">How to expose ACIS database for
@@ -308,7 +300,7 @@ Person Identification Aid</a> for more details.</p>
 results as a list of personal data records.</p>
 
 
-   <h5 id="id2600400">Configuration</h5>
+   <h5 id="id2244993">Configuration</h5>
 
 <p>Parameters:</p>
 
@@ -330,8 +322,7 @@ results as a list of personal data records.</p>
 </ul>
 </li>
 <li>
-<p>
-<code>max_results</code> — maximum number of results to return.</p>
+<p><code>max_results</code> — maximum number of results to return.</p>
 
 <p>This specifies maximum number of matching personal
 records to return from a search operation.
@@ -341,8 +332,7 @@ Default: 15.</p>
 
 <p>There are two ways of specifying the configuration.</p>
 
-<p>
-<strong>First:</strong> directly define variable $ACIS::PIDAID::CONF:</p>
+<p><strong>First:</strong> directly define variable $ACIS::PIDAID::CONF:</p>
 
 <pre><code>$ACIS::PIDAID::CONF = {
   host =&gt; 'acis.super.edu',
@@ -354,8 +344,7 @@ Default: 15.</p>
 };
 </code></pre>
 
-<p>
-<strong>Second:</strong> pass a hash of these parameters to the
+<p><strong>Second:</strong> pass a hash of these parameters to the
 PIDAID object constructor <code>new()</code> as a reference.</p>
 
 <pre><code>my $conf = {
@@ -370,7 +359,7 @@ my $pidaid = ACIS::PIDAID -&gt; new( $conf );
 </code></pre>
 
 
-   <h5 id="id2600529">Constructor: new( [CONF] )</h5>
+   <h5 id="id2245100">Constructor: new( [CONF] )</h5>
 
 <p>Usage example: </p>
 
@@ -387,7 +376,7 @@ fails to connect to the specified database.</p>
 on success.</p>
 
 
-   <h5 id="id2600562">Method: find_by_name( LASTNAME [, FIRSTNAME ] )</h5>
+   <h5 id="id2245128">Method: find_by_name( LASTNAME [, FIRSTNAME ] )</h5>
 
 <p>Usage example:</p>
 
@@ -407,7 +396,7 @@ found.</p>
 <p>If the LASTNAME value ends with an asterisk character
 “<code>*</code>”, then it is assumed to be just the beginning of
 the names to search.  For instance, if <code>$last</code> is
-<code>&quot;Mendel*&quot;</code>, it would match both “Mendel” and
+<code>"Mendel*"</code>, it would match both “Mendel” and
 “Mendelssohn” surnames.</p>
 
 <p>The FIRSTNAME, if non-empty, will always be matched in the
@@ -423,38 +412,30 @@ empty strings, it will return “too many” string.</p>
 the following structure:</p>
 
 <ul>
-<li><p>
-<code>shortid</code> — the person’s record short-id;</p></li>
-<li><p>
-<code>id</code> — the person’s record id (handle);</p></li>
-<li><p>
-<code>profile_url</code> — URL of a detailed page about the
+<li><p><code>shortid</code> — the person’s record short-id;</p></li>
+<li><p><code>id</code> — the person’s record id (handle);</p></li>
+<li><p><code>profile_url</code> — URL of a detailed page about the
 person;</p></li>
-<li><p>
-<code>namelast</code> — full name of the person in format
+<li><p><code>namelast</code> — full name of the person in format
 “Lastname, Firstname M.”;</p></li>
-<li><p>
-<code>familyname</code> — the “Lastname” part of <code>namelast</code> value</p></li>
-<li><p>
-<code>givenname</code> — the “Firstname M.” part of
+<li><p><code>familyname</code> — the “Lastname” part of <code>namelast</code> value</p></li>
+<li><p><code>givenname</code> — the “Firstname M.” part of
 <code>namelast</code> value, will include middle names or initials
 if known;</p></li>
-<li><p>
-<code>namefull</code> — full name of the person as she
+<li><p><code>namefull</code> — full name of the person as she
 identified herself to ACIS, usually in format “Firstname
 M. Lastname”. Not necessarily equals <code>familyname</code>
 and <code>givenname</code> combined.</p></li>
-<li><p>
-<code>homepage</code> — URL of the person’s homepage, if
+<li><p><code>homepage</code> — URL of the person’s homepage, if
 known.</p></li>
 </ul>
 
 
-   <h5 id="id2600766">Method: find_by_shortid( SHORTID )</h5>
+   <h5 id="id2245303">Method: find_by_shortid( SHORTID )</h5>
 
 <p>Usage example:</p>
 
-<pre><code>my $persons = $pidaid -&gt; find_by_shortid( &quot;pre32&quot; );
+<pre><code>my $persons = $pidaid -&gt; find_by_shortid( "pre32" );
 </code></pre>
 
 <p>The SHORTID — somebody’s short-id — ACIS-assigned short
@@ -472,7 +453,7 @@ found.  </p></li>
 <code>find_by_name()</code>.</p>
 
 
-   <h5 id="id2600825">Method: find_by_email( EMAIL )</h5>
+   <h5 id="id2245352">Method: find_by_email( EMAIL )</h5>
 
 <p>Usage example:</p>
 
@@ -545,9 +526,9 @@ produce well-formed XML.  The produced XML string will be in
 UTF-8 encoding.</p>
 
 <p>If the <code>$persons</code> parameter is not a list
-reference, but, instead, is a string <code>&quot;too
-many&quot;</code>, the function will return
-<code>&quot;&lt;toomany/&gt;&quot;</code> XML.</p>
+reference, but, instead, is a string <code>"too
+many"</code>, the function will return
+<code>"&lt;toomany/&gt;"</code> XML.</p>
 
 
    <h2 id="level4">Level 4.  Metadata update request</h2>
@@ -580,7 +561,7 @@ successful (<a href="cooperate.html#meta-update-screen">this part</a>, at
 least).</p>
 
 
-   <h3 id="id2601087">Logic of interaction</h3>
+   <h3 id="id2245575">Logic of interaction</h3>
 
 <p>Here is the basic logic of what happens between a document
 submission service and an ACIS service, if all 4 levels are
@@ -649,10 +630,10 @@ requests from these IP addresses.</p>
 
 <p>Parameter value is a whitespace-separated list of
 IP/archive specifications, where each specification is of
-the form <i>ID</i> + <code>&quot;@&quot;</code> + <i>IP</i>.  Here:
+the form <i>ID</i> + <code>"@"</code> + <i>IP</i>.  Here:
 <i>ID</i> is identifier of an archive.  <i>IP</i> is a
 numeric IP address of the machine the archive will send
-requests from.  <code>&quot;@&quot;</code> is a literal “commercial
+requests from.  <code>"@"</code> is a literal “commercial
 at” character.</p>
 
 <p>Example:</p>
@@ -690,7 +671,7 @@ and interface <a href="#fetch-func">are below</a>.</p>
 </dl>
 
 
-   <h4 id="id2601369">Processing requests (Implementation technical details)</h4>
+   <h4 id="id2245815">Processing requests (Implementation technical details)</h4>
 
 <p>Requests for the screen are processed by the
 ACIS::Web::MetaUpdate module.  Two main functions of this
@@ -727,15 +708,14 @@ RePEc::Index::UpdateClient module;</p>
 RePEc::Index::UpdateClient::send_update_request( $collection, $file );
 </code></pre>
 
-<p>
-<code>$file</code> here is a relative pathname to file or
+<p><code>$file</code> here is a relative pathname to file or
 directory to update in <a href="daemon.html#collection">collection</a> <code>$collection</code>.</p>
 </li>
 <li><p>return appropriate response to the requesting party; see below.</p></li>
 </ul>
 
 
-   <h4 id="id2601509">Response</h4>
+   <h4 id="id2245934">Response</h4>
 
 <p>The <code>/meta/update</code> screen’s response always consists
 of a certain HTTP response Status header and the response
@@ -836,15 +816,15 @@ following keys:</p>
 
 <ul>
 <li>
-<code>&quot;archive unknown&quot;</code> — if function does
+<code>"archive unknown"</code> — if function does
 not know how to access the archive.</li>
 
 <li>
-<code>&quot;can not fetch&quot;</code> — archive is known, but it failed to
+<code>"can not fetch"</code> — archive is known, but it failed to
 connect and fetch the object from it.</li>
 
 <li>
-<code>&quot;ok&quot;</code> — archive is known, object is fetched
+<code>"ok"</code> — archive is known, object is fetched
 and saved.</li>
 </ul>
 </td>
@@ -866,7 +846,7 @@ to the collection’s root point.</td>
 </table>
 
 <p>Note: <code>collection</code> and <code>pathname</code> are only needed
-if the <code>status</code> is <code>&quot;ok&quot;</code>.</p>
+if the <code>status</code> is <code>"ok"</code>.</p>
 
 <p>How will the function access the archive and fetch the
 requested object is completely a matter of implementation.
@@ -908,16 +888,13 @@ acis_metaupdate_request( $filename );
 <p>Parameters:</p>
 
 <ul>
-<li><p>
-<code>request-target-url</code> — the URL address of the
+<li><p><code>request-target-url</code> — the URL address of the
 <code>/meta/update</code> screen of an ACIS installation to
 send requests to; required parameter;</p></li>
-<li><p>
-<code>archive-id</code> — identifier of the archive to send
+<li><p><code>archive-id</code> — identifier of the archive to send
 requests on behalf of; must be negotiated with the ACIS
 service administrator; required parameter;</p></li>
-<li><p>
-<code>log-filename</code> — name of the log file to write;
+<li><p><code>log-filename</code> — name of the log file to write;
 optional.</p></li>
 </ul>
 
@@ -940,7 +917,7 @@ acis_metaupdate_request() function call; see below.</p></li>
 </ul>
 
 
-   <h4 id="id2602025">The acis_metaupdate_request( OBJECT, [PARAMETERS] ) function</h4>
+   <h4 id="id2243810">The acis_metaupdate_request( OBJECT, [PARAMETERS] ) function</h4>
 
 <p>Example: </p>
 
@@ -979,13 +956,11 @@ will be accompanied by date and time of the request.</p>
   
 <address class="footer">
 <p>
-$Id: cooperate.html,v 2.0 2005/12/27 19:47:36 ivan Exp $
+$Id: cooperate.html,v 2.1 2005/12/30 20:55:37 ivan Exp $
 </p>
-<p>Generated: Sun Nov 27 15:26:53 2005</p>
-<p>
-<a href="http://acis.openlib.org/">ACIS project</a>,
-          acis<i>@</i>openlib<span>.org</span>
-</p>
+<p>Generated: Fri Dec 30 18:17:53 2005</p>
+<p><a href="http://acis.openlib.org/">ACIS project</a>,
+          acis<i>@</i>openlib<span>.org</span></p>
 </address>
 </body>
 </html>

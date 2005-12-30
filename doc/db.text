@@ -28,8 +28,8 @@ currently maintained through the system.  Database name: as
 configured in main.conf via <c>acis-db-name</c>, table name:
 <var>records</var>.
 
-Columns: shortid, id, owner, userdata_file, namelast,
-namefull, profile_url, emailmd5.
+Columns: shortid, id, owner, userdata\_file, namelast,
+namefull, profile\_url, emailmd5.
 
 
 
@@ -237,8 +237,7 @@ administrator have to:
   (e.g. <code><span class='red'>goblin</span></code>) to the
   submission service administrator.  (These items are
   collectively referred to as "MySQL access parameters" in
-  <a href='http://acis.openlib.org/documents/saskatoon/'
-  >Saskatoon</a> doc.)
+  <a href='http://acis.openlib.org/documents/saskatoon/'>Saskatoon</a> doc.)
 
 
 

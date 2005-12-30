@@ -8,18 +8,16 @@ installation / ACIS documentation</title>
 <body>
       
 
-   <h1 id="private-bdb">Berkeley DB library: private
+   <h1 id="bdb-private">Berkeley DB library: private
 installation</h1>
 
 <h3><i>Table of contents</i></h3>
-<p class="toc">   <a href="#id2607380">Intro</a><br>   <a href="#id2607410">The problem</a><br>   <a href="#id2607450">Installing the library</a><br>   <a href="#id2607592">Installing the BerkeleyDB perl module</a><br>
-</p>
+<p class="toc">   <a href="#id2251744">Intro</a><br>   <a href="#id2251769">The problem</a><br>   <a href="#id2251803">Installing the library</a><br>   <a href="#id2251925">Installing the BerkeleyDB perl module</a><br></p>
 
 
-   <h2 id="id2607380">Intro</h2>
+   <h2 id="id2251744">Intro</h2>
 
-<p>
-<a href="http://www.sleepycat.com/products/db.shtml">Berkeley
+<p><a href="http://www.sleepycat.com/products/db.shtml">Berkeley
 DB</a> is a very common industrial-strength open source
 embedded database library.  It is used in a huge number of
 applications and appliances.  ACIS uses Berkeley DB for its
@@ -29,7 +27,7 @@ applications and appliances.  ACIS uses Berkeley DB for its
 have it installed.</p>
 
 
-   <h2 id="id2607410">The problem</h2>
+   <h2 id="id2251769">The problem</h2>
 
 <p>There is one problem with this library.  It requires special
 attention in case you are really doing a production-level
@@ -54,7 +52,7 @@ This way you’ll be independent of the system-wide upgrades
 and save yourself from some headache.</p>
 
 
-   <h2 id="id2607450">Installing the library</h2>
+   <h2 id="id2251803">Installing the library</h2>
 
 <p>Here is a little description of how I did this.  Your
 configuration will be different, but the general algorithm
@@ -120,7 +118,7 @@ $ ln -s bdb-4.3.27 bdb
 </table>
 
 
-   <h2 id="id2607592">Installing the BerkeleyDB perl module</h2>
+   <h2 id="id2251925">Installing the BerkeleyDB perl module</h2>
 
 <p>Next step was to install the perl module <a href="http://search.cpan.org/dist/BerkeleyDB/">BerkeleyDB</a>.</p>
 
@@ -173,11 +171,9 @@ previous stages, you are now ready to fire up the <a href="daemon.html">update d
 
   
 <address class="footer">
-<p>Generated: Sun Nov 27 15:26:53 2005</p>
-<p>
-<a href="http://acis.openlib.org/">ACIS project</a>,
-          acis<i>@</i>openlib<span>.org</span>
-</p>
+<p>Generated: Fri Dec 30 18:17:53 2005</p>
+<p><a href="http://acis.openlib.org/">ACIS project</a>,
+          acis<i>@</i>openlib<span>.org</span></p>
 </address>
 </body>
 </html>

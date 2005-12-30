@@ -1,17 +1,16 @@
 #!/usr/bin/perl
 
 use strict;
+use Carp::Assert;
+
+#my $md = './Markdown.pl';
 my $md = `which Markdown.pl`;
-#my $md = `which Markdown.pl.orig`;
-#my $md = `which Markdown1.0.pl`;
-
-if ( not $md ) { die "Markdown.pl not found"; }
 chomp $md;
+if ( not $md ) { die "Markdown.pl not found"; }
 
+#my $sp = './SmartyPants.pl';
 my $sp = `which SmartyPants.pl`;
-if ( $sp ) {
-  chomp $sp;
-}
+chomp $sp;
 
 
 my $xp = `which xsltproc`;
@@ -60,7 +59,9 @@ foreach ( @src ) {
 
   $name = $1;
 
+#  print "Run: $md $_\n";
   my $text = `$md $_`;
+  assert( $text );
 
   $text =~ s!<p>(</?ignore\s*>)</p>\n*!$1!gm;
 
@@ -72,6 +73,7 @@ foreach ( @src ) {
 pi "</doc>";
 
 close IND;
+
 
 if ( $sp ) {
   my $typ = `$sp tmp/index.xml`;
