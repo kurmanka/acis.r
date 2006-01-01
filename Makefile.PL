@@ -57,6 +57,7 @@ WriteMakefile
                      'XML::XPath'   => '1.12',
                      'XML::LibXSLT' => "",
                      'AppConfig'    => "1.52",
+                     'Proc::Daemon' => "0.03",
 
                     }, 
    DIR => [ @dirs ],
