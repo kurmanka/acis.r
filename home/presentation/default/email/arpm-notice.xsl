@@ -159,7 +159,7 @@
     ><xsl:value-of select='$base-url'/>/research/autoupdate</a>
     </p>
 
-    <xsl:if test='$user-pass'>
+    <xsl:if test='$user-pass and not($user-type/hide-password)'>
       <p>Your password in our service is: <xsl:value-of select='$user-pass'/></p>
     </xsl:if>
 
