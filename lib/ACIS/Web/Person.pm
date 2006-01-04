@@ -27,7 +27,7 @@ package ACIS::Web::Person;  ### -*-perl-*-
 #  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 #
 #  ---
-#  $Id: Person.pm,v 2.0 2005/12/27 19:47:39 ivan Exp $
+#  $Id: Person.pm,v 2.1 2006/01/04 14:20:36 ivan Exp $
 #  ---
 
 use strict;
@@ -75,7 +75,7 @@ sub compile_name_variations {
     # normalize
     s/\s+/ /g;
     s/\b(\p{Lu})(\s|$)/$1.$2/g;  # initials
-    s/(\.)(\w)/$1 $2/g;          # initials
+    s/([\.,])(\w)/$1 $2/g;       # initials
 
     # exclude repeated items
     if ( $hash->{$_} ) { undef $_; next; }
