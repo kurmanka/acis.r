@@ -8,6 +8,7 @@ requires:
     AppConfig:                     1.52
     Carp::Assert:                  0.17
     CGI::Untaint:                  
+    Proc::Daemon:                  0.03
     Storable:                      1.013
     XML::LibXSLT:                  
     XML::XPath:                    1.12
