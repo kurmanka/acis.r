@@ -1,0 +1,107 @@
+# ACIS Citations TO DO List
+
+iku: 2006-01-19 16:40
+
+
+Research 
+
+  - string similarity assessment algorithm
+
+    - String::Similarity ?
+
+  - input processing, citations table maintenance,
+
+  - citation string normalization
+
+  - removing edited (collected) works from the searchable citations
+
+  - similar citations clustering
+
+  - citations profile screen
+
+     - study Thomson Web of Science tutorials
+
+     - basic main procedure for verification and identification
+
+     - browsing the currently accepted citations
+
+     - refused citations (and, for a company, refused research sub-screen)
+
+  - offline citations search for every user
+
+Specify
+
+ - input data requirements
+
+ - configuration parameters
+
+ - userdata structures for citations
+
+ - the citations table structure
+
+Specification
+
+  - write it all down, negotiate, fix and get it approved
+
+Configuration Parameters
+
+  - citations-profile  (logical, on or off)
+
+  - citations collections ? (which of the data collections are citations collections)
+
+     - use it in bin/setup.ri_collections
+
+Database tables
+
+  - citations table
+
+Citations processing
+
+  - input data processing, maintaining the citations table
+
+  - citations search for a personal record (by the name variations)
+
+  - saving and restoring citations from the suggestions table
+
+  - string similarity assessment algorithm 
+
+  - citations data output in the personal AMF records (presenter
+    export/amf-person.xsl)
+
+Citation profile screen
+
+  - presenters in presentation/default/
+
+     - citations/main.xsl
+
+     - citations/browse.xsl
+
+     - citations/searching.xsl
+
+     - ...
+
+  - module lib/ACIS/Web/Citations.pm
+
+     - prepare for work
+
+     - display currently verified and identified citations
+
+     - general post handler
+
+     - check all citations to see if they are still in the database
+
+     - ...
+
+Test
+
+  - get some citations data (from Jose-Manuel)
+
+  - make some citations data for local-testing
+
+  - ...
+
+
+Documentation
+
+
+   

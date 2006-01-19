@@ -1,0 +1,143 @@
+Citations in ACIS
+
+
+2006-01-13 16:32 
+
+The incoming citations data have to be processed and saved into a database.
+Not only it has to be written to the database, but the database has to be
+brought in sync with the data.  This means that some records will have to be
+deleted from it, if they disappear from the original files.
+
+(Two ways here: use RePEc-Index and ARDB or put all citations data into a
+temporary table and then replace the old table with the new one.  That's A
+QUESTION.)
+
+Incoming data will probably look like this:
+
+    <amf ...>
+      <text ref="ref">
+        <reference>
+          <literal> text of citation </literal>
+        </reference>
+        <reference>
+          <literal> another citation </literal>
+        </reference>
+        ...
+      </text>
+
+      <text>
+        ....
+      </text>
+
+      ...
+    </amf>
+
+
+And we put it into a table of the following structure:
+
+  document id | normalized searchable citation string | full original citation text
+
+QUESTION: we need to define the table structure and for that we have to have a
+reasonable maximum length of the normalized searchable citation string field.
+(On the other hand, is this really a problem?  Because we will only search by
+name variations and the author names are always in the beginning of the
+citation string, aren't they?  So it is not a problem, it may even be used as
+a feature. ;-) )
+
+Later, we use this table to find the relevant citations when a user enters a
+citations profile and starts a search.
+
+
+
+2006-01-16 13:38
+
+
+Offline citation search will be run in a way similar to ARPU (via bin/arpm) or
+will be joined with ARPU.  It will execute a search for the personal name
+variations in the citations table, filter out the already found or refused
+and will store the rest in the suggestions table.
+
+Online citation search will run like the background automatic research search
+and there will be a status screen, which will show that the process is going
+on and the results are not ready yet.
+
+
+As we read data citations from the suggestions table, we can reconstruct the
+refering object's data (with the help of the resources table): title, authors,
+type, details link.
+
+After that stage we have a pool of citations and a pool of documents and we
+need to establish the matches between the items of this pool.  A citation can
+point to one document, not to several.  But many citations can point to a
+single document.  Citations also may be brought by mistake, they can point to
+some other person.  We will give the user an option to filter it out.  (How?)
+
+
+
+
+When we are about to present the citations to the user for verification and
+identification, we need a string similarity algorithm.  With it we will
+identify, which documents are the most interesting ones in terms of citations.
+Probably, the ones which have most citations are also the most valuable to the
+author himself.
+
+When the documents are ordered by their "interestingness", we can verify and
+identify the citations.   
+
+
+2006-01-17 
+
+Here I suggest to do both things together, without a separate verification,
+even though it was planned originally.
+
+We go through the interesting documents, one by one, starting with the most
+interesting one.  Right after the document's description on the page we list
+citations that we believe may be relevant to it.  Below that we list citations
+which were identified as pointing to this document earlier.  Both lists will
+be clearly separated.  Each item in the first list will have a checkbox to
+confirm that this citation really points to this document.  The checkbox will
+probably be checked by default, but it may depend on the level of similarity
+found.
+
+Then there also will be a checkbox to deny (refuse) a citation.  Unchecked by
+default.  If the user checks it and sends the form, we will put that citation
+into the refused list, and will not show it on the following document screens.
+
+For each step we will have to find the most interesting document given the set
+of current citations for that moment.  Let us measure similarity by numbers.
+Then, we will build a matrix of similarity levels found between every
+suggested citation and every document in the research profile.  After each
+step we will throw away the citation rows of the identified and the refused
+citations.  Then we will sum up the citations' similarity numbers for each
+document and will choose the one with the largest number.
+
+
+
+For each citation we will show the original citation string, the title, the
+authors, type of the referencing work and a link to its full details.
+
+
+Then there may be some citations left after this with no document that is
+similar to them.  Those we may show and verify.  By verify we mean: ask the
+user, if these are citations of his works or not?
+
+Given that there may be lots of citations (who knows?) we will have to make
+a paging mechanism for them on this screen.
+
+On every stage of the process we want to show the user how many more citations
+are there for her to process.
+
+Several citations may come from a single document, so it would make sense to
+group them.
+
+
+2006-01-17 17:37
+
+CITATIONS DATA PROCESSING QUESTIONS
+
+Checksum of all the citations of a document?  How to process if a citation is
+removed from a document?  How will the citations profile get cleared of such
+citations?
+
+
+
