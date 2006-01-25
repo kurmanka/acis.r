@@ -2,10 +2,15 @@ if test $perllibprepend
 then 
     perlparams="-I$perllibprepend"
 fi
+if test "$ACIS_cgi_perl_wrapper"
+then 
+    perlbin=$ACIS_cgi_perl_wrapper
+fi
 echo "#!$perlbin $perlparams"
 echo 
 echo "use lib qw( $homelib );"
-echo
+echo "use vars qw( \$acis );"
+echo 
 if [[ $perllibadd ]]; then
   echo "push @INC, '$perllibadd';"      
   echo ""                               
@@ -18,16 +23,25 @@ then
   echo 'BEGIN {'
   echo '    print "Content-Type: text/html; charset=utf-8\nCache-Control: no-cache\n\n";'
   echo '    $Web::App::DEBUGIMMEDIATELY = "on";'
-  echo '    $ACIS::DEBUGIMMEDIATELY = "on";'
   echo '    undef $\;'
   echo '}'
 fi
 echo
-echo 'BEGIN { $Web::App::DEBUG = "on"; }'
+if test $ACIS_debug; then
+  echo 'BEGIN { $Web::App::DEBUG = "on"; }'
+fi
 echo
 echo 'use ACIS::Web;'
-echo 'my $acis = new ACIS::Web( );'
+echo '$acis ||= new ACIS::Web( );'
+#if test $ACIS_cgi_perl_wrapper; then
+#else 
+#  echo '$acis = new ACIS::Web( );'
+#fi
 echo
 echo '$acis -> handle_request;'
+if test "$ACIS_cgi_perl_wrapper"
+then
+  echo '$acis -> clear_after_request;'
+fi
 echo
-
+#echo 'close STDIN;'

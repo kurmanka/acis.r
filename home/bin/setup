@@ -116,6 +116,11 @@ if test $ACIS_base_cgi_script_filename; then
   chmod +x $ACIS_base_cgi_script_filename
 fi
 
+if test "$ACIS_cgi_perl_wrapper"; then
+    # reinitialize the persistent environment
+    $ACIS_cgi_perl_wrapper_restart $ACIS_base_cgi_script_filename
+fi
+
 if test -z $ACIS_tempate_set; then
     ACIS_template_set='default'
 fi

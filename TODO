@@ -1,3 +1,6 @@
+Set CGI::Untaint version requirements in install.html and in Makefile.PL to at
+least 1.23
+
 short-id assignment: two simultaneous requests should not
 interfere.
 

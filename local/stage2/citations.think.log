@@ -111,7 +111,9 @@ step we will throw away the citation rows of the identified and the refused
 citations.  Then we will sum up the citations' similarity numbers for each
 document and will choose the one with the largest number.
 
-
+* But the similarity level number will have to be zero for neglegible
+  similarity, or it will influence the "interstingness" sorting in an
+  undesired way. (2006-01-19 16:46)
 
 For each citation we will show the original citation string, the title, the
 authors, type of the referencing work and a link to its full details.
@@ -138,6 +140,24 @@ CITATIONS DATA PROCESSING QUESTIONS
 Checksum of all the citations of a document?  How to process if a citation is
 removed from a document?  How will the citations profile get cleared of such
 citations?
+
+
+
+2006-01-19 18:02
+
+All the development again has to be divided into levels, but not exactly in
+the same way as it was in stage 3.  There must be the most basic level first,
+which will be functional on itself.  It must be workable on its own, it must
+be sufficient.  Then the improvements.
+
+For a sufficient level some interactions or design may be rough, some advanced
+features may be anavailable.  
+
+This is not reflected in the current plan.
+
+
+
+
 
 
 

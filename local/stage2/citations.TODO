@@ -13,9 +13,21 @@ Research
 
   - citation string normalization
 
+     - Unicode decomposition, upper case, add spaces after
+       dots and after commas, remove spaces between a dot
+       and a comma, compact all whitespace, remove starting
+       and trailing whitespace.
+
   - removing edited (collected) works from the searchable citations
 
+     - not on the basic level
+
+     - possible: if the handle belongs to this namespace,
+       apply this regexp to extract the searchable part
+
   - similar citations clustering
+
+     - no
 
   - citations profile screen
 

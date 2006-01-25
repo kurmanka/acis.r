@@ -25,7 +25,7 @@ package Web::App;   ### -*-perl-*-
 #  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 #
 #  ---
-#  $Id: App.pm,v 2.2 2006/01/25 14:19:38 ivan Exp $
+#  $Id: App.pm,v 2.3 2006/01/25 14:25:22 ivan Exp $
 #  ---
 
 
@@ -775,7 +775,11 @@ sub handle_request {
     querystring => $ENV{QUERY_STRING},
   };
 
+<<<<<<< App.pm
+  debug "REQUEST_METHOD: ", $request->{method} || '';
+=======
   debug "REQUEST_METHOD: $request->{method}";
+>>>>>>> 2.2
 
 
   ### some mode settings
@@ -1130,7 +1134,7 @@ sub print_http_response_headers {
   my $location = $response ->{'redirect-to'};
 
   if ( $location ) {
-    debug "Location header: $location";
+    debug "Location: $location";
     $Web::App::DEBUGIMMEDIATELY
                  ? print "Location: <a href='$location'>$location</a>\n\n" 
                  : print "Location: $location\n\n";
