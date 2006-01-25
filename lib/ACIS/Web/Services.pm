@@ -28,7 +28,7 @@ package ACIS::Web;   ### -*-perl-*-
 #  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 #
 #  ---
-#  $Id: Services.pm,v 2.0 2005/12/27 19:47:40 ivan Exp $
+#  $Id: Services.pm,v 2.1 2006/01/25 14:19:38 ivan Exp $
 #  ---
 
 use strict;
@@ -393,21 +393,22 @@ sub authenticate {
   my $passwd;
 
   debug "check CGI parameters and cookies";
-  
+
   # now we find out
 
   my $form_input = $app -> form_input;
-  my $query      = $app -> request -> {CGI} ;
- 
-  $login  = $form_input -> {login}; 
-  $passwd = $form_input -> {pass}; 
- 
+
+  $login  = $form_input -> {login};
+  $passwd = $form_input -> {pass};
+
+#  my $cookies = $app -> request -> {cookies};
+
   if ( not $login ) {
-    $login = $query -> cookie ( 'login' );
+    $login = $app -> get_cookie ( 'login' );
   }
 
   if ( not $passwd ) {
-    $passwd = $query -> cookie( 'pass' );
+    $passwd = $app -> get_cookie( 'pass' );
   }
 
 
@@ -532,7 +533,6 @@ sub login_start_session {
   my $login   = shift;
 
   my $request = $app -> request;
-  my $query   = $request -> {CGI};
 
   my $udata_file = $app -> paths -> {'user-data'};
 
@@ -832,10 +832,11 @@ sub check_input_parameters {
   my $handler;
 
   {
-    my $include_path = ( $CGI::Untaint::VERSION < "1.23" ) 
+    my $include_path = ( $CGI::Untaint::VERSION < "1.23" )
         ? "ACIS/Web" 
-        : "ACIS::Web";
-    $handler = new CGI::Untaint ( {INCLUDE_PATH => $include_path}, 
+        : "ACIS::Web::CGI::Untaint";
+    debug "INCLUDE_PATH is $include_path";
+    $handler = new CGI::Untaint ( {INCLUDE_PATH => $include_path},
                                   $form_input_copy );
   }
   my $errors;

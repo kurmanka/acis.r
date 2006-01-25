@@ -39,7 +39,7 @@ sub run_xslt_presenter {
   my $self          = shift;
   my $presenterfile = shift;
   my $params        = { @_ };
-  
+
   my $hide_emails      = $params -> {-hideemails};
   my $feed_data_string = $params -> {-feeddatastring};
 

@@ -25,7 +25,7 @@ package ACIS::Web::Site;  ### -*-perl-*-
 #  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 #
 #  ---
-#  $Id: Site.pm,v 2.0 2005/12/27 19:47:40 ivan Exp $
+#  $Id: Site.pm,v 2.1 2006/01/25 14:19:38 ivan Exp $
 #  ---
 
 
@@ -82,15 +82,12 @@ sub serve_local_document {
 
 sub homepage {
   my $app = shift;
-  
   my $vars = $app -> variables;
-  my $cgi  = $app -> request -> {CGI};
-
 
   require ACIS::Web::User;
 
   if ( &ACIS::Web::User::normal_login( $app ) ) {
-    return; 
+    return;
   }
 
   my $seid = $app -> request -> {'session-id'};
@@ -111,25 +108,25 @@ sub homepage {
   }
 
 
-  if (     $cgi -> cookie( 'login' ) 
-       and $cgi -> cookie( 'pass'  )  ) {
+  if (     $app -> get_cookie( 'login' ) 
+       and $app -> get_cookie( 'pass'  )  ) {
 
-    my $login = $cgi -> cookie( 'login' );
-    my $pass  = $cgi -> cookie( 'pass'  );
+    my $login = $app -> get_cookie( 'login' );
+    my $pass  = $app -> get_cookie( 'pass'  );
 
     my $status = $app -> check_login_and_pass( $login, $pass, 1 );
 
     if ( $status eq 'existing-session-loaded' ) {
-      
+
     } elsif ( ref $status ) {
       $vars -> {'auto-login-possible'} = { name  => $status ->{owner}{name},
                                            login => $status ->{owner}{login}, };
     }
   }
 
-  my $login_cu = $cgi -> cookie( 'login' );
+  my $login_cu = $app -> get_cookie( 'login' );
 
-  if ( $login_cu 
+  if ( $login_cu
        and not $app-> session
        and not $vars -> {'auto-login-possible'}
      ) {

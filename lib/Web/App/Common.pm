@@ -25,7 +25,7 @@ package Web::App::Common;   ### -*-perl-*-
 #  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 #
 #  ---
-#  $Id: Common.pm,v 2.0 2005/12/27 19:47:40 ivan Exp $
+#  $Id: Common.pm,v 2.1 2006/01/25 14:19:38 ivan Exp $
 #  ---
 
 
@@ -88,10 +88,8 @@ sub critical_message {
       print "</ul>\n";
     }
 
-#    print "<p>Debug information:</p>\n<pre>$LOGCONTENTS</pre>"
-#      unless $ACIS::DEBUGIMMEDIATELY;
   } else {
-    
+
     print "Internal Error: $msg\n",
       join ( "\n", @lines ),
         "\n";
@@ -112,12 +110,16 @@ sub debug {
   return unless $Web::App::DEBUG;
 
   my $message = join '', @_;
-  
+
   my ($package, $filename, $line, $subroutine, $hasargs,
      $wantarray, $evaltext, $is_require, $hints, $bitmask) = caller(1);
 
   ($package, $filename, $line) = caller;
-  
+
+  if ( $Web::App::DEBUGIMMEDIATELY
+       and open DEBUGLOG, ">>/home/ivan/proj/acis.zet/DEBUGLOG" ) {
+    print DEBUGLOG "[$subroutine($line)] $message\n";
+  }
   print "[$subroutine($line)] $message\n"
     if $Web::App::DEBUGIMMEDIATELY;
 
@@ -129,7 +131,7 @@ sub debug_as_is {
   return unless $Web::App::DEBUG;
 
   my $message   = join '', @_;
-  
+
   print "> $message\n" if $Web::App::DEBUGIMMEDIATELY;
   $LOGCONTENTS .= "> $message\n";
 }
@@ -141,7 +143,7 @@ sub debug_as_is {
 sub force_dir {
   my $base = shift;
   my $dir  = shift;
-  
+
   $base =~ s+/$++g;
   $dir  =~ s+^/|/$++g;
   

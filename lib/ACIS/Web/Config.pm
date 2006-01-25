@@ -28,7 +28,7 @@ package ACIS::Web::Config;   ### -*-perl-*-
 #  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 #
 #  ---
-#  $Id: Config.pm,v 2.0 2005/12/27 19:47:39 ivan Exp $
+#  $Id: Config.pm,v 2.1 2006/01/25 14:19:38 ivan Exp $
 #  ---
 
 
@@ -49,10 +49,10 @@ sub configuration_parameters {
     'static-base-dir',  'required',
     'session-lifetime', '15',
 
-    'profile-pages-dir', 'profile/', 
+    'profile-pages-dir', 'profile/',
     'compact-redirected-profile-urls', "not-defined",
 
-
+    'cgi-perl-wrapper',  'not-defined',
 
     # cookies
 #    'auth-cookie-domain',    'not-defined',

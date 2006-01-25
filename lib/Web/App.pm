@@ -25,7 +25,7 @@ package Web::App;   ### -*-perl-*-
 #  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 #
 #  ---
-#  $Id: App.pm,v 2.1 2005/12/28 22:47:03 ivan Exp $
+#  $Id: App.pm,v 2.2 2006/01/25 14:19:38 ivan Exp $
 #  ---
 
 
@@ -207,7 +207,8 @@ sub configuration_parameters {
     'admin-email',      'required',
     'log-verbosity',    'not-defined',
 
-    'production-mode',  'true',
+#    'production-mode',  'true',
+    'debug',            'not-defined',
 
     'require-modules',  'not-defined',
     
@@ -533,18 +534,14 @@ sub form_input {
 sub request_input {
   my $self = shift;
   my $name = shift;
-  
+
   my $request = $self -> {request};
   if ( exists $request -> {params} {$name} ) {
     return $request -> {params} {$name};
 
   } else {
-    my $cookie = $request ->{CGI} -> cookie( $name );
-    if ( defined $cookie ) {
-      return $cookie;
-    }
+    return $self -> get_cookie( $name );
   }
-  return undef;
 }
 
 
@@ -700,6 +697,8 @@ sub find_right_screen {
 sub clear_after_request {
   my $self = shift;
 
+  debug "clearing";
+
   foreach ( qw( request response username session
                 http_headers content_type
                 presenter
@@ -721,6 +720,7 @@ sub clear_after_request {
     delete $paths -> {$_};
   }
 
+  CGI::Minimal::reset_globals();
 }
 
 
@@ -747,13 +747,16 @@ sub handle_request {
   print "\n\n<pre>"
     if $Web::App::DEBUGIMMEDIATELY;
 
-  
+
   ###  primary request analysis
 
   debug "fetch request data";
-  
-  my $query = new CGI;
-  
+
+  use CGI::Minimal;
+  my $query = new CGI::Minimal;
+
+  debug "CGI object: $query";
+
   my $unescaped_url = $ENV{REQUEST_URI} || '';
 
   ### this needs to be fixed to take care of non-ascii chars (in an encoding)
@@ -766,19 +769,19 @@ sub handle_request {
 
   my $request = $self -> {request} = {
     CGI     => $query,
-    referer => CGI::referer(),
+    referer => $ENV{HTTP_REFERER},
     agent   => $ENV{HTTP_USER_AGENT},
+    method  => $ENV{REQUEST_METHOD},
+    querystring => $ENV{QUERY_STRING},
   };
 
-  if ( $ENV{QUERY_STRING} ) {
-    $request -> {querystring} = $ENV{QUERY_STRING};
-  }
+  debug "REQUEST_METHOD: $request->{method}";
 
 
   ### some mode settings
 
   my $charset = lc $config->{'character-encoding'};
-  my $production_mode = $config->{'production-mode'};
+  my $debug_mode = $config->{debug};
 
   $self -> {response} = 
     { headers => [], 
@@ -792,7 +795,7 @@ sub handle_request {
     my $log = $config ->{'requests-log'};
     my $the_request = $request -> {url} . " [$$]";
     if ( $log eq '*stderr*' ) {
-      warn "request: $the_request\n";
+      print STDERR "request: $the_request\n";
     } elsif ( open LOG, '>>', $log ) {
       print LOG scalar( localtime ), " ", $the_request, "\n";
       close LOG;
@@ -809,7 +812,7 @@ sub handle_request {
 
   my @event = ( -class  => 'request', 
                 -screen => $screen_name );
-                
+
   if ( defined $session_id ) {
     debug "request of session: $session_id";
 
@@ -847,13 +850,13 @@ sub handle_request {
       $form_input ->{$_} = \@val;
     }
   }
-  
-  if ( not $production_mode ) {
+
+  if ( $debug_mode ) {
     if ( scalar keys %$form_input ) {
       my $dump = Data::Dumper->Dump( [$form_input], ['form_input'] );
       chomp $dump;
       debug $dump;
-      
+
     } else { 
       debug "\$form_input = {};"; 
     }
@@ -941,38 +944,38 @@ sub handle_request {
   ###  first send the headers
   $self -> print_http_response_headers;
 
-  if ( not $self -> {presenter} ) {
-    return;
+  if ( $self -> {presenter} ) {
+
+    ###  prepare presenter-data 
+    $self -> prepare_presenter_data;
+
+    $self -> {response}{body} = 
+      my $content = 
+        $self -> run_presenter( $self->{presenter} );
+
+    print "</pre>\n"
+      if $Web::App::DEBUGIMMEDIATELY;
+
+    $self -> time_checkpoint( 'presenter' );
+
+    $self -> post_process_content( \$content );
+
+    $charset = $self->{response}{charset};
+
+    ###  now go, print the resulting page
+
+    if ( $charset ne 'utf-8' ) {
+      binmode STDOUT, ":encoding($charset)"; 
+    } else {
+      binmode STDOUT, ":utf8"; 
+    }
+    $/=undef;
+    print STDOUT $content;
+
   }
-
-  ###  prepare presenter-data 
-  $self -> prepare_presenter_data;
-
-  $self -> {response}{body} = 
-    my $content = 
-      $self -> run_presenter( $self->{presenter} );
-    
-  print "</pre>\n"
-    if $Web::App::DEBUGIMMEDIATELY;
-  
-  $self -> time_checkpoint( 'presenter' );
-
-  $self -> post_process_content( \$content );
-
-  $charset = $self->{response}{charset};
-
-  ###  now go, print the resulting page
-
-  if ( $charset ne 'utf-8' ) {
-    binmode STDOUT, ":encoding($charset)"; 
-  } else {
-    binmode STDOUT, ":utf8"; 
-  }
-  $/=undef;
-  print STDOUT $content;
-
 
   $self -> post_scriptum;
+
 
 }
 ####   e n d    o f    h a n d l e   r e q u e s t   s u b 
@@ -1044,9 +1047,9 @@ _DEBUG_INCLUDE
 sub post_scriptum {
   my $self = shift;
 
-  my $content = $self -> {response}{body};
+  my $content = $self -> {response}{body} || '';
 
-  my $vars_xml_dumped = $self -> {presenter_data_string};
+  my $vars_xml_dumped = $self -> {presenter_data_string} || '';
 
   my $vars_len = length( $vars_xml_dumped ) / 1000;
   my $page_len = length( $content ) / 1000;
@@ -1073,8 +1076,9 @@ sub post_scriptum {
     my $logfn = $self ->config('debug-log');
 
     if ( open DLOG, '>>:utf8', $logfn ) { 
-      print DLOG "\n* ", date_now(), 
-        "\n", $Web::App::Common::LOGCONTENTS; close DLOG; 
+      print DLOG "\n* ", date_now(), " [$$]\n", $Web::App::Common::LOGCONTENTS;
+      close DLOG;
+      undef $Web::App::Common::LOGCONTENTS;
     }
   }
 
@@ -1123,9 +1127,10 @@ sub print_http_response_headers {
   }
 
 
-  my $location = $self ->{'redirect-to'};
-  
+  my $location = $response ->{'redirect-to'};
+
   if ( $location ) {
+    debug "Location header: $location";
     $Web::App::DEBUGIMMEDIATELY
                  ? print "Location: <a href='$location'>$location</a>\n\n" 
                  : print "Location: $location\n\n";
@@ -1232,9 +1237,10 @@ sub add_to_process_queue {
   }
 
   my $process;
+  my $req_method = $self -> request ->{method} || '';
 
   if ( $screen -> {'process-on-POST'} ) {
-    if ( $cgi -> request_method eq 'POST'
+    if ( $req_method eq 'POST'
          and scalar keys %$params ) {
       $process = 1;
     }
@@ -1242,7 +1248,6 @@ sub add_to_process_queue {
   } elsif ( scalar keys %$params ) {
     $process = 1;
   }
-
 
   if ( $process ) {
     $processors = $screen -> {'process-calls'};
@@ -1324,15 +1329,16 @@ sub get_url_of_a_screen {
 sub redirect_to_screen {
   my $self   = shift;
   my $screen = shift;
-  
+
   my $base_url = $self -> {config} {'base-url'};
+  my $response = $self -> {response};
 
   if ( $self->session ) {
     my $session_id = $self -> session -> id;
-    $self -> {'redirect-to'} = "$base_url/$screen!$session_id";
+    $response -> {'redirect-to'} = "$base_url/$screen!$session_id";
 
   } else {
-    $self -> {'redirect-to'} = "$base_url/$screen";
+    $response -> {'redirect-to'} = "$base_url/$screen";
 
   }
 }
@@ -1342,8 +1348,8 @@ sub redirect_to_screen {
 sub redirect {
   my $self = shift;
   my $url  = shift;
-  
-  $self -> {'redirect-to'} = $url;
+
+  $self -> {response} {'redirect-to'} = $url;
 }
 
 sub print_content_type_header {
@@ -1367,9 +1373,11 @@ sub set_cookie {
 #  my $path   = $par{-path};
 #  my $maxage = $par{-maxage};
 
-  return undef if not $self -> {request} {CGI};
+#  return undef if not $self -> {request} {CGI};
 
-  my $cookie = $self -> {request} {CGI} -> cookie( @_ );
+  require CGI::Cookie;
+
+  my $cookie = CGI::Cookie -> new( @_ );
 
   my $response = $self -> {response};
   my $headers  = $response -> {headers};
@@ -1382,10 +1390,20 @@ sub set_cookie {
 sub get_cookie {
   my $self = shift;
   my $name = shift || die;
-  my $cgi  = $self -> {request} {CGI};
 
-  return undef if not $cgi;
-  return $cgi -> cookie( $name );
+  require CGI::Cookie;
+  if ( $self -> {request}{cookies} ) {
+
+  } else {
+    my $raw = $ENV{HTTP_COOKIE} || '';
+    $self->{request}{cookies} = CGI::Cookie -> parse( $raw );
+  }
+
+  my $cookies  = $self -> {request}{cookies};
+
+  return undef if not $cookies;
+  return undef if not $cookies->{$name};
+  return $cookies->{$name}->value;
 }
 
 

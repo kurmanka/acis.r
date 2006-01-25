@@ -46,7 +46,7 @@
                   <p class='logged-notice'>
                     <a class='int' href='{$base-url}/welcome' 
                        title='Enter into your account!'
-                       >Welcome, <span title='{login}' class='name'
+                       >Welcome, <span title='{login/text()}' class='name'
                     ><xsl:value-of select='name' /></span >!</a>
                   </p>
             </xsl:for-each>

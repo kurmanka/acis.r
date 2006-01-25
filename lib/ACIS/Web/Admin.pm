@@ -25,7 +25,7 @@ package ACIS::Web::Admin;   ### -*-perl-*-
 #  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 #
 #  ---
-#  $Id: Admin.pm,v 2.0 2005/12/27 19:47:39 ivan Exp $
+#  $Id: Admin.pm,v 2.1 2006/01/25 14:19:38 ivan Exp $
 #  ---
 
 
@@ -56,15 +56,17 @@ sub check_access {
   my $acis = shift;
 
   my $cgi  = $acis -> request -> {CGI};
-  
+
   my $pass    = $acis -> config( 'admin-access-pass' );
+  debug "pass real = $pass";
 
   if ( $pass and length( $pass ) > 5 ) { 
 
     my $form_input = $acis -> form_input();
     my $param   = $form_input -> {pass};
-    my $cookie  = $cgi -> cookie( 'admin-pass' );
-    
+    my $cookie  = $acis -> get_cookie( 'admin-pass' );
+    debug "pass cook = $cookie";
+
     if ( $param and $form_input -> {'remember-me'} ) {
       $acis -> set_cookie( -name  => 'admin-pass', 
                            -value => $param,
@@ -72,7 +74,8 @@ sub check_access {
     }
 
     if ( $cookie and $cookie eq $pass ) {  return 1;  }
-    
+
+    debug "pass para = $cookie";
     if ( $param and $param eq $pass ) {    return 1;  }
 
   }
@@ -80,7 +83,7 @@ sub check_access {
 
   {
     if ( $acis -> load_session_if_possible ) {
-       
+
       my $session = $acis -> session;
       if ( $session 
            and $session -> owner -> {type}

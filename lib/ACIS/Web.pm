@@ -25,7 +25,7 @@ package ACIS::Web;   ### -*-perl-*-
 #  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 #
 #  ---
-#  $Id: Web.pm,v 2.0 2005/12/27 19:47:39 ivan Exp $
+#  $Id: Web.pm,v 2.1 2006/01/25 14:19:37 ivan Exp $
 #  ---
 
 
@@ -118,6 +118,8 @@ sub new {
     require Web::App::Profiling;
   }
 
+  $self -> {CGI_UNTAINT_INCLUDE_PATH} = 'ACIS::Web::CGI::Untaint';
+
   return $self;
 }
 
@@ -180,9 +182,7 @@ sub parse_request_url {
     $req -> {'short-id'} = $1;
   }
 
-  my $cgi = $self -> request -> {CGI};
-
-  my $session_cook = $cgi -> cookie( 'session' );
+  my $session_cook = $self -> get_cookie( 'session' );
 
   if ( $session_cook ) {
     debug "session id cookie: $session_cook";
@@ -269,17 +269,16 @@ sub get_auto_logon_mode {
   if ( $session ) {
     my $ud    = $session -> object;
     my $owner = $ud -> {owner};
-    
+
     my $login = $owner -> {login};
     my $pass  = $owner -> {password};
-    
-    my $cgi = $self -> request -> {CGI};
-    my $cookie_login = $cgi -> cookie( 'login' );
-    my $cookie_pass  = $cgi -> cookie( 'pass'  );
+
+    my $cookie_login = $self -> get_cookie( 'login' );
+    my $cookie_pass  = $self -> get_cookie( 'pass'  );
 
     if ( $cookie_login and $cookie_login eq $login ) {
-      if ( $cookie_pass 
-#          and $cookie_pass eq $pass 
+      if ( $cookie_pass
+#          and $cookie_pass eq $pass
          ) { return 'full' ; }
       else { return 'login'; }
 

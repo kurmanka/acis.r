@@ -91,8 +91,6 @@ sub prepare_form_data {
 
 sub check_input_parameters {
   my $self   = shift;
-  
-  require CGI::Untaint;
 
   my $required_absent;
   my $invalid_value;
@@ -102,27 +100,33 @@ sub check_input_parameters {
   my $params        = $screen_config -> {variables};
   my $vars       = $self -> variables;
   my $form_input = $self -> form_input;
-  
-  debug "checking input parameters";
+
   debug "loading CGI::Untaint";
+  require CGI::Untaint;
+
+  debug "checking input parameters";
 
   my $form_input_copy = { %$form_input };
-  
+
   my $handler;
 
   {
     my @cuparams = ();
     my $include_path = $self -> {CGI_UNTAINT_INCLUDE_PATH};
     if ( $include_path ) {
-      if ( $CGI::Untaint::VERSION < "1.23" ) {
+      if ( $CGI::Untaint::VERSION lt "1.23" ) {
         $include_path =~ s!::!/!g;
       } else {
         $include_path =~ s!/!::!g;
       }
+      debug "INCLUDE_PATH is $include_path";
       push @cuparams, "INCLUDE_PATH", $include_path;
+
+    } else {
+      debug "no INCLUDE_PATH";
     }
-    
-    $handler = new CGI::Untaint( { @cuparams }, 
+
+    $handler = new CGI::Untaint( { @cuparams },
                                  $form_input_copy );
   }
 
