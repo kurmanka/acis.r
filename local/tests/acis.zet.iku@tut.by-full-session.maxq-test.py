@@ -16,8 +16,7 @@ import re
 class acis(PyHttpTestCase):
     def runTest(self):
 
-
-        self.msg('Test started')
+        self.msg('Testing ACIS (acis.zet)')
 
         self.setCharset( 'UTF-8' );
 
@@ -25,7 +24,7 @@ class acis(PyHttpTestCase):
             ('''login''', '''iku@tut.by'''),
             ('''pass''', '''passwd'''),
             ('''do''', '''Login'''),]
-        self.msg("Testing URL: %s" % self.replaceURL('''http://acis.zet/'''))
+        self.msg("Testing POST to URL: %s" % self.replaceURL('''http://acis.zet/'''))
         url = "http://acis.zet/"
         Validator.validateRequest(self, self.getMethod(), "post", url, params)
         self.post(url, params)
@@ -98,7 +97,7 @@ class acis(PyHttpTestCase):
 И. В. Курманов'''),
             ('''continue''', '''SAVE AND RETURN TO MENU'''),]
 
-        self.msg("Testing URL: %s" % self.replaceURL('''http://acis.zet/name!'''))
+        self.msg("Testing POST to URL: %s" % self.replaceURL('''http://acis.zet/name!'''))
         url = "http://acis.zet/name!%s" % sid;
         Validator.validateRequest(self, self.getMethod(), "post", url, params)
         self.post(url, params)
@@ -134,7 +133,7 @@ class acis(PyHttpTestCase):
             ('''phone''', '''234-58-95'''),
             ('''postal''', '''Minsk, 220002,
 Chervyakova, 8 - 151'''),]
-        self.msg("Testing URL: %s" % self.replaceURL('''http://acis.zet/contact!'''))
+        self.msg("Testing POST to URL: %s" % self.replaceURL('''http://acis.zet/contact!'''))
         url = "http://acis.zet/contact!%s" % sid
         Validator.validateRequest(self, self.getMethod(), "post", url, params)
         self.post(url, params)
@@ -222,17 +221,24 @@ Chervyakova, 8 - 151'''),]
         Validator.validateRequest(self, self.getMethod(), "get", url, params)
         self.get(url, params)
         # check for 200 response status
+        self.msg("Response code: %s" % self.getResponseCode())
+        self.assertEquals("Assert number 14.2 failed", 200, self.getResponseCode())
 
         self.msg("Testing URL: %s" % self.replaceURL('''http://acis.zet/style/brownish.css'''))
         url = "http://acis.zet/style/brownish.css"
         params = None
         Validator.validateRequest(self, self.getMethod(), "get", url, params)
         self.get(url, params)
+        self.msg("Response code: %s" % self.getResponseCode())
+        self.assertEquals("Assert number 14.3 failed", 200, self.getResponseCode())
+
         self.msg("Testing URL: %s" % self.replaceURL('''http://acis.zet/script/main.js'''))
         url = "http://acis.zet/script/main.js"
         params = None
         Validator.validateRequest(self, self.getMethod(), "get", url, params)
         self.get(url, params)
+        self.msg("Response code: %s" % self.getResponseCode())
+        self.assertEquals("Assert number 14.3 failed", 200, self.getResponseCode())
 
         self.msg("Testing URL: %s" % self.replaceURL('''http://acis.zet/off!'''))
         url = "http://acis.zet/off!%s" % sid
@@ -244,7 +250,6 @@ Chervyakova, 8 - 151'''),]
         Validator.validateResponse(self, self.getMethod(), url, params)
         
         
-
 
     # ^^^ Insert new recordings here.  (Do not remove this line.)
 
