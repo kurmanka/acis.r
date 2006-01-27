@@ -7,10 +7,10 @@
 <body>
       
 
-   <h1 id="id2247775">ACIS configuration</h1>
+   <h1 id="id2247777">ACIS configuration</h1>
 
 <h3><i>Table of contents</i></h3>
-<p class="toc">   <a href="#mainconf"><code class="C">main.conf</code> file</a><br>   <a href="#id2247819"><code>[ACIS]</code> section of <code>main.conf</code></a><br>   <a href="#id2248295">General parameters</a><br>   <a href="#binsetup">Updating a running system’s configuration — <code class="C">bin/setup</code> utility</a><br></p>
+<p class="toc">   <a href="#mainconf"><code class="C">main.conf</code> file</a><br>   <a href="#id2247821"><code>[ACIS]</code> section of <code>main.conf</code></a><br>   <a href="#id2248338">General parameters</a><br>   <a href="#binsetup">Updating a running system’s configuration — <code class="C">bin/setup</code> utility</a><br></p>
 
 <h2 id="mainconf" C="main.conf">
 <code class="C">main.conf</code> file</h2>
@@ -28,7 +28,7 @@ lines.</p>
 <code class="f BROKEN">{HOME}/main.conf.eg</code>.</p>
 
 
-   <h2 id="id2247819">
+   <h2 id="id2247821">
 <code>[ACIS]</code> section of <code>main.conf</code>
 </h2>
 
@@ -71,6 +71,7 @@ users’ requests.  Required.</dd>
 <dd>Filename of the CGI script, which ACIS creates and which
 is accessible through the <a class="c" href="conf.html#base-url">base-url</a> URL.
 Required.</dd>
+
 
 <dt id="home-url" C="home-url"><code class="C">home-url</code></dt>
 
@@ -294,10 +295,28 @@ sometimes they would find works for the users, which would
 not have been found otherwise.  Default: off.</dd>
 
 
+<dt id="cgi-pperl-binary" C="cgi-pperl-binary"><code class="C">cgi-pperl-binary</code></dt>
+
+<dd>Type: string.  Enables support for Matt Sergeant’s fine <a href="http://search.cpan.org/dist/PPerl/">PPerl</a> instead of plain old slow
+ CGI.  If set, it will be used instead of perl in the CGI script’s shebang
+ line (the first line of the script, which normally says
+ <code>”#!/usr/bin/perl”</code>).  It will also cause the CGI script to be adapted
+ in some minor ways to the PPerl environment: some modules will be preloaded
+ and clean-ups will be done after each request processed.</dd>
+
+
+<dt id="cgi-pperl-reinit" C="cgi-pperl-reinit"><code class="C">cgi-pperl-reinit</code></dt>
+
+<dd>Type: string.  Command to reinitialize or simply shutdown the PPerl
+process.  See previous entry for PPerl pointers.  The command will be executed
+by the <a class="c" href="conf.html#binsetup">bin/setup</a> script after installation or configuration changes.
+</dd>
+
+
 </dl>
 
 
-   <h2 id="id2248295">General parameters</h2>
+   <h2 id="id2248338">General parameters</h2>
 
 <dl>
 
@@ -404,7 +423,7 @@ aware of the changes you made.</p>
 
   
 <address class="footer">
-<p>Generated: Fri Dec 30 18:17:53 2005</p>
+<p>Generated: Fri Jan 27 17:17:02 2006</p>
 <p><a href="http://acis.openlib.org/">ACIS project</a>,
           acis<i>@</i>openlib<span>.org</span></p>
 </address>
