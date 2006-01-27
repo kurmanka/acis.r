@@ -50,3 +50,17 @@
 
    Show current settings and reset them at user's will, all
    in JavaScript.
+
+
+2006-01-26 15:31
+
+ - ACIS can now run under Matt Sergeant's fine PPerl (persistent perl)
+   http://search.cpan.org/dist/PPerl/
+
+ - new main.conf, [ACIS] section parameters: cgi-perl-wrapper and
+   cgi-perl-wrapper-restart (for PPerl).
+
+ - No longer using CGI.pm monster module.  Using CGI::Minimal instead.
+   CGI::Cookie, which is a part of the CGI.pm distribution, is still required
+
+ - 

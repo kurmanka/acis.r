@@ -17,10 +17,12 @@ mail transport agent.
 Required Perl modules:
 
 -  XML::XPath 1.13
--  XML::LibXML 1.52
--  XML::LibXSLT 1.52
+-  XML::LibXML 1.58
+-  XML::LibXSLT 1.58
 -  Carp::Assert 0.17
--  CGI::Untaint 0.90
+-  CGI::Cookie 1.25
+-  CGI::Minimal 1.24
+-  CGI::Untaint 1.25
 -  Storable 2.04
 -  AppConfig 1.54
 -  BerkeleyDB 0.19
@@ -186,9 +188,11 @@ We encourage you to try the recent versions of this software
 and only fall back to these older ones if the new versions
 to do not work well for you.
 
-
 PS. This dirty problem notwithstanding, the libxslt library
 and its Perl interface XML::LibXSLT has proven as very
 reliable, fast and professional opensource software.
 
+<p><b>Update from 2006-01-26:</b> we don't seem to have this
+problem anymore with libxslt version 1.1.15 and XML::LibXSLT
+version 1.58.</p>
 

@@ -49,22 +49,23 @@ sub MY::dist {
 WriteMakefile
   (
    'NAME'               => 'ACIS',
-   'VERSION'    => '0.1', # finds $VERSION
+   'VERSION'    => '0.1',
    'PREREQ_PM'  =>  {
                      'Carp::Assert' => "0.17",
                      'Storable'     => "1.013",
-                     'CGI::Untaint' => '',
+                     'CGI::Cookie'  => '1.25',
+                     'CGI::Minimal' => '1.24',
+                     'CGI::Untaint' => '1.25',
                      'XML::XPath'   => '1.12',
-                     'XML::LibXSLT' => "",
+                     'XML::LibXML'  => "1.52",
+                     'XML::LibXSLT' => "1.52",
                      'AppConfig'    => "1.52",
                      'Proc::Daemon' => "0.03",
-
-                    }, 
+                    },
    DIR => [ @dirs ],
    ABSTRACT      => 'Academic Contributor Information System',
-   AUTHOR        => 'Ivan Baktcheev & Ivan Kurmanov', 
+   AUTHOR        => 'Ivan Bahcheyev & Ivan Kurmanov',
 
-#   dist => { PREOP => '$(CP) /home/ivan/dev/Index/Index/RePEc-Index-0.4.tar.gz $(DISTVNAME)', },
 
   );
 

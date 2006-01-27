@@ -25,7 +25,7 @@ package ACIS::Web::Admin;   ### -*-perl-*-
 #  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 #
 #  ---
-#  $Id: Admin.pm,v 2.1 2006/01/25 14:19:38 ivan Exp $
+#  $Id: Admin.pm,v 2.2 2006/01/27 09:56:45 ivan Exp $
 #  ---
 
 
@@ -54,8 +54,6 @@ sub show_current_time {
 
 sub check_access {
   my $acis = shift;
-
-  my $cgi  = $acis -> request -> {CGI};
 
   my $pass    = $acis -> config( 'admin-access-pass' );
   debug "pass real = $pass";
@@ -167,7 +165,6 @@ sub show_sessions {
 
 
 
-use CGI qw( :standard );
 
 sub session_act {
   my $acis = shift;

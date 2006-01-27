@@ -16,7 +16,7 @@ if [[ $perllibadd ]]; then
   echo ""                               
 fi
 echo 'use strict;'
-echo 'use warnings;'
+#echo 'use warnings;'
 echo
 if test $ACIS_extreme_debug
 then 
@@ -32,6 +32,9 @@ if test $ACIS_debug; then
 fi
 echo
 echo 'use ACIS::Web;'
+if test $ACIS_cgi_perl_wrapper; then
+   echo 'use ACIS::Web::AllModules;'
+fi
 echo '$acis ||= new ACIS::Web( );'
 #if test $ACIS_cgi_perl_wrapper; then
 #else 

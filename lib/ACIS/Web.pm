@@ -25,7 +25,7 @@ package ACIS::Web;   ### -*-perl-*-
 #  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 #
 #  ---
-#  $Id: Web.pm,v 2.1 2006/01/25 14:19:37 ivan Exp $
+#  $Id: Web.pm,v 2.2 2006/01/27 09:56:45 ivan Exp $
 #  ---
 
 
@@ -39,9 +39,6 @@ use Data::Dumper;
 use Storable;
 
 use Encode;
-
-use CGI;
-use CGI::Untaint;
 
 require sql_helper;
 
@@ -118,7 +115,8 @@ sub new {
     require Web::App::Profiling;
   }
 
-  $self -> {CGI_UNTAINT_INCLUDE_PATH} = 'ACIS::Web::CGI::Untaint';
+# we do not use Web::App::FormsProcessing, so we do not need this:
+#  $self -> {CGI_UNTAINT_INCLUDE_PATH} = 'ACIS::Web::CGI::Untaint';
 
   return $self;
 }
