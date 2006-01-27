@@ -63,4 +63,9 @@
  - No longer using CGI.pm monster module.  Using CGI::Minimal instead.
    CGI::Cookie, which is a part of the CGI.pm distribution, is still required
 
- - 
+2006-01-27 17:42 (ACIS-1.4.20-20060127b)
+
+ - PPerl: instead of the parameters mentioned yesterday:
+   cgi-pperl-binary and cgi-pperl-reinit
+
+ - documentation updated

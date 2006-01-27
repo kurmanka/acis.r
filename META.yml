@@ -7,10 +7,13 @@ installdirs:  site
 requires:
     AppConfig:                     1.52
     Carp::Assert:                  0.17
-    CGI::Untaint:                  
+    CGI::Cookie:                   1.25
+    CGI::Minimal:                  1.24
+    CGI::Untaint:                  1.25
     Proc::Daemon:                  0.03
     Storable:                      1.013
-    XML::LibXSLT:                  
+    XML::LibXML:                   1.52
+    XML::LibXSLT:                  1.52
     XML::XPath:                    1.12
 
 distribution_type: module

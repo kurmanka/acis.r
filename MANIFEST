@@ -197,6 +197,7 @@ lib/ACIS/Web/Admin.pm
 lib/ACIS/Web/Admin/Events.pm
 lib/ACIS/Web/Admin/EventsArchiving.pm
 lib/ACIS/Web/Affiliations.pm
+lib/ACIS/Web/AllModules.pm
 lib/ACIS/Web/ARPM.pm
 lib/ACIS/Web/ARPM/Queue.pm
 lib/ACIS/Web/Background.pm
