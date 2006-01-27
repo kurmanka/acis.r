@@ -2,9 +2,9 @@ if test $perllibprepend
 then 
     perlparams="-I$perllibprepend"
 fi
-if test "$ACIS_cgi_perl_wrapper"
+if test "$ACIS_cgi_pperl_binary"
 then 
-    perlbin=$ACIS_cgi_perl_wrapper
+    perlbin="$ACIS_cgi_pperl_binary"
 fi
 echo "#!$perlbin $perlparams"
 echo 
@@ -32,19 +32,17 @@ if test $ACIS_debug; then
 fi
 echo
 echo 'use ACIS::Web;'
-if test $ACIS_cgi_perl_wrapper; then
+if test "$ACIS_cgi_pperl_binary"; then
+   # questionable XX
    echo 'use ACIS::Web::AllModules;'
-fi
-echo '$acis ||= new ACIS::Web( );'
-#if test $ACIS_cgi_perl_wrapper; then
-#else 
-#  echo '$acis = new ACIS::Web( );'
-#fi
-echo
-echo '$acis -> handle_request;'
-if test "$ACIS_cgi_perl_wrapper"
-then
-  echo '$acis -> clear_after_request;'
+   echo
+   echo 'BEGIN { $acis = new ACIS::Web( ); }'
+   echo
+   echo '$acis -> handle_request;'
+   echo '$acis -> clear_after_request;'
+else
+   echo '$acis = new ACIS::Web( );'
+   echo 
+   echo '$acis -> handle_request;'
 fi
 echo
-#echo 'close STDIN;'

@@ -65,6 +65,7 @@ users' requests.  Required.</dd>
 is accessible through the <c>base-url</c> URL.
 Required.</dd>
 
+
 <dt><C>home-url</C></dt>
 
 <dd>URL of the public homepage of the service.  Value of
@@ -287,6 +288,25 @@ research searches.  They are not required as it is, but
 increase quality of search under certain conditions;
 sometimes they would find works for the users, which would
 not have been found otherwise.  Default: off.</dd>
+
+
+<dt><C>cgi-pperl-binary</C></dt>
+
+<dd>Type: string.  Enables support for Matt Sergeant's fine <a
+ href='http://search.cpan.org/dist/PPerl/'>PPerl</a> instead of plain old slow
+ CGI.  If set, it will be used instead of perl in the CGI script's shebang
+ line (the first line of the script, which normally says
+ <co>"#!/usr/bin/perl"</co>).  It will also cause the CGI script to be adapted
+ in some minor ways to the PPerl environment: some modules will be preloaded
+ and clean-ups will be done after each request processed.</dd>
+
+
+<dt><C>cgi-pperl-reinit</C></dt>
+
+<dd>Type: string.  Command to reinitialize or simply shutdown the PPerl
+process.  See previous entry for PPerl pointers.  The command will be executed
+by the <c>bin/setup</c> script after installation or configuration changes.
+</dd>
 
 
 </dl>

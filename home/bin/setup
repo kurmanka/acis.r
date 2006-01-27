@@ -116,9 +116,9 @@ if test $ACIS_base_cgi_script_filename; then
   chmod +x $ACIS_base_cgi_script_filename
 fi
 
-if test "$ACIS_cgi_perl_wrapper"; then
-    # reinitialize the persistent environment
-    $ACIS_cgi_perl_wrapper_restart $ACIS_base_cgi_script_filename
+if test "$ACIS_cgi_pperl_reinit"; then
+    # reinitialize the PPerl persistent environment
+    /bin/bash -c "$ACIS_cgi_pperl_reinit"
 fi
 
 if test -z $ACIS_tempate_set; then
