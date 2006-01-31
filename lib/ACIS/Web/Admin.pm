@@ -25,7 +25,7 @@ package ACIS::Web::Admin;   ### -*-perl-*-
 #  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 #
 #  ---
-#  $Id: Admin.pm,v 2.2 2006/01/27 09:56:45 ivan Exp $
+#  $Id: Admin.pm,v 2.3 2006/01/31 18:21:39 ivan Exp $
 #  ---
 
 
@@ -1130,7 +1130,7 @@ sub adm_get {
     my $col = $1;
     my $id  = $2;
     my $op  = $4;
-    
+
     $input ->{id} = $id;
     $input ->{col} = $col;
     $input ->{op} = $op;
