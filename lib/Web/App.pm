@@ -25,7 +25,7 @@ package Web::App;   ### -*-perl-*-
 #  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 #
 #  ---
-#  $Id: App.pm,v 2.4 2006/01/27 09:56:46 ivan Exp $
+#  $Id: App.pm,v 2.5 2006/01/31 18:21:52 ivan Exp $
 #  ---
 
 
@@ -1078,7 +1078,7 @@ sub post_scriptum {
     if ( open DLOG, '>>:utf8', $logfn ) { 
       print DLOG "\n* ", date_now(), " [$$]\n", $Web::App::Common::LOGCONTENTS;
       close DLOG;
-      undef $Web::App::Common::LOGCONTENTS;
+      $Web::App::Common::LOGCONTENTS = '';
     }
   }
 
