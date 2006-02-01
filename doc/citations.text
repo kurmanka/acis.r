@@ -1,0 +1,61 @@
+Citations in ACIS
+=================
+
+<toc/>
+
+
+## Why? And what for?
+
+Motivation.  Authors learn who cites their works.  Services get better
+citations data.  Output data is useful for other researchers.
+
+
+## Approach
+
+First level: citations processing with an automated reference and citation
+parsing system.  Second level: human users check, filter and validate the
+data.
+
+ - Why this way?  Is automatic citations processing faulty and weak?  Or is it
+   just costly?  Or do we simply want to be 100% sure?
+
+## Citations data on input
+
+Data comes from automatic reference and citation parsing systems.  Structure
+of the data and its format.
+
+### Configuring citations data input in ACIS
+
+Configure a metadata collection via metadata-collections parameter.  Set
+metadata-X-type to "AMFCitations" (?).
+
+### Technical: processing the citations data
+
+The data processing flow.  From RI to ARDB.  Citations table structure.
+
+Citation string normalization.  Searchable citations string part -- excluding
+the ediors part.  (Configuration.)
+
+
+## Citations profile
+
+Functional overview: process new citations and review those found before.
+
+
+### Citations profile screen
+
+
+### ACIS configuration
+
+main.conf: [ACIS] +citations-profile parameter
+
+String similarity assessment function.
+
+### Technical: userdata structure
+
+### Technical: citation-research similarity matrix
+
+
+
+
+
