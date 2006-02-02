@@ -1,17 +1,23 @@
 Citations in ACIS
 =================
 
+Sections marked "Technical:" will hold the implementation
+issues, not functional requirements.
+
 <toc/>
 
+## Introduction
 
-## Why? And what for?
+### Why? What for?
 
 Motivation.  Authors learn who cites their works.  This supports further
 research dialogue.  Services get better citations data.  Output data is useful
-for other researchers.
+for other researchers (via services that are based on this data).
 
+ - Will use part of section 2. Background on ACIS of
+   Helsinki document for this.
 
-## Approach
+### Approach
 
 First level: citations processing with an automated reference and citation
 parsing system.  Second level: human users check, filter and validate the
@@ -20,12 +26,14 @@ data.
  - Why this way?  Is automatic citations processing faulty and weak?  Or is it
    just too costly?  Or do we simply want to raise data correctness?
 
+
+
 ## Citations data on input
 
 Data comes from automatic reference and citation parsing systems.  Structure
 of the data and its format.
 
-### Configuring citations data input in ACIS
+### Configuration
 
 Configure a metadata collection via metadata-collections parameter.  Set
 metadata-X-type to "CitationsAMF" (?).
@@ -35,8 +43,7 @@ metadata-X-type to "CitationsAMF" (?).
 The data processing flow.  From RI to ARDB.  Citations table structure.
 
 Citation string normalization.  Searchable citations string part -- excluding
-the ediors part.  (Configuration.  (Possibly can be done through a perl
-function.) )
+the ediors part.  (Configuration.  Possibly through a perl function.)
 
 
 ## Citations profile
@@ -44,15 +51,35 @@ function.) )
 Functional overview: process new citations and review those found before.
 
 Search for citations: background and online.  Sub-screens: identified,
-refused, autosearch.
+refused, autosearch, unidentified (same as autosearch).
 
 
-### Citations profile, `new citations found' screen
+### The `New citations found' screen
 
-Types of pages.  Detailed description.
+Verification and Identification.  "Interesting" documents.  Detailed
+description of the user interface.
 
 
-### ACIS configuration
+### Identified citations screen
+
+Will show all the verified and identified citations, listed
+by the document they refer to.  
+
+### Refused citations screen
+
+### Unidentified citations screen
+
+It will look like and work in the same way as the "New
+citations found" screen.  The difference is that the "New
+citations" screen will be shown up automatically when a user
+enters the citations profile and there are new citations for
+the profile.  But the "Unidentified citations" screen will
+be called by the user himself.
+
+
+
+
+### Configuration
 
 main.conf: [ACIS] +citations-profile parameter
 
@@ -61,6 +88,9 @@ String similarity assessment function.
 
 ### Technical: search for citations
 
+Background and foreground search.  Joining it with ARPU (?).  
+
+Citation-to-document similarity assessment.
 
 
 ### Technical: userdata structure
@@ -68,9 +98,16 @@ String similarity assessment function.
 Citations branch.  
 
 
-
 ### Technical: citation-research similarity matrix
 
+
+## Citations data output
+
+Structure and format.
+
+Also, probably, should cover display of the identified
+citations to the general public on the personal profile
+pages, that ACIS generates.
 
 
 

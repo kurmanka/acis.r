@@ -53,9 +53,9 @@ citations profile and starts a search.
 
 
 Offline citation search will be run in a way similar to ARPU (via bin/arpm) or
-will be joined with ARPU.  It will execute a search for the personal name
-variations in the citations table, filter out the already found or refused
-and will store the rest in the suggestions table.
+will be joined with ARPU.  [That's a QUESTION.]  It will execute a search for
+the personal name variations in the citations table, filter out the already
+found or refused and will store the rest in the suggestions table.
 
 Online citation search will run like the background automatic research search
 and there will be a status screen, which will show that the process is going
@@ -118,10 +118,13 @@ document and will choose the one with the largest number.
 For each citation we will show the original citation string, the title, the
 authors, type of the referencing work and a link to its full details.
 
+* Do we need all these details at this stage?  We could show the original
+  citation string only and then only show full details on the identified
+  citations screen. (2006-02-02 21:18)
 
 Then there may be some citations left after this with no document that is
 similar to them.  Those we may show and verify.  By verify we mean: ask the
-user, if these are citations of his works or not?
+user, Are these citations of your works or not?
 
 Given that there may be lots of citations (who knows?) we will have to make
 a paging mechanism for them on this screen.
