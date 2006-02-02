@@ -6,8 +6,9 @@ Citations in ACIS
 
 ## Why? And what for?
 
-Motivation.  Authors learn who cites their works.  Services get better
-citations data.  Output data is useful for other researchers.
+Motivation.  Authors learn who cites their works.  This supports further
+research dialogue.  Services get better citations data.  Output data is useful
+for other researchers.
 
 
 ## Approach
@@ -17,7 +18,7 @@ parsing system.  Second level: human users check, filter and validate the
 data.
 
  - Why this way?  Is automatic citations processing faulty and weak?  Or is it
-   just costly?  Or do we simply want to be 100% sure?
+   just too costly?  Or do we simply want to raise data correctness?
 
 ## Citations data on input
 
@@ -27,22 +28,28 @@ of the data and its format.
 ### Configuring citations data input in ACIS
 
 Configure a metadata collection via metadata-collections parameter.  Set
-metadata-X-type to "AMFCitations" (?).
+metadata-X-type to "CitationsAMF" (?).
 
 ### Technical: processing the citations data
 
 The data processing flow.  From RI to ARDB.  Citations table structure.
 
 Citation string normalization.  Searchable citations string part -- excluding
-the ediors part.  (Configuration.)
+the ediors part.  (Configuration.  (Possibly can be done through a perl
+function.) )
 
 
 ## Citations profile
 
 Functional overview: process new citations and review those found before.
 
+Search for citations: background and online.  Sub-screens: identified,
+refused, autosearch.
 
-### Citations profile screen
+
+### Citations profile, `new citations found' screen
+
+Types of pages.  Detailed description.
 
 
 ### ACIS configuration
@@ -51,7 +58,16 @@ main.conf: [ACIS] +citations-profile parameter
 
 String similarity assessment function.
 
+
+### Technical: search for citations
+
+
+
 ### Technical: userdata structure
+
+Citations branch.  
+
+
 
 ### Technical: citation-research similarity matrix
 

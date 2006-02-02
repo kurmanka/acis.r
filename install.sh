@@ -77,7 +77,7 @@ cp -r home/bin/templates       $dest/bin/
 cp -r lib/*                    $dest/lib/
 cp -r sql_helper/*pm           $dest/lib/
 cp -r home/plugins             $dest/
-cp -r doc/img doc/*.html       $dest/doc/
+cp -r doc/img doc/*.html doc/style.css      $dest/doc/
 cp home/screens.xml            \
    home/configuration.xml      \
    home/contributions.conf.xml \
