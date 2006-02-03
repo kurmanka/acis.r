@@ -19,12 +19,10 @@ for other researchers (via services that are based on this data).
 
 ### Approach
 
-First level: citations processing with an automated reference and citation
-parsing system.  Second level: human users check, filter and validate the
-data.
-
- - Why this way?  Is automatic citations processing faulty and weak?  Or is it
-   just too costly?  Or do we simply want to raise data correctness?
+First level: autonomous citation indexing.  (Citations
+processing with an automated reference and citation parsing
+system.)  Second level: human users check, filter and
+validate the data.
 
 
 ## Citations data on input
