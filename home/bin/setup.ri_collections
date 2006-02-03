@@ -6,7 +6,7 @@ for col in $metadata_collections; do
    eval colhome=\${metadata_${col}_home}
    eval coltype=\${metadata_${col}_type}
    eval colproc=\${metadata_${col}_proc}
-   if test -z $colproc; then
+   if test -z "$colproc"; then
       colproc='proc=ARDB::RI,records_db=1'
    fi
    echo $colhome $coltype $col $colproc

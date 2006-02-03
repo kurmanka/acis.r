@@ -1,6 +1,6 @@
 # ACIS Citations TO DO List
 
-iku: 2006-01-19 16:40
+iku: 2006-02-03 14:57
 
 
 Research 
@@ -9,25 +9,12 @@ Research
 
     - String::Similarity ?
 
-  - input processing, citations table maintenance,
-
-  - citation string normalization
-
-     - Unicode decomposition, upper case, add spaces after
-       dots and after commas, remove spaces between a dot
-       and a comma, compact all whitespace, remove starting
-       and trailing whitespace.
-
   - removing edited (collected) works from the searchable citations
 
      - not on the basic level
 
      - possible: if the handle belongs to this namespace,
        apply this regexp to extract the searchable part
-
-  - similar citations clustering
-
-     - no
 
   - citations profile screen
 
@@ -39,7 +26,9 @@ Research
 
      - refused citations (and, for a company, refused research sub-screen)
 
-  - offline citations search for every user
+  - offline citations search for every user 
+
+     - via arpu
 
 Specify
 
@@ -59,17 +48,24 @@ Configuration Parameters
 
   - citations-profile  (logical, on or off)
 
-  - citations collections ? (which of the data collections are citations collections)
+  - metadata-x-type == "CitationsAMF"
 
      - use it in bin/setup.ri_collections
+
+  - ...
 
 Database tables
 
   - citations table
 
-Citations processing
+Implement citations processing
 
-  - input data processing, maintaining the citations table
+  - ACIS::Citations::Input (RePEc::Index collection's proc
+    interface, like ARDB::RI)
+
+    - input data processing, maintaining the citations table
+
+    - citation string normalization and cutting the editors part
 
   - citations search for a personal record (by the name variations)
 
@@ -80,7 +76,7 @@ Citations processing
   - citations data output in the personal AMF records (presenter
     export/amf-person.xsl)
 
-Citation profile screen
+Implement citation profile screen
 
   - presenters in presentation/default/
 
@@ -104,7 +100,7 @@ Citation profile screen
 
      - ...
 
-Test
+Test and fix
 
   - get some citations data (from Jose-Manuel)
 
@@ -113,7 +109,5 @@ Test
   - ...
 
 
-Documentation
+Document things
 
-
-   

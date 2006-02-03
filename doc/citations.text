@@ -10,12 +10,12 @@ issues, not functional requirements.
 
 ### Why? What for?
 
-Motivation.  Authors learn who cites their works.  This supports further
+*Motivation.*  Authors learn who cites their works.  This supports further
 research dialogue.  Services get better citations data.  Output data is useful
 for other researchers (via services that are based on this data).
 
  - Will use part of section 2. Background on ACIS of
-   Helsinki document for this.
+   the Helsinki document for this.
 
 ### Approach
 
@@ -27,37 +27,91 @@ data.
    just too costly?  Or do we simply want to raise data correctness?
 
 
-
 ## Citations data on input
 
-Data comes from automatic reference and citation parsing systems.  Structure
-of the data and its format.
+Data comes from automatic reference and citation parsing
+systems.  Examples: CiteEc, CiteSeer.
+
+*Structure of the data and its format.  Naming of files the
+data comes in.*
+
+    <amf ...>
+      <text ref="id1">
+        <reference>
+          <literal> text of citation </literal>
+        </reference>
+        <reference>
+          <literal> another citation </literal>
+        </reference>
+        ...
+      </text>
+
+      <text ref="id2">
+        ....
+      </text>
+      ...
+    </amf>
+
+
 
 ### Configuration
 
-Configure a metadata collection via metadata-collections parameter.  Set
-metadata-X-type to "CitationsAMF" (?).
+Configure a new <a ref='collection'>metadata collection</a>
+via the <c>metadata-collections</c> parameter.  Set
+<c>metadata-X-type</c> to "CitationsAMF".
+
+*Configuration example.*
+
 
 ### Technical: processing the citations data
 
-The data processing flow.  From RI to ARDB.  Citations table structure.
+*The data processing flow.*  RePEc::Index and
+RePEc::Index::Collections::CitationsAMF to
+ACIS::Citations::Input via the collection's proc parameter.
 
-Citation string normalization.  Searchable citations string part -- excluding
-the ediors part.  (Configuration.  Possibly through a perl function.)
+Citations table structure:
+
+    document id | normalized searchable citation string | full original citation text
+
+SQL create statement:
+
+    CREATE TABLE $acisdb.citations ( 
+           docid   CHAR(255),
+           nstring CHAR(255), 
+           ostring TEXT );
+
+*TODO:* Add character set and collations to the table
+ definition.  Also: make it configurable?
+
+*TODO:* add this table to the <a href='db.html'>Database
+tables</a> document.
+
+*Citation string normalization:* Put it through Unicode
+decomposition, convert letters to upper case, add a space
+after each dot and each comma, remove spaces after a dot if
+a comma follows it, compact all whitespace, remove starting
+and trailing whitespace.
+
+*Searchable citations string part -- cutting out the editors
+part.* *(Configuration; possibly through a perl function.)*
 
 
 ## Citations profile
 
-Functional overview: process new citations and review those found before.
+*Functional overview: process new citations and review those found before.*
 
-Search for citations: background and online.  Sub-screens: identified,
-refused, autosearch, unidentified (same as autosearch).
+*Principles.*  Should not look or work much different from
+the research profile.  We must maintain consistency here.
+
+*Search for citations: background and online.  Sub-screens: identified,
+refused, autosearch, unidentified (same as autosearch).*
+
 
 
 ### The `New citations found' screen
 
-Verification and Identification.  "Interesting" documents.  Detailed
-description of the user interface.
+*Verification and Identification.  "Interesting" documents.  Detailed
+description of the user interface.*
 
 
 ### Identified citations screen
@@ -81,33 +135,46 @@ be called by the user himself.
 
 ### Configuration
 
-main.conf: [ACIS] +citations-profile parameter
+<a href='conf.html'>main.conf</a>, <co>[ACIS]</co> section:
 
-String similarity assessment function.
+ - citations-profile parameter;
+
+ - citations-profile-online-search parameter.
+
+*String similarity assessment function parameter.*
 
 
 ### Technical: search for citations
 
-Background and foreground search.  Joining it with ARPU (?).  
+*Background and foreground search.  Connection with ARPU.*
 
-Citation-to-document similarity assessment.
+Similar to the research search.
 
+### Technical: citation to research items similarity 
+
+*Citation-to-document similarity assessment.*
+
+*Similarity matrix.*
 
 ### Technical: userdata structure
 
-Citations branch.  
+*Citations branch:*
 
+ - identified
 
-### Technical: citation-research similarity matrix
+ - refused
+
+ - unidentified
+
 
 
 ## Citations data output
 
-Structure and format.
+*Structure and format.*
 
-Also, probably, should cover display of the identified
-citations to the general public on the personal profile
-pages, that ACIS generates.
+*Also, probably, this section should cover display of the
+identified citations to the general public on the personal
+profile pages, that ACIS generates.*
 
 
 
