@@ -79,7 +79,8 @@ SQL create statement:
            ostring TEXT );
 
 *TODO:* Add character set and collations to the table
- definition.  Also: make it configurable?
+definition?  Also: make it configurable?  (Probably not.
+Instead, configure it globally for the database.)
 
 *TODO:* add this table to the <a href='db.html'>Database
 tables</a> document.
@@ -146,13 +147,45 @@ be called by the user himself.
 
 *Background and foreground search.  Connection with ARPU.*
 
-Similar to the research search.
+Will be done in a similar way to how the research search
+works now.
 
 ### Technical: citation to research items similarity 
 
-*Citation-to-document similarity assessment.*
+*Citation-to-document similarity assessment algorithm.*
+
+For every item of the research profile and for every
+citation:
+
+1. Compare titles.  Take the normalized citation string and take the normalized
+title of the research item.  Find where in the citation
+string the first word of the title is present.
+
+Take as many characters of the citation string as there are
+in the title and compare them to the work's title (with
+[String::Similarity](http://search.cpan.org/perdoc?String::Similarity)).
+
+(Alternatively, find where in the citation string the last
+word of the title is present and take a substring from start
+to end.  Compare in the same way.)
+
+2. Check if the first author's name is present in the citation
+
+3. Check if the other authors' names are present in the citation
+
+4. Check the publication year of the document, is it present
+   in the citation?
+
+5. Check the publication status of the document.  Is there
+   anything similar in the citation string?
+
+
+
+Get the comparison result as a number between 0 and 1.
+
 
 *Similarity matrix.*
+
 
 ### Technical: userdata structure
 

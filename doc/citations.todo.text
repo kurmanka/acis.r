@@ -1,35 +1,35 @@
 # ACIS Citations TO DO List
 
-iku: 2006-02-03 14:57
+iku: 2006-02-06 17:46
 
 
-Research 
+Research:
 
-  - string similarity assessment algorithm
+- citation to research-item similarity assessment algorithm
 
-    - String::Similarity ?
 
-  - removing edited (collected) works from the searchable citations
+- removing edited (collected) works from the searchable
+  citations
 
-     - not on the basic level
+  - not on the basic level
 
-     - possible: if the handle belongs to this namespace,
-       apply this regexp to extract the searchable part
+  - possible: if the handle belongs to this namespace,
+    apply this regexp to extract the searchable part
 
-  - citations profile screen
+- citations profile screen
 
-     - study Thomson Web of Science tutorials
+  - study Thomson Web of Science tutorials
 
-     - basic main procedure for verification and identification
+  - basic main procedure for verification and identification
 
-     - browsing the currently accepted citations
+  - browsing the currently accepted citations
 
-     - refused citations (and, for a company, refused research sub-screen)
+  - refused citations (and, for a company, refused research sub-screen)
 
-  - offline citations search for every personal profile in
-    the service 
+- offline citations search for every personal profile in
+  the service 
 
-     - via arpu
+   - via arpu
 
 Specify
 
@@ -43,7 +43,9 @@ Specify
 
 Specification
 
-  - write it all down, negotiate, fix and get it approved
+  - write all the above and everything else down
+
+  - negotiate, fix and get it approved
 
 Configuration Parameters
 
