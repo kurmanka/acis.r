@@ -69,7 +69,8 @@
           <span class='role' title='your role in creation of that work'
           >
 
-          <select name='role_{$sid}' id='role_{$sid}' size='1'>
+          <select name='role_{$sid}' id='role_{$sid}' size='1'
+	    onchange='javascript:getRef("submitB").value="REMOVE CHECKED ITEMS / SAVE CHANGES"'>
             <xsl:if test='not( $config-this-type/roles/list-item[text()=$role] )'>
               <xsl:message>Role '<xsl:value-of select='$role'/>' is not a known role for <xsl:value-of select='type'/> type of objects.</xsl:message>
               <option value='{$role}' selected='1'><xsl:value-of select='$role'/></option>
@@ -122,9 +123,6 @@
 
   <xsl:template name='research-identified'>
 
-<!--
-    <xsl:call-template name='research-profile-navigation'/>
--->
 
     <h1>Research profile: your identified works</h1>
 
@@ -159,9 +157,10 @@
 
             <input type='hidden' name='mode' value='edit'/>
             <input type='submit'
+	           id='submitB'
                    name='continue'
                    class='important'
-                   value='SAVE CHANGES' 
+                   value='REMOVE CHECKED ITEMS' 
                    />
           </p>
 
