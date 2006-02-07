@@ -112,6 +112,32 @@ refused, autosearch, unidentified (same as autosearch).*
 *Verification and Identification.  "Interesting" documents.  Detailed
 description of the user interface.*
 
+On this screen ACIS shows:
+
+- the usual profile menu
+
+- on the right: the citations profile menu
+
+- phrase: "This is a document from your research profile:"
+  where "research profile" is a link to the identified
+  research screen ("research/identified") 
+
+- description of a document: author names, title, type, date
+  and a link to further details.
+
+- phrase: "Which of these citations point to this document?"
+  (in bold or large font)
+
+- a two-column table with the citations:
+
+  checkbox | citation string (link)
+
+  link here is a link to the description of the citing document
+
+
+
+
+
 
 ### Identified citations screen
 
@@ -148,7 +174,24 @@ be called by the user himself.
 *Background and foreground search.  Connection with ARPU.*
 
 Will be done in a similar way to how the research search
-works now.
+works now.  
+
+One thing can be done differently.
+
+If we search for citations in the background, we can also do
+citation-to-document matching in the background.  And dump
+the results to a table, from which the online part will pick
+it up.  Table:
+
+personal shortid | citation docid | citation string | research id | similarity index
+
+We will have to clear the table after a citation has been
+identified.  (Or maybe not?)  Do we need the suggestions
+table in this case?
+
+
+
+
 
 ### Technical: citation to research items similarity 
 

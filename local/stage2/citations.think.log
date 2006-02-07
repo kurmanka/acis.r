@@ -167,3 +167,9 @@ Question: Should we display the identified citations to the general public on
 the personal profile pages, that ACIS generates?
 
 
+
+2006-02-06 19:36
+
+If we search for citations in the background, we can also do
+citation-to-document matching in the background.  And dump the results to a
+table.
