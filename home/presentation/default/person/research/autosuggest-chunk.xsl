@@ -491,7 +491,7 @@
 
         <p>Our automatic search found the following works that may be
         authored by you. Check the ones you have authored and click on
-        the submit buttom at the top or bottom of the page to add
+        the submit button at the top or bottom of the page to add
         these works to your profile.</p>
 
       </xsl:when>
