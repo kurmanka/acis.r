@@ -82,13 +82,22 @@
       <xsl:for-each select='$suggestions/list-item'>
 
         <xsl:variable name='already-shown' 
-             select='count( preceding::list-item[parent::list and ancestor::suggest] )'/>
+             select='count(
+             preceding::list-item[parent::list and
+             ancestor::suggest and ancestor::contributions] )'/>
+
+	     <comment> already-shown= <xsl:value-of
+	     select='$already-shown'/> </comment>
 
         <xsl:if test='$already-shown &lt; $chunk-size'>
 
           <xsl:variable name='this-list-chunk-limit' 
                         select='$chunk-size - $already-shown'/>
           
+	  <comment> this-list-chunk-limit= <xsl:value-of
+	  select='$this-list-chunk-limit'/>
+	  <xsl:text> </xsl:text></comment>
+
           <tr class='explanation'>
             <td colspan='2' 
                 style='padding: 3px;' >
@@ -102,8 +111,10 @@
           </xsl:text>
           
           <xsl:for-each select='list/list-item'>
-            <xsl:if test='@pos &lt; $this-list-chunk-limit'>
+	    <comment>@pos=<xsl:value-of select='@pos'/></comment>
+            <xsl:if test='number(@pos) &lt; $this-list-chunk-limit'>
               <xsl:call-template name='suggest-item-row'/>
+	      <comment>/item</comment>   
             </xsl:if>
           </xsl:for-each>
 
