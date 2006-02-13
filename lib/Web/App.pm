@@ -25,7 +25,7 @@ package Web::App;   ### -*-perl-*-
 #  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 #
 #  ---
-#  $Id: App.pm,v 2.5 2006/01/31 18:21:52 ivan Exp $
+#  $Id: App.pm,v 2.6 2006/02/13 21:19:50 ivan Exp $
 #  ---
 
 
@@ -1284,12 +1284,12 @@ sub set_presenter {
 
   assert( $self );
   assert( $self-> get_screen( $screen ) );
-  
+
   $self ->{presenter} =
     $self -> get_screen( $screen ) -> {presentation};
 
 }
- 
+
 
 sub clear_process_queue {
   my $self = shift;
@@ -1410,15 +1410,17 @@ sub get_cookie {
 
 ### a helper function for some presenter types, e.g. XSLT
 
-sub serialize_presenter_data { 
+sub serialize_presenter_data {
   my $self = shift;
   my $data = $self -> {'presenter-data'} || die;
-  my $serializer = $self -> {serializer} || die;
+  my $serializer = $self -> {response} {serializer}
+      || $self -> {serializer}
+      || die;
 
   return undef if not $serializer;
 
   my $ret = &$serializer( $data ) || die;
- 
+
   return $self -> {presenter_data_string} = $ret;
 }
 
