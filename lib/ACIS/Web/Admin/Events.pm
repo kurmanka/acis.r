@@ -694,7 +694,7 @@ sub recent_events_decode {
   my $d   = $acis -> get_recent_events( $period );
   my $sql = $acis -> sql_object;
   die if $sql->error;
-  
+
   if ( not $d or not $d ->{row} ) { 
     $acis -> error( "no-events" ); 
     return undef;
@@ -703,7 +703,7 @@ sub recent_events_decode {
   my @chains;
   my %chain_ids;
   my @evs = ();
-  
+
   eval {
 
     while ( $d ->{row} ) {
@@ -765,7 +765,7 @@ sub recent_events_decode {
   $acis -> variables -> {events} = \@evs;
   $acis -> variables -> {'events-hours-shown'} = $period;
 
-  $acis -> {serializer} = \&ACIS::Data::DumpXML::dump_no_bullshit;
+  $acis -> {response} {serializer} = \&ACIS::Data::DumpXML::dump_no_bullshit;
 
 }
 
@@ -859,7 +859,7 @@ sub events {
 #  $acis -> variables -> {TOPEVENTS} = 1;
   my $sql  = $acis -> sql_object;
 
-  $acis -> {serializer} = \&ACIS::Data::DumpXML::dump_no_bullshit;
+  $acis -> {response} {serializer} = \&ACIS::Data::DumpXML::dump_no_bullshit;
 
   my $start;
   my $sid  ;
@@ -998,7 +998,7 @@ sub events_recent {
 
   my $sql  = $acis -> sql_object;
 
-  $acis -> {serializer} = \&ACIS::Data::DumpXML::dump_no_bullshit;
+  $acis -> {response} {serializer} = \&ACIS::Data::DumpXML::dump_no_bullshit;
 
   my $recent  = get_current_recent_is( $acis );
   my $options = get_options( $acis ) || undef;
@@ -1007,12 +1007,12 @@ sub events_recent {
   my $slimit = $acis -> get_cookie( "slimit" );
 
 
-  show_events_for( $acis, 
-                   -recent => $recent, 
-                   -slimit => $slimit, 
-                   -elimit => $elimit, 
+  show_events_for( $acis,
+                   -recent => $recent,
+                   -slimit => $slimit,
+                   -elimit => $elimit,
    ($options) ? ( -options => $options ) : (),
-                 );    
+                 );
 
 }
 
