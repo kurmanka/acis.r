@@ -353,7 +353,7 @@ sub process_resource {
   my $config = $ardb -> {config};
   my $sql    = $ardb -> {sql_object};
   
-  if ( $id =~ m/^repec:rus:/i ) {  $do_store = 0;  }
+  if ( $id =~ m/^repec:rus:/i ) {  $do_store = 0;  }  ### XXX a hack
   if ( not $sid ) { $do_store = 0; }
 
   if ( not $do_store ) {
@@ -432,13 +432,20 @@ sub process_resource {
     $editors = normalize_personal_names ( \@editors );
     
     if ( $editors ) {
-      my $ed = $editors;  
+      my $ed = $editors;
       $ed =~ s/(?:^\x1|\x1$)//g;
       $ed =~ s/\x1/ & /g;
       $item -> {editors} = $ed;
     }
   }
 
+  if ( $type eq 'chapter' ) {
+    ### XX a hack: if that's a chapter -- save no editor info
+    $editors = '';
+    $item -> {editors} = '';
+    @editors = ();
+    @ed_emails = ();
+  }
 
 
 
@@ -533,7 +540,7 @@ sub process_resource {
   }
   
   ####  editors' handles, Editor-Person attribute
-  {
+  if ( $type ne 'chapter' ) { ### XX a hack against chapter template editors
     my @h =  $record -> get_value( "editor/person" );
     
     resolve_shortids( \@h );
