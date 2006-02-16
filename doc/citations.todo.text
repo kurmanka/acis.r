@@ -1,11 +1,26 @@
 # ACIS Citations TO DO List
 
-iku: 2006-02-06 17:46
+iku: 2006-02-16 13:41
 
 
 Research:
 
+- citations profile screen
+
+  - look again at the Thomson Web of Science tutorials
+    [#1#](http://scientific.thomson.com/tutorials/citedreference/crs3.htm)
+    [#2#](http://scientific.thomson.com/tutorials/webofscience5/wostut06.htm)
+
+  - draw the screens of the basic main procedure for
+    verification and identification
+
+  - draw the screens of browsing the currently accepted citations
+
+  - refused citations (and, for a company, refused research sub-screen)
+
+
 - citation to research-item similarity assessment algorithm
+  (depends on having sample citation data)
 
 
 - removing edited (collected) works from the searchable
@@ -16,15 +31,6 @@ Research:
   - possible: if the handle belongs to this namespace,
     apply this regexp to extract the searchable part
 
-- citations profile screen
-
-  - study Thomson Web of Science tutorials
-
-  - basic main procedure for verification and identification
-
-  - browsing the currently accepted citations
-
-  - refused citations (and, for a company, refused research sub-screen)
 
 - offline citations search for every personal profile in
   the service 
@@ -33,7 +39,7 @@ Research:
 
 Specify
 
- - input data requirements
+ - input data format and requirements
 
  - configuration parameters
 
