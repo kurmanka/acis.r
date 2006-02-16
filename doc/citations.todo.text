@@ -1,36 +1,57 @@
 # ACIS Citations TO DO List
 
-iku: 2006-02-16 13:41
+iku: 2006-02-16 22:53
 
 
 Research:
 
 - citations profile screen
 
-  - look again at the Thomson Web of Science tutorials
-    [#1#](http://scientific.thomson.com/tutorials/citedreference/crs3.htm)
-    [#2#](http://scientific.thomson.com/tutorials/webofscience5/wostut06.htm)
+  - look again at the Thomson Web of Science tutorials:
+    [#1](http://scientific.thomson.com/tutorials/citedreference/crs3.htm),
+    [#2](http://scientific.thomson.com/tutorials/webofscience5/wostut06.htm).
+    An excerpt from my email, dated 16 Jan 2006:
 
-  - draw the screens of the basic main procedure for
+    > I found a tutorial on the Web of Science service by Thomson Scientific.  They
+      offer an interface to similar data: research, citations.  Although our
+      system's purpose is different, it is useful for me to study the interface of
+      their service for several reasons:
+
+    > - I can see how they use the specific English terms here, most importantly
+        "reference" and "citation".
+
+    > - to see how somebody solved a problem that is similar to ours, in terms of
+        the user interface
+
+    > - their interface may be familiar to some or many of our users (is it true?);
+        if this is true, we may make the users' life easier by following their
+        conventions.
+
+    
+  - design the screens of the basic main procedure for
     verification and identification
+    
+      - draw on paper
 
-  - draw the screens of browsing the currently accepted citations
+      - write it down
 
-  - refused citations (and, for a company, refused research sub-screen)
+  - design the screens of browsing the currently accepted
+    citations
+
+  - design the refused citations screen (and, for a company,
+    refused research sub-screen)
 
 
 - citation to research-item similarity assessment algorithm
   (depends on having sample citation data)
 
-
-- removing edited (collected) works from the searchable
+- removing edited (collected) works data from the searchable
   citations
 
-  - not on the basic level
-
-  - possible: if the handle belongs to this namespace,
-    apply this regexp to extract the searchable part
-
+   - one way to do it is to configure a function, which will
+     accept a citation string on input, decide what to do
+     with it and will return the searchable citation string
+     on output
 
 - offline citations search for every personal profile in
   the service 
