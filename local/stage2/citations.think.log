@@ -112,7 +112,7 @@ citations.  Then we will sum up the citations' similarity numbers for each
 document and will choose the one with the largest number.
 
 * But the similarity level number will have to be zero for neglegible
-  similarity, or it will influence the "interstingness" sorting in an
+  similarity, or it will influence the "interestingness" sorting in an
   undesired way. (2006-01-19 16:46)
 
 For each citation we will show the original citation string, the title, the
@@ -173,3 +173,16 @@ the personal profile pages, that ACIS generates?
 If we search for citations in the background, we can also do
 citation-to-document matching in the background.  And dump the results to a
 table.
+
+
+
+2006-02-23 13:04
+
+Got some citations data (from Jose-Manuel)
+
+adnetec@mutabor.openlib.org:RePEc/zzz/cites:
+
+   find ??? -type f| perl -ne 'next if ++$o<300;print $_;$o=0' >list
+   tar cjvf cites-selected.tar.bz2 --files-from=list
+
+
