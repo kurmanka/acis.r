@@ -1,13 +1,8 @@
 # ACIS Citations TO DO List
 
-iku: 2006-02-24 00:08
 
-
-Questions:
-
-- Should we display the identified citations to the general
-  public on the personal profile pages which ACIS generates?
-
+- record all the questions we have and put them into 
+  [citations.questions.html](citations.questions.html)
 
 
 Research:
@@ -38,20 +33,32 @@ Research:
   - design the screens of the basic main procedure for
     verification and identification
     
-      - make HTML prototype of the page
+      - make HTML prototype of the page:
+
+         - add the number of the other new citations to go
+           through in the following screens
+
+         - a list (or a link to a list) of citations that are
+           already identified, as pointing to this document
+
+         - make citations table with altering color?
+
+         - take the rows in the citations table a bit apart vertically?
+
+         - make citations clickable switches for the checkboxes?
 
       then
 
-        - write brief explanation of the screen in citations.html
-          and link to the HTML prototype
+       - write brief explanation of the screen in citations.html
+         and link to the HTML prototype
 
       or
 
-        - make png snapshots of the prototype pages and
+       - make png snapshots of the prototype pages and
 
-        - add them to the citations.html as pictures and
+       - add them to the citations.html as pictures and
 
-        - write some explanations
+       - write some explanations
 
   - design the screens of browsing the currently accepted
     citations
