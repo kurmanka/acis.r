@@ -1,0 +1,72 @@
+Questions on citations in ACIS
+==============================
+
+
+
+
+## Input data format
+
+Thomas says:
+
+    <text ref="text">
+       <references>
+         <acis:orginialstring> text of citation </acis:originalstring>
+         <text ref="text2"/>
+       </references>
+
+       <reference>
+         <literal> unidentified citation </literal>
+       </reference>
+    </text>
+
+I suggest:
+
+    <text ref='text'>
+       <reference ref='text2'>
+         <literal> text of citation </literal>
+       </reference>
+
+       <reference>
+         <literal> unidentified citation </literal>
+       </reference>
+    </text>
+
+
+
+## Input data processing
+
+Should citations data be accumulated in ACIS?
+
+Citations will be picked up from the database by searching for the author
+names.  Can we safely limit the searchable citation string field in the
+database to 255 chars? (The MySQL indexed field limitation.)
+
+If not, what workaround can we apply? (cutting the citation into several
+searchable strings?)
+
+
+
+## User interface
+
+Some of the citations in the input data will be already identified.  I mean,
+that the citations data provider will have them identified automatically.
+Should we not offer these automatically identified citations to users for
+review and verification?  (I think: yes, we should.)
+
+Should we make the refused citations screen?  (I think: yes, we should; and we
+should make the refused research screen.)
+
+
+
+
+## Data output
+
+Should we (ACIS) generate citations data separately from the personal AMF
+files?  (I think: we should not.)
+
+Should we display the identified citations to the general public on the
+personal profile pages which ACIS generates?  Should it be an option of the
+profile holder?  If so, should we also list verified, but unidentified
+citations?  If it should be an option, where will the profile owner switch it?
+
+
