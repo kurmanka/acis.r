@@ -9,6 +9,7 @@ doc/bdb-private.html
 doc/bdb-private.text
 doc/check-filelist.pl
 doc/citations.text
+doc/citations.html
 doc/conf.html
 doc/conf.text
 doc/cooperate.html
@@ -25,6 +26,7 @@ doc/iku-plan.html
 doc/iku-plan.text
 doc/img/eprints/core-bibliographic-info-author-area-with-shortid-or-email-field-with-empty-fields.png
 doc/img/eprints/core-bibliographic-info-author-area-with-shortid-or-email-field-with-walsh-and-menu.png
+doc/img/citations/profile-page-overview.png
 doc/index.html
 doc/index.text
 doc/install.html
