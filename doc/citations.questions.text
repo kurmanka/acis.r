@@ -1,7 +1,7 @@
 Questions on citations in ACIS
 ==============================
 
-$Id: citations.questions.text,v 2.2 2006/02/24 15:44:56 ivan Exp $
+$Id: citations.questions.text,v 2.3 2006/03/02 12:34:29 ivan Exp $
 
 
 ## Input data format
@@ -34,8 +34,6 @@ I suggest:
 
 
 ## Input data processing
-
-Should citations data be accumulated in ACIS?
 
 Citations will be picked up from the database by searching for the author
 names.  Can we safely limit the searchable citation string field in the

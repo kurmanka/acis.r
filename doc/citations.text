@@ -110,8 +110,8 @@ It may look like this:
     metadata-CitEc-home=/data/CitEc/amf
     metadata-CitEc-type=CitationsAMF
 
-Data files **must have <c>.amf.xml</c> name extension** to be
-processed by ACIS.
+The data files **must have <c>.amf.xml</c> name extension**
+to be processed by ACIS.
 
 
 ### Technical: processing the citations data
@@ -165,13 +165,18 @@ refused, autosearch, unidentified (same as autosearch).*
 *Verification and Identification.  "Interesting" documents.  Detailed
 description of the user interface.*
 
-On this screen ACIS shows:
 
-- the usual profile menu
+<p>
+<img class='snap'
+src='img/citations/profile-page-overview.png'/>
+</p>
 
-- on the right: the citations profile menu
 
-- phrase: "This is a document from your research profile:"
+This screen shows:
+
+- the usual profile menu and the citations profile menu on the right: 
+
+- phrase: "Here is a document from your research profile:"
   where "research profile" is a link to the identified
   research screen ("research/identified") 
 
@@ -183,43 +188,31 @@ On this screen ACIS shows:
 
 - a two-column table with the citations:
 
-      checkbox | citation string (link) 
+      checkbox | citation string (citing document) 
                  [not mine work]
 
-  "link" here is a link to the description of the citing
+  "citing document" here is a link to the description of the citing
   document
 
   "[not mine work]" is a button for user to click when the
   citation actually refers to a document, which the person
   has not authored.
 
+  The first citation in the table also has such note near
+  the [not mine work] button: "<= press this if it is not
+  your work that is cited, and this citation will not be
+  offered again."
+
 - a button, labelled: "ADD THESE CITATIONS"
 
-- phrase: "More new citations, waiting to be verified or
-  identified: X"
+- phrase: "There are X other new citations waiting. But get
+  done with the above first."
 
-- phrase: "Citations, already identified as pointing to the
-  above document: X [See them]" Here X is the number of
-  those citations.  "See them." is a link (or a button) to
-  show those citations (javascript).
+- phrase: "This document already has 14 citations identified
+  as pointing to it."
 
-  If there are no citations that where already identified
-  for this research item, then "See them" does not appear.
-
-  If user presses the "See them" button, a table of those
-  citations appears immeadiately.  The button disappears and
-  text appears in its place: "Listed below".
-
-  Then goes a simple citation table with a citation on each
-  row:
-
-      citation string (link)
-
-  and a phrase after the table: "Correct this list." being a
-  link to the citations/identified screen for that document,
-  where the user will be able to remove the errorneously
-  identified citations.
-
+- the usual "Where do you want to go now?" question at page
+  bottom.
 
 
 ### Identified citations screen
@@ -243,13 +236,46 @@ be called by the user himself.
 
 ### Configuration
 
-<a href='conf.html'>main.conf</a>, <co>[ACIS]</co> section:
 
- - citations-profile parameter;
+The citations profile is enabled and configured via the
+<co>[ACIS]</co> section of the <a
+href='conf.html'>main.conf</a> configuration file.  In this
+it is not much different from other parts of the ACIS web
+interface.
 
- - citations-profile-online-search parameter.
+<dl>
 
-*String similarity assessment function parameter.*
+<dt><C>citations-profile</C></dt>
+
+<dd>To show the citation profile to the users or not?
+Boolean value.  Default: false.</dd>
+
+<!-- <dt>citations-profile-online-search</dt> ?? -->
+
+<dt><C>citation-document-similarity-func</C></dt>
+
+<dd>
+
+<p>The parameter specifies a Perl function which ACIS will
+call internally.  The function will be called for assessing
+similarity between a citation string and a document record
+and must conform to the <a ref='similarity-pi'
+>Citation-document similarity assessment interface</a>.</p>
+
+<p>The function must accept two parameters on input and
+return a numerical value between 0 (no similarity) and 1 (a
+perfect match) inclusive.</p>
+
+<p>The default value for this parameter provides a function,
+documented in section <a
+ref='similarity-default-func'>Default citation-document
+similarity assessment algorithm</a>.</p>
+
+</dd>
+
+</dl>
+
+
 
 
 ### Technical: search for citations
@@ -278,10 +304,54 @@ table in this case?
 
 ### Technical: citation to research items similarity 
 
-*Citation-to-document similarity assessment algorithm.*
 
-For every item of the research profile and for every
-citation:
+<h4 id='similarity-pi'>Similarity assessment function interface</h4>
+
+The citation-document similarity function (see
+<c>citation-document-similarity-func</c>) will be called by
+ACIS like this:
+
+    $sim = func( CIT, DOC );
+
+where CIT is a reference to a citation record, DOC is a
+reference to a document record and $sim is a similarity
+value returned by the function.
+
+<dl><dt>CIT</dt>
+
+<dd><p>is a reference to a hash:</p>
+
+<pre><code>{ original => CITSTR, 
+  normalized => NORCITSTR }</code></pre>
+
+<p>Here CITSTR is the original citation string, and
+NORCITSTR is the normalized citation string.</p>
+
+</dd>
+
+<dt>DOC</dt>
+<dd><p>is a reference to a hash:</p>
+
+<pre><code>{ title   => TITLE,
+  authors => [ AUTHOR1NAME, AUTHOR2NAME, ... ],
+  type    => TYPE,
+}</code></pre>
+
+<p>Here TITLE is the work's title (a string), AUTHOR1NAME,
+AUTHOR2NAME and so on are the names of the authors
+(strings), and TYPE is one of "article", "paper", "book",
+"software", "chapter", "text" (when no particular type is
+known).</p>
+
+</dd></dl>
+
+
+
+<h4 id='similarity-default-func'>Default citation-document
+similarity assessment algorithm</h4>
+
+
+For the given document and the given citation:
 
 1. Compare titles.  Take the normalized citation string and take the normalized
    title of the research item.  Find where in the citation
@@ -299,12 +369,13 @@ citation:
 
 3. Check if the other authors' names are present in the citation
 
+<!-- 
 4. Check the publication year of the document, is it present
    in the citation?
 
 5. Check the publication status of the document.  Is there
    anything similar in the citation string?
-
+-->
 
 
 Get the comparison result as a number between 0 and 1.
@@ -315,7 +386,8 @@ Get the comparison result as a number between 0 and 1.
   what CiteSeer team tried.
 
 
-*Similarity matrix.*
+<h4>Citation-document similarity matrix</h4>
+
 
 
 ### Technical: userdata structure
