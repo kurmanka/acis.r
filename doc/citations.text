@@ -181,10 +181,11 @@ the users will deal with citations.  The users will:
  - refuse errorneously-suggested citations and review
    previously refused citations to correct possible errors.
 
-ACIS, thus, will search for citations in the database (among
+ACIS will search for citations in the database (among
 the data provided on input), attempt to match the citations
 to the documents of the user's research profile, and offer
 them to the user for validation.
+
 
 *Design principles.* The screens of the citations profile should
 not look or work much different from the research profile.
@@ -197,9 +198,30 @@ refused, autosearch, unidentified (same as autosearch).*
 
 ### The `New citations found' screen
 
-*Verification and Identification.  "Interesting" documents.  Detailed
-description of the user interface.*
+This is the main screen of the citations profile.  It is the
+default screen, which means it will show up every time when
+user clicks on "CITATIONS" in the profile navigation menu,
+but only if there are some new citations found.
 
+User will deal with a bunch of citations presumably pointing
+to one document per screen reload.
+
+To make the dialogue with the user most efficient, at each
+screen reload we will assess the found citations.  By
+matching the citations to the document items, we will find:
+
+ 1. which document is the most *interesting* in a sense that
+    it has most potential new (unidentified) citations
+    pointing to it (weighted by their respective similarity
+    measure);
+
+ 2. which citations more closely resemble the interesting
+    document.
+
+This will give us the order, in which to present the
+documents and citations to the user: we will always show the
+most interesting document and the most relevant citations at
+the top.
 
 <p>
 <img class='snap'
@@ -207,7 +229,7 @@ src='img/citations/profile-page-overview.png'/>
 </p>
 
 
-This screen shows:
+The screen shows:
 
 - the usual profile menu and the citations profile menu on the right: 
 
@@ -248,6 +270,12 @@ This screen shows:
 
 - the usual "Where do you want to go now?" question at page
   bottom.
+
+
+
+*what happens with "not mine work"?* 
+
+...
 
 
 ### Identified citations screen
