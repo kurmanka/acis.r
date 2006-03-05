@@ -1,10 +1,9 @@
 # ACIS Citations TO DO List
 
 
-- record all the appearing questions into
-  [citations.questions.html](citations.questions.html)
-
 Write [citations.html](citations.html)
+
+  - the citations profile in general
 
   - the new citations found screen: similarity, interesting
     documents, ordering
@@ -12,9 +11,10 @@ Write [citations.html](citations.html)
   - data output format
 
 
-
-
 Research:
+
+- record all the appearing questions into
+  [citations.questions.html](citations.questions.html)
 
 - citations profile screen
 

@@ -89,6 +89,24 @@ is: the citation data should come as a supplement to a
 bibliographical dataset.
 
 
+Two kinds of citations are expected in the input data (this
+is not yet shown in the example above):
+
+- identified;
+- unidentified.
+
+*Identified* are the citations, which have an autonomously
+identified citation target.  That is, the software on
+citations data provider side has found that such a citation
+is pointing to a particular document in the same set of
+documents and the data includes the identifier of that cited
+document.
+
+Therefore, the *unidentified* citations are those, which
+point to an unknown document, which may be present in the
+document database of ACIS and may not be present.
+
+
 
 ### Configuration
 
@@ -150,10 +168,27 @@ part.* *(Configuration; possibly through a perl function.)*
 
 ## Citations profile
 
-*Functional overview: process new citations and review those found before.*
+Citations profile is a part of the ACIS web interface, where
+the users will deal with citations.  The users will:
 
-*Principles.*  Should not look or work much different from
-the research profile.  We must maintain consistency here.
+ - review citations that have been identified as referring
+   to their works;
+
+ - certify that particular citations point to their
+   particular documents, with ability to review their
+   choices and correct possible errors;
+
+ - refuse errorneously-suggested citations and review
+   previously refused citations to correct possible errors.
+
+ACIS, thus, will search for citations in the database (among
+the data provided on input), attempt to match the citations
+to the documents of the user's research profile, and offer
+them to the user for validation.
+
+*Design principles.* The screens of the citations profile should
+not look or work much different from the research profile.
+We should maintain consistency here.
 
 *Search for citations: background and online.  Sub-screens: identified,
 refused, autosearch, unidentified (same as autosearch).*
