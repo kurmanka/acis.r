@@ -1,7 +1,7 @@
 Citations in ACIS
 =================
 
-Sections marked "Technical:" will hold the implementation
+Sections marked "Technical:" hold the implementation
 issues, not functional requirements.
 
 <toc/>
@@ -138,20 +138,20 @@ to be processed by ACIS.
 RePEc::Index::Collections::CitationsAMF to
 ACIS::Citations::Input via the collection's proc parameter.
 
-Citations table structure:
+Citations table structure (the fields):
 
-    document id | normalized searchable citation string | full original citation text
+- document id
+- normalized searchable citation string 
+- full original citation text 
+- refers to doc id
 
 SQL create statement:
 
     CREATE TABLE $acisdb.citations ( 
            docid   CHAR(255),
            nstring CHAR(255), 
-           ostring TEXT );
-
-*TODO:* Add character set and collations to the table
-definition?  Also: make it configurable?  (Probably not.
-Instead, configure it globally for the database.)
+           ostring TEXT,
+           citdocid CHAR(255) );
 
 *TODO:* add this table to the <a href='db.html'>Database
 tables</a> document.
@@ -159,12 +159,16 @@ tables</a> document.
 *Citation string normalization:* Put it through Unicode
 decomposition, convert letters to upper case, add a space
 after each dot and each comma, remove spaces after a dot if
-a comma follows it, compact all whitespace, remove starting
+a comma follows it, compact all whitespace, remove leading
 and trailing whitespace.
 
 *Searchable citations string part -- cutting out the editors
 part.* *(Configuration; possibly through a perl function.)*
+The regular expression:
 
+    s/\b((I|i)n\W.+?\Wed\..*)$//
+
+*(Requires testing.)*
 
 ## Citations profile
 
@@ -188,11 +192,14 @@ them to the user for validation.
 
 
 *Design principles.* The screens of the citations profile should
-not look or work much different from the research profile.
-We should maintain consistency here.
+look and work similar to those of the research profile.
+Consistency is valuable.
 
-*Search for citations: background and online.  Sub-screens: identified,
-refused, autosearch, unidentified (same as autosearch).*
+*Sub-screens: identified, refused, autosearch, unidentified
+(same as autosearch), overview?.*
+
+*Search for citations: background and online.*
+
 
 
 
@@ -245,8 +252,8 @@ The screen shows:
 
 - a two-column table with the citations:
 
-      checkbox | citation string (citing document) 
-                 [not mine work]
+  <pre>checkbox | citation string (citing document) 
+               [not mine work]</pre>
 
   "citing document" here is a link to the description of the citing
   document
@@ -273,7 +280,7 @@ The screen shows:
 
 
 
-*what happens with "not mine work"?* 
+*what exactly happens when user clicks "not mine work"?* 
 
 ...
 
@@ -410,9 +417,10 @@ known).</p>
 
 
 
-<h4 id='similarity-default-func'>Default citation-document
+<h4 id='similarity-default-func'>The default citation-document
 similarity assessment algorithm</h4>
 
+*This section needs a revision.*
 
 For the given document and the given citation:
 

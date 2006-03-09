@@ -186,3 +186,58 @@ adnetec@mutabor.openlib.org:RePEc/zzz/cites:
    tar cjvf cites-selected.tar.bz2 --files-from=list
 
 
+
+2006-03-09 14:08
+
+A question asked and then answered: cutting the editor names.
+
+
+**2.2.** Thomas mentioned that citations should not include
+edited work title and the names of the editors, when the
+cited work appears inside an edited volume.  This is because
+we don't want users to include such indirect citations into
+their profiles.
+
+How are we going to exclude the editors data?
+
+Here are some sample citations that I took from Jose's data,
+just for consideration:
+
+ - Strand, Ivar, James E. Kirkley, and
+K. E. McConnell. Economic Analysis and the Management of
+Atlantic Surf Cl ams, in L.G. Anderson, ed., Economic
+Analysis for Fisheries Management Plans. Ann Arbor MI: Ann
+Arbor Science, 1981, pp. 245-66.
+
+ - Murphy, Kevin M. and Robert H. Topel. Estimation and Inference in Two-Step Econometric Models. Journ
+al of Business and Economic Statistics, October 1985, 3 (4),
+pp. 370-79.
+
+ - Lopes, L. (1987): Between Hope and Fear: The Psychology of Risk, in Advances in Experimental Social
+Psychology, ed. by L. Berkowitz, pp. 255--295. Academic
+Press, New York.
+
+ - Osborne, M. J., and A. Rubinstein (1994): A Course in Game Theory. MIT, Cambridge, MA. 
+
+ - Hargreaves Heap, S. 1993. Post-Modernity and New Conceptions of Rationality in Economics. In B. Gerr
+ard, ed. The Economics of Rationality. London and New York: Routledge, 68-90.
+
+ -  Klamer, A. and D. N. McCloskey. 1988. Economics in the Human Conversations. In R. M. Solow, ed. The
+Consequences of Economic Rhetoric. Cambridge, UK: Cambridge University Press, 3-20.
+
+ - McLennan, G. 1992. The Enlightenment Project Revisited. In T. McGrew, ed. Modernity and Its Futures.
+ Cambridge: Polity Press in Association with the Open University, 327-355.
+
+ - Spiro, M. E. 1992. Cultural Relativism and the Future of
+   Anthropology. In G. E. Marcus, ed. Rereading Cultural
+   Anthropology. Durham and London: Duke University Press.
+
+
+ - Weimann, J. 1994. Individual Behavior in Free Riding Experiment. Journal of Public Economics 54: 185-200.
+
+
+The regular expression:
+
+    s/\b((I|i)n\W.+?\Wed\..*)$//
+
+

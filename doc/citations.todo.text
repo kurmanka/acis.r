@@ -1,12 +1,25 @@
 # ACIS Citations TO DO List
 
 
-Write [citations.html](citations.html)
-
-  - the citations profile in general
+Write into [citations.html](citations.html):
 
   - the new citations found screen: similarity, interesting
     documents, ordering
+
+     - what exactly happens when user clicks [not mine work]
+       button?
+
+  - search: offline and online
+
+     - can't we simply agree that we will not do online search?
+
+  - identified citations screen (a list of documents + a
+    number of citations identified, clickable; then: a
+    document and a list of citations, editable; after
+    removal a citation returns to the unidentified list;
+    should we display [not mine work] button there also?)
+
+  - refused citations screen (just a list of citations, editable)
 
   - data output format
 
@@ -17,54 +30,20 @@ Research:
   [citations.questions.html](citations.questions.html)
 
 - citations profile screen
-
-  - look again at the Thomson Web of Science tutorials:
-    [#1](http://scientific.thomson.com/tutorials/citedreference/crs3.htm),
-    [#2](http://scientific.thomson.com/tutorials/webofscience5/wostut06.htm).
-    An excerpt from my email, dated 16 Jan 2006:
-
-    > I found a tutorial on the Web of Science service by Thomson Scientific.  They
-      offer an interface to similar data: research, citations.  Although our
-      system's purpose is different, it is useful for me to study the interface of
-      their service for several reasons:
-
-    > - I can see how they use the specific English terms here, most importantly
-        "reference" and "citation".
-
-    > - to see how somebody solved a problem that is similar to ours, in terms of
-        the user interface
-
-    > - their interface may be familiar to some or many of our users (is it true?);
-        if this is true, we may make the users' life easier by following their
-        conventions.
-
     
-  - design the screens of the basic main procedure for
+  - design the screens of the main procedure for
     verification and identification
     
-      - make HTML prototype of the page:
+      - the HTML prototype of the page:
 
-         - make citations table with altering color?
+         - make citations table with altering color of rows?
 
          - take the rows in the citations table a bit apart vertically?
 
-         - make citations clickable switches for the checkboxes?
+         - make citations clickable switches for the
+           checkboxes (label element)?
 
-      then
-
-       - write brief explanation of the screen in citations.html
-         and link to the HTML prototype
-
-      or
-
-       - make png snapshots of the prototype pages and
-
-       - add them to the citations.html as pictures and
-
-       - write some explanations
-
-  - design the screens of browsing the currently accepted
-    citations
+  - design the identified citations screen
 
   - design the refused citations screen (and, for a company,
     refused research sub-screen)
@@ -78,6 +57,16 @@ Research:
 
 - citation to research-item similarity assessment algorithm
   (depends on having sample citation data)
+
+  - How do we get volume / issue / page data for the article
+    documents, if available, to use it for matching to
+    citations?
+
+     - RI database?
+
+     - add these fields to the document table?
+
+     - (this should work as well for AMF as for ReDIF)
 
 - removing edited (collected) works data from the searchable
   citations
