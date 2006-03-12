@@ -25,7 +25,7 @@ package ACIS::Web;   ### -*-perl-*-
 #  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 #
 #  ---
-#  $Id: Web.pm,v 2.3 2006/03/12 22:13:25 ivan Exp $
+#  $Id: Web.pm,v 2.4 2006/03/12 22:28:15 ivan Exp $
 #  ---
 
 
@@ -355,7 +355,7 @@ sub userdata_file_for_login {
   my $udata_dir  = $self -> userdata_dir;
 
   my $safe = $login;
-  $safe =~ s![\n\r|;><\\/]!!g;  ### security
+  $safe =~ s![\s|;><\\/]!!g;  ### security
 
   my $udata_file = "$udata_dir/$fl/$sl/$safe.xml";
 
