@@ -40,11 +40,23 @@
   <xsl:template match='/data'>
     <xsl:call-template name='page'>
 
-      <xsl:with-param name='title'>adm/get</xsl:with-param>
+      <xsl:with-param name='title'>
+        <xsl:text>rec </xsl:text>
+	<xsl:value-of select='$form-input/id'/>
+<xsl:choose>
+<xsl:when test='//nosuchrecord'> not found </xsl:when>
+</xsl:choose>
+</xsl:with-param>
       
       <xsl:with-param name='content'>
 
         <xsl:choose>
+	  <xsl:when test='//nosuchrecord'>
+	     <h1>Record not found</h1>
+	     
+	     <p><xsl:value-of select='$form-input/id'/></p>
+
+	  </xsl:when>
           <xsl:when test='$form-input/id/text()'>
             
             <h1>Rec <xsl:value-of select='$form-input/id'/></h1>

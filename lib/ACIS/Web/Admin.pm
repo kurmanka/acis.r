@@ -25,7 +25,7 @@ package ACIS::Web::Admin;   ### -*-perl-*-
 #  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 #
 #  ---
-#  $Id: Admin.pm,v 2.4 2006/03/12 22:13:25 ivan Exp $
+#  $Id: Admin.pm,v 2.5 2006/03/14 10:51:24 ivan Exp $
 #  ---
 
 
@@ -1162,10 +1162,14 @@ sub adm_get {
     require RePEc::Index::Reader;
     my $reader = RePEc::Index::Reader -> new( $col );
     $data = $reader -> get_record( $id );
-    $var -> {record}  = $data ->[0];
-    $var -> {type}    = $data ->[1];
-    if ( $reader -> get_conflict( $id ) ) {
-      $var -> {conflict} = 1;
+
+    if ( not $data ) { $var -> {nosuchrecord} = 1; }
+    else {
+      $var -> {record}  = $data ->[0];
+      $var -> {type}    = $data ->[1];
+      if ( $reader -> get_conflict( $id ) ) {
+        $var -> {conflict} = 1;
+      }
     }
 
   } elsif ( $op eq 'hist' 
@@ -1175,10 +1179,13 @@ sub adm_get {
     my $reader = RePEc::Index::Reader -> new( $col );
     $data = $reader -> get_history( $id );
 
-    resolve_times_in_history( $data );
-    $var -> {history}  = $data;
-    if ( $reader -> get_conflict( $id ) ) {
-      $var -> {conflict} = 1;
+    if ( not $data ) { $var -> {nosuchrecord} = 1; }
+    else {
+      resolve_times_in_history( $data );
+      $var -> {history}  = $data;
+      if ( $reader -> get_conflict( $id ) ) {
+        $var -> {conflict} = 1;
+      }
     }
 
   } elsif ( $op eq 'ardb' ) {
@@ -1186,7 +1193,10 @@ sub adm_get {
     require ARDB::Local;
     my $ardb = ARDB-> new();
     $data = $ardb -> get_record( $id );
-    $var -> {record} = $data;
+    if ( not $data ) { $var -> {nosuchrecord} = 1; }
+    else {
+      $var -> {record} = $data;
+    }
 
   } else {
     $app -> error( "unclear-function-to-get" );
