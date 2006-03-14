@@ -25,7 +25,7 @@ package Web::App::Common;   ### -*-perl-*-
 #  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 #
 #  ---
-#  $Id: Common.pm,v 2.1 2006/01/25 14:19:38 ivan Exp $
+#  $Id: Common.pm,v 2.2 2006/03/14 10:50:19 ivan Exp $
 #  ---
 
 
@@ -116,15 +116,28 @@ sub debug {
 
   ($package, $filename, $line) = caller;
 
-  if ( $Web::App::DEBUGIMMEDIATELY
-       and open DEBUGLOG, ">>/home/ivan/proj/acis.zet/DEBUGLOG" ) {
-    print DEBUGLOG "[$subroutine($line)] $message\n";
-  }
+#  if ( $Web::App::DEBUGIMMEDIATELY
+#       and $Web::App::DEBUGLOGFILE
+#       and open DEBUGLOG, ">>$Web::App::DEBUGLOGFILE" 
+#     ) {
+#    print DEBUGLOG "[$subroutine($line)] $message\n";
+#  }
   print "[$subroutine($line)] $message\n"
     if $Web::App::DEBUGIMMEDIATELY;
 
   $LOGCONTENTS .= "[$subroutine($line)] $message\n";
 }
+
+sub dump_debug {
+  if ( $Web::App::DEBUGLOGFILE
+       and open DEBUGLOG, ">>$Web::App::DEBUGLOGFILE" ) {
+    print DEBUGLOG "\n * ", scalar( localtime ), " debug log dump";
+    print DEBUGLOG $LOGCONTENTS, "\n";
+    close DEBUGLOG;
+  }
+}
+
+$::SIG{USR1} = \&dump_debug;
 
 
 sub debug_as_is {
