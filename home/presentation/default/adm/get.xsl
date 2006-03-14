@@ -41,10 +41,10 @@
     <xsl:call-template name='page'>
 
       <xsl:with-param name='title'>
-        <xsl:text>rec </xsl:text>
-	<xsl:value-of select='$form-input/id'/>
 <xsl:choose>
-<xsl:when test='//nosuchrecord'> not found </xsl:when>
+<xsl:when test='$form-input/id'><xsl:value-of select='$form-input/id'/></xsl:when>
+<xsl:when test='//nosuchrecord'> record not found </xsl:when>
+<xsl:otherwise> adm/get </xsl:otherwise>
 </xsl:choose>
 </xsl:with-param>
       
@@ -54,12 +54,12 @@
 	  <xsl:when test='//nosuchrecord'>
 	     <h1>Record not found</h1>
 	     
-	     <p><xsl:value-of select='$form-input/id'/></p>
+	     <p><big><xsl:value-of select='$form-input/id'/></big></p>
 
 	  </xsl:when>
           <xsl:when test='$form-input/id/text()'>
             
-            <h1>Rec <xsl:value-of select='$form-input/id'/></h1>
+            <h1>Record <xsl:value-of select='$form-input/id'/></h1>
             
             <xsl:call-template name='menu'/>
             
