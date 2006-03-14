@@ -10,12 +10,14 @@ require Date::Manip;
 require Exporter;
 require Storable;
 require XML::Parser;
+require Proc::Daemon;
 
 # other components
 require ARDB;
 require ARDB::Local;
-require RePEc::Index::Reader;
-require RePEc::Index::UpdateClient;
+#require RePEc::Index::Reader;
+#require RePEc::Index::local_setup;
+#require RePEc::Index::UpdateClient;
 require sql_helper;
 
 # ACIS
