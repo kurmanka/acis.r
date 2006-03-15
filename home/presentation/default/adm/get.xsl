@@ -15,7 +15,7 @@
 
 <p>
 <xsl:choose>
-<xsl:when test='$dot/record'
+<xsl:when test='$dot/record and not( $dot/ardb )'
 ><span class='here'>&#160;the&#160;record&#160;</span>
 </xsl:when>
 <xsl:otherwise>
@@ -33,6 +33,17 @@
 >the history</a>&#160;</span>
 </xsl:otherwise>
 </xsl:choose>
+|
+<xsl:choose>
+<xsl:when test='$dot/record and $dot/ardb'
+><span class='here'>&#160;ARDB&#160;</span>
+</xsl:when>
+<xsl:otherwise>
+<span>&#160;<a ref='/adm/get/{$form-input/col}/{$form-input/id}/ardb'
+>ARDB</a>&#160;</span>
+</xsl:otherwise>
+</xsl:choose>
+
 </p>
 
 </xsl:template>
@@ -148,11 +159,11 @@
           
           <p>
             <label for='col'>collection: </label>
-            <input type='text' id='col' name='col' size='12'/>
+            <input type='text' id='col' name='col' value='{$form-input/col}' size='12'/>
             <br/>
             
             <label for='id'>id: </label>
-            <input type='text' id='id' name='id' size='60'/>
+            <input type='text' id='id' name='id' value='{$form-input/id}' size='60'/>
             
             <xsl:text> </xsl:text>
 

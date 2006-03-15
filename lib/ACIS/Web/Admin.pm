@@ -25,7 +25,7 @@ package ACIS::Web::Admin;   ### -*-perl-*-
 #  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 #
 #  ---
-#  $Id: Admin.pm,v 2.5 2006/03/14 10:51:24 ivan Exp $
+#  $Id: Admin.pm,v 2.6 2006/03/15 09:53:39 ivan Exp $
 #  ---
 
 
@@ -1189,8 +1189,10 @@ sub adm_get {
     }
 
   } elsif ( $op eq 'ardb' ) {
+
     require ARDB;
     require ARDB::Local;
+    $var -> {ardb}   = 1;
     my $ardb = ARDB-> new();
     $data = $ardb -> get_record( $id );
     if ( not $data ) { $var -> {nosuchrecord} = 1; }

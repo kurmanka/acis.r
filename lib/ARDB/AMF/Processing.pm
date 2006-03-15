@@ -147,7 +147,7 @@ sub process_text {
              sid => $sid,
             };
   
-  my $table  = $config -> table( 'res_creators_separate' );
+  $table  = $config -> table( 'res_creators_separate' );
   $table -> delete_records( 'sid', $sid, $sql );
   
   my @emails = ( @au_emails, @ed_emails );
@@ -268,8 +268,8 @@ sub process_authors {
 
     if ( $authors ) {
       my $au = $authors;
-      $au =~ s/(?:^\x1|\x1$)//g;
-      $au =~ s/\x1/ & /g;
+      $au =~ s/(?:^\x{1}|\x{1}$)//g;
+      $au =~ s/\x{1}/ & /g;
       $item -> {authors} = $au;
     }
   }
@@ -292,8 +292,8 @@ sub process_editors {
     
     if ( $editors ) {
       my $ed = $editors;  
-      $ed =~ s/(?:^\x1|\x1$)//g;
-      $ed =~ s/\x1/ & /g;
+      $ed =~ s/(?:^\x{1}|\x{1}$)//g;
+      $ed =~ s/\x{1}/ & /g;
       $item -> {editors} = $ed;
     }
   }
