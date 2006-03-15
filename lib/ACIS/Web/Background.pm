@@ -181,8 +181,9 @@ sub run_thread {
     exit 1;
     
   } elsif ( defined $fork )  {
-    
+    wait;
     return 1;
+
   } else {
 
     clear_thread_record ( $sql, $psid, $type );
