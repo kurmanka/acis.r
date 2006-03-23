@@ -144,9 +144,7 @@ sub run_thread {
   }
 
 
-#  RePEc::ShortIDs::sync_database();
-
-  my $parent = $PPerlServer::spid || $$;
+  my $parent = $PPerlServer::child_pid || $PPerlServer::spid || $$;
   my $fork = fork ();
 
   if ( $fork == 0 ) {
@@ -159,9 +157,12 @@ sub run_thread {
 
 #    $sql_helper::VERBOSE_LOG = 1;   ### XXX debugging
 
-    ### detach
+    my $midpid = $$;
 
+    ### detach
     Proc::Daemon::Init();
+
+    logit "became daemon from $parent via $midpid";
 
 
     ### call the function
@@ -179,7 +180,7 @@ sub run_thread {
     clear_thread_record ( $sql, $psid, $type );
 
     ### exit
-    logit "exited";
+    logit "finished";
     exit 1;
     
   } elsif ( defined $fork )  {
