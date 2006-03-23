@@ -25,7 +25,7 @@ package ACIS::Web::Contributions;  ### -*-perl-*-
 #  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 #
 #  ---
-#  $Id: Contributions.pm,v 2.1 2006/03/23 10:46:10 ivan Exp $
+#  $Id: Contributions.pm,v 2.2 2006/03/23 11:07:07 ivan Exp $
 #  ---
 
 use strict;
@@ -265,7 +265,7 @@ sub main_screen {
   assert( $contributions );
 #  my $contributions = $session -> {$id} {contributions};
 
-  my $laststatus = $contributions -> {laststatus};
+  my $laststatus = $contributions -> {laststatus} || '';
 
   my $status = get_search_status( $app );
   ### check search status
@@ -490,17 +490,14 @@ sub get_search_status {
   my $id      = $record -> {id} ;
   my $sid     = $record -> {sid};
 
-
-  $contributions = $session -> {$id} {contributions};
-
-  my $status ;
+  my $status  = '';
 
   require ACIS::Web::Background;
+
 
   my $trstatus = ACIS::Web::Background::check_thread( $app, $sid );
 
   debug "get_search_status";
-
 
   if ( $trstatus ) {
 
@@ -514,6 +511,7 @@ sub get_search_status {
          or $threads -> {'res-auto-approx'} ) {
       $status = 'running';
 
+      $contributions = $session -> {$id} {contributions};
       $contributions -> {searching} = $threads;
 
       ###  since what time?
@@ -739,7 +737,7 @@ sub process {
 
   my $processed = 0;
 
-  my $mode   = $input -> {mode};
+  my $mode   = $input -> {mode} || '';
   my $source = $input -> {source};
 
   my $pool;
@@ -757,7 +755,9 @@ sub process {
 
 
     ########################################################
-    if ( $_ =~ m/^add_(.+)/ and $val ) {            ###    A D D 
+                                              ###    A D D 
+    if ( $_ =~ m/^add_(.+)/ 
+         and $val ) {            
       my $tid    = $1;
       my $handle = $input -> {"id_$tid"};
       my $role   = $input -> {"role_$tid"};
@@ -876,7 +876,7 @@ sub process {
 
 
 
-  if ( $input ->{mode} eq 'add' ) {
+  if ( $mode eq 'add' ) {
     my $refuse = $input ->{'refuse-ignored'};
 
     foreach ( keys %$input  ) {

@@ -1,5 +1,5 @@
 package sql_helper;
-# $Id: sql_helper.pm,v 2.0 2005/12/27 19:47:41 ivan Exp $
+# $Id: sql_helper.pm,v 2.1 2006/03/23 11:07:07 ivan Exp $
 
 use DBI;
 # ? just for early detection of DBD::mysql absence
@@ -324,20 +324,22 @@ sub prepare {
 
   TRY:
     my $dbh = $self->{dbh};
-
+    my $errstr;
     my $r;
     
     eval {
       $r = $dbh->prepare ( @_ );
     };    
-    if ( $dbh->errstr =~ /server has gone away/ ) {
+    $errstr = $dbh->errstr;
+    if ( defined $errstr 
+         and $errstr =~ /server has gone away/ ) {
       $self->reconnect;
       goto TRY;
     }
     if ( not $r or $@ 
 #        or $VERBOSE_LOG 
        ) {
-      $self->query_log ( "prepare result: " , $dbh->errstr() );
+      $self->query_log ( "prepare result: " , $errstr );
     }
     if ( not $r or $@ ) { return undef; }
 

@@ -28,7 +28,7 @@ package ACIS::Web;   ### -*-perl-*-
 #  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 #
 #  ---
-#  $Id: Services.pm,v 2.1 2006/01/25 14:19:38 ivan Exp $
+#  $Id: Services.pm,v 2.2 2006/03/23 11:07:07 ivan Exp $
 #  ---
 
 use strict;
@@ -555,6 +555,7 @@ sub login_start_session {
   my $session = $app -> start_session( "user", $owner );
 
   my $sid = $session -> id;
+  assert( $sid );
 
   $app -> sevent ( -class => 'auth',
                   -action => 'success',
@@ -602,7 +603,7 @@ sub login_start_session {
   }
   ###### udata lock was here
 
-  my $auto_login = $app -> form_input ->{'auto-login'};
+  my $auto_login = $app -> form_input ->{'auto-login'} || '';
  
   if ( $auto_login eq "true" )  {
     my $pass = $app -> form_input ->{pass};
@@ -613,7 +614,7 @@ sub login_start_session {
   ### redirect to the same screen, but with session id
 
   my $base_url = $app -> config( 'base-url' );
-  my $screen   = $app -> {request} -> {screen};
+  my $screen   = $app -> {request} -> {screen} || '';
 
   my $URI = "$base_url/$screen!$sid";  ### XXX URL structure, dependency
 
