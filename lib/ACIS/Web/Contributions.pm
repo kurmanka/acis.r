@@ -25,7 +25,7 @@ package ACIS::Web::Contributions;  ### -*-perl-*-
 #  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 #
 #  ---
-#  $Id: Contributions.pm,v 2.0 2005/12/27 19:47:39 ivan Exp $
+#  $Id: Contributions.pm,v 2.1 2006/03/23 10:46:10 ivan Exp $
 #  ---
 
 use strict;
@@ -767,6 +767,7 @@ sub process {
            and $conf -> {roles} {$role} ) {
         ### all correct, but also we could check the item type and...
         
+        assert( $source );
         my $item = find_contribution ( $contributions, $handle, $source );
 
         if ( not $item ) {
@@ -851,6 +852,7 @@ sub process {
 
       if ( $handle and $val ) {
 
+        assert( $source );
         my $item = find_contribution ( $contributions, $handle, $source );
         my $sid  = $item -> {sid};
 
@@ -883,8 +885,9 @@ sub process {
       if ( $_ =~ m/^id_(.+)/ ) {
         my $tid    = $1;
         my $handle = $val;
-        if ( $tid and not $input -> {"add_$tid"} ) {
+        if ( $tid and $handle and not $input -> {"add_$tid"} ) {
 
+          assert( $source );
           ###  find it
           my $item = find_contribution ( $contributions, $handle, $source );
 
@@ -986,8 +989,8 @@ sub find_contribution {  ###  among suggestions
   my $id            = shift;
   my $source        = shift;
 
-  assert( $id );
-  assert( $source );
+  assert( $id ,    '$id is untrue');
+  assert( $source, '$source is untrue');
 
   my $item;
 
@@ -996,27 +999,16 @@ sub find_contribution {  ###  among suggestions
 
   if ( $source eq 'suggestions' ) {
     foreach my $list ( @$suggest ) {
-      foreach ( @{ $list -> {list} } ) {
-        if( $_ ->{id} eq $id ) {
-          $item = $_;
-          goto OUT;
-        }
+      foreach $item ( @{ $list -> {list} } ) {
+        if( $item ->{id} eq $id ) { return $item; }
       }
     }
 
   } elsif ( $source eq 'search' ) {
-    foreach ( @{ $search -> {list} } ) {
-      if( $_ ->{id} eq $id ) {
-        $item = $_;
-        goto OUT;
-      }
+    foreach $item ( @{ $search -> {list} } ) {
+      if( $item ->{id} eq $id ) { return $item }
     }
-
-  } else {
-    die;
   }
-
- OUT:
 
   return $item;
 }
