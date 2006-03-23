@@ -115,7 +115,7 @@ sub run_thread {
   debug "run_thread()";
 
   ###  this module's own log
-  logit "run thread( psid: $psid, type: $type )";
+  logit "run thread( psid: $psid, type: $type, func: $func )";
 
   my $check = check_thread ( $app, $psid, $type );
 
@@ -145,12 +145,14 @@ sub run_thread {
 
 
 #  RePEc::ShortIDs::sync_database();
- 
+
+  my $parent = $PPerlServer::spid || $$;
   my $fork = fork ();
 
   if ( $fork == 0 ) {
+    # the child 
 
-    logit "forked";
+    logit "forked from $parent to run $func";
     undef $sql;
     $app -> {sql_object} = undef;
     $sql = $app -> sql_object;
@@ -181,6 +183,9 @@ sub run_thread {
     exit 1;
     
   } elsif ( defined $fork )  {
+    # the parent
+    
+    # wait till the child goes daemon
     wait;
     return 1;
 
