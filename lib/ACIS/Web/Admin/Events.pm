@@ -358,7 +358,8 @@ sub show_events_for {
       }
     }
 
-    if ( $row->{startend} == 1 ) { 
+    if ( defined $row->{startend} 
+         and $row ->{startend} == 1 ) { 
       if ( $mode eq 'scan' ) { next; }
     }
 
