@@ -25,7 +25,7 @@ package Web::App::Common;   ### -*-perl-*-
 #  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 #
 #  ---
-#  $Id: Common.pm,v 2.2 2006/03/14 10:50:19 ivan Exp $
+#  $Id: Common.pm,v 2.3 2006/03/23 09:00:00 ivan Exp $
 #  ---
 
 
@@ -104,17 +104,19 @@ sub generate_id {
 
 
 
- 
-sub debug {
+use vars qw( $dumped_debug );
+$dumped_debug = 0;
 
-  return unless $Web::App::DEBUG;
+sub debug {
 
   my $message = join '', @_;
 
-  my ($package, $filename, $line, $subroutine, $hasargs,
-     $wantarray, $evaltext, $is_require, $hints, $bitmask) = caller(1);
+#  return unless $Web::App::DEBUG;
 
-  ($package, $filename, $line) = caller;
+  my $subroutine = (caller(1))[3];
+  my $line       = (caller)[2];
+
+  $message = "[$subroutine($line)] $message\n";
 
 #  if ( $Web::App::DEBUGIMMEDIATELY
 #       and $Web::App::DEBUGLOGFILE
@@ -122,22 +124,61 @@ sub debug {
 #     ) {
 #    print DEBUGLOG "[$subroutine($line)] $message\n";
 #  }
-  print "[$subroutine($line)] $message\n"
+
+  print $message
     if $Web::App::DEBUGIMMEDIATELY;
 
-  $LOGCONTENTS .= "[$subroutine($line)] $message\n";
+  $LOGCONTENTS .= $message;
+
+  if ( $PPERL::DEBUG 
+       and $PPerlServer::LOG_ERROR ) {
+    PPerlServer::log_error( $message );
+  }
 }
 
 sub dump_debug {
+  PPerlServer::log_error( "Web::App::Common::dump_debug() to $Web::App::DEBUGLOGFILE\n" );
   if ( $Web::App::DEBUGLOGFILE
        and open DEBUGLOG, ">>$Web::App::DEBUGLOGFILE" ) {
-    print DEBUGLOG "\n * ", scalar( localtime ), " debug log dump";
+    print DEBUGLOG "\n * ", scalar( localtime ), " debug log dump\n";
     print DEBUGLOG $LOGCONTENTS, "\n";
+    print DEBUGLOG "------\n";
     close DEBUGLOG;
   }
 }
 
-$::SIG{USR1} = \&dump_debug;
+
+if (0) {
+  *debug= sub {
+    my $message = join '', @_;
+    
+    my ($package, $filename, $line, $subroutine, $hasargs,
+        $wantarray, $evaltext, $is_require, $hints, $bitmask) = caller(1);
+
+    ($package, $filename, $line) = caller;
+
+    if ( $Web::App::DEBUGLOGFILE
+         and open DEBUGLOG, ">>$Web::App::DEBUGLOGFILE" ) {
+      print DEBUGLOG "[$subroutine($line)] $message\n";
+      close DEBUGLOG;
+    }
+    $LOGCONTENTS .= "[$subroutine($line)] $message\n";
+  };
+}
+                                   
+
+#$::SIG{USR1} = \&dump_debug;
+
+#   if ( $PPerlServer::LOG_ERROR
+#        and not $dumped_debug ) {
+#     if ( $Web::App::DEBUGLOGFILE
+#          and open DEBUGLOG, ">>$Web::App::DEBUGLOGFILE" ) {
+#       print DEBUGLOG "\n * ", scalar( localtime ), " debug log dump\n";
+#       print DEBUGLOG $LOGCONTENTS, "\n";
+#       close DEBUGLOG;
+#     }
+#     $dumped_debug=1;
+#   }
 
 
 sub debug_as_is {
