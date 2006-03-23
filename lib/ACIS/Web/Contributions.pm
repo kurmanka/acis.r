@@ -25,7 +25,7 @@ package ACIS::Web::Contributions;  ### -*-perl-*-
 #  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 #
 #  ---
-#  $Id: Contributions.pm,v 2.2 2006/03/23 11:07:07 ivan Exp $
+#  $Id: Contributions.pm,v 2.3 2006/03/23 11:24:16 ivan Exp $
 #  ---
 
 use strict;
@@ -1155,9 +1155,9 @@ sub search {
   my $objects     = 'resources';
   my $table;
 
-  my $search_key = $input -> {'q'};    
+  my $search_key = $input -> { q };    
   my $field      = $input -> { field };
-  my $phrasematch= $input -> { phrase };
+  my $phrasematch= $input -> { phrase } || 0;
   
   if ( $field eq 'id' ) {
     $phrasematch = 1;
@@ -1596,7 +1596,7 @@ sub search_documents {
   my $context = shift;
   my $key     = shift;
   my $field   = shift;
-  my $phrase  = shift;
+  my $phrase  = shift || 0;
 
   my $result = [];
 
