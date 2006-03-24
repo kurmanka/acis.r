@@ -25,7 +25,7 @@ package ACIS::Web::Admin;   ### -*-perl-*-
 #  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 #
 #  ---
-#  $Id: Admin.pm,v 2.6 2006/03/15 09:53:39 ivan Exp $
+#  $Id: Admin.pm,v 2.7 2006/03/24 17:17:56 ivan Exp $
 #  ---
 
 
@@ -1129,7 +1129,7 @@ sub adm_get {
   if ( $request =~ m!^(\w+)/(.+?)(/(rec|record|hist|history|ardb))?$! ) {
     my $col = $1;
     my $id  = $2;
-    my $op  = $4;
+    my $op  = $4 || '';
 
     $input ->{id} = $id;
     $input ->{col} = $col;
