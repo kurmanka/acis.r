@@ -60,7 +60,7 @@ sub chain_process_event($$;$) {
   my $about = $chain -> {about};
 
   my $error;
-  my $type  = $e -> {type} ;
+  my $type  = $e -> {type} || '';
   my $class = $e -> {class};
   my $action= $e -> {action};
   my $descr = $e -> {descr};
@@ -385,7 +385,8 @@ sub show_events_for {
 
     $e = make_event_from_db_row( $row );
 
-    if ( $e -> {startend} == 1 ) {
+    if ( $e -> {startend}
+         and $e -> {startend} == 1 ) {
       
       my $se = start_new_chain( $e );
 

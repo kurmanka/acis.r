@@ -28,7 +28,7 @@ package ACIS::Web;   ### -*-perl-*-
 #  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 #
 #  ---
-#  $Id: Services.pm,v 2.2 2006/03/23 11:07:07 ivan Exp $
+#  $Id: Services.pm,v 2.3 2006/03/24 08:06:17 ivan Exp $
 #  ---
 
 use strict;
@@ -710,9 +710,13 @@ sub set_form_action {
 
 sub set_form_value {
   my $self    = shift;
-  my $element = shift;
+  my $element = shift || croak;
   my $value   = shift;
   
+  if ( not defined $value ) {
+    Carp::cluck( "value undefined! setting to empty string" );
+    $value = '';
+  }
   $self -> {'presenter-data'} {response} 
            {form} {values} {$element} = $value;
 
@@ -846,7 +850,7 @@ sub check_input_parameters {
     my $type     = $_ -> {type};
     my $name     = $_ -> {name};
     my $maxlen   = $_ -> {maxlen};
-    my $required = $_ -> {required};
+    my $required = $_ -> {required} || 0;
 
     my $error;
     my $value;
@@ -939,14 +943,18 @@ sub process_form_data {
     next if not exists $input->{$name} 
       and exists $par ->{'if-not-empty'};
 
-    debug "process parameter name = '" . $name . "', value = '" . 
-      $input -> {$name} . "'";
-     
-    debug "store to " . $par -> {place};
+    my $val = $input -> {$name};
+
+    next if not defined $val;
+
+    my $place = $par -> {place};
+    next if not defined $place;
+
+    debug "process parameter '$name', value '$val'";
+    debug "store to $place";
       
     my $data;
-      
-    my @places = split ',', $par -> {place};
+    my @places = split ',', $place;
       
     foreach my $to ( @places ) {
       my ( $prefix, $place ) = split ':', $to;
@@ -963,8 +971,6 @@ sub process_form_data {
       } else { 
         die "error in screens configuration"; 
       } 
-
-      my $val = $input -> {$name};
 
       assign_path ( $data, $place, $val );
     }  

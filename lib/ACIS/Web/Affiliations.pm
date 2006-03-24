@@ -25,7 +25,7 @@ package ACIS::Web::Affiliations;   ### -*-perl-*-
 #  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 #
 #  ---
-#  $Id: Affiliations.pm,v 2.0 2005/12/27 19:47:39 ivan Exp $
+#  $Id: Affiliations.pm,v 2.1 2006/03/24 08:06:17 ivan Exp $
 #  ---
 
 
@@ -227,11 +227,11 @@ sub remove {
   return 
     unless defined $affiliations and scalar @$affiliations;
 
-  my $instid = $app -> get_form_value ( 'id' );
-  my $name   = $app -> get_form_value ( 'name'   );
+  my $instid = $app -> get_form_value ( 'id' )     || '';
+  my $name   = $app -> get_form_value ( 'name'   ) || '';
   
+  assert( $name or $instid );
   debug "remove institution id: $instid, n: $name";
-
   $app -> userlog( "affil: request to remove an item, id: $instid, n: $name" );
 
   my @old_affs = @$affiliations;
@@ -715,8 +715,10 @@ sub submit_institution {
   my $input = $app -> form_input;
 
   my $name    = $input -> {name};
-  my $oldname = $input -> {oldname};
-  my $id      = $input -> {id};
+  my $oldname = $input -> {oldname} || '';
+  my $id      = $input -> {id} || '';
+
+  assert( $name );
   
   debug "submit: name: $name";
   debug "submit:  old: $oldname";
@@ -726,7 +728,7 @@ sub submit_institution {
   foreach ( qw( name name-english location homepage 
                 email phone fax   postal   note id
                 add-to-profile ) ) {
-    if( defined $input->{$_} ) {
+    if ( defined $input->{$_} ) {
       $institution -> {$_} = $input->{$_};
     }
   }
@@ -744,7 +746,7 @@ sub submit_institution {
     foreach ( @$list ) {
       if( $_ -> {name} eq $name 
           or $_ -> {name} eq $oldname   ### this is when user wants to edit an institution
-          or ( $_->{id} and ( $_ -> {id} eq $id ) )  ) {
+          or ( $_->{id} and $id and ( $_->{id} eq $id ) )  ) {
         $replace = $counter; last;
       }
       $counter ++;
@@ -766,7 +768,6 @@ sub submit_institution {
 
   # adding an institution to the profile
   
-
   if ( $input -> {'add-to-profile'} ) {
 
     debug "adding a submitted institution ($name) to the record";
@@ -797,6 +798,7 @@ sub submit_institution {
           or ( $_ -> {name} eq $oldname ) 
           or (
               defined $_ -> {id} 
+              and $id
               and ( $_ -> {id} eq $id ) 
              )
          ) {
@@ -832,7 +834,7 @@ sub submit_institution {
     debug "not needed to add";
 
     $app -> userlog( "affil: submited an institution, but asked not to add it, name: $name", 
-                     $id ? " id: $id" : '' );
+                     ($id ? " id: $id" : '') );
 
     $app -> sevent ( -class => 'affil',
                     -action => 'submit-not-add',
