@@ -25,7 +25,7 @@ package Web::App;   ### -*-perl-*-
 #  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 #
 #  ---
-#  $Id: App.pm,v 2.6 2006/02/13 21:19:50 ivan Exp $
+#  $Id: App.pm,v 2.7 2006/03/24 17:18:53 ivan Exp $
 #  ---
 
 
@@ -773,6 +773,7 @@ sub handle_request {
     agent   => $ENV{HTTP_USER_AGENT},
     method  => $ENV{REQUEST_METHOD},
     querystring => $ENV{QUERY_STRING},
+    ip      => $ENV{REMOTE_ADDR},                                     
   };
 
   debug "REQUEST_METHOD: ", $request->{method} || '';
@@ -791,14 +792,19 @@ sub handle_request {
 
   my ( $screen_name, $session_id ) = $self ->parse_request_url( $requested_url );
 
-  if ( $config ->{'requests-log'} ) {
-    my $log = $config ->{'requests-log'};
-    my $the_request = $request -> {url} . " [$$]";
-    if ( $log eq '*stderr*' ) {
-      print STDERR "request: $the_request\n";
-    } elsif ( open LOG, '>>', $log ) {
-      print LOG scalar( localtime ), " ", $the_request, "\n";
-      close LOG;
+  {
+    my $ip  = $request->{ip} || '';
+    my $url = $request->{url} || '';
+    my $the_request = "[${ip}] ${url} [$$]";
+    debug $the_request;
+    if ( $config ->{'requests-log'} ) {
+      my $log = $config ->{'requests-log'};
+      if ( $log eq '*stderr*' ) {
+        print STDERR "request: $the_request\n";
+      } elsif ( open LOG, '>>', $log ) {
+        print LOG scalar( localtime ), " ", $the_request, "\n";
+        close LOG;
+      }
     }
   }
 
