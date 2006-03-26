@@ -28,7 +28,7 @@ package ACIS::Web;   ### -*-perl-*-
 #  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 #
 #  ---
-#  $Id: Services.pm,v 2.4 2006/03/24 08:17:41 ivan Exp $
+#  $Id: Services.pm,v 2.5 2006/03/26 10:04:11 ivan Exp $
 #  ---
 
 use strict;
@@ -809,8 +809,9 @@ sub prepare_form_data {
       } elsif( $prefix eq 'session' )  {
         $data = $self -> session;
       }
-      
-      $self -> set_form_value ( $_ -> {name}, path_to_val ($data, $place) );
+
+      my $val = path_to_val ($data, $place) || '';
+      $self -> set_form_value ( $_ -> {name}, $val );
     }
   }
 }
