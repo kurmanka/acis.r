@@ -73,11 +73,13 @@ sub auto_search {
 
   my $session = $app -> session;
   my $id      = $session -> current_record -> {id};
+
   my $context = prepare_search_context( $app );
   if ( not $session -> {$id} {'reloaded-accepted-contributions'} ) {
     ACIS::Web::Contributions::reload_accepted_contributions( $app );
   }
   my $search  = search_for_resources_exact( $app, $context );
+
   if ( $app -> config( "research-additional-searches" ) ) {
     my $add     = additional_searches( $app, $context );
   }

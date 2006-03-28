@@ -25,7 +25,7 @@ package ACIS::Web::Contributions;  ### -*-perl-*-
 #  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 #
 #  ---
-#  $Id: Contributions.pm,v 2.4 2006/03/26 10:04:11 ivan Exp $
+#  $Id: Contributions.pm,v 2.5 2006/03/28 16:14:44 ivan Exp $
 #  ---
 
 use strict;
@@ -1510,10 +1510,20 @@ sub search_resources_for_exact_phrases {
 
   my $result = [];
 
-  my $list = join( '|', @$namelist ) ;
+  my $re = ' ' x 500; # pre-allocate some space
 
-  ###  regular expression
-  my $re = '[[:<:]]('. $list . ')[[:>:]]';
+  $re = '[[:<:]]('; # regular expression: at word start
+
+  foreach ( @$namelist ) {
+    my $name = $_;
+    # escape unsafe chars
+    $name =~ s!([\.*?+{}()|^[\];])!\\$1!g;
+    $re .= $name;
+    $re .= '|';
+  }
+
+  # clear the last '|', put "at word end" special construct
+  substr( $re, -1 ) = ')[[:>:]]';
 
   ###  the query
   $sql -> prepare_cached( 
