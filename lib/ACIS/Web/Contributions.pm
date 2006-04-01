@@ -7,7 +7,7 @@ package ACIS::Web::Contributions;  ### -*-perl-*-
 #    The Contributions profile.
 #
 #
-#  Copyright (C) 2003 Ivan Kurmanov for ACIS project,
+#  Copyright (C) 2003-2006 Ivan Kurmanov for ACIS project,
 #  http://acis.openlib.org/
 #
 #
@@ -25,7 +25,7 @@ package ACIS::Web::Contributions;  ### -*-perl-*-
 #  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 #
 #  ---
-#  $Id: Contributions.pm,v 2.5 2006/03/28 16:14:44 ivan Exp $
+#  $Id: Contributions.pm,v 2.6 2006/04/01 20:57:25 ivan Exp $
 #  ---
 
 use strict;
@@ -959,6 +959,96 @@ sub current_process {
   if ( $app -> success() ) {
   }
 }
+
+
+
+###########################################################################
+##########   s u b    p r o c e s s   r e f u s e d   #####################
+###########################################################################
+
+sub process_refused {
+  my $app = shift;
+
+  my $session = $app -> session;
+  my $vars    = $app -> variables;
+  my $record  = $session -> current_record;
+  my $id      = $record -> {id};
+  my $psid    = $record -> {sid};
+
+  assert( $contributions );
+  
+  my $input = $app -> form_input;
+
+  assert( $refused  );
+
+  my $already_refused  = $contributions -> {'already-refused' }; 
+
+  my $statistics = {};
+  my $processed  = 0;
+
+
+  ###  process contribution additions and deletions
+
+  foreach ( keys %$input  ) {
+    my $val = $input -> {$_};
+
+    ########################################################
+                                              ###    A D D 
+    if ( $_ =~ m/^unrefuse_(.+)/ 
+         and $val ) {            
+      my $tid    = $1;
+      my $handle = $input -> {"id_$tid"};
+      debug( "unrefuse $handle" );
+
+      if ( $handle ) {
+        if ( $already_refused->{$handle} ) {
+          # ok
+          delete $already_refused->{$handle};
+        } else {
+          debug( "Can't find an item among refused: id: $handle" );
+        }
+        $processed++; 
+      }
+    }
+
+  }  ####  end of the main parameters pass
+
+  foreach ( @$refused ) {
+    my $id   = $_ ->{id};
+    if ( not $already_refused->{$id} ) {
+
+      undef $_;
+
+      $acis -> userlog( "unrefuse a research item: $id" );
+      $acis -> sevent( -class  => 'contrib',
+                       -action => 'unrefused',
+                       -descr  => $id );
+
+      $statistics -> {unrefused} ++;
+      debug( "cleared refused item $id" );
+
+    }
+  }  
+  clear_undefined $refused;
+
+  $contributions -> {actions} = $statistics;
+
+
+  if ( $processed ) {
+    $app -> success( 1 );
+
+    if ( $statistics -> {unrefused} ) {
+      $app -> message( 'research-items-unrefused' );
+    } else {
+      $app -> message( 'research-decisions-processed' );
+    }      
+
+#    if ( $session -> type eq 'new-user' ) {
+#      $app -> set_presenter( 'research/ir-guide' );
+#    }
+  }
+}
+
 
 
 

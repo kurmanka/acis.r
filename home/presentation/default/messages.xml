@@ -26,6 +26,9 @@
 
   <message id='research-items-refused'>Your decisions were processed and saved.</message>
 
+  <message id='research-items-unrefused'>Item(s) were removed from your
+  refused list.</message>
+
   <message id='research-decisions-processed'
   >Your decisions were processed and saved.</message>
 

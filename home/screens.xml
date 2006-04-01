@@ -444,10 +444,27 @@
       <call function='load_session_or_authenticate' />
       <call function='ACIS::Web::Contributions::prepare'/>
       <call function='ACIS::Web::Contributions::process'/>
-      <call function='ACIS::Web::Contributions::current_process'/>
     </process>
     
     <presentation type='xslt' filename='person/research/identified.xsl' />
+
+  </screen>
+
+  <screen id='research/refused'>
+    <use module='ACIS::Web::Contributions' />
+    <init>
+      <call function='load_session_or_authenticate' />
+      <call function='ACIS::Web::Contributions::prepare'/>
+      <xcall function='ACIS::Web::Admin::dump_presenter_data'/>
+    </init>
+    <process>
+      <call function='load_session_or_authenticate' />
+      <call function='ACIS::Web::Contributions::prepare'/>
+      <call function='ACIS::Web::Contributions::process_refused'/>
+    </process>
+    <presentation type='xslt' filename='person/research/refused.xsl' />
+<!--    
+-->
 
   </screen>
 
