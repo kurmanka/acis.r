@@ -278,15 +278,15 @@
       <xsl:with-param name='tabs'>
         <xsl:choose>
           <xsl:when test='$screen-autosuggest-all'>
-        <tab selected='1'> all at once </tab>
-        <tab> <a ref='@research/autosuggest'> 12 per page </a> </tab>
+        <tab selected='1'> all&#160;at&#160;once </tab>
+        <tab> <a ref='@research/autosuggest'> 12&#160;per&#160;page </a> </tab>
           </xsl:when>
           <xsl:otherwise>
-        <tab> <a ref='@research/autosuggest-all'>all at once</a> </tab>
-        <tab selected='1'> 12 per page </tab>
+        <tab> <a ref='@research/autosuggest-all'>all&#160;at&#160;once</a> </tab>
+        <tab selected='1'> 12&#160;per&#160;page </tab>
           </xsl:otherwise>
         </xsl:choose>
-        <tab> <a ref='@research/autosuggest-1by1'>one by one</a> </tab>
+        <tab> <a ref='@research/autosuggest-1by1'>one&#160;by&#160;one</a> </tab>
       </xsl:with-param>
       <xsl:with-param name='content'>
 

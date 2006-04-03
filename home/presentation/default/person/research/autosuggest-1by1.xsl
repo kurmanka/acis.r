@@ -43,9 +43,9 @@
     <xsl:call-template name='tabset'>
       <xsl:with-param name='id'>tabs</xsl:with-param>
       <xsl:with-param name='tabs'>
-        <tab><a ref='@research/autosuggest-all'>all at once</a></tab>
-        <tab><a ref='@research/autosuggest'>12 per page</a></tab>
-        <tab selected='1'>one by one</tab>
+        <tab><a ref='@research/autosuggest-all'>all&#160;at&#160;once</a></tab>
+        <tab><a ref='@research/autosuggest'>12&#160;per&#160;page</a></tab>
+        <tab selected='1'>one&#160;by&#160;one</tab>
       </xsl:with-param>
       <xsl:with-param name='content'>
 
