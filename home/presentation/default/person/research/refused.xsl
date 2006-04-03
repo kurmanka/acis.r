@@ -1,6 +1,7 @@
 <xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0">
 
   <xsl:import href='main.xsl' />
+  <xsl:import href='../../widgets.xsl' />
   
 
   <xsl:variable name='parents'>
@@ -9,6 +10,15 @@
 
   <xsl:variable name='current-screen-id'>research/refused</xsl:variable>
 
+
+  <xsl:variable name='refused-count' 
+                select='count( $refused/list-item )'/>
+
+  <xsl:variable name='chunk-size' select='"12"'/>
+
+  <xsl:variable name='paging'   select='$refused-count &gt; 15'/>
+  <xsl:variable name='page'     select='$request-subscreen'/>
+  <xsl:variable name='page-all' select='$page="all"'/>
 
 
   <xsl:template name='table-resources-for-review'>
@@ -68,20 +78,7 @@
 
 
 
-
-
-  <xsl:template name='research-refused'>
-
-
-    <h1>Refused research items</h1>
-
-    <xsl:call-template name='show-status'/>
-
-    <xsl:variable name='refused-count' 
-                  select='count( $refused/list-item )'/>
-
-    <xsl:choose>
-      <xsl:when test='$refused/list-item'>
+  <xsl:template name='refused-list-all'>
 
         <form screen='@research/refused' 
               xsl:use-attribute-sets='form'>
@@ -104,8 +101,6 @@
           </table>
           
           <p>
-
-            <input type='hidden' name='mode' value='edit'/>
             <input type='submit'
 	           id='submitB'
                    name='continue'
@@ -114,9 +109,61 @@
                    />
           </p>
 
-
-
         </form>
+
+  </xsl:template>
+
+                      
+
+
+  <xsl:template name='research-refused'>
+
+
+    <h1>Refused research items</h1>
+
+    <xsl:comment> subscreen <xsl:value-of select='$request-subscreen'/> </xsl:comment>
+
+    <xsl:call-template name='show-status'/>
+
+    <xsl:choose>
+      <xsl:when test='$paging and $page-all'>
+      
+         <xsl:call-template name='tabset'>
+            <xsl:with-param name='id' select='"tabs"'/>
+            <xsl:with-param name='tabs'>
+               <tab selected='1'> all&#160;at&#160;once </tab>
+               <tab> <a ref='@research/refused'> 12&#160;per&#160;page </a> </tab>
+            </xsl:with-param>
+            <xsl:with-param name='content'>
+ 
+              <xsl:call-template name='refused-list-all'/>
+
+            </xsl:with-param>
+         </xsl:call-template>
+
+      </xsl:when>
+
+      <xsl:when test='$paging and not($page-all)'>
+
+         <xsl:call-template name='tabset'>
+            <xsl:with-param name='id' select='"tabs"'/>
+            <xsl:with-param name='tabs'>
+              <tab> <a ref='@research/refused/all'>all&#160;at&#160;once</a> </tab>
+              <tab selected='1'> 12&#160;per&#160;page </tab>
+            </xsl:with-param>
+            <xsl:with-param name='content'>
+ 
+               <p>the list</p>
+
+            </xsl:with-param>
+         </xsl:call-template>
+
+      </xsl:when>
+
+      <xsl:when test='$refused/list-item'>
+
+        <xsl:call-template name='refused-list-all'/>
+
       </xsl:when>
     
       <xsl:otherwise> 
@@ -131,6 +178,7 @@
 
 
   </xsl:template>
+
 
 
 

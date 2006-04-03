@@ -68,6 +68,7 @@
 <xsl:variable name='form-input'   select='$request/form/input'/>
 
 <xsl:variable name='request-screen'    select='$request/screen/text()' />
+<xsl:variable name='request-subscreen' select='$request/subscreen/text()' />
 <xsl:variable name='referer'           select='$request/referer/text()'/>
 
 
