@@ -81,6 +81,7 @@ while ( $res and $res->{row} ) {
     if ( $name =~ m![\n\r:]! ) {
       p "bad name: $name\n";
       $countbadnames++;
+      next;
     }
 
     push @list, $name;
