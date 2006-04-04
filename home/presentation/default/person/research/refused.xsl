@@ -20,58 +20,81 @@
   <xsl:variable name='page'     select='$request-subscreen'/>
   <xsl:variable name='page-all' select='$page="all"'/>
 
+  <xsl:variable name='page-num'>
+    <xsl:choose>
+      <xsl:when test='$paging and not($page)'>1</xsl:when>
+      <xsl:when test='$paging and (($page -1) * $chunk-size ) &lt; $refused-count '
+         ><xsl:value-of select='$page'/></xsl:when>
+      <xsl:when test='$paging'
+         ><xsl:value-of select='ceiling($refused-count div $chunk-size)'/></xsl:when>
+    </xsl:choose>
+  </xsl:variable>
+
+  <xsl:variable name='page-start' select='($page-num - 1) * $chunk-size +1' />
+  <xsl:variable name='page-end'   select='$page-start + $chunk-size -1'/>
+  <xsl:variable name='page-last'>
+    <xsl:choose>
+      <xsl:when test='$page-end &gt; $refused-count'><xsl:value-of select='$refused-count'/></xsl:when>
+      <xsl:otherwise><xsl:value-of select='$page-end'/></xsl:otherwise>
+    </xsl:choose>
+  </xsl:variable>
+    
 
   <xsl:template name='table-resources-for-review'>
     <xsl:param name='list'/>
 
-    <tr class='here'>
-
-      <th width='6%'>delete</th>
-      <th class='desc'> item description</th>
-
-    </tr>
-    
     <xsl:for-each select='$list/list-item[id and title]' xml:space='preserve'>
       <xsl:variable name="nid" select='generate-id(.)'/>
       <xsl:variable name="id" select='id'/>
 
       <xsl:variable name='alternate'><xsl:if test='position() mod 2'> alternate</xsl:if></xsl:variable>
       <tr class='resource{$alternate}' id='row_{$nid}'>
+      <td valign='top'><xsl:value-of select='position()'/>.</td>
+
+      <td>
         
-        <td class='checkbutton' width='6%' valign='top'>
-          
-          <span class='checkbutton'>
-
-            <input type='checkbox' name='unrefuse_{$nid}' id='unrefuse_{$nid}' 
-                     onblur_after='item_checkbox_blur("row_{$nid}",this);'
-                     onfocus_after='if(item_label_click){{this.blur();}};item_label_click=false;'
-                     value='1'
-                     xml:space='default'
-               ><xsl:if test='contains( $user-agent,"Gecko/" )'>
-                <xsl:attribute name='onchange'
-                >item_checkbox_changed("row_<xsl:value-of select='$nid'/>",this);</xsl:attribute>
-                <xsl:attribute name='onblur_after'/>
-              </xsl:if>
-            </input>
-
-            <xsl:text>
-            </xsl:text>
-
-            <input type='hidden' name='id_{$nid}' value='{$id}'/>
-          </span>
-
-        </td>
-
-        <td class='description'>
-
           <xsl:call-template name='present-resource' xml:space='default'>
             <xsl:with-param name='resource' select='.'/>
-            <xsl:with-param name='for' select='concat( "unrefuse_", $nid )' />
-            <xsl:with-param name='label-onclick'
-                            >item_label_click=true;</xsl:with-param>
           </xsl:call-template>
-    </td>
-    </tr>
+
+          <input type='submit' name='unrefuse_{$nid}' value='remove'/>
+          <input type='hidden' name='id_{$nid}'       value='{$id}'/>
+
+      </td>
+      </tr>
+
+    </xsl:for-each>
+  </xsl:template>
+
+
+
+
+  <xsl:template name='table-resources-page-for-review'>
+    <xsl:param name='list'/>
+
+    <xsl:for-each select='$list/list-item[id and title]'
+                  xml:space='preserve'>
+    
+      <xsl:if test='position()&gt;=$page-start and position()&lt;=$page-last' >
+        <xsl:variable name="nid" select='generate-id(.)'/>
+        <xsl:variable name="id" select='id'/>
+
+        <xsl:variable name='alternate'><xsl:if test='position() mod 2'> alternate</xsl:if></xsl:variable>
+        <tr class='resource{$alternate}' id='row_{$nid}'>
+        <td valign='top'><xsl:value-of select='position()'/>.</td>
+
+        <td>
+        
+          <xsl:call-template name='present-resource' xml:space='default'>
+            <xsl:with-param name='resource' select='.'/>
+          </xsl:call-template>
+
+          <input type='submit' name='unrefuse_{$nid}' value='remove'/>
+          <input type='hidden' name='id_{$nid}'       value='{$id}'/>
+
+        </td>
+        </tr>
+      </xsl:if>
 
     </xsl:for-each>
   </xsl:template>
@@ -80,7 +103,7 @@
 
   <xsl:template name='refused-list-all'>
 
-        <form screen='@research/refused' 
+        <form screen='@research/refused/all' 
               xsl:use-attribute-sets='form'>
 
           <xsl:choose>
@@ -100,14 +123,62 @@
             </xsl:call-template>
           </table>
           
-          <p>
-            <input type='submit'
-	           id='submitB'
-                   name='continue'
-                   class='important'
-                   value='REMOVE CHECKED ITEMS FROM THE LIST' 
-                   />
+        </form>
+
+  </xsl:template>
+
+
+
+ 
+  <xsl:template name='prev-page-link'>
+    <xsl:choose>
+      <xsl:when test='$page-num = 1'>
+         <span class='disabled'>Back</span>
+      </xsl:when>
+      <xsl:otherwise>
+         <a ref='@research/refused/{$page-num -1}'>Back</a>
+      </xsl:otherwise>
+    </xsl:choose>
+  </xsl:template>
+
+
+  <xsl:template name='next-page-link'>
+    <xsl:choose>
+      <xsl:when test='$page-last = $refused-count'>
+         <span class='disabled'>Forth</span>
+      </xsl:when>
+      <xsl:otherwise>
+         <a ref='@research/refused/{$page-num +1}'>Forth</a>
+      </xsl:otherwise>
+    </xsl:choose>
+  </xsl:template>
+
+
+ <xsl:template name='refused-list-chunk'>
+
+     <xsl:variable name='sub'>
+       <xsl:if test='$page'>/<xsl:value-of select="$page"/></xsl:if>
+     </xsl:variable>
+
+     <form screen='@research/refused{$sub}' xsl:use-attribute-sets='form'>
+
+          <p>Here are the items <xsl:value-of select='$page-start' />-<xsl:value-of
+          select='$page-last'/> (of <xsl:value-of select='$refused-count' /> total) you 
+          have refused some time in the past:</p>
+
+          <table class='resources'>
+            <xsl:call-template name='table-resources-page-for-review'>
+              <xsl:with-param name='list' select='$refused'/>
+            </xsl:call-template>
+          </table>
+          
+          <p><small>Navigate: </small>
+          <xsl:call-template name='prev-page-link'/>
+           ... 
+          <xsl:call-template name='next-page-link'/>
           </p>
+
+          <p>Total number of refused items: <xsl:value-of select='$refused-count'/>.</p>
 
         </form>
 
@@ -153,7 +224,7 @@
             </xsl:with-param>
             <xsl:with-param name='content'>
  
-               <p>the list</p>
+               <xsl:call-template name='refused-list-chunk'/>
 
             </xsl:with-param>
          </xsl:call-template>

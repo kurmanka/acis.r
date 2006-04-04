@@ -1,6 +1,6 @@
 /* THE MAIN ACIS CSS STYLESHEET */
 
-/* $Id: main.css,v 2.0 2005/12/27 19:47:39 ivan Exp $ */
+/* $Id: main.css,v 2.1 2006/04/04 12:00:38 ivan Exp $ */
 
 body { 
  margin: 0;
@@ -1062,3 +1062,8 @@ table.list tr th {
  font-size: 60%;
  font-weight: normal;
 }
+
+.disabled { 
+  color: #999;
+}
+
