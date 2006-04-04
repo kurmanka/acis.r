@@ -69,19 +69,6 @@
 
     -->
 
-<!--
-    <call-perl-function
-      name='ARDB::Plugin::Processing::ACIS_UD::process_record' />
--->    
-<!--
-    <store-to-table table='acis:names'>
-      <field-attribute-mapping>
-        <field-associations
-          shorid='sid'
-          names='ARDB::Plugin::Processing::ACIS_UD::get_nameset'/>
-      </field-attribute-mapping>
-    </store-to-table>
--->
 
     <build-forward-relation 
       type="affiliated-with" 

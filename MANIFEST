@@ -75,6 +75,7 @@ home/bin/templates/arpu.pl
 home/bin/templates/clean-up.pl
 home/bin/templates/create_tables.pl
 home/bin/templates/dump_email_handle_table.pl
+home/bin/templates/export_name_variations.pl
 home/bin/templates/events_archiving.pl
 home/bin/templates/mvrec.pl
 home/bin/templates/offline_maintain.pl
