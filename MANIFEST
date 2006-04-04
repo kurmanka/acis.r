@@ -172,6 +172,7 @@ home/presentation/default/person/research/listings.xsl
 home/presentation/default/person/research/main.xsl
 home/presentation/default/person/research/old-table.xsl
 home/presentation/default/person/research/search.xsl
+home/presentation/default/person/research/refused.xsl
 home/presentation/default/phrase.xml
 home/presentation/default/script/main.js
 home/presentation/default/stub.xsl
