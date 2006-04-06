@@ -455,7 +455,6 @@
     <init>
       <call function='load_session_or_authenticate' />
       <call function='ACIS::Web::Contributions::prepare'/>
-      <xcall function='ACIS::Web::Admin::dump_presenter_data'/>
     </init>
     <process>
       <call function='load_session_or_authenticate' />
@@ -466,6 +465,21 @@
 <!--    
 -->
 
+  </screen>
+
+  <screen id='research/refused/xml'>
+    <use module='ACIS::Web::Contributions' />
+    <init>
+      <call function='load_session_or_authenticate' />
+      <call function='ACIS::Web::Contributions::prepare'/>
+      <call function='dump_presenter_xml'/>
+    </init>
+    <process>
+      <call function='load_session_or_authenticate' />
+      <call function='ACIS::Web::Contributions::prepare'/>
+      <call function='ACIS::Web::Contributions::process_refused'/>
+      <call function='dump_presenter_xml'/>
+    </process>
   </screen>
 
 

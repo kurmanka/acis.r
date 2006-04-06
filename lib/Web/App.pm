@@ -25,7 +25,7 @@ package Web::App;   ### -*-perl-*-
 #  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 #
 #  ---
-#  $Id: App.pm,v 2.7 2006/03/24 17:18:53 ivan Exp $
+#  $Id: App.pm,v 2.8 2006/04/06 15:22:48 ivan Exp $
 #  ---
 
 
@@ -787,6 +787,7 @@ sub handle_request {
   $self -> {response} = 
     { headers => [], 
       charset => $charset,
+      HTML    => 1,  ### the default
     };
 
 
@@ -966,19 +967,21 @@ sub handle_request {
 
     $self -> post_process_content( \$content );
 
+  }
+
+  if ( $self -> {response}{body} ) {
     $charset = $self->{response}{charset};
 
     ###  now go, print the resulting page
-
     if ( $charset ne 'utf-8' ) {
       binmode STDOUT, ":encoding($charset)"; 
     } else {
       binmode STDOUT, ":utf8"; 
     }
     $/=undef;
-    print STDOUT $content;
-
+    print STDOUT $self -> {response}{body};
   }
+
 
   $self -> post_scriptum;
 
@@ -1053,14 +1056,15 @@ _DEBUG_INCLUDE
 sub post_scriptum {
   my $self = shift;
 
-  my $content = $self -> {response}{body} || '';
+  my $response = $self ->{response};
+  my $content  = $response ->{body} || '';
 
   my $vars_xml_dumped = $self -> {presenter_data_string} || '';
 
   my $vars_len = length( $vars_xml_dumped ) / 1000;
   my $page_len = length( $content ) / 1000;
 
-  if ( $self ->{SHOW_PROFILING} ) {
+  if ( $self ->{SHOW_PROFILING} and $response -> {HTML} ) {
 
     my $rep = $self -> report_timed_checkpoints || '';
 
@@ -1153,8 +1157,8 @@ sub print_http_response_headers {
   }
 
   
-  if ( not $self -> {response} {'content-type-printed'} ) {
-    my $charset = $self -> {response} {charset};
+  if ( not $response -> {'content-type-printed'} ) {
+    my $charset = $response -> {charset};
     print "Content-Type: text/html; charset=$charset\n";
   }
   

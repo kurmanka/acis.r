@@ -25,7 +25,7 @@ package ACIS::Web;   ### -*-perl-*-
 #  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 #
 #  ---
-#  $Id: Web.pm,v 2.4 2006/03/12 22:28:15 ivan Exp $
+#  $Id: Web.pm,v 2.5 2006/04/06 15:22:48 ivan Exp $
 #  ---
 
 
@@ -559,6 +559,23 @@ sub get_recent_events {
 }
 
 ################################   END OF EVENTS   ############################
+
+
+sub dump_presenter_xml {
+  my $self = shift;
+  
+  $self -> prepare_presenter_data;
+  my $xml = $self -> serialize_presenter_data;
+
+  my $response = $self-> {response};
+
+  undef $response -> {HTML};
+  $response -> {body} = $xml;
+  $response -> {charset} = 'utf-8';
+
+  print STDOUT "Content-type: application/xml; charset=utf-8\n";
+  $response -> {'content-type-printed'} = 1;  
+}
 
 
 ##############################################################
