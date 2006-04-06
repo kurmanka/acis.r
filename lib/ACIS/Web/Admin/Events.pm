@@ -747,7 +747,8 @@ sub recent_events_decode {
 
       NEWCHAIN:
         if ( $chid ) {
-          if ( $e -> {startend} == 1 ) {
+          if ( defined $e -> {startend} 
+               and $e -> {startend} == 1 ) {
             my $chain = start_new_chain( $e );
             $chain_ids{$chid} = $chain;
             push @evs, $chain;
