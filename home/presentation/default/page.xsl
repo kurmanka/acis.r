@@ -60,6 +60,7 @@
 
   <xsl:variable name='full-page-title'/>
   <xsl:variable name='page-title'/>
+  <xsl:variable name='additional-head-stuff'/>
 
 
   <!-- GLOBAL ACIS PAGE TEMPLATE -->
@@ -119,6 +120,7 @@
 
 
 <xsl:copy-of select='$headers'/>
+<xsl:copy-of select='$additional-head-stuff'/>
 
 <meta http-equiv="Content-Script-Type" content="text/javascript"/>
 <script type="text/javascript" src='{$static-base-url}/script/main.js'/>

@@ -192,8 +192,7 @@ function form_submit() {
 
 function check_form_changes() {
   if ( formChanged && formChangedName ) {
-    var save = confirm( 
-"Save your changes before you leave?\n\nPress OK to save." );
+    var save = confirm(  "Save your changes before you leave?\n\nPress OK to save." );
     
     if ( save ) {
       formChanged = false;
@@ -221,8 +220,8 @@ function set_parameter ( formname, par, val ) {
 
 
 function Submit ( formname ) {
- var form = document.forms[formname];
- form.submit();
+  var form = document.forms[formname];
+  form.submit();
 }
 
 function give_focus_to_first_control () {
@@ -332,4 +331,21 @@ function init_set_style () {
 }
 
 init_set_style();
+
+
+
+/******   installation tool   *****************/         
+
+// from http://simon.incutio.com/archive/2004/05/26/addLoadEvent
+function addLoadEvent(func) {
+    var oldonload = window.onload;
+    if (typeof oldonload != 'function') {
+        window.onload = func;
+    } else {
+        window.onload = function() {
+            oldonload();
+            func();
+        }
+    }
+}
 

@@ -57,7 +57,9 @@
             <xsl:with-param name='resource' select='.'/>
           </xsl:call-template>
 
-          <input type='submit' name='unrefuse_{$nid}' value='remove'/>
+          <input type='submit' name='unrefuse_{$nid}' value='remove' 
+                 class='RemoveButton' 
+                 docid='{$id}'/>
           <input type='hidden' name='id_{$nid}'       value='{$id}'/>
 
       </td>
@@ -89,7 +91,9 @@
             <xsl:with-param name='resource' select='.'/>
           </xsl:call-template>
 
-          <input type='submit' name='unrefuse_{$nid}' value='remove'/>
+          <input type='submit' name='unrefuse_{$nid}' value='remove' 
+                 class='RemoveButton' 
+                 docid='{$id}'/>
           <input type='hidden' name='id_{$nid}'       value='{$id}'/>
 
         </td>
@@ -160,7 +164,7 @@
        <xsl:if test='$page'>/<xsl:value-of select="$page"/></xsl:if>
      </xsl:variable>
 
-     <form screen='@research/refused{$sub}' xsl:use-attribute-sets='form'>
+     <form screen='@research/refused{$sub}' xsl:use-attribute-sets='form' id='refused' >
 
           <p>Here are the items <xsl:value-of select='$page-start' />-<xsl:value-of
           select='$page-last'/> (of <xsl:value-of select='$refused-count' /> total) you 
@@ -245,7 +249,35 @@
       </xsl:otherwise>
   
     </xsl:choose>
+
+    <p><input id='button' type='button' value=' SUPER BUTTON '/></p>
     
+    <script-onload>
+
+function remove_button_click() {
+  var docid=this.getAttribute('docid');
+  this.setAttribute("disabled", 1);
+  var button = this;
+  if ( docid ) {
+    $.post( "/research/refused/xml", { unrefuse: docid },
+      function () { 
+        var parent = button.parentNode;
+        $(parent.parentNode).addClass("disabled"); 
+        $(button).remove();
+        $(parent).append( " &amp;nbsp;  &lt;b>(removed)&lt;/b>" );
+      }
+    );
+  }
+  return false;
+}
+ 
+    $("form#refused").submit( function (){ alert( "the form is submited" ); return false; } );
+
+    $("input#button").click( function (){ $(this).slideUp("slow");} );
+    $("input.RemoveButton").click( remove_button_click );
+
+    </script-onload>
+
 
 
   </xsl:template>
@@ -254,9 +286,19 @@
 
 
 
+  <xsl:variable name='page-id'>research-refused</xsl:variable>
+  <xsl:variable name='additional-head-stuff'>
+        <script type="text/javascript" src='{$base-url}/script/jquery.js'></script>
+<!--
+        <script type="text/javascript" src='{$base-url}/script/ajax.js'></script>
+        <script type="text/javascript" src='{$base-url}/script/xmlrequest.js'></script>
+-->
+  </xsl:variable>
+  
+
   <!--   n o w   t h e   p a g e   t e m p l a t e    -->
 
-  
+    
   <xsl:template match='/data'>
 
     <xsl:call-template name='research-page'>
