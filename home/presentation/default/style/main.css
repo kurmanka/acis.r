@@ -1,6 +1,6 @@
 /* THE MAIN ACIS CSS STYLESHEET */
 
-/* $Id: main.css,v 2.1 2006/04/04 12:00:38 ivan Exp $ */
+/* $Id: main.css,v 2.2 2006/04/07 01:50:15 ivan Exp $ */
 
 body { 
  margin: 0;
@@ -634,7 +634,7 @@ td.session table caption {
 }
 
 tr.error {
- xbackground: #fff4f4;
+ x-background: #fff4f4;
  color: #900;
  font-weight: bold;
 }
@@ -943,14 +943,10 @@ div.block {
 }
 
 
-##########################################
-###      TABS, ATTACHED TO A FORM 
+/************************************
+**      TABS, ATTACHED TO A FORM 
+*/
 
-div.tabset { 
-  background: #f4f4f4; 
-  margin-top: 12px; 
-  margin-bottom: 0;
-}
 
 div.tabset form { 
   margin-top: 0; 

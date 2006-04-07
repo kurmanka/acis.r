@@ -55,11 +55,9 @@ p.menu a:hover {
  border-color: #985;
 }
 
-###      TABS, ATTACHED TO A FORM 
-
-div.tabset { 
-  background: #edb; 
-}
+/*
+**  TABS, ATTACHED TO A FORM  
+*/
 
 div.tabset .tabs div { 
   background:   #f4f0d8;
