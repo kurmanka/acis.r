@@ -21,7 +21,7 @@ class acis(PyHttpTestCase):
         self.setCharset( 'UTF-8' );
 
         params = [
-            ('''login''', '''iku@tut.by'''),
+            ('''login''', '''test@user.local'''),
             ('''pass''', '''passwd'''),
             ('''do''', '''Login'''),]
         self.msg("Testing POST to URL: %s" % self.replaceURL('''http://acis.zet/'''))
@@ -69,13 +69,15 @@ class acis(PyHttpTestCase):
         Validator.validateResponse(self, self.getMethod(), url, params)
         
         params = [
-            ('''full-name''', u'''\u0412аnя Bячеславoвич Kурманов'''),
+            ('''full-name''', u'''Заглавный Тестер'''),
             ('''first-name''', '''Иван'''),
             ('''middle-name''', '''Вячеславович'''),
             ('''last-name''', '''Курманов'''),
             ('''name-suffix''', ''''''),
             ('''name-latin''', '''Ivan Vyacheslavovich Kurmanov'''),
-            ('''name-variations''', '''Ваня Вячеславович Курманов
+            ('''name-variations''', '''Jean-Jacques Laffont
+Friedlaender, A.F.
+Ваня Вячеславович Курманов
 Курманов, Ваня Вячеславович
 Ваня В. Курманов
 Курманов, Ваня В.
@@ -94,7 +96,8 @@ class acis(PyHttpTestCase):
 Курманов, Иван Вячеславович
 Курманов, Иван В.
 Курманов, И. В.
-И. В. Курманов'''),
+И. В. Курманов
+'''),
             ('''continue''', '''SAVE AND RETURN TO MENU'''),]
 
         self.msg("Testing POST to URL: %s" % self.replaceURL('''http://acis.zet/name!'''))
@@ -127,7 +130,7 @@ class acis(PyHttpTestCase):
         Validator.validateResponse(self, self.getMethod(), url, params)
         
         params = [
-            ('''email''', '''iku@tut.by'''),
+            ('''email''', '''test@user.local'''),
             ('''email-pub''', '''true'''),
             ('''homepage''', '''http://ahinea.com/'''),
             ('''phone''', '''234-58-95'''),
