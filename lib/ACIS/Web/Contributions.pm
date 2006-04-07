@@ -25,7 +25,7 @@ package ACIS::Web::Contributions;  ### -*-perl-*-
 #  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 #
 #  ---
-#  $Id: Contributions.pm,v 2.6 2006/04/01 20:57:25 ivan Exp $
+#  $Id: Contributions.pm,v 2.7 2006/04/07 01:49:04 ivan Exp $
 #  ---
 
 use strict;
@@ -198,6 +198,7 @@ sub prepare {
   debug "the contributions accepted and refused are prepared.";
 
 }
+
 
 
 sub prepare_the_role_list {
@@ -961,6 +962,43 @@ sub current_process {
 }
 
 
+###############    RESEARCH / REFUSED SCREENS
+
+### this is a lighter version of sub prepare, only for the research/refused
+### screens
+
+sub prepare_refused {
+  my $app = shift;
+
+  my $session = $app -> session;
+  my $vars    = $app -> variables;
+  my $record  = $session -> current_record;
+  my $id      = $record  -> {id};
+
+  $contributions = $session -> {$id} {contributions} || {};
+
+  $refused  = $record ->{contributions} {refused } || [];
+  $record -> {contributions} {refused}   = $refused;
+  
+  my $already_refused = {}; 
+  foreach ( @$refused ) {
+    my $id = $_ ->{id};
+    if ( $already_refused->{$id} ) {
+      undef $_;
+    } else { $already_refused -> {$id} = 1; }
+  }
+  clear_undefined $refused;
+
+  $contributions ->{'already-refused' } = $already_refused ; 
+  $contributions ->{refused}  = $refused;
+
+  ###  make it visible
+  $vars ->{contributions} {refused} = $refused;
+  
+  debug "prepared the contributions/refused";
+}
+
+
 
 ###########################################################################
 ##########   s u b    p r o c e s s   r e f u s e d   #####################
@@ -987,13 +1025,13 @@ sub process_refused {
   my $processed  = 0;
 
 
-  ###  process contribution additions and deletions
+  ###  process contribution refusals
 
   foreach ( keys %$input  ) {
     my $val = $input -> {$_};
 
     ########################################################
-                                              ###    A D D 
+                                           ###   R E F U S E  
     if ( $_ =~ m/^unrefuse_(.+)/ 
          and $val ) {            
       my $tid    = $1;
@@ -1043,10 +1081,62 @@ sub process_refused {
       $app -> message( 'research-decisions-processed' );
     }      
 
-#    if ( $session -> type eq 'new-user' ) {
-#      $app -> set_presenter( 'research/ir-guide' );
-#    }
   }
+}
+
+
+###########################################################################
+######   s u b    p r o c e s s   r e f u s e d   x m l    ################
+###########################################################################
+
+sub process_refused_xml {
+  my $app = shift;
+
+  my $session = $app -> session;
+  my $vars    = $app -> variables;
+  my $record  = $session -> current_record;
+  my $id      = $record -> {id};
+  my $psid    = $record -> {sid};
+
+  assert( $contributions );
+  
+  my $input = $app -> form_input;
+
+  assert( $refused  );
+
+  my $already_refused  = $contributions -> {'already-refused' }; 
+
+  if ( $input -> {unrefuse} ) {
+    my $handle = $input -> {unrefuse};
+    debug( "unrefuse $handle" );
+
+    if ( $handle ) {
+      if ( $already_refused->{$handle} ) {
+        # ok
+        delete $already_refused->{$handle};
+      } else {
+        debug( "Can't find an item among refused: id: $handle" );
+      }
+    }
+  }
+  
+  foreach ( @$refused ) {
+    my $id   = $_ ->{id};
+    if ( not $already_refused->{$id} ) {
+      undef $_;
+
+      $acis -> userlog( "unrefuse a research item: $id" );
+      $acis -> sevent( -class  => 'contrib',
+                       -action => 'unrefused',
+                       -descr  => $id );
+
+      debug( "cleared refused item $id" );
+      $app -> variables -> {unrefused} = $id;
+    }
+  }  
+  clear_undefined $refused;
+
+  undef $app -> variables -> {contributions};
 }
 
 

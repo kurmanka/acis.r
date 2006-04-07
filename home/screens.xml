@@ -452,34 +452,22 @@
 
   <screen id='research/refused'>
     <use module='ACIS::Web::Contributions' />
-    <init>
-      <call function='load_session_or_authenticate' />
-      <call function='ACIS::Web::Contributions::prepare'/>
-    </init>
+    <call function='load_session_or_authenticate' />
+    <call function='ACIS::Web::Contributions::prepare'/>
     <process>
-      <call function='load_session_or_authenticate' />
-      <call function='ACIS::Web::Contributions::prepare'/>
       <call function='ACIS::Web::Contributions::process_refused'/>
     </process>
     <presentation type='xslt' filename='person/research/refused.xsl' />
-<!--    
--->
-
   </screen>
 
   <screen id='research/refused/xml'>
     <use module='ACIS::Web::Contributions' />
-    <init>
-      <call function='load_session_or_authenticate' />
-      <call function='ACIS::Web::Contributions::prepare'/>
-      <call function='dump_presenter_xml'/>
-    </init>
+    <call function='load_session_or_authenticate' />
+    <call function='ACIS::Web::Contributions::prepare_refused'/>
     <process>
-      <call function='load_session_or_authenticate' />
-      <call function='ACIS::Web::Contributions::prepare'/>
-      <call function='ACIS::Web::Contributions::process_refused'/>
-      <call function='dump_presenter_xml'/>
+      <call function='ACIS::Web::Contributions::process_refused_xml'/>
     </process>
+    <call function='dump_variables_xml'/>
   </screen>
 
 
