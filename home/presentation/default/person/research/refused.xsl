@@ -250,8 +250,6 @@
   
     </xsl:choose>
 
-    <p><input id='button' type='button' value=' SUPER BUTTON '/></p>
-    
     <script-onload>
 
 function remove_button_click() {
@@ -272,8 +270,6 @@ function remove_button_click() {
 }
  
     $("form#refused").submit( function (){ alert( "the form is submited" ); return false; } );
-
-    $("input#button").click( function (){ $(this).slideUp("slow");} );
     $("input.RemoveButton").click( remove_button_click );
 
     </script-onload>
@@ -286,7 +282,7 @@ function remove_button_click() {
 
 
 
-  <xsl:variable name='page-id'>research-refused</xsl:variable>
+  <xsl:variable name='page-id'>researchRefused</xsl:variable>
   <xsl:variable name='additional-head-stuff'>
         <script type="text/javascript" src='{$base-url}/script/jquery.js'></script>
 <!--

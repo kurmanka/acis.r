@@ -1,6 +1,6 @@
 /* THE MAIN ACIS CSS STYLESHEET */
 
-/* $Id: main.css,v 2.2 2006/04/07 01:50:15 ivan Exp $ */
+/* $Id: main.css,v 2.3 2006/04/11 12:41:26 ivan Exp $ */
 
 body { 
  margin: 0;
@@ -1061,5 +1061,9 @@ table.list tr th {
 
 .disabled { 
   color: #999;
+}
+
+#researchRefused input.RemoveButton {
+  font-size: 80%;
 }
 
