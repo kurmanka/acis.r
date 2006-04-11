@@ -279,3 +279,6 @@ sql_helper/sql_helper.pm
 sql_helper/sql_result.pm
 TODO
 VERSION
+home/bin/templates/sanitize_names_table.pl
+home/bin/templates/sanitize_redif_files.pl
+home/presentation/default/script/jquery.js
