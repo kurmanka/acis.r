@@ -60,10 +60,9 @@ sub chain_process_event($$;$) {
   my $about = $chain -> {about};
 
   my $error;
-  my $type  = $e -> {type} || '';
-  my $class = $e -> {class};
-  my $action= $e -> {action};
-  my $descr = $e -> {descr};
+  my $type  = $e -> {type}   || '';
+  my $class = $e -> {class}  || '';
+  my $action= $e -> {action} || '';
 
   my $noadd = 0; ### do not add to log?
   
