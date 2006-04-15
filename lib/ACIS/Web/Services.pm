@@ -28,7 +28,7 @@ package ACIS::Web;   ### -*-perl-*-
 #  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 #
 #  ---
-#  $Id: Services.pm,v 2.5 2006/03/26 10:04:11 ivan Exp $
+#  $Id: Services.pm,v 2.6 2006/04/15 12:27:55 ivan Exp $
 #  ---
 
 use strict;
@@ -462,7 +462,7 @@ sub authenticate {
     $app -> set_presenter( 'sorry' );
 
     $app -> event ( -class => 'authenticate',
-                    -descr => "userdata damaged"
+                    -descr => "userdata damaged",
                     -file  => $udata_file,
                     -login => $login,
                   );

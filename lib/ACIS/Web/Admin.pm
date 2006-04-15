@@ -25,7 +25,7 @@ package ACIS::Web::Admin;   ### -*-perl-*-
 #  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 #
 #  ---
-#  $Id: Admin.pm,v 2.7 2006/03/24 17:17:56 ivan Exp $
+#  $Id: Admin.pm,v 2.8 2006/04/15 12:27:55 ivan Exp $
 #  ---
 
 
@@ -62,7 +62,7 @@ sub check_access {
 
     my $form_input = $acis -> form_input();
     my $param   = $form_input -> {pass};
-    my $cookie  = $acis -> get_cookie( 'admin-pass' );
+    my $cookie  = $acis -> get_cookie( 'admin-pass' ) || '';
     debug "pass cook = $cookie";
 
     if ( $param and $form_input -> {'remember-me'} ) {
