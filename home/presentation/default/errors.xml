@@ -6,7 +6,7 @@
  <error id='screen-presentation-invalid'>There was an internal error
  while generating the page.  Please let administrator know.</error>
 
-  <error id='sesssion-failure'>Your session can't be loaded.  It is probably
+ <error id='sesssion-failure'>Your session can't be loaded.  It is probably
     expired already.</error>
 
 

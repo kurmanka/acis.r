@@ -28,7 +28,7 @@ package ACIS::Web;   ### -*-perl-*-
 #  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 #
 #  ---
-#  $Id: Services.pm,v 2.6 2006/04/15 12:27:55 ivan Exp $
+#  $Id: Services.pm,v 2.7 2006/04/15 12:41:33 ivan Exp $
 #  ---
 
 use strict;
@@ -541,13 +541,19 @@ sub login_start_session {
   
   my $owner = $udata -> {owner};
 
-
   $login = lc $login;
 
   if ( lc $owner->{login} ne $login ) {
     $app -> errlog( 
        "[$login] login entered and userdata's owner don't match, userdata: $owner->{login}" );
-    assert( 0, "a problem with your account" );
+
+    $app -> error( 'login-account-damaged', { 
+                       -class => 'authenticate',
+                       -descr => "login entered and userdata's owner don't match",
+                       -login => $login,
+                       -expected => $owner->{login},
+                     } );
+    return undef;
   }
 
   $owner -> {IP} = $ENV {'REMOTE_ADDR'};
