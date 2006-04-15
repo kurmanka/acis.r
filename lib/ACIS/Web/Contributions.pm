@@ -25,7 +25,7 @@ package ACIS::Web::Contributions;  ### -*-perl-*-
 #  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 #
 #  ---
-#  $Id: Contributions.pm,v 2.7 2006/04/07 01:49:04 ivan Exp $
+#  $Id: Contributions.pm,v 2.8 2006/04/15 08:11:50 ivan Exp $
 #  ---
 
 use strict;
@@ -668,6 +668,7 @@ sub refuse_item {
   my $id   = shift;
   my $item = shift;
 
+  assert( $id );
   assert( $contributions );
   assert( $refused );
   assert( $acis );
@@ -686,10 +687,13 @@ sub refuse_item {
 
     $acis -> userlog ( "refuse a contribution: id: $id" );
     
+    my $title = $item -> {title} || '';
+    my $type  = $item -> {type}  || '';
+    my $url   = $item -> {'url-about'} || '';
     $acis -> sevent( -class  => 'contrib',
                     -action => 'refused',
-                    -descr  => $item->{title} . " ($item->{type}, $id)",
-                    -URL    => $item ->{'url-about'},
+                    -descr  => "$title ($type, $id)",
+                    -URL    => $url,
  (exists $item->{authors}) ? ( -authors  => $item -> {authors} ) : (),
  (exists $item->{editors}) ? ( -editors  => $item -> {editors} ) : (),
 

@@ -909,8 +909,8 @@ sub events {
 
   }
 
-  my $elimit = $acis -> get_cookie( "elimit" );
-  my $slimit = $acis -> get_cookie( "slimit" );
+  my $elimit = $acis -> get_cookie( "elimit" ) || '';
+  my $slimit = $acis -> get_cookie( "slimit" ) || '';
 
   if ( $start ) {
 
@@ -1006,9 +1006,8 @@ sub events_recent {
   my $recent  = get_current_recent_is( $acis );
   my $options = get_options( $acis ) || undef;
 
-  my $elimit = $acis -> get_cookie( "elimit" );
-  my $slimit = $acis -> get_cookie( "slimit" );
-
+  my $elimit = $acis -> get_cookie( "elimit" ) || '';
+  my $slimit = $acis -> get_cookie( "slimit" ) || '';
 
   show_events_for( $acis,
                    -recent => $recent,
@@ -1023,13 +1022,13 @@ sub events_recent {
 sub preferences {
   my $acis = shift;
 
-  my $elimit = $acis -> get_cookie( "elimit" );
+  my $elimit = $acis -> get_cookie( "elimit" ) || '';
   $acis -> set_form_value( 'eventslimit', $elimit );
 
-  my $slimit = $acis -> get_cookie( "slimit" );
+  my $slimit = $acis -> get_cookie( "slimit" ) || '';
   $acis -> set_form_value( 'sessionslimit', $slimit );
 
-  my $recentis = get_current_recent_is( $acis ); 
+  my $recentis = get_current_recent_is( $acis ) || ''; 
   $acis -> set_form_value( 'recentis', $recentis );
 
 
