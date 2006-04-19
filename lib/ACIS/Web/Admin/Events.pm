@@ -523,7 +523,8 @@ sub show_events_for {
       my $chid = $e ->{chain};
       if ( not $chid ) { next;  }
 
-      if ( $e -> {startend} == 1 ) { next; }
+      if ( defined $e -> {startend} and 
+           $e -> {startend} == 1 ) { next; }
       
       my $se = $sessions ->{$chid};
 
@@ -856,7 +857,7 @@ sub get_current_recent_is {
 
 sub events {
   my $acis = shift || die;
-  my $sub  = $acis -> request-> {subscreen};
+  my $sub  = $acis -> request-> {subscreen} || '';
 
 #  $acis -> variables -> {TOPEVENTS} = 1;
   my $sql  = $acis -> sql_object;
