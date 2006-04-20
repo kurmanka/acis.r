@@ -28,7 +28,7 @@ package ACIS::Web;   ### -*-perl-*-
 #  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 #
 #  ---
-#  $Id: Services.pm,v 2.7 2006/04/15 12:41:33 ivan Exp $
+#  $Id: Services.pm,v 2.8 2006/04/20 07:58:10 ivan Exp $
 #  ---
 
 use strict;
@@ -128,8 +128,17 @@ sub load_session {
     }
   }
 
+  assert( ref $session );
+  assert( $session -> isa( 'Web::App::Session' ) );
+  assert( $session -> owner );
 
-  if ( $session -> owner -> {IP} eq $IP ) {
+  my $sIP = $session -> owner ->{IP};
+  if ( not $session -> owner ) {
+    debug "session owner is undefined, so it is invalid";
+    return undef;
+  }
+
+  if ( $sIP eq $IP ) {
     debug "previous session found, IP matches, continuing";
     
   } else {
