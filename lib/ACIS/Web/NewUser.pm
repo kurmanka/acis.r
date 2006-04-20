@@ -27,7 +27,7 @@ package ACIS::Web::NewUser; ### -*-perl-*-
 #  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 #
 #  ---
-#  $Id: NewUser.pm,v 2.0 2005/12/27 19:47:39 ivan Exp $
+#  $Id: NewUser.pm,v 2.1 2006/04/20 12:48:25 ivan Exp $
 #  ---
 
 
@@ -443,7 +443,7 @@ sub confirm {
   my $app = shift;
   
   debug "running new user confirmation screen";
-  my $confirmation_id = $app -> request -> {'session-id'};
+  my $confirmation_id = $app -> request -> {'session-id'} || '';
 
   my $session;
 

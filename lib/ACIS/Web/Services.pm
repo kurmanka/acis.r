@@ -28,7 +28,7 @@ package ACIS::Web;   ### -*-perl-*-
 #  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 #
 #  ---
-#  $Id: Services.pm,v 2.8 2006/04/20 07:58:10 ivan Exp $
+#  $Id: Services.pm,v 2.9 2006/04/20 12:46:29 ivan Exp $
 #  ---
 
 use strict;
@@ -1034,6 +1034,15 @@ sub forgotten_password {
   my $udata = load ACIS::Web::UserData ( $udata_file );
   
   my $owner = $udata -> {owner};
+
+  if ( not $owner 
+       or not $owner ->{login}
+       or not $owner ->{password} ) {
+    $app -> error ( 'login-account-damaged' );
+    $app -> clear_process_queue;
+    return undef;
+  }
+  assert( $owner );
   
   $app -> {'presenter-data'} {request} {user} = {
     name  => $owner -> {name},
@@ -1047,7 +1056,7 @@ sub forgotten_password {
 
   $app -> message( 'forgotten-password-email-sent' );
 
-  $app -> set_form_value ( 'login', $owner->{login} );
+  $app -> set_form_value ( 'login', $login );
   $app -> set_form_action( $app -> config( 'base-url' ) );
 
   $app -> clear_process_queue;
