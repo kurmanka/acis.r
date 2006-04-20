@@ -25,7 +25,7 @@ package Web::App;   ### -*-perl-*-
 #  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 #
 #  ---
-#  $Id: App.pm,v 2.8 2006/04/06 15:22:48 ivan Exp $
+#  $Id: App.pm,v 2.9 2006/04/20 07:57:02 ivan Exp $
 #  ---
 
 
@@ -1342,6 +1342,7 @@ sub redirect_to_screen {
 
   my $base_url = $self -> {config} {'base-url'};
   my $response = $self -> {response};
+  $self -> response_status( "303 See Other" );
 
   if ( $self->session ) {
     my $session_id = $self -> session -> id;
@@ -1359,6 +1360,7 @@ sub redirect {
   my $self = shift;
   my $url  = shift;
 
+  $self -> response_status( "303 See Other" );
   $self -> {response} {'redirect-to'} = $url;
 }
 
