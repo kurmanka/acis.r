@@ -1,3 +1,10 @@
+research/refused:
+
+  load details for the incomplete refused items
+
+  have the fixedRowTable class not included by default
+
+
 Set CGI::Untaint version requirements in install.html and in Makefile.PL to at
 least 1.23
 

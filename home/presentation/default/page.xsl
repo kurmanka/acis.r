@@ -134,8 +134,6 @@
 
 function onLoad() {
   onload_show_switcher();
-<!--  <xsl:apply-templates select='exsl:node-set( $content )//script-onload' mode='scripting'/> 
--->
 <xsl:copy-of select='exsl:node-set( $content )//script-onload/text()'/>
 }
 </script>
