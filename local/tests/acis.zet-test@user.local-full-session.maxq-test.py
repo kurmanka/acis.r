@@ -30,7 +30,7 @@ class acis(PyHttpTestCase):
         self.post(url, params)
 
         self.msg("Response code: %s" % self.getResponseCode())
-        self.assertEquals("Assert number 1 failed", 302, self.getResponseCode())
+        self.assertEquals("Assert number 1 failed", 303, self.getResponseCode())
 
         redirect = self.getResponseHeader()['Location']
         self.msg( "redirected to: %s" % redirect )
@@ -105,7 +105,7 @@ Friedlaender, A.F.
         Validator.validateRequest(self, self.getMethod(), "post", url, params)
         self.post(url, params)
         self.msg("Response code: %s" % self.getResponseCode())
-        self.assertEquals("Assert number 5 failed", 302, self.getResponseCode())
+        self.assertEquals("Assert number 5 failed", 303, self.getResponseCode())
         Validator.validateResponse(self, self.getMethod(), url, params)
         
 
@@ -141,7 +141,7 @@ Chervyakova, 8 - 151'''),]
         Validator.validateRequest(self, self.getMethod(), "post", url, params)
         self.post(url, params)
         self.msg("Response code: %s" % self.getResponseCode())
-        self.assertEquals("Assert number 8 failed", 302, self.getResponseCode())
+        self.assertEquals("Assert number 8 failed", 303, self.getResponseCode())
         Validator.validateResponse(self, self.getMethod(), url, params)
         
         self.msg("Testing URL: %s" % self.replaceURL('''http://acis.zet/piv1/menu!'''))
@@ -171,10 +171,10 @@ Chervyakova, 8 - 151'''),]
         self.get(url, params)
         self.msg("Response code: %s" % self.getResponseCode())
         self.assertTrue("Assert number 11 failed",
-                        (self.getResponseCode() == 302 or self.getResponseCode() == 200)
+                        (self.getResponseCode() == 303 or self.getResponseCode() == 200)
                         )
         start_auto_search = True
-        if self.getResponseCode() == 302:
+        if self.getResponseCode() == 303:
             start_auto_search = False
         Validator.validateResponse(self, self.getMethod(), url, params)
 
@@ -187,7 +187,7 @@ Chervyakova, 8 - 151'''),]
             Validator.validateRequest(self, self.getMethod(), "post", url, params)
             self.post(url, params)
             self.msg("Response code: %s" % self.getResponseCode())
-            self.assertEquals("Assert number 11.2 failed", 302, self.getResponseCode())
+            self.assertEquals("Assert number 11.2 failed", 303, self.getResponseCode())
             Validator.validateResponse(self, self.getMethod(), url, params)
         
         while True:
@@ -200,10 +200,10 @@ Chervyakova, 8 - 151'''),]
             self.get(url, params)
             self.msg("Response code: %s" % self.getResponseCode())
             self.assertTrue("Assert number 12, iter %d failed" % iteration,
-                            self.getResponseCode() == 302 or self.getResponseCode() == 200
+                            self.getResponseCode() == 303 or self.getResponseCode() == 200
                             )
             Validator.validateResponse(self, self.getMethod(), url, params)
-            if self.getResponseCode() == 302:
+            if self.getResponseCode() == 303:
                 break
             iteration = iteration+1
         

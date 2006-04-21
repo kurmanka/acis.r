@@ -1,6 +1,6 @@
 /* THE MAIN ACIS CSS STYLESHEET */
 
-/* $Id: main.css,v 2.3 2006/04/11 12:41:26 ivan Exp $ */
+/* $Id: main.css,v 2.4 2006/04/21 00:35:43 ivan Exp $ */
 
 body { 
  margin: 0;
@@ -1063,7 +1063,74 @@ table.list tr th {
   color: #999;
 }
 
+
+/*  Fixed Row Table -- table with disabled text wrapping */
+
+table.fixedRowTable {
+        width: 100%;    /* need to be adjusted in IE */
+	table-layout: fixed;
+	border-collapse: collapse;
+}
+
+table.fixedRowTable tr td {
+	text-overflow:clip;
+	text-overflow:ellipsis;
+	overflow:hidden;
+	white-space:nowrap;
+        height: 2em;
+} 
+
+
+/*   research/refused   */
+
+form.refused { 
+  padding-left:   0;
+  padding-right:  0;
+  padding-bottom: 0;
+  margin-bottom: 3em;
+}
+
+form.refused p {
+  margin-left:  2em;
+  margin-right: 2em;
+}
+
+
 #researchRefused input.RemoveButton {
+  background: #f4f4f4;
   font-size: 80%;
 }
 
+
+table.briefResources tr.disabled td {
+  color: #999;
+}
+
+table.briefResources {
+  border-collapse: collapse;
+  margin: 0;
+  background:    #fff;
+}
+
+.briefResources td {
+  padding-top:   .6ex;
+  padding-right:  1ex;
+  vertical-align: baseline;
+}
+
+.briefResources td.but {
+}
+
+.briefResources td.numb {
+  color: #666;
+  font-size: smaller;
+}
+
+table.briefResources th {
+  border-bottom: 1px solid #ccc;
+  font-weight: normal;
+}
+
+
+#refusedResearch table.fixedRowTable {
+}

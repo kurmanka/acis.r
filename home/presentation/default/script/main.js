@@ -21,7 +21,13 @@ function getRef(obj) {
   return obj;
 }
 
-
+function get(obj) {
+  if ( typeof obj == "string" && document.getElementById ) {
+    return document.getElementById(obj);
+  } else {
+    return null;
+  }
+}
 
 
 function show( targetId ) {
@@ -349,3 +355,41 @@ function addLoadEvent(func) {
     }
 }
 
+
+function get_width( obj ) {
+  if ( obj ) { 
+    var width = obj.style.pixelWidth ||
+                obj.clientWidth ||
+                obj.offsetWidth ||
+                obj.innerWidth;
+//                obj.style.width;
+
+    if ( typeof width == 'string' ) 
+      return parseInt( width );
+    
+    return width;
+  }
+  return null;
+}
+
+
+function set_width( obj, width ) {
+  if ( obj && obj.style ) { 
+    obj.style.width = width+"px";
+    if ( obj.width ) 
+      obj.width = width;
+
+//    obj.style.setAttribute( 'width', width ); // wrong
+//    $(obj).css( 'width', width+"px" );
+
+//    alert( 'set_width( ' + obj + ', ' + width + ' )' );
+    return obj;
+  }
+  return null;
+}
+
+function set_width_as( obj1, obj2, plus ) {
+  if ( ! plus ) plus = 0;
+  var w = get_width( obj2 );
+  set_width( obj1, parseInt(w)+plus );
+}
