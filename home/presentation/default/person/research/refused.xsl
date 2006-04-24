@@ -16,7 +16,7 @@
   <xsl:template name='table-resources-for-review'>
     <xsl:param name='list'/>
 
-    <xsl:for-each select='$list/list-item[id and title]' xml:space='preserve'>
+    <xsl:for-each select='$list/list-item[id]' xml:space='preserve'>
       <xsl:variable name="nid" select='generate-id(.)'/>
       <xsl:variable name="id" select='id'/>
 
@@ -42,7 +42,17 @@
           </xsl:choose>
         </td>
 
+<xsl:choose>
+  <xsl:when test='title'>
         <td class='title'   width='50%'><a href='{url-about}' title='{title}'><xsl:value-of select='title' /></a></td>
+  </xsl:when>
+  <xsl:when test='url-about'>
+        <td class='title'   width='50%'>unknown, id: <a href='{url-about}'><xsl:value-of select='id' /></a></td>
+  </xsl:when>
+  <xsl:otherwise>
+        <td class='title'   width='50%'><small>title unknown, id: <xsl:value-of select='id'/></small></td>
+  </xsl:otherwise>
+</xsl:choose>
         <td class='authors' width='40%' title='{authors}'><xsl:value-of select='authors'/></td>
 
       </tr>
@@ -54,7 +64,7 @@
 
         <form class='refused' 
               id='theform'
-              screen='@research/refused/all' xsl:use-attribute-sets='form'>
+              screen='@research/refused' xsl:use-attribute-sets='form'>
 
           <xsl:choose>
           <xsl:when test='$refused-count &gt; 1'>

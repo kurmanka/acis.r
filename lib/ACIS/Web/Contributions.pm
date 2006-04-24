@@ -25,7 +25,7 @@ package ACIS::Web::Contributions;  ### -*-perl-*-
 #  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 #
 #  ---
-#  $Id: Contributions.pm,v 2.8 2006/04/15 08:11:50 ivan Exp $
+#  $Id: Contributions.pm,v 2.9 2006/04/24 13:42:50 ivan Exp $
 #  ---
 
 use strict;
@@ -993,6 +993,8 @@ sub prepare_refused {
   }
   clear_undefined $refused;
 
+  reload_refused_contributions( $app );
+
   $contributions ->{'already-refused' } = $already_refused ; 
   $contributions ->{refused}  = $refused;
 
@@ -1404,7 +1406,7 @@ sub reload_accepted_contributions {
     my $type = $_ ->{type};
     my $role = $_ ->{role};
     
-    $_ = reload_contribution( $app, $id, $type, $metadata_db );
+    $_ = reload_contribution( $app, $id, $metadata_db );
     if ( $_ ) {
       $_ ->{role} = $role;
       
@@ -1439,6 +1441,45 @@ sub reload_accepted_contributions {
   }
   
   $session -> {$id} {'reloaded-accepted-contributions'} = 1;
+}
+
+
+
+sub reload_refused_contributions {
+  my $app = shift;
+
+  my $session = $app -> session;
+  my $record  = $session -> current_record;
+  my $id      = $record -> {id};
+
+  my $metadata_db = $app -> config( 'metadata-db-name' );
+
+  if ( $session ->{$id}{contributions}{refused_reloaded} ) { return 1; }
+  $session ->{$id}{contributions}{refused_reloaded} = 1;
+
+  my $list = $record ->{contributions}{refused};
+  my $list_size_before = scalar @$list;
+
+  foreach ( @$list ) {
+    my $item = $_;
+    my $id   = $_ ->{id};
+    
+    my $new  = reload_contribution( $app, $id, $metadata_db );
+    if ( $new ) {
+      $_ = $new;
+    } else {
+      debug "refused item $id is not in the database";
+    }
+
+  }
+  
+  clear_undefined $list;
+
+  if ( $list_size_before ) {
+    debug "refused contributions have been reloaded from the database";
+  }
+  
+  $session -> {$id} {'reloaded-refused-contributions'} = 1;
 }
 
 
@@ -1494,26 +1535,14 @@ sub make_resource_item_from_db_row {
 sub reload_contribution {
   my $app  = shift;
   my $id   = shift;
-  my $type = shift;
   my $db   = shift;
 
   assert( $id   );
   assert( $db   );
 
   my $sql  = $app ->sql_object;
-
-#  ###  now, useless
-#  my $document_types = {
-#    'paper'    => 1,
-#    'article'  => 1,
-#    'software' => 1,
-#    'book'     => 1,
-#    'chapter'  => 1,
-#  };
-
   my $item;
     
-#  $sql -> prepare_cached ( "$select_what from $db.resources where id=?" );
   $sql -> prepare_cached ( "select data from $db.objects where id=?" );
   warn "SQL: " . $sql->error if $sql->error;
   my $res = $sql -> execute ( $id );

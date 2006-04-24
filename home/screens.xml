@@ -453,7 +453,7 @@
   <screen id='research/refused'>
     <use module='ACIS::Web::Contributions' />
     <call function='load_session_or_authenticate' />
-    <call function='ACIS::Web::Contributions::prepare'/>
+    <call function='ACIS::Web::Contributions::prepare_refused'/>
     <process>
       <call function='ACIS::Web::Contributions::process_refused'/>
     </process>
