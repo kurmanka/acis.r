@@ -21,9 +21,9 @@
       <xsl:variable name="id" select='id'/>
 
       <xsl:variable name='alternate'><xsl:if test='position() mod 2'> alternate</xsl:if></xsl:variable>
-      <tr class='resource{$alternate}' id='row_{$nid}'>
+      <tr class='resource{$alternate}' id='row_{$nid}'  valign='baseline'>
 
-        <td width='2%' class='but'>
+        <td class='but'>
           <input type='submit' name='unrefuse_{$nid}' value='remove' 
                                class='RemoveButton'   docid='{id}' 
            ><xsl:if test='position() = 1'><xsl:attribute name='id'
@@ -32,7 +32,7 @@
           <input type='hidden' name='id_{$nid}' value='{id}'/>
         </td>
 
-        <td class='numb'   width='2%'>
+        <td class='numb'>
           <xsl:choose><xsl:when test='position() = last()'>
             <span id='ncLast'><xsl:value-of select='position()'/>.</span>
           </xsl:when>
@@ -44,16 +44,16 @@
 
 <xsl:choose>
   <xsl:when test='title'>
-        <td class='title'   width='50%'><a href='{url-about}' title='{title}'><xsl:value-of select='title' /></a></td>
+        <td class='title' ><a href='{url-about}' title='{normalize-space(title/text())}'><xsl:value-of select='title' /></a></td>
   </xsl:when>
   <xsl:when test='url-about'>
-        <td class='title'   width='50%'>unknown, id: <a href='{url-about}'><xsl:value-of select='id' /></a></td>
+        <td class='title' >unknown, id: <a href='{url-about}'><xsl:value-of select='id' /></a></td>
   </xsl:when>
   <xsl:otherwise>
-        <td class='title'   width='50%'><small>title unknown, id: <xsl:value-of select='id'/></small></td>
+        <td class='title' ><small>title unknown, id: <xsl:value-of select='id'/></small></td>
   </xsl:otherwise>
 </xsl:choose>
-        <td class='authors' width='40%' title='{authors}'><xsl:value-of select='authors'/></td>
+        <td class='authors' title='{authors}'><xsl:value-of select='authors'/></td>
 
       </tr>
 
@@ -76,8 +76,9 @@
           </xsl:when>
           </xsl:choose>
           
-          <table id='refusedTable' class='briefResources fixedRowTable' cols='4'>
-            <tr><th></th><th></th><th>title of the work</th><th>the authors</th></tr>
+          <table id='refusedTable' class='briefResources xfixedRowTable' cols='4'>
+            <tr><th idth='0*'></th><th idth='0*'></th><th xwidth='54%'
+            >title of the work</th><th xwidth='36%' >the authors</th></tr>
             <xsl:call-template name='table-resources-for-review'>
               <xsl:with-param name='list' select='$refused'/>
             </xsl:call-template>
@@ -85,18 +86,26 @@
           
         </form>
 
+
 <script-onload>
-setWidths();
-// var table  = $( '#refusedTable' );
-// table &amp;&amp; table.addClass( 'fixedRowTable' );
-window.onresize = setWidths;
+// $('#theform').submit( function (){ return false; } );
+$("input.RemoveButton").click( remove_button_click );
+//var table  = $( '#refusedTable' );
+//table &amp;&amp; table.addClass( 'fixedRowTable' );
+
+//setWidths();
+//alert( 'table size set' );
+//window.onresize = setWidths;
 </script-onload>
 
 <script>
+
 function setWidths() {
 
   var form   = get( 'theform' );
   var table  = get( 'refusedTable' );
+  table &amp;&amp; form &amp;&amp; set_width_as( table, form );
+  DEBUG( 'the table width set to ' + get_width( form ) );
 
   var columns;
   if ( table 
@@ -107,52 +116,19 @@ function setWidths() {
     var column1 = columns[0];
     var column2 = columns[1];
 
-    columns[2].width = '54%'; // title
-    columns[3].width = '36%'; // authors
-
     var button = get( 'unrefuse_button1' );
-    button &amp;&amp; column1 &amp;&amp; set_width_as( column1, button, 12 );
+    DEBUG( get_width( button ) + ' ' + get_width( column1 ) );
+
+    button &amp;&amp; column1 &amp;&amp; set_width_as( column1, button, 32 );
+    DEBUG( get_width( button ) + ' ' + get_width( column1 ) );
 
     var number = get( 'ncLast' );
     number &amp;&amp; column2 &amp;&amp; set_width_as( column2, number, 6 );
+    DEBUG( get_width( button ) + ' ' + get_width( column1 ) );
   }
 
-  table &amp;&amp; form &amp;&amp; set_width_as( table, form );
-
 }
-</script>
 
-  </xsl:template>
-
-
-
-
-  <xsl:template name='research-refused'>
-
-
-    <h1>Refused research items</h1>
-
-    <xsl:comment> subscreen <xsl:value-of select='$request-subscreen'/> </xsl:comment>
-
-    <xsl:call-template name='show-status'/>
-
-    <xsl:choose>
-      <xsl:when test='$refused/list-item'>
-
-        <xsl:call-template name='refused-list-all'/>
-
-      </xsl:when>
-    
-      <xsl:otherwise> 
-
-        <p>At this moment, there are no refused research
-        items in your profile.</p>
-
-      </xsl:otherwise>
-  
-    </xsl:choose>
-
-    <script>
 
 function remove_button_click() {
   var docid=this.getAttribute('docid');
@@ -173,12 +149,38 @@ function remove_button_click() {
 
     </script>
  
-<script-onload>
-// $('#theform').submit( function (){ return false; } );
-$("input.RemoveButton").click( remove_button_click );
-</script-onload>
 
 
+
+  </xsl:template>
+
+
+
+
+  <xsl:template name='research-refused'>
+
+
+    <h1 id='display'>Refused research items</h1>
+
+    <xsl:comment> subscreen <xsl:value-of select='$request-subscreen'/> </xsl:comment>
+
+    <xsl:call-template name='show-status'/>
+
+    <xsl:choose>
+      <xsl:when test='$refused/list-item'>
+
+        <xsl:call-template name='refused-list-all'/>
+
+      </xsl:when>
+    
+      <xsl:otherwise> 
+
+        <p>At this moment, there are no refused research
+        items in your profile.</p>
+
+      </xsl:otherwise>
+  
+    </xsl:choose>
 
   </xsl:template>
 

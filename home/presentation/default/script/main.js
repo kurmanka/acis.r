@@ -359,7 +359,7 @@ function addLoadEvent(func) {
 function get_width( obj ) {
   if ( obj ) { 
     var width = obj.style.pixelWidth ||
-                obj.clientWidth ||
+//                obj.clientWidth ||
                 obj.offsetWidth ||
                 obj.innerWidth;
 //                obj.style.width;
@@ -392,4 +392,17 @@ function set_width_as( obj1, obj2, plus ) {
   if ( ! plus ) plus = 0;
   var w = get_width( obj2 );
   set_width( obj1, parseInt(w)+plus );
+}
+
+
+function DEBUG(text) {
+  var display = get( 'display' );
+  if ( !display ) {
+    display = document.getElementsByTagName('h1')[0];
+  }
+  if ( display ) {
+    display.innerHTML = display.innerHTML + ' <br>' + text;
+  } else { 
+    alert( text );
+  }
 }

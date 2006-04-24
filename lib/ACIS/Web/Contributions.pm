@@ -25,7 +25,7 @@ package ACIS::Web::Contributions;  ### -*-perl-*-
 #  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 #
 #  ---
-#  $Id: Contributions.pm,v 2.9 2006/04/24 13:42:50 ivan Exp $
+#  $Id: Contributions.pm,v 2.10 2006/04/24 17:35:42 ivan Exp $
 #  ---
 
 use strict;
@@ -1082,7 +1082,11 @@ sub process_refused {
     $app -> success( 1 );
 
     if ( $statistics -> {unrefused} ) {
-      $app -> message( 'research-items-unrefused' );
+      if ( $statistics -> {unrefused} == 1 ) {
+        $app -> message( 'one-research-item-unrefused' );
+      } else {
+        $app -> message( 'research-items-unrefused' );
+      }
     } else {
       $app -> message( 'research-decisions-processed' );
     }      
