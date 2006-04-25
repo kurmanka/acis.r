@@ -26,7 +26,7 @@ package ACIS::Web::User; ### -*-perl-*-
 #  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 #
 #  ---
-#  $Id: User.pm,v 2.0 2005/12/27 19:47:40 ivan Exp $
+#  $Id: User.pm,v 2.1 2006/04/25 18:10:52 ivan Exp $
 #  ---
 
 
@@ -310,7 +310,7 @@ sub remove_account {
   
   while ( -e $deleted_userdata ) {
     debug "backup file $deleted_userdata already exists";
-    $deleted_userdata =~ s/\.xml(\.(\d+))?$/".xml." . ($2+1)/eg;
+    $deleted_userdata =~ s/\.xml(\.(\d+))?$/".xml." . ($2 ? ($2+1) : '1')/eg;
   }
 
   debug "move userdata from '$userdata' to '$deleted_userdata'";

@@ -25,7 +25,7 @@ package ACIS::Web::Affiliations;   ### -*-perl-*-
 #  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 #
 #  ---
-#  $Id: Affiliations.pm,v 2.1 2006/03/24 08:06:17 ivan Exp $
+#  $Id: Affiliations.pm,v 2.2 2006/04/25 18:10:51 ivan Exp $
 #  ---
 
 
@@ -313,10 +313,10 @@ sub search {
   my $db = $app -> config( 'metadata-db-name' );
 
 
-  my $key   = $input ->{ 'search-what' };
-  my $field = $input ->{ 'search-by' };
+  my $key   = $input ->{ 'search-what' } || '';
+  my $field = $input ->{ 'search-by' }   || '';
 
-  $field =~ s/[^a-z]//g;
+  $field =~ s/[^a-z]//g;  # untaint
 
   $app -> userlog( "affil: search: by $field, key: '$key'", );
 
