@@ -1,6 +1,8 @@
 research/refused:
 
-  Find, why Opera 8.54 does not remove the item
+  ask Christian to test it
+
+  add item to the R-profile submenu
 
 
 Set CGI::Untaint version requirements in install.html and in Makefile.PL to at
