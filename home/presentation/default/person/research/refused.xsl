@@ -77,8 +77,12 @@
           </xsl:choose>
           
           <table id='refusedTable' class='briefResources xfixedRowTable' cols='4'>
-            <tr><th idth='0*'></th><th idth='0*'></th><th xwidth='54%'
-            >title of the work</th><th xwidth='36%' >the authors</th></tr>
+            <tr
+              ><th class='but'
+             /><th class='numb' 
+             /><th>title of the work</th
+             ><th class='authors'>the authors</th
+            ></tr>
             <xsl:call-template name='table-resources-for-review'>
               <xsl:with-param name='list' select='$refused'/>
             </xsl:call-template>
@@ -88,27 +92,24 @@
 
 
 <script-onload>
-// $('#theform').submit( function (){ return false; } );
 $("input.RemoveButton").click( remove_button_click );
-//var table  = $( '#refusedTable' );
-//table &amp;&amp; table.addClass( 'fixedRowTable' );
-
-//setWidths();
-//alert( 'table size set' );
-//window.onresize = setWidths;
+setup_the_table();
 </script-onload>
 
 <script>
 
-function setWidths() {
+function setup_the_table() {
 
   var form   = get( 'theform' );
   var table  = get( 'refusedTable' );
   table &amp;&amp; form &amp;&amp; set_width_as( table, form );
-  DEBUG( 'the table width set to ' + get_width( form ) );
+
+  var table  = $( '#refusedTable' );
+  table &amp;&amp; table.addClass( 'fixedRowTable' );
 
   var columns;
-  if ( table 
+  if ( 0
+       &amp;&amp; table 
        &amp;&amp; table.getElementsByTagName
        &amp;&amp; (columns = table.getElementsByTagName( 'th' ))
        &amp;&amp; columns[0] ) {
@@ -125,6 +126,7 @@ function setWidths() {
     var number = get( 'ncLast' );
     number &amp;&amp; column2 &amp;&amp; set_width_as( column2, number, 6 );
     DEBUG( get_width( button ) + ' ' + get_width( column1 ) );
+
   }
 
 }
@@ -191,7 +193,127 @@ function remove_button_click() {
   <xsl:variable name='page-id'>researchRefused</xsl:variable>
   <xsl:variable name='additional-head-stuff'>
         <script type="text/javascript" src='{$base-url}/script/jquery.js'></script>
+        <style type='text/css'>
+/*  Fixed Row Table -- table with disabled text wrapping */
+
+table.fixedRowTable {
+        width: 100%;    /* need to be adjusted in IE */
+	table-layout: fixed;
+	border-collapse: collapse;
+}
+
+table.fixedRowTable tr td.title,
+table.fixedRowTable tr td.authors {
+	text-overflow:ellipsis;
+	overflow: hidden;
+	white-space:nowrap;
+} 
+
+
+/*   research/refused   */
+
+form.refused { 
+  padding-left:   0;
+  padding-right:  0;
+  padding-bottom: 0;
+  margin-bottom: 3em;
+}
+
+form.refused p {
+  margin-left:  2em;
+  margin-right: 2em;
+}
+
+
+.briefResources {
+  table-layout: auto;
+  border-collapse: collapse;
+  margin: 0;
+  background:   #fff;
+}
+
+.briefResources td {
+  padding-top:   .6ex;
+  padding-left:  1ex;
+  vertical-align: baseline;
+}
+
+.briefResources .but {
+  width: 9.5ex;
+  padding-left:  0;
+}
+
+.briefResources .numb {
+  width: 4ex;
+  color: #666;
+  font-size: smaller;
+}
+
+table.briefResources th {
+  border-bottom: 1px solid #ccc;
+  font-weight: normal;
+}
+
+#researchRefused table tr .authors,
+#researchRefused table.fixedRowTable  tr .authors,
+#researchRefused table.briefResources tr .authors {
+  width: 33%;
+  padding-left: 1ex;
+}
+
+#researchRefused table tr td.authors,
+#researchRefused table.fixedRowTable  tr td.authors,
+#researchRefused table.briefResources tr td.authors {
+  padding-bottom: 1em;
+}
+
+#researchRefused table.briefResources .but,
+#researchRefused table.fixedRowTable .but  { 
+  width: 9.5ex; 
+  padding-left: 0;
+}
+
+#researchRefused table.briefResources .numb,
+#researchRefused table.fixedRowTable .numb {
+  width: 4ex; 
+}
+
+#researchRefused table.fixedRowTable {}
+#researchRefused table.fixedRowTable td {
+  padding-top:   .6ex;
+  vertical-align: baseline;
+}
+
+
+
+
+
+#researchRefused input.RemoveButton {
+  background: #f4f4f4;
+  font-size: 80%;
+  margin: 0;
+}
+
+
+/* removed-items-rows */
+
+table.briefResources tr.disabled td.but { 
+  font-size: 80%;
+}
+
+table.briefResources tr.disabled td,
+table.briefResources tr.disabled td a:link {
+  color: #999;
+}
+table.briefResources tr.disabled td a:visited { color: #777; }
+
+
+
+</style>
+
   </xsl:variable>
+
+
   
 
   <!--   n o w   t h e   p a g e   t e m p l a t e    -->

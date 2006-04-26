@@ -1,6 +1,6 @@
 research/refused:
 
-  have the fixedRowTable class not included by default
+  Find, why Opera 8.54 does not remove the item
 
 
 Set CGI::Untaint version requirements in install.html and in Makefile.PL to at

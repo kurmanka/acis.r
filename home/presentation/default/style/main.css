@@ -1,6 +1,6 @@
 /* THE MAIN ACIS CSS STYLESHEET */
 
-/* $Id: main.css,v 2.5 2006/04/24 17:35:42 ivan Exp $ */
+/* $Id: main.css,v 2.6 2006/04/26 22:30:50 ivan Exp $ */
 
 body { 
  margin: 0;
@@ -1064,81 +1064,5 @@ table.list tr th {
 }
 
 
-/*  Fixed Row Table -- table with disabled text wrapping */
-
-table.fixedRowTable {
-        width: 100%;    /* need to be adjusted in IE */
-	table-layout: fixed;
-	border-collapse: collapse;
-}
-
-table.fixedRowTable tr td.title,
-table.fixedRowTable tr td.authors {
-	text-overflow:ellipsis;
-	overflow: hidden;
-	white-space:nowrap;
-        height: 2em;
-        height: 3.6ex;
-} 
 
 
-/*   research/refused   */
-
-form.refused { 
-  padding-left:   0;
-  padding-right:  0;
-  padding-bottom: 0;
-  margin-bottom: 3em;
-}
-
-form.refused p {
-  margin-left:  2em;
-  margin-right: 2em;
-}
-
-
-#researchRefused input.RemoveButton {
-  background: #f4f4f4;
-  font-size: 80%;
-}
-
-
-table.briefResources tr.disabled td,
-table.briefResources tr.disabled td a:link {
-  color: #999;
-}
-
-table.briefResources tr.disabled td a:visited { color: #777; }
-
-
-.briefResources {
-  border-collapse: collapse;
-  margin: 0;
-  background:    #fff;
-  table-layout: auto;
-}
-
-.briefResources td {
-  padding-top:   .6ex;
-  padding-right:  1ex;
-  vertical-align: baseline;
-}
-
-.briefResources td.but {
-  width: 8.5ex;
-}
-
-.briefResources td.numb {
-  color: #666;
-  font-size: smaller;
-  width: 4.5ex;
-}
-
-table.briefResources th {
-  border-bottom: 1px solid #ccc;
-  font-weight: normal;
-}
-
-
-#refusedResearch table.fixedRowTable {}
-#refusedResearch table.fixedRowTable td {}
