@@ -107,8 +107,10 @@ function toggle_class( id, cla ) {
 // cla as one of its classes or not, depending on the 
 // checked logical value.
 
-function set_class_if( id, cla, checked ) {
-  var o = getRef( id );
+function set_class_if( o, cla, checked ) {
+  if ( typeof o == 'string' ) {
+     o = getRef( id );
+  }
   var class_list;
   if ( o ) {
 
@@ -165,6 +167,17 @@ function set_class_if( id, cla, checked ) {
 
   return;
 }
+
+function set_class( o, name ) {
+  set_class_if( o, name, true );
+  alert( 'set class ' + name + ' for ' + o );
+}
+
+function unset_class( o, name ) {
+  set_class_if( o, name, false );
+}
+
+
 
 var item_label_click = false;
 
@@ -271,10 +284,12 @@ function setActiveStyleSheet(title) {
      a = links[i];
      if ( a.getAttribute("rel").indexOf("style") != -1
           && a.getAttribute("title") ) {
-       a.disabled = true;
        if ( a.getAttribute("title") == title ) {
           a.disabled = false;
-          setCookie("style", title, 365);
+          setCookie("style", title, 365, '/');
+
+       } else {
+          a.disabled = true;
        }
      }
    }  

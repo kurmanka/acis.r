@@ -86,3 +86,19 @@ form fieldset {
   border-color: #985;
 }
 
+
+
+/* screen-specific */
+
+#researchRefused .briefResources {
+  background: #f4f0d8;           }
+ 
+#researchRefused input.RemoveButton {
+  background: #edb;              }
+
+#researchRefused .briefResources .numb {
+  color: #985;                   }
+
+#researchRefused table.briefResources th {
+  border-color: #985;            }
+

@@ -20,8 +20,7 @@
       <xsl:variable name="nid" select='generate-id(.)'/>
       <xsl:variable name="id" select='id'/>
 
-      <xsl:variable name='alternate'><xsl:if test='position() mod 2'> alternate</xsl:if></xsl:variable>
-      <tr class='resource{$alternate}' id='row_{$nid}'  valign='baseline'>
+      <tr class='resource' id='row_{$nid}'  valign='baseline'>
 
         <td class='but'>
           <input type='submit' name='unrefuse_{$nid}' value='remove' 
@@ -132,17 +131,23 @@ function setup_the_table() {
 }
 
 
+var record_sid = "<xsl:value-of select='$record-sid'/>";
+var session_id = "<xsl:value-of select='$session-id'/>";
+
 function remove_button_click() {
   var docid=this.getAttribute('docid');
   this.setAttribute("disabled", 1);
   var button = this;
   if ( docid ) {
-    $.post( "/research/refused/xml", { unrefuse: docid },
-      function () { 
+    var url = '/' + record_sid + '/research/refused/xml!' + session_id; 
+    $.post( url, { unrefuse: docid },
+      function (xml) { 
         var parent = button.parentNode;
-        $(parent.parentNode).addClass("disabled"); 
-        $(button).hide();
-        $(parent).append( "removed" );
+        if ( xml ) {
+          $(parent.parentNode).addClass("disabled"); 
+          $(button).hide();
+          $(parent).append( "removed" );
+        }
       }
     );
   }
@@ -193,124 +198,6 @@ function remove_button_click() {
   <xsl:variable name='page-id'>researchRefused</xsl:variable>
   <xsl:variable name='additional-head-stuff'>
         <script type="text/javascript" src='{$base-url}/script/jquery.js'></script>
-        <style type='text/css'>
-/*  Fixed Row Table -- table with disabled text wrapping */
-
-table.fixedRowTable {
-        width: 100%;    /* need to be adjusted in IE */
-	table-layout: fixed;
-	border-collapse: collapse;
-}
-
-table.fixedRowTable tr td.title,
-table.fixedRowTable tr td.authors {
-	text-overflow:ellipsis;
-	overflow: hidden;
-	white-space:nowrap;
-} 
-
-
-/*   research/refused   */
-
-form.refused { 
-  padding-left:   0;
-  padding-right:  0;
-  padding-bottom: 0;
-  margin-bottom: 3em;
-}
-
-form.refused p {
-  margin-left:  2em;
-  margin-right: 2em;
-}
-
-
-.briefResources {
-  table-layout: auto;
-  border-collapse: collapse;
-  margin: 0;
-  background:   #fff;
-}
-
-.briefResources td {
-  padding-top:   .6ex;
-  padding-left:  1ex;
-  vertical-align: baseline;
-}
-
-.briefResources .but {
-  width: 9.5ex;
-  padding-left:  0;
-}
-
-.briefResources .numb {
-  width: 4ex;
-  color: #666;
-  font-size: smaller;
-}
-
-table.briefResources th {
-  border-bottom: 1px solid #ccc;
-  font-weight: normal;
-}
-
-#researchRefused table tr .authors,
-#researchRefused table.fixedRowTable  tr .authors,
-#researchRefused table.briefResources tr .authors {
-  width: 33%;
-  padding-left: 1ex;
-}
-
-#researchRefused table tr td.authors,
-#researchRefused table.fixedRowTable  tr td.authors,
-#researchRefused table.briefResources tr td.authors {
-  padding-bottom: 1em;
-}
-
-#researchRefused table.briefResources .but,
-#researchRefused table.fixedRowTable .but  { 
-  width: 9.5ex; 
-  padding-left: 0;
-}
-
-#researchRefused table.briefResources .numb,
-#researchRefused table.fixedRowTable .numb {
-  width: 4ex; 
-}
-
-#researchRefused table.fixedRowTable {}
-#researchRefused table.fixedRowTable td {
-  padding-top:   .6ex;
-  vertical-align: baseline;
-}
-
-
-
-
-
-#researchRefused input.RemoveButton {
-  background: #f4f4f4;
-  font-size: 80%;
-  margin: 0;
-}
-
-
-/* removed-items-rows */
-
-table.briefResources tr.disabled td.but { 
-  font-size: 80%;
-}
-
-table.briefResources tr.disabled td,
-table.briefResources tr.disabled td a:link {
-  color: #999;
-}
-table.briefResources tr.disabled td a:visited { color: #777; }
-
-
-
-</style>
-
   </xsl:variable>
 
 
