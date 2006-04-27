@@ -170,7 +170,6 @@ function set_class_if( o, cla, checked ) {
 
 function set_class( o, name ) {
   set_class_if( o, name, true );
-  alert( 'set class ' + name + ' for ' + o );
 }
 
 function unset_class( o, name ) {
@@ -271,25 +270,28 @@ function Obfuscate_with_body( b, a, attr, body ) {
 // with small modifications
  
 function setActiveStyleSheet(title) {
-   if (    ! document.getElementsByTagName 
+   if (    ! title
+        || ! document.getElementsByTagName 
         || ! document.getElementsByTagName("link") ) { 
      return;
    }
-
    var i, a;
    var links = document.getElementsByTagName("link");
    if ( !links.length ) return;
 
    for ( i=0; links.length > i; i++ ) {
      a = links[i];
+     var linktitle = a.getAttribute( 'title' );
+
      if ( a.getAttribute("rel").indexOf("style") != -1
-          && a.getAttribute("title") ) {
-       if ( a.getAttribute("title") == title ) {
+          && linktitle ) {
+       a.disabled = true;
+ 
+       if ( linktitle == title ) {
           a.disabled = false;
           setCookie("style", title, 365, '/');
 
        } else {
-          a.disabled = true;
        }
      }
    }  
@@ -352,7 +354,7 @@ function init_set_style () {
 }
 
 init_set_style();
-
+addLoadEvent( init_set_style );
 
 
 /******   installation tool   *****************/         
