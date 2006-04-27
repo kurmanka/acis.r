@@ -1,8 +1,16 @@
+research: 
+
+  preserve items, which dissappeared from the database, for
+  some time
+
+
 research/refused:
 
   ask Christian to test it
 
   add item to the R-profile submenu
+
+
 
 
 Set CGI::Untaint version requirements in install.html and in Makefile.PL to at

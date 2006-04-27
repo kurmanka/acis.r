@@ -25,7 +25,7 @@ package ACIS::Web::Contributions;  ### -*-perl-*-
 #  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 #
 #  ---
-#  $Id: Contributions.pm,v 2.11 2006/04/27 12:41:58 ivan Exp $
+#  $Id: Contributions.pm,v 2.12 2006/04/27 18:10:00 ivan Exp $
 #  ---
 
 use strict;
@@ -1398,6 +1398,8 @@ sub search {
 ###   s u b    r e l o a d   a c c e p t e d   c o n t r i b u t i o n s   #
 ############################################################################
 
+my $grace_period = 60*60*24*7*2; # two weeks
+ 
 sub reload_accepted_contributions {
   my $app = shift;
 
@@ -1421,25 +1423,41 @@ sub reload_accepted_contributions {
     my $type = $_ ->{type};
     my $role = $_ ->{role};
     
-    $_ = reload_contribution( $app, $id, $metadata_db );
-    if ( $_ ) {
+    my $reload = reload_contribution( $app, $id, $metadata_db );
+    if ( $reload ) {
+      $_ = $reload;
       $_ ->{role} = $role;
+      delete $_->{frozen};
       
     } else {
       debug "contribution $id can't be reloaded";
 
-      my $title = $item ->{title};
+      # freeze or clear?
+      my $today = time;
+      my $long_ago = $today - $grace_period;
 
-      $app -> userlog( "clearing a contribution: id $id, role $role" );
-      $app -> userlog( "contribution: '$title' (type: $item->{type})" );
-      
-      $app -> sevent( -class  => 'contrib',
-                      -action => 'cleared lost',
-                      -descr  => $title . " ($type, $id)",
-                      -URL    => $item ->{'url-about'},
- (exists $item->{authors}) ? ( -authors  => $item -> {authors} ) : (),
- (exists $item->{editors}) ? ( -editors  => $item -> {editors} ) : (),
-                    );
+      if ( $_ ->{frozen} ) {
+        if ( $_ ->{frozen} <= $long_ago ) {
+          # clear
+          undef $_;
+
+          my $title = $item ->{title};
+
+          $app -> userlog( "clearing a contribution: id $id, role $role" );
+          $app -> userlog( "contribution: '$title' (type: $item->{type})" );
+          
+          $app -> sevent( -class  => 'contrib',
+                          -action => 'cleared lost',
+                          -descr  => $title . " ($type, $id)",
+                          -URL    => $item ->{'url-about'},
+           (exists $item->{authors}) ? ( -authors  => $item -> {authors} ) : (),
+           (exists $item->{editors}) ? ( -editors  => $item -> {editors} ) : (),
+                        );
+        }
+
+      } else {
+        $_ -> {frozen} = $today;
+      }
       
     }
   }
