@@ -25,7 +25,7 @@ package ACIS::Web;   ### -*-perl-*-
 #  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 #
 #  ---
-#  $Id: Web.pm,v 2.6 2006/04/07 01:49:24 ivan Exp $
+#  $Id: Web.pm,v 2.7 2006/04/27 12:41:58 ivan Exp $
 #  ---
 
 
@@ -589,6 +589,8 @@ sub dump_variables_xml {
   undef $response -> {HTML};
   $response -> {body} = $xml;
   $response -> {charset} = 'utf-8';
+
+  debug "xml response: $xml";
 
   print STDOUT "Content-type: application/xml; charset=utf-8\n";
   $response -> {'content-type-printed'} = 1;  

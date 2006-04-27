@@ -143,10 +143,37 @@ function remove_button_click() {
     $.post( url, { unrefuse: docid },
       function (xml) { 
         var parent = button.parentNode;
-        if ( xml ) {
+        var success;
+        if ( ! xml )                 return alert( 'no xml response; can not remove the item' );
+        if ( xml.documentElement )   xml = xml.documentElement;
+
+        if ( $( 'unrefused list-item', xml ).size() ) {
           $(parent.parentNode).addClass("disabled"); 
           $(button).hide();
           $(parent).append( "removed" );
+
+        } else {
+          alert( 'Opps!  Unrefusing item ' + docid + ' failed.' );
+
+          // debugging...
+          if ( ! xml.getElementsByTagName )              return alert( 'no xml.getElementsByTagName' ); 
+          if ( ! xml.getElementsByTagName('unrefused') ) return alert( 'no xml.getElementsByTagName(unrefused)' );
+
+          var unrefused = xml.getElementsByTagName( 'unrefused' );
+
+          if ( ! unrefused.size )            return alert( 'no unrefused.size' );
+          if ( ! unrefused.size() )          return alert( 'no unrefused.size()' );
+          else                               alert( 'unrefused size() is ' + unrefused.size() );
+
+          if ( ! unrefused[0] )              return alert( 'no unrefused[0]' );
+          if ( ! unrefused[0].firstChild )   return alert( 'no unrefused[0].firstChild' );
+          if ( ! unrefused[0].firstChild() ) return alert( 'no unrefused[0].firstChild()' );
+
+          var child = unrefused[0].firstChild();
+          if ( ! child.tagName )             return alert( 'no child.tagName' );
+          if ( ! child.tagName() )           alert( 'no child.tagName()' );
+          else                               alert( 'child tagName() is ' + child.tagName() );
+
         }
       }
     );

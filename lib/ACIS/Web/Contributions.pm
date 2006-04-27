@@ -25,7 +25,7 @@ package ACIS::Web::Contributions;  ### -*-perl-*-
 #  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 #
 #  ---
-#  $Id: Contributions.pm,v 2.10 2006/04/24 17:35:42 ivan Exp $
+#  $Id: Contributions.pm,v 2.11 2006/04/27 12:41:58 ivan Exp $
 #  ---
 
 use strict;
@@ -1115,6 +1115,11 @@ sub process_refused_xml {
   assert( $refused  );
 
   my $already_refused  = $contributions -> {'already-refused' }; 
+  my $cleared = [];
+
+  if ( $input -> {unrefuse} ) {
+    $input -> {unrefuse} =~ s/\x{0}$//g; 
+  }
 
   if ( $input -> {unrefuse} ) {
     my $handle = $input -> {unrefuse};
@@ -1141,12 +1146,18 @@ sub process_refused_xml {
                        -descr  => $id );
 
       debug( "cleared refused item $id" );
-      $app -> variables -> {unrefused} = $id;
+      push @$cleared, $id;
     }
   }  
   clear_undefined $refused;
 
-  undef $app -> variables -> {contributions};
+  if ( scalar @$cleared ) {
+    $app->variables -> {unrefused} = $cleared;
+  } else {
+    $app->variables -> {failed} = 1;
+  }
+
+  delete $app -> variables -> {contributions};
 }
 
 
