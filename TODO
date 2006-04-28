@@ -1,15 +1,9 @@
-research: 
-
-  preserve items, which dissappeared from the database, for
-  some time
-
 
 research/refused:
 
   ask Christian to test it
 
   add item to the R-profile submenu
-
 
 
 
@@ -131,8 +125,8 @@ Deceased people's profiles (discussion on RePEc-run around
 2003-10-17)
 
 
-Remove error message when session expired, but not
-neccessary (??)
+Remove error message when the session has expired, but is
+not neccessary for this request.
 
 make new-user session lifetime a configuration parameter
 
@@ -153,14 +147,27 @@ screen.
   - monitor threads table?
   - remove outdated items?
 
+Check for XXX in the sources and resolve/clear them.
 
-Wishes:
 
-- settings screen: move cookie options to a group of its own
 
-- settings: cookie clear button
+WISHES:
 
-- check for XXX in the sources
+  - confirmation handling.  Users have to click the confirmation URL and then
+    enter their login & password to enter the account.  Many services work
+    this way.  But why wouldn't users immediately get into their new profile
+    after clicking the confirmation URL?
+
+  - new users can't change a typo in their email address, if they did it.  And
+    they will only realize it by the end of registration process.
+
+
+
+The Settings screen:
+
+  - move cookie options to a group of its own
+
+  - cookie clear button
 
 
 
