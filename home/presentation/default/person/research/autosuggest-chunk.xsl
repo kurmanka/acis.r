@@ -372,6 +372,10 @@
           </label>
         </p>
         
+        <p><small>If you check the above checkbox, the items
+        which you didn't choose will be considered <a
+        ref='@research/refused'>refused</a>.</small></p>
+
         <p>
           <input type='submit' name='save' 
                  value='Add checked items to my profile and continue' 

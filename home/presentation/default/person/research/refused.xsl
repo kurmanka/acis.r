@@ -65,15 +65,24 @@
               id='theform'
               screen='@research/refused' xsl:use-attribute-sets='form'>
 
+              <p>Below <xsl:text/>
+
           <xsl:choose>
           <xsl:when test='$refused-count &gt; 1'>
-            <p>Here are the <xsl:value-of select='$refused-count'/>
-            items that you have refused so far:</p>
+             <xsl:text>are the </xsl:text>
+             <xsl:value-of select='$refused-count'/>
+             <xsl:text> items that you have refused so far.</xsl:text>
           </xsl:when>
           <xsl:when test='$refused-count = 1'>
-            <p>Here is the single item that you have refused so far:</p>
+             <xsl:text>is the single item that you have refused so far.</xsl:text>
           </xsl:when>
           </xsl:choose>
+          
+               <xsl:text> Remove items from this list to make them 
+               available again for inclusion in your </xsl:text>
+               <a ref='@research/identified' >research profile</a>. <xsl:text/>
+
+             </p>
           
           <table id='refusedTable' class='briefResources xfixedRowTable' cols='4'>
             <tr
