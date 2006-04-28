@@ -25,7 +25,7 @@ package Web::App;   ### -*-perl-*-
 #  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 #
 #  ---
-#  $Id: App.pm,v 2.9 2006/04/20 07:57:02 ivan Exp $
+#  $Id: App.pm,v 2.10 2006/04/28 08:51:46 ivan Exp $
 #  ---
 
 
@@ -753,7 +753,14 @@ sub handle_request {
   debug "fetch request data";
 
   use CGI::Minimal;
-  my $query = new CGI::Minimal;
+  my $query;
+  eval { $query = new CGI::Minimal; };
+  if ( $@ or not $query ) {
+    ## invalid request
+    my $method = $ENV{REQUEST_METHOD};
+    die "invalid request (method: $method):\n$@";
+  }
+   
 
   debug "CGI object: $query";
 
