@@ -367,15 +367,13 @@
         <p>
           <label for='refuse-ignored'>
             <input type='checkbox' name='refuse-ignored' id='refuse-ignored' value='1'/> 
-            <i> &#x201C;I have no connection to the unselected works above.
-            Do not suggest these works again.&#x201D;</i>
+            <i> &#x201C;I have no connection to the works not selected above.
+            Do not suggest these works to me in the
+            future.&#x201D;</i>  (They will be added to the <a
+            ref='@research/refused'>refused items</a> list.)
           </label>
         </p>
         
-        <p><small>If you check the above checkbox, the items
-        which you didn't choose will be considered <a
-        ref='@research/refused'>refused</a>.</small></p>
-
         <p>
           <input type='submit' name='save' 
                  value='Add checked items to my profile and continue' 
