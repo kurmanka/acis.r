@@ -25,7 +25,7 @@ package ACIS::Web::Contributions;  ### -*-perl-*-
 #  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 #
 #  ---
-#  $Id: Contributions.pm,v 2.12 2006/04/27 18:10:00 ivan Exp $
+#  $Id: Contributions.pm,v 2.13 2006/05/01 21:58:32 ivan Exp $
 #  ---
 
 use strict;
@@ -916,6 +916,10 @@ sub process {
           $processed++; 
         }
       }
+    }
+    
+    if ( $refuse ) {
+      $app -> set_form_value( 'refuse-ignored', 1 );
     }
   }
 

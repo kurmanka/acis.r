@@ -366,7 +366,13 @@
       <xsl:if test='count( $suggestions/list-item/list/list-item[id] )'>
         <p>
           <label for='refuse-ignored'>
-            <input type='checkbox' name='refuse-ignored' id='refuse-ignored' value='1'/> 
+            <input type='checkbox' name='refuse-ignored'
+                   id='refuse-ignored' value='1'
+             ><xsl:if test='$form-values/refuse-ignored/text()'
+             ><xsl:attribute name='checked'
+             /></xsl:if
+             ></input>
+
             <i> &#x201C;I have no connection to the works not selected above.
             Do not suggest these works to me in the
             future.&#x201D;</i>  (They will be added to the <a
