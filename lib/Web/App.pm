@@ -25,7 +25,7 @@ package Web::App;   ### -*-perl-*-
 #  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 #
 #  ---
-#  $Id: App.pm,v 2.10 2006/04/28 08:51:46 ivan Exp $
+#  $Id: App.pm,v 2.11 2006/05/03 19:29:03 ivan Exp $
 #  ---
 
 
@@ -865,15 +865,13 @@ sub handle_request {
     }
   }
 
-  if ( $debug_mode ) {
-    if ( scalar keys %$form_input ) {
-      my $dump = Data::Dumper->Dump( [$form_input], ['form_input'] );
-      chomp $dump;
-      debug $dump;
+  if ( scalar keys %$form_input ) {
+    my $dump = Data::Dumper->Dump( [$form_input], ['form_input'] );
+    chomp $dump;
+    debug $dump;
 
-    } else { 
-      debug "\$form_input = {};"; 
-    }
+  } else { 
+    debug "\$form_input = {};"; 
   }
   $request ->{params} = $form_input;
 

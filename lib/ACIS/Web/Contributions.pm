@@ -25,7 +25,7 @@ package ACIS::Web::Contributions;  ### -*-perl-*-
 #  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 #
 #  ---
-#  $Id: Contributions.pm,v 2.13 2006/05/01 21:58:32 ivan Exp $
+#  $Id: Contributions.pm,v 2.14 2006/05/03 19:29:03 ivan Exp $
 #  ---
 
 use strict;
@@ -128,7 +128,7 @@ sub prepare {
   my $session = $app -> session;
   my $vars    = $app -> variables;
   my $record  = $session -> current_record;
-  my $id      = $record  -> {id};
+  my $id      = $record  -> {id};  assert( $id );
 
   $contributions = $session -> {$id} {contributions} || {};
 
@@ -925,7 +925,7 @@ sub process {
 
   $contributions -> {actions} = $statistics;
 
-  my $sug_count = clear_some_suggestions ( $contributions, $clear_from_suggestions );
+  my $sug_count = clear_some_suggestions( $contributions, $clear_from_suggestions );
 
   require ACIS::Web::Contributions::Back;
 
