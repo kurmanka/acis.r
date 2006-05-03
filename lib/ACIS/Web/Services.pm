@@ -28,7 +28,7 @@ package ACIS::Web;   ### -*-perl-*-
 #  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 #
 #  ---
-#  $Id: Services.pm,v 2.9 2006/04/20 12:46:29 ivan Exp $
+#  $Id: Services.pm,v 2.10 2006/05/03 21:33:59 ivan Exp $
 #  ---
 
 use strict;
@@ -853,15 +853,22 @@ sub check_input_parameters {
   
   my $handler;
 
-  {
+  eval {
     my $include_path = ( $CGI::Untaint::VERSION < "1.23" )
         ? "ACIS/Web" 
         : "ACIS::Web::CGI::Untaint";
     debug "INCLUDE_PATH is $include_path";
     $handler = new CGI::Untaint ( {INCLUDE_PATH => $include_path},
                                   $form_input_copy );
+  };
+  if ( $@ ) {
+    debug "can't create CGI::Untaint handler";
+    die   "can't create CGI::Untaint handler: $@";
   }
+
   my $errors;
+
+  debug "screen has " . (scalar @$params) . " param(s) defined";
 
   foreach ( @$params ) {
     my $type     = $_ -> {type};
@@ -874,9 +881,16 @@ sub check_input_parameters {
 
     if ( defined $form_input -> {$name} ) {
 
-      my $orig_val =  $form_input -> {$name};
+      my $orig_val = $form_input -> {$name};
 
-      ### XXX $orig_val may be an ARRAY REF
+      ### $orig_val may be an ARRAY REF
+      if ( $orig_val and ref( $orig_val ) ) {
+        debug "multiple values for parameter '$name'... using the first one.";
+        $orig_val = $orig_val ->[0] || '';
+      }
+
+      ### make sure it is 
+      assert( not ref( $orig_val ) );
       
       debug "parameter '$name' with value '$orig_val'";
 

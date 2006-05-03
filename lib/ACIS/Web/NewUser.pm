@@ -27,7 +27,7 @@ package ACIS::Web::NewUser; ### -*-perl-*-
 #  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 #
 #  ---
-#  $Id: NewUser.pm,v 2.1 2006/04/20 12:48:25 ivan Exp $
+#  $Id: NewUser.pm,v 2.2 2006/05/03 21:33:59 ivan Exp $
 #  ---
 
 
@@ -64,13 +64,15 @@ sub initial_process {
   
   my $form_input = $app -> form_input;
   
-  debug "running new-user initial screen";
+  debug "processing new-user initial screen";
 
   my $abort;
 
   my $owner = {};
   my $login = $owner -> {login} = $form_input -> {email};
-  assert( $login );
+  assert( $login, 'no email address given' );
+  assert( $form_input -> {'first-name'}, 'no first name given' );
+  assert( $form_input -> {'last-name'} , 'no last name given'  );
 
   my $paths = $app -> update_paths_for_login( $login );
 
@@ -81,19 +83,22 @@ sub initial_process {
   }
 
 
-  if ( $app -> get_form_value ('pass') 
-       ne $app -> get_form_value ('pass-confirm') ) {
+  ### check password and password confirmation
+  if ( not $app -> get_form_value ('pass') 
+       or ( $app -> get_form_value ('pass') 
+            ne $app -> get_form_value ('pass-confirm') ) ) {
 
     $app -> form_invalid_value( 'pass' );
     $app -> form_invalid_value( 'pass-confirm' );
     $abort = 1;
   }
 
+
   {
     my ( $year, $month, $day );
-    $year  = $form_input -> {year};
-    $month = $form_input -> {month};
-    $day   = $form_input -> {day};
+    $year  = $form_input -> {year}  || die;
+    $month = $form_input -> {month} || die;
+    $day   = $form_input -> {day}   || die;
     my $bad;
 
     if ( $year > 2200  or $year < 1000 ) { 
