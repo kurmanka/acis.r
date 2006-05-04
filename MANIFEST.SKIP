@@ -53,3 +53,4 @@ LocalConfig\.pm$
 \.bak/
 /200[4567]\-
 ^doc/wp.archive
+\.shell$
