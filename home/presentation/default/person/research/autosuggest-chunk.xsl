@@ -373,10 +373,10 @@
              /></xsl:if
              ></input>
 
-            <i> &#x201C;I have no connection to the works not selected above.
-            Do not suggest these works to me in the
-            future.&#x201D;</i>  (They will be added to the <a
-            ref='@research/refused'>refused items</a> list.)
+            <i> &#x201C;I have no connection to the works <b>not selected</b> above.
+            Add these works to the <a ref='@research/refused' >refused list</a> and
+            do not suggest them to me in the
+            future.&#x201D;</i>
           </label>
         </p>
         

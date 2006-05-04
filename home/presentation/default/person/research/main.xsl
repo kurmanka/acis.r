@@ -490,6 +490,9 @@ for your works again.</small>
             
 <xsl:if test='$session-type = "user"'>
 
+            <li><a ref='@research/refused'
+            screen='research/refused'>refused items</a></li>
+
             <li><a ref='@research/autoupdate'
             screen='research/autoupdate'>automatic profile update
             preferences</a></li>
@@ -663,7 +666,23 @@ for your works again.</small>
 
   <tr>
     <td class='no' valign='top' align='right'>
-      <p><a ref='@research/autoupdate'>4</a></p>
+      <p><a ref='@research/refused'>4</a></p>
+    </td>
+    <td>
+      <h2><a ref='@research/refused'
+      class='item'
+      >REFUSED RESEARCH ITEMS</a></h2>
+
+      <p>These works are automatically excluded from the
+      search results, because you refused to claim them.</p>
+
+    </td>
+  </tr>
+
+
+  <tr>
+    <td class='no' valign='top' align='right'>
+      <p><a ref='@research/autoupdate'>5</a></p>
     </td>
     <td>
       <h2><a ref='@research/autoupdate'
@@ -675,6 +694,7 @@ for your works again.</small>
 
     </td>
   </tr>
+
 
 </xsl:if>
 
@@ -737,18 +757,6 @@ for your works again.</small>
       <xsl:text>&#160;</xsl:text>
     </hl>
 
-<!--
-    <hl screen='personal-research-accessible-scroll'>
-      <xsl:text>&#160;</xsl:text>
-      <a ref='@research/suggest/scroll' 
-      >suggest <small>1</small> by <small>1</small></a>
-      <xsl:text>&#160;</xsl:text>
-    </hl>
-
-    <xsl:text>
-</xsl:text>
-
--->
 
     <hl screen='research/search'>
       <xsl:text>&#160;</xsl:text>
@@ -759,11 +767,18 @@ for your works again.</small>
        
 <xsl:if test='$session-type = "user"'>
 
+    <hl screen='research/refused'>
+      <xsl:text>&#160;</xsl:text>
+      <a ref='@research/refused'>refused items</a>
+      <xsl:text>&#160;</xsl:text>
+    </hl>
+
     <hl screen='research/autoupdate'>
       <xsl:text>&#160;</xsl:text>
       <a ref='@research/autoupdate'>auto update</a>
       <xsl:text>&#160;</xsl:text>
     </hl>
+
 </xsl:if>
 
 </span>
@@ -777,97 +792,11 @@ for your works again.</small>
 
     
   </xsl:template>
+
 
 
   <xsl:template name='additional-page-navigation'>
     <xsl:call-template name='research-navigation'/>
-  </xsl:template>
-
-
-
-  <xsl:template name='research-navigation-bak'>
-
-    <xsl:call-template name='link-filter'>
-      <xsl:with-param name='content'>
-        
-        <xsl:text>
-        </xsl:text>
-    
-        <p class='menu submenu'>
-
-<span class='head'>
-<span class='here'>
-
-  <xsl:text>&#160;</xsl:text>
-
-<xsl:choose>
-  <xsl:when test='$current-screen-id = "research/main"'>
-
-      <b>Research:</b>
-
-  </xsl:when>
-  <xsl:otherwise>
-
-    <a ref='research/main'>Research:</a>
-
-  </xsl:otherwise>
-</xsl:choose>
-
-      <xsl:text>&#160;</xsl:text>
-</span>
-</span>
-
-    <hl screen='research/identified'>
-         <xsl:text>&#160;</xsl:text>
-         <a ref='@research/identified' 
-         >identified</a>
-         <xsl:text>&#160;</xsl:text>
-    </hl>
-
-    <hl screen='research/autosuggest'>
-      <xsl:text>&#160;</xsl:text>
-      <a ref='@research/autosuggest' 
-      >auto&#160;suggestions</a>
-      <xsl:text>&#160;</xsl:text>
-    </hl>
-
-<!--
-    <hl screen='personal-research-accessible-scroll'>
-      <xsl:text>&#160;</xsl:text>
-      <a ref='@research/suggest/scroll' 
-      >suggest <small>1</small> by <small>1</small></a>
-      <xsl:text>&#160;</xsl:text>
-    </hl>
-
-    <xsl:text>
-</xsl:text>
-
--->
-
-    <hl screen='research/search'>
-      <xsl:text>&#160;</xsl:text>
-      <a ref='@research/search' 
-      >manual search</a>
-      <xsl:text>&#160;</xsl:text>
-    </hl>
-       
-<xsl:if test='$session-type = "user"'>
-
-    <hl screen='research/autoupdate'>
-      <xsl:text>&#160;</xsl:text>
-      <a ref='@research/autoupdate'>auto update</a>
-      <xsl:text>&#160;</xsl:text>
-    </hl>
-</xsl:if>
-    
-    </p>
-
-<xsl:text> 
-</xsl:text>
-
-    </xsl:with-param></xsl:call-template>
-
-    
   </xsl:template>
 
 
