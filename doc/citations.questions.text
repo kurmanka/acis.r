@@ -1,71 +1,63 @@
 Questions on citations in ACIS
 ==============================
 
-$Id: citations.questions.text,v 2.4 2006/03/02 22:28:31 ivan Exp $
+$Id: citations.questions.text,v 2.5 2006/05/10 22:39:26 ivan Exp $
 
 
 ## 1. Input data format
 
-**1.1.** Thomas says:
-
-    <text ref="text">
-       <references>
-         <acis:orginialstring> text of citation </acis:originalstring>
-         <text ref="text2"/>
-       </references>
-
-       <reference>
-         <literal> unidentified citation </literal>
-       </reference>
-    </text>
-
-I suggest:
-
-    <text ref='text'>
-       <reference ref='text2'>
-         <literal> text of citation </literal>
-       </reference>
-
-       <reference>
-         <literal> unidentified citation </literal>
-       </reference>
-    </text>
-
-
 
 ## 2. Input data processing
-
-**2.1.** Citations will be picked up from the database by searching for the author
-names.  Can we safely limit the searchable citation string field in the
-database to 255 chars? (The MySQL indexed field limitation.)
-
-If not, what workaround can we apply? (cutting the citation into several
-searchable strings?)
-
 
 
 ## 3. User interface
 
-**3.1.** Some of the citations in the input data will be already identified.  I mean,
-that the citations data provider will have them identified automatically.
-Should we not offer these automatically identified citations to users for
-review and verification?  (I think: yes, we should.)
 
-**3.2.** Should we make the refused citations screen?  (I think: yes, we should;
-       and we should make the refused research screen.)
 
-**3.3.** Should we offer the verified, but not identified citations for the
-       user's review?
+**3.4.** The New citations found screen.  Is there a better way?
+
+
+**3.5.** Thomas (2006-03-17): 
+
+<blockquote><p>
+  "not mine work" should probably be "not my work". When
+  the user dose not press this but not add the paper to a
+  citiation of tihs paper, then it willl not be offered
+  either, will it?
+</p></blockquote>
+
+It will be considered verified (authorship acknowledged) and may be offered to
+the user on subsequent instances of this screen.
+
+
+**3.6.** Thomas (2006-03-27): Why will verification be appearning last? Should
+         it not appear first?  An email quote:
+
+<blockquote><pre>> >   "not mine work" should probably be "not my work". When
+> >   the user dose not press this but not add the paper to a
+> >   citiation of tihs paper, then it willl not be offered
+> >   either, will it? 
+>
+> It then may be suggested as a citation for subsequent documents.  And then it
+> will be offered for verification.
+
+  Why will verification be appearning last? Should it not appear first?
+</pre></blockquote>
+
+
+
+**3.7.** Thomas (2006-03-17): 
+
+<blockquote><p>
+  One thing is missing in our thoughts. When authors
+  A1 and A2 have been co-authors on a paper P, then
+  if author A1 identifies, it should be appearning
+  in the citations profile of author A2.
+</p></blockquote>
+
+Complicates some things, but we can do it.  (Via the suggestions table.)
 
 
 ## 4. Data output
-
-**4.1.** Should we (ACIS) generate citations data separately from the personal
-AMF files?  (I think: we should not.)
-
-**4.2.** Should we display the identified citations to the general public on the
-personal profile pages which ACIS generates?  Should it be an option of the
-profile holder?  If so, should we also list verified, but unidentified
-citations?  Should it be a user's option?
 
 
