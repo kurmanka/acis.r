@@ -25,11 +25,12 @@ package ACIS::Web::Contributions;  ### -*-perl-*-
 #  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 #
 #  ---
-#  $Id: Contributions.pm,v 2.14 2006/05/03 19:29:03 ivan Exp $
+#  $Id: Contributions.pm,v 2.15 2006/05/13 00:14:59 ivan Exp $
 #  ---
 
 use strict;
 
+use Carp qw( cluck );
 use Carp::Assert;
 
 use Web::App::Common;
@@ -565,6 +566,26 @@ sub accept_item {
   my $already_accepted = $contributions -> {'already-accepted'};
   my $action;
 
+  my $type = $item ->{type};
+
+  ### check role appropriateness for this type of object
+  eval { 
+    my $roles = $Conf -> {types} {$type} {roles};
+    my $ok;
+    foreach ( @$roles ) {
+      if ( $_ eq $role ) { $ok = 1; }
+    }
+    if ( not $ok ) {
+      cluck "Didn't find role $role among permitted roles for type $type";
+      debug "Didn't find role $role among permitted roles for type $type";
+    }
+  };
+
+  if ( $role eq 'editor' 
+       and $type eq 'chapter' ) {
+    warn  "chapter editor again!";
+    debug "chapter editor again!";
+  }
   
   if ( not exists $already_accepted ->{$id} ) {
     push @$accepted, $item;
@@ -781,7 +802,13 @@ sub process {
           next;
         }
         
+        my $type = $item ->{type};
         ### XXX ... should check role appropriateness for this type of object
+        if ( $role eq 'editor' 
+             and $type eq 'chapter' ) {
+          warn "chapter editor again!";
+          debug "chapter editor again!";
+        }
 
         $item -> {role} = $role;
         my $sid = $item ->{sid};
