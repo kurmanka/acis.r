@@ -25,7 +25,7 @@ package ACIS::Web::Admin;   ### -*-perl-*-
 #  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 #
 #  ---
-#  $Id: Admin.pm,v 2.8 2006/04/15 12:27:55 ivan Exp $
+#  $Id: Admin.pm,v 2.9 2006/05/15 18:17:49 ivan Exp $
 #  ---
 
 
@@ -1123,10 +1123,11 @@ sub refresh_test {
 
 sub adm_get {
   my $app = shift;
-  my $request = $app -> {request} {subscreen};
+  my $request = $app -> {request} {subscreen} || '';
   my $input = $app->form_input;
 
-  if ( $request =~ m!^(\w+)/(.+?)(/(rec|record|hist|history|ardb))?$! ) {
+  if ( $request 
+       and $request =~ m!^(\w+)/(.+?)(/(rec|record|hist|history|ardb))?$! ) {
     my $col = $1;
     my $id  = $2;
     my $op  = $4 || '';
