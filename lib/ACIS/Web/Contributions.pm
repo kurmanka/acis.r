@@ -25,7 +25,7 @@ package ACIS::Web::Contributions;  ### -*-perl-*-
 #  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 #
 #  ---
-#  $Id: Contributions.pm,v 2.16 2006/05/15 09:20:34 ivan Exp $
+#  $Id: Contributions.pm,v 2.17 2006/05/15 13:06:09 ivan Exp $
 #  ---
 
 use strict;
@@ -569,7 +569,7 @@ sub accept_item {
   eval { 
     if ( not $Conf
          or not $Conf->{types} 
-         or not $Conf->{types} {$types} ) {
+         or not $Conf->{types} {$type} ) {
       undef $Conf;
       $Conf = get_configuration( $acis );
     }
