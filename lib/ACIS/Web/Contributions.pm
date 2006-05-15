@@ -25,7 +25,7 @@ package ACIS::Web::Contributions;  ### -*-perl-*-
 #  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 #
 #  ---
-#  $Id: Contributions.pm,v 2.15 2006/05/13 00:14:59 ivan Exp $
+#  $Id: Contributions.pm,v 2.16 2006/05/15 09:20:34 ivan Exp $
 #  ---
 
 use strict;
@@ -100,13 +100,10 @@ sub get_configuration {
   $Conf ->{roles}      = $roles;
   $Conf ->{roles_list} = \@roles;
 
-
   ### XXX in place-test
   assert( $roles ->{author} );
   assert( $roles ->{editor} );
   assert( ref $roles ->{editor} );
-  assert( scalar ( @{ $roles ->{editor} } ) > 1 );
-
 
   $app -> variables ->{'contributions-config-file'} = $file;
 
@@ -570,6 +567,12 @@ sub accept_item {
 
   ### check role appropriateness for this type of object
   eval { 
+    if ( not $Conf
+         or not $Conf->{types} 
+         or not $Conf->{types} {$types} ) {
+      undef $Conf;
+      $Conf = get_configuration( $acis );
+    }
     my $roles = $Conf -> {types} {$type} {roles};
     my $ok;
     foreach ( @$roles ) {
