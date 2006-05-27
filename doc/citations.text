@@ -1,6 +1,9 @@
 Citations in ACIS
 =================
 
+<p><i>a work in progress</i></p>
+
+
 <toc/>
 
 ## Introduction
@@ -64,7 +67,7 @@ data is transfered is out of the scope of our concern.)  It
 is then processed by ACIS.  Service administrator will have
 to get things <a href='#input-configuration' >configured</a>
 for this.
-
+    
 Then ACIS starts <a href='#user-interface'>offering</a>
 citations to its users and they create their own citations
 profiles.  This means they identify citations as pointing to
@@ -77,6 +80,10 @@ and is <a href='#data-output' >included</a> into the
 personal data that ACIS exports.
 
 
+In this document we first describe the user interface, then
+the data formats, then the administrator's configuration
+parameters.  Technical implementation details are probably
+interesting to only a few and, therefore, they come last.
 
 
 <h2 id='user-interface'>Citations profile: user interface</h2>
