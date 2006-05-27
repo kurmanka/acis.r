@@ -1,9 +1,6 @@
 Citations in ACIS
 =================
 
-Sections marked "Technical:" hold the implementation
-issues, not functional requirements.
-
 <toc/>
 
 ## Introduction
@@ -42,135 +39,47 @@ form, we will provide a service to the community.  And make
 ACIS software more useful.
 
 
-### Two-level approach
-
-First level: autonomous citation indexing.  Citations get
-parsed, extracted and indexed with an automated reference
-and citation parsing system.  That happens outside ACIS, by
+Therefore, we follow a two-level approach.  First level:
+autonomous citation indexing.  Citations get parsed,
+extracted and indexed with an automated reference and
+citation parsing system.  That happens outside ACIS, by
 systems like CiteSeer.
 
 Second level, in ACIS: human users review, validate and
 filter the data.
 
 
-## Citations data input
+### Workflow overview
 
-Data comes from automatic reference and citation parsing
-systems.  Examples: CiteEc, CiteSeer.
+In simple words, this is what happens and what we do with
+citations.  Citation indexing service processes the same set
+of data on which an ACIS service is running.  It parses the
+document bodies and finds citations and tries to identify,
+which citations point to which documents.  It then encodes
+the data in the specified <a href='#data-input'>input
+format</a>.
 
-For ACIS to process and use citation data, the data must be
-encoded in the <a href='http://amf.openlib.org/'>Academic
-Metadata Format</a>, structured this way:
+The data is then supplied to the ACIS service.  (How the
+data is transfered is out of the scope of our concern.)  It
+is then processed by ACIS.  Service administrator will have
+to get things <a href='#input-configuration' >configured</a>
+for this.
 
-    <amf ...>
+Then ACIS starts <a href='#user-interface'>offering</a>
+citations to its users and they create their own citations
+profiles.  This means they identify citations as pointing to
+their own certain documents.  They reject some citations
+which are not relevant for them.  At this stage ACIS
+software tries hard to be helpful and make the process easy.
 
-      <text ref="id1">
-        <reference>
-          <literal> text of citation </literal>
-        </reference>
-        <reference>
-          <literal> another citation </literal>
-        </reference>
-        ...
-      </text>
-
-      <text ref="id2">
-        ....
-      </text>
-
-      ...
-
-    </amf>
-
-Document identifiers in the above example (see <c>ref</c>
-attributes of <c>text</c> elements) refer to bibliographical
-data records, which should be already known to ACIS.  That
-is: the citation data should come as a supplement to a
-bibliographical dataset.
-
-
-Two kinds of citations are expected in the input data (this
-is not yet shown in the example above):
-
-- identified;
-- unidentified.
-
-*Identified* are the citations, which have an autonomously
-identified citation target.  That is, the software on
-citations data provider side has found that such a citation
-is pointing to a particular document in the same set of
-documents and the data includes the identifier of that cited
-document.
-
-Therefore, the *unidentified* citations are those, which
-point to an unknown document, which may be present in the
-document database of ACIS and may not be present.
+As a result of this interaction, citations data is generated
+and is <a href='#data-output' >included</a> into the
+personal data that ACIS exports.
 
 
 
-### Configuration
 
-Citation data can be "fed" to an ACIS service in the form of 
-a collection of metadata files.  
-
-That means you should configure a new <a
-ref='collection'>metadata collection</a> via the
-<c>metadata-collections</c> parameter.  To make ACIS aware,
-that it should expect **citation** data in it, set the
-collection's type (<c>metadata-X-type</c> parameter) to
-"CitationsAMF".
-
-It may look like this:
-
-    metadata-collections='RePEc CitEc'
-    metadata-RePEc-home=/data/RePEc/amf
-    metadata-RePEc-type=AMF
-    metadata-CitEc-home=/data/CitEc/amf
-    metadata-CitEc-type=CitationsAMF
-
-The data files **must have <c>.amf.xml</c> name extension**
-to be processed by ACIS.
-
-
-### Technical: processing the citations data
-
-*The data processing flow.*  RePEc::Index and
-RePEc::Index::Collections::CitationsAMF to
-ACIS::Citations::Input via the collection's proc parameter.
-
-Citations table structure (the fields):
-
-- document id
-- normalized searchable citation string 
-- full original citation text 
-- refers to doc id
-
-SQL create statement:
-
-    CREATE TABLE $acisdb.citations ( 
-           docid   CHAR(255),
-           nstring CHAR(255), 
-           ostring TEXT,
-           citdocid CHAR(255) );
-
-*TODO:* add this table to the <a href='db.html'>Database
-tables</a> document.
-
-*Citation string normalization:* Put it through Unicode
-decomposition, convert letters to upper case, add a space
-after each dot and each comma, remove spaces after a dot if
-a comma follows it, compact all whitespace, remove leading
-and trailing whitespace.
-
-*Searchable citations string part -- cutting out the editors
-part.* *(Configuration; possibly through a perl function.)*
-The regular expression:
-
-    s/\b((I|i)n\W.+?\Wed\..*)$//
-
-*(Requires testing.)*
-
-## Citations profile
+<h2 id='user-interface'>Citations profile: user interface</h2>
 
 Citations profile is a part of the ACIS web interface, where
 the users will deal with citations.  The users will:
@@ -304,7 +213,107 @@ be called by the user himself.
 
 
 
-### Configuration
+
+
+<h2 id='data-input'>Citations data input</h2>
+
+Data comes from automatic reference and citation parsing
+systems.  Examples: CiteEc, CiteSeer.
+
+For ACIS to process and use citation data, the data must be
+encoded in the <a href='http://amf.openlib.org/'>Academic
+Metadata Format</a>, structured this way:
+
+    <amf ...>
+
+      <text ref="id1">
+        <reference>
+          <literal> text of citation </literal>
+        </reference>
+        <reference>
+          <literal> another citation </literal>
+        </reference>
+        ...
+      </text>
+
+      <text ref="id2">
+        ....
+      </text>
+
+      ...
+
+    </amf>
+
+Document identifiers in the above example (see <c>ref</c>
+attributes of <c>text</c> elements) refer to bibliographical
+data records, which should be already known to ACIS.  That
+is: the citation data should come as a supplement to a
+bibliographical dataset.
+
+
+Two kinds of citations are expected in the input data (this
+is not yet shown in the example above):
+
+- identified;
+- unidentified.
+
+*Identified* are the citations, which have an autonomously
+identified citation target.  That is, the software on
+citations data provider side has found that such a citation
+is pointing to a particular document in the same set of
+documents and the data includes the identifier of that cited
+document.
+
+Therefore, the *unidentified* citations are those, which
+point to an unknown document, which may be present in the
+document database of ACIS and may not be present.
+
+
+
+
+<h2 id='data-output'>Citations data output</h2>
+
+*Structure and format.*
+
+*Also, probably, this section should cover display of the
+identified citations to the general public on the personal
+profile pages, that ACIS generates.*
+
+
+
+
+
+## Administration and configuration
+
+
+
+<h3 id='input-configuration'>Input data</h3>
+
+Citation data can be "fed" to an ACIS service in the form of 
+a collection of metadata files.  
+
+That means you should configure a new <a
+ref='collection'>metadata collection</a> via the
+<c>metadata-collections</c> parameter.  To make ACIS aware,
+that it should expect **citation** data in it, set the
+collection's type (<c>metadata-X-type</c> parameter) to
+"CitationsAMF".
+
+It may look like this:
+
+    metadata-collections='RePEc CitEc'
+    metadata-RePEc-home=/data/RePEc/amf
+    metadata-RePEc-type=AMF
+    metadata-CitEc-home=/data/CitEc/amf
+    metadata-CitEc-type=CitationsAMF
+
+The data files **must have <c>.amf.xml</c> name extension**
+to be processed by ACIS.
+
+
+
+
+### Citations screens
 
 
 The citations profile is enabled and configured via the
@@ -348,7 +357,51 @@ similarity assessment algorithm</a>.</p>
 
 
 
-### Technical: search for citations
+## Technical implementation details 
+
+
+### Processing the citations data
+
+*The data processing flow.*  RePEc::Index and
+RePEc::Index::Collections::CitationsAMF to
+ACIS::Citations::Input via the collection's proc parameter.
+
+Citations table structure (the fields):
+
+- document id
+- normalized searchable citation string 
+- full original citation text 
+- refers to doc id
+
+SQL create statement:
+
+    CREATE TABLE $acisdb.citations ( 
+           docid   CHAR(255),
+           nstring CHAR(255), 
+           ostring TEXT,
+           citdocid CHAR(255) );
+
+*TODO:* add this table to the <a href='db.html'>Database
+tables</a> document.
+
+*Citation string normalization:* Put it through Unicode
+decomposition, convert letters to upper case, add a space
+after each dot and each comma, remove spaces after a dot if
+a comma follows it, compact all whitespace, remove leading
+and trailing whitespace.
+
+*Searchable citations string part -- cutting out the editors
+part.* *(Configuration; possibly through a perl function.)*
+The regular expression:
+
+    s/\b((I|i)n\W.+?\Wed\..*)$//
+
+*(Requires testing.)*
+
+
+
+
+### Search for citations
 
 *Background and foreground search.  Connection with ARPU.*
 
@@ -372,7 +425,7 @@ table in this case?
 
 
 
-### Technical: citation to research items similarity 
+### Citation to research items similarity 
 
 
 <h4 id='similarity-pi'>Similarity assessment function interface</h4>
@@ -461,7 +514,7 @@ Get the comparison result as a number between 0 and 1.
 
 
 
-### Technical: userdata structure
+### Userdata structure
 
 *Citations branch:*
 
@@ -471,15 +524,6 @@ Get the comparison result as a number between 0 and 1.
 
  - unidentified
 
-
-
-## Citations data output
-
-*Structure and format.*
-
-*Also, probably, this section should cover display of the
-identified citations to the general public on the personal
-profile pages, that ACIS generates.*
 
 
 
