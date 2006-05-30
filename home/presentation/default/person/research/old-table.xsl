@@ -61,46 +61,20 @@
         </xsl:if>
         <td class='checkbutton' width='6%' valign='top' >
 
-          <span class='checkbutton'>
-
-<!--
-            <xsl:text>
-            </xsl:text>
--->
-
-            <input type='checkbox' 
-                   name='add_{$sid}' id='add_{$sid}' 
-                   onblur_after='item_checkbox_blur("row_{$sid}",this);'
-                   onfocus_after='if(item_label_click){{this.blur();}};item_label_click=false;'
-                   value='1'>
-              <xsl:if test='$checked = "true"'>
-                <xsl:attribute name='checked'/>
-              </xsl:if>
-              <xsl:if test='contains( $user-agent, "Gecko/" )'>
-                <xsl:attribute name='onchange'>item_checkbox_changed("row_<xsl:value-of select='$sid'/>",this);</xsl:attribute>
-                <xsl:attribute name='onblur_after'/>
-              </xsl:if>
-            </input>
+          <input type='checkbox' name='add_{$sid}' id='add_{$sid}' 
+                 value='1'>
+            <xsl:if test='$checked = "true"'>
+              <xsl:attribute name='checked'/>
+            </xsl:if>
+          </input>
             
-
-          </span>
-
-<!--            
-            <xsl:text>&#160;</xsl:text>
-            <label for='add_{$sid}'
-                   title='select for adding the item'
-                   onclick='item_label_click=true;'>
-              <small class='checkBoxLabel' >Add</small>
-            </label>
--->
-            
-            <xsl:text>
-            </xsl:text>
+          <xsl:text>
+          </xsl:text>
       
-            <input type='hidden' name='id_{$sid}' value='{$id}'/>
+          <input type='hidden' name='id_{$sid}' value='{$id}'/>
 
-            <xsl:text>
-            </xsl:text>
+          <xsl:text>
+          </xsl:text>
 
         </td>
 
@@ -115,10 +89,7 @@
           <xsl:call-template name='present-resource'>
             <xsl:with-param name='resource' select='.'/>
             <xsl:with-param name='for' select='concat( "add_", $sid )' />
-            <xsl:with-param name='label-onclick'
-                            >item_label_click=true;</xsl:with-param>
           </xsl:call-template>
-
           <br />
 
       <xsl:text>

@@ -1,6 +1,6 @@
 /* THE MAIN ACIS CSS STYLESHEET */
 
-/* $Id: main.css,v 2.7 2006/04/26 23:41:17 ivan Exp $ */
+/* $Id: main.css,v 2.8 2006/05/30 13:27:52 ivan Exp $ */
 
 body { 
  margin: 0;
@@ -44,8 +44,12 @@ input, textarea, select {
 input.inputcheckbox,
 input.inputradio { 
  margin: 1px 2px 1px 0; 
+ height: 1.4em;
+ width:  1.4em;
 /* vertical-align: baseline; */
 }
+
+
 
 label {
   cursor: pointer;
@@ -411,11 +415,12 @@ table.resources {
   padding-bottom: 1.4em; }
 
 .resources tr td.description { margin-left: 0px;  }
-.resources tr td.checkbutton { text-align: center; 
+.resources tr td.checkbutton {
+     text-align: center; 
      margin-right: 0px;
      padding-top: 10px; 
      line-height: 145%;
-     }
+}
 
 
 
@@ -448,24 +453,8 @@ ol.questionChoices {
 
 
 td.checkbutton { 
- text-align: center;
+  text-align: center;
 }
-
-td.checkbutton span { 
-  padding: 0px 4px 3px 3px; 
-  margin: 0;
-  border: 0;
-}
-
-td.checkbutton span input.inputcheckbox { 
-  margin: 1px; 
-  margin-top: 0;
-  padding: 0;
-  border: 0;
-  vertical-align: middle;
-}
-
-.select td.checkbutton span { background: #999; }
 
 
 .checkBoxLabel {

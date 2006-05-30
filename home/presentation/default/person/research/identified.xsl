@@ -38,26 +38,14 @@
         
         <td class='checkbutton' width='6%' valign='top'>
           
-          <span class='checkbutton'>
+          <xsl:if test='string-length( $role )' xml:space='default'>
 
-            <xsl:if test='string-length( $role )' xml:space='default'>
+            <input type='checkbox' name='remove_{$sid}' id='remove_{$sid}' 
+                   value='1'/>
 
-              <input type='checkbox' name='remove_{$sid}' id='remove_{$sid}' 
-                     onblur_after='item_checkbox_blur("row_{$sid}",this);'
-                   onfocus_after='if(item_label_click){{this.blur();}};item_label_click=false;'
-                     value='1'>
-                <xsl:if test='contains( $user-agent, "Gecko/" )'>
-                  <xsl:attribute name='onchange'>item_checkbox_changed("row_<xsl:value-of select='$sid'/>",this);</xsl:attribute>
-                  <xsl:attribute name='onblur_after'/>
-                </xsl:if>
-              </input>
-
-              <xsl:text>
-              </xsl:text>
-
-            </xsl:if>
+            <xsl:text>
+            </xsl:text>
             <input type='hidden' name='id_{$sid}' value='{$id}'/>
-          </span>
 
 
         <xsl:variable name="config-this-type" 
@@ -107,8 +95,6 @@
           <xsl:call-template name='present-resource' xml:space='default'>
             <xsl:with-param name='resource' select='.'/>
             <xsl:with-param name='for' select='concat( "remove_", $sid )' />
-            <xsl:with-param name='label-onclick'
-                            >item_label_click=true;</xsl:with-param>
           </xsl:call-template>
 
     </td>

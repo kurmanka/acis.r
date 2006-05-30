@@ -29,3 +29,11 @@ div.content form div.page ul,
  { font-size: 100%; }
 
 div.content form div.page p.explanation { font-size: 80%; }
+
+
+
+input.inputcheckbox,
+input.inputradio { 
+ height: 1.6em;
+ width:  1.6em;
+}
