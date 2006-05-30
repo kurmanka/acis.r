@@ -38,10 +38,8 @@
         
         <td class='checkbutton' width='6%' valign='top'>
           
-          <xsl:if test='string-length( $role )' xml:space='default'>
-
             <input type='checkbox' name='remove_{$sid}' id='remove_{$sid}' 
-                   value='1'/>
+                   value='1' />
 
             <xsl:text>
             </xsl:text>
