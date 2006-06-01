@@ -9,7 +9,7 @@ package ACIS::EPrints::MetadataExport::ReDIF; # -*-perl-*-
 #    internal eprint objects.
 #
 #
-#  Copyright (C) 2005 Ivan Kurmanov for ACIS project, http://acis.openlib.org/
+#  Copyright (C) 2006 Ivan Kurmanov for ACIS project, http://acis.openlib.org/
 #
 #
 #  This program is free software; you can redistribute it and/or modify
@@ -26,7 +26,7 @@ package ACIS::EPrints::MetadataExport::ReDIF; # -*-perl-*-
 #  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 #
 #  ---
-#  $Id: ReDIF.pm,v 2.1 2006/05/31 22:13:16 ivan Exp $
+#  $Id: ReDIF.pm,v 2.2 2006/06/01 13:15:25 ivan Exp $
 #  ---
 
 
@@ -179,7 +179,7 @@ sub get_redif_from_eprint {
 
   if ( not $templatetype ) { $templatetype = 'Paper'; }
   
-  attr 'template-type', $templattype;
+  attr 'template-type', "ReDIF-$templatetype 1.0";
   transf "title";
   transf "abstract";
 
@@ -334,4 +334,45 @@ sub resolve_sid ($) {
 
 
 __END__
+
+
+EPrints eprint types:
+
+Article
+
+    An article in a journal, magazine, newspaper. Not necessarily
+    peer-reviewed. May be an electronic-only medium, such as an online journal
+    or news website.
+
+Book Section
+
+    A chapter or section in a book.
+
+Monograph
+
+    A monograph. This may be a technical report, project report,
+    documentation, manual, working paper or discussion paper.
+
+Conference or Workshop Item
+
+    A paper, poster, speech, lecture or presentation given at a conference,
+    workshop or other event. If the conference item has been published in a
+    journal or book then please use "Book Section" or "Article" instead.
+
+Book
+
+    A book or a conference volume.
+
+Thesis
+
+    A thesis or dissertation.
+
+Patent
+
+    A published patent. Do not include as yet unpublished patent applications.
+
+Other
+
+    Something within the scope of the repository, but not covered by the other
+    categories.
 
