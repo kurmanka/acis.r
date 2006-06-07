@@ -26,7 +26,7 @@ package ACIS::EPrints::MetadataExport::ReDIF; # -*-perl-*-
 #  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 #
 #  ---
-#  $Id: ReDIF.pm,v 2.2 2006/06/01 13:15:25 ivan Exp $
+#  $Id: ReDIF.pm,v 2.3 2006/06/07 07:36:59 ivan Exp $
 #  ---
 
 
@@ -223,6 +223,12 @@ sub export_metadata_real {
   if ( not $dir ) { return; }
   logit "dir: $dir";
 
+  my $idfunc = $archive 
+     -> get_conf( "eprint_metadata_export_ReDIF_id_func" ) || '';
+
+  my $filefunc = $archive 
+     -> get_conf( "eprint_metadata_export_ReDIF_filename_func" ) || '';
+
   my $prefix = $archive 
      -> get_conf( "eprint_metadata_export_ReDIF_idprefix" ) || '';
  
@@ -232,11 +238,23 @@ sub export_metadata_real {
   if ( not -d $dir ) { mkdir $dir; }
   if ( not -d $dir ) { logit "can't create dir $dir"; return 0; } 
 
-  my $filename = $dir . "/" . $id . ".rdf";
-  
+
+  my $handle;
+  if ( $idfunc ) {
+    $handle = &{ $idfunc }( $eprint );
+  } else {
+    $handle = "$prefix$id";
+  }
+
+  my $file = $id;
+  if ( $filefunc ) {
+    $file = &{ $filefunc }( $eprint, $handle );
+  }
+  my $filename = $dir . "/" . $file . ".rdf";
+
   
   ### get ReDIF from $eprint
-  my $text = get_redif_from_eprint( $eprint, "$prefix$id" );
+  my $text = get_redif_from_eprint( $eprint, $handle );
 
   ### save it
   if ( open FILE, ">:utf8", $filename ) {
