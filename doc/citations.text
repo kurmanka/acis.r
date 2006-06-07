@@ -3,7 +3,8 @@ Citations in ACIS
 
 
 <p>
-<i>a work in progress</i>
+<i>a work in progress</i> -- <a
+href='http://acis.openlib.org/software/doc/citations.text'>document source</a>
 </p>
 
 
@@ -192,25 +193,30 @@ of the new citations, i.e. for which the similarity is
 higher than a certain threshold, will have the box checked
 by default.
 
-If the user presses the SUBMIT FORM button, all checked
-citations will be identified as pointing to that document.
-They will no longer be suggested for identification to other
-documents.
+The "Not my work" button removes a citation from the pool of
+potential citations for all the documents, and puts it into the
+refused citations list.
 
-When there is at least one other document with new citations
-for it, we show a checkbox near the submit button, labeled
-"Show next document with new citations".  This checkbox will
-be checked by default if the current page offers any new
-citations.  If the checkbox is checked when the form is
-submitted, we process the user's choices and then redirect
-her to the next <a href='#most-interesting-doc'>most
-interesting document</a>.
+If the user presses the SUBMIT FORM button, all checked citations
+will be identified as pointing to that document.  They will no
+longer be suggested for identification to other documents.
+
+When there is at least one other document with new citations for
+it, we show a checkbox near the submit button, labeled "Show next
+document with new citations".  This checkbox will be checked by
+default if the current page offers any new citations.  If the
+checkbox is checked when the form is submitted, we process the
+user's choices and then redirect her to the next <a
+href='#most-interesting-doc'>most interesting document</a>.
 
 
 If the user has no potential citations at all, we will show
 a message saying: 
 
     We have no citations to suggest for this document at this time.
+
+
+<!--
 
 Here is an older illustration of what now has become the
 *potential* tab:
@@ -219,7 +225,7 @@ Here is an older illustration of what now has become the
 <img class='snap'
 src='img/citations/profile-page-overview.png'/>
 </p>
-
+-->
 
 
 
@@ -344,7 +350,7 @@ realise such abuse has taken place.
 <h2 id='data-input'>Citations data input</h2>
 
 Data comes from automatic reference and citation parsing
-systems.  Examples: CiteEc, CiteSeer.
+systems.  Examples: CitEc, CiteSeer.
 
 For ACIS to process and use citation data, the data must be
 encoded in the <a href='http://amf.openlib.org/'>Academic
@@ -654,7 +660,7 @@ Get the comparison result as a number between 0 and 1.
 
 
 <id>
-$Id: citations.text,v 2.17 2006/06/07 10:02:20 ivan Exp $
+$Id: citations.text,v 2.18 2006/06/07 10:35:21 ivan Exp $
 </id>
 
 
