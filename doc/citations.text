@@ -5,6 +5,7 @@ Citations in ACIS
 <p>
 <i>a work in progress</i> -- <a
 href='http://acis.openlib.org/software/doc/citations.text'>document source</a>
+in Markdown format
 </p>
 
 
@@ -320,7 +321,8 @@ once per user session to avoid confusion.
 
 <h2 id='auto-update'>Automatic citation profile update</h2>
 
-
+Similar to the automatic research profile update, there are cases when we may
+alter the citations profile for our users automatically.
 
 ### Co-authorship and citations claim
 
@@ -590,6 +592,7 @@ NORCITSTR is the normalized citation string.</p>
 <pre><code>{ title   => TITLE,
   authors => [ AUTHOR1NAME, AUTHOR2NAME, ... ],
   type    => TYPE,
+  location => LOCATION
 }</code></pre>
 
 <p>Here TITLE is the work's title (a string), AUTHOR1NAME,
@@ -597,6 +600,11 @@ AUTHOR2NAME and so on are the names of the authors
 (strings), and TYPE is one of "article", "paper", "book",
 "software", "chapter", "text" (when no particular type is
 known).</p>
+
+<p>LOCATION is a string built by joining the following items: the series or
+journal name, the paper's number in the series (if it is present), the
+issue/volume/pages.  For AMF we can take all the adjectives of the serial
+adjective container.</p>
 
 </dd></dl>
 
@@ -609,7 +617,17 @@ similarity assessment algorithm</h4>
 
 For the given document and the given citation:
 
-1. Compare titles.  Take the normalized citation string and take the normalized
+1. Look at the author names first. Split the names of the authors of the
+   document into a list of words, stripping all non-letter non-whitespace
+   characters and then stripping single letters from it. We then will search
+   for approximate matches for each of these words in the citation string. If
+   there is no such match, the similarity measure returned is zero. Otherwise,
+   it is an "author pass".
+
+   If the document is an author pass, it will be ranked accounding to the
+   string similarity of the title only.
+
+2. Compare titles.  Take the normalized citation string and take the normalized
    title of the research item.  Find where in the citation
    string the first word of the title is present.
 
@@ -617,15 +635,16 @@ For the given document and the given citation:
    are in the title and compare them to the work's title
    (with [String::Similarity](http://search.cpan.org/perdoc?String::Similarity)).
 
-   (Alternatively,  find where  in the  citation  string the
-   last word  of the title  is present and take  a substring
-   from start to end.  Compare in the same way.)
+   (Alternatively, find where in the citation string the last word of the
+   title is present and take a substring from start to end.  Compare in the
+   same way.)
+
+<!--
 
 2. Check if the first author's name is present in the citation
 
 3. Check if the other authors' names are present in the citation
 
-<!-- 
 4. Check the publication year of the document, is it present
    in the citation?
 
@@ -644,6 +663,16 @@ Get the comparison result as a number between 0 and 1.
 
 <h4>Citation-document similarity matrix</h4>
 
+We can put this into a separate table.  
+
+    citation | source | doc sid | similarity 
+
+or, maybe,
+
+    citation | source | doc sid | similarity | personal sid
+
+ - should we use citation numbers instead of strings?  (Or is it premature
+   optimization?)
 
 
 ### Userdata structure
@@ -660,7 +689,7 @@ Get the comparison result as a number between 0 and 1.
 
 
 <id>
-$Id: citations.text,v 2.18 2006/06/07 10:35:21 ivan Exp $
+$Id: citations.text,v 2.19 2006/06/07 21:32:26 ivan Exp $
 </id>
 
 

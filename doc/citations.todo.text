@@ -1,103 +1,43 @@
 # ACIS Citations TO DO List
 
-
-Write into [citations.html](citations.html):
-
-  - the new citations found screen: similarity, interesting
-    documents, ordering
-
-     - what exactly happens when user clicks [not mine work]
-       button?
-
-  - search: offline and online
-
-     - can't we simply agree that we will not do online search?
-
-  - identified citations screen (a list of documents + a
-    number of citations identified, clickable; then: a
-    document and a list of citations, editable; after
-    removal a citation returns to the unidentified list;
-    should we display [not mine work] button there also?)
-
-  - refused citations screen (just a list of citations, editable)
-
-  - data output format
+2006-06-08 00:32
 
 
-Research:
+TBSIFD = To be specified in further detail
 
-- record all the appearing questions into
-  [citations.questions.html](citations.questions.html)
 
-- citations profile screen
-    
-  - design the screens of the main procedure for
-    verification and identification
-    
-      - the HTML prototype of the page:
+### discuss 
 
-         - make citations table with altering color of rows?
+  - co-authorship claims
 
-         - take the rows in the citations table a bit apart vertically?
+     - what if author A rejects (refuses) citation C, should
+       we automatically refuse the citation for author B?  Should we notify her about it?
 
-         - make citations clickable switches for the
-           checkboxes (label element)?
+     - or should we offer the citation to the author B, but not pre-selected?
 
-  - design the identified citations screen
+### [citations.html](citations.html)
 
-  - design the refused citations screen (and, for a company,
-    refused research sub-screen)
+ - mainly copy from the Moscow meeting notes:
 
-- can we safely limit the searchable citation string field
-  in the database to 255 chars?  (MySQL indexed field
-  limitation)
+    - data formats: input and output
 
-  - If not, what workaround can we apply? (cutting the
-    citation into several searchable strings?)
+ - write based on discussion
 
-- citation to research-item similarity assessment algorithm
-  (depends on having sample citation data)
+    - co-authorship claims and automatic citation profile update
 
-  - How do we get volume / issue / page data for the article
-    documents, if available, to use it for matching to
-    citations?
 
-     - RI database?
+### Research:
 
-     - add these fields to the document table?
-
-     - (this should work as well for AMF as for ReDIF)
-
-- removing edited (collected) works data from the searchable
-  citations
-
-   - one way to do it is to configure a function, which will
-     accept a citation string on input, decide what to do
-     with it and will return the searchable citation string
-     on output
-
-- offline citations search for every personal profile in
-  the service 
-
-   - via arpu
-
+  - finding co-authors of the user on document D
+   
 Specify
-
- - input data format and requirements
-
- - configuration parameters
 
  - userdata structures for citations
 
  - the citations table structure
 
-Specification
 
-  - write all the above and everything else down into [citations.html](citations.html)
-
-  - negotiate, fix and get it approved by Thomas
-
-Configuration Parameters
+### Configuration Parameters
 
   - citations-profile  (logical, on or off)
 
@@ -107,11 +47,23 @@ Configuration Parameters
 
   - ...
 
-Database tables
+### Database tables
 
-  - citations table
+  - add citations table
 
-Implement citations processing
+  - change documents table (resources)
+
+    - add location field (LOCATION is a string built by
+      joining the following items: the series or journal
+      name, the paper's number in the series (if it is
+      present), the issue/volume/pages.  For AMF we can take
+      all the adjectives of the serial adjective container.)
+
+  - matrix?  - TBS
+
+  - citations_actions? - TBS
+
+### Implement citations input processing
 
   - ACIS::Citations::Input (RePEc::Index collection's proc
     interface, like ARDB::RI)
@@ -120,30 +72,89 @@ Implement citations processing
 
     - citation string normalization and cutting the editors part
 
-  - citations search for a personal record (by the name variations)
+### Citations search for a personal record 
 
-  - saving and restoring citations from the suggestions table
+  - the search itself (by the name variations)
 
-  - string similarity assessment algorithm 
+  - saving found citations to the suggestions table, also
+    loading from it
 
-  - citations data output in the personal AMF records (presenter
-    export/amf-person.xsl)
+  - similarity matrix - TBSIFD, but see citations.html
 
-Implement citation profile screen
+      - building
+
+      - saving 
+
+      - restoring
+
+      - updating
+
+  - default citation-to-document similarity assessment algorithm 
+
+
+### Implement citation profile screens
+
+  - screens.xml
+
+     - citations
+
+     - citations/identified
+
+     - citations/potential
+
+     - citations/autosug
+
+     - citations/refused
+
+     - citations/doclist
+
+     - citations/potential/old
+
+     - citations/potential/old/xml
+
+     - citations/refuse
+
+     - citations/refuse/xml
 
   - presenters in presentation/default/
 
      - citations/main.xsl
 
-     - citations/browse.xsl
+     - citations/identified.xsl
 
-     - citations/searching.xsl
+     - citations/potential.xsl
 
-     - ...
+     - citations/refused.xsl
 
-  - module lib/ACIS/Web/Citations.pm
+     - citations/doclist.xsl
+
+     - citations/overview.xsl
+
+     - citations/notmywork.xsl
+
+     - citations/nothingnew.xsl
+
+     - add javascript 
+
+         - to the potential tab for showing old citations
+
+         - to the potential tab for [not my work] button
+
+         - to the refused citation screen - probably not?
+
+
+     - citations data output in the personal AMF records
+       (presenter export/amf-person.xsl)
+
+     - change global profile menu, but make it depending on
+       the configuration variables
+
+
+  - module lib/ACIS/Web/Citations.pm - TBSIFD
 
      - prepare for work
+
+     - load citation data
 
      - display currently verified and identified citations
 
@@ -151,8 +162,24 @@ Implement citation profile screen
 
      - check all citations to see if they are still in the database
 
-     - ...
 
-Test and fix
+### Automatic citations profile update
 
-Bring documentation up to date
+  - add it to the ARPU
+
+  - finding co-authors (should we delay this or make it a separate process?)
+
+  - storing suggestions
+
+  - loading suggestions
+
+  - notification emails
+
+
+
+### Test and fix
+
+   - collect the users' feedback
+
+### Bring documentation up to date
+
