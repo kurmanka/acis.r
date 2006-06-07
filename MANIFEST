@@ -51,7 +51,9 @@ EPrints/images/face.gif
 EPrints/images/homepage.png
 EPrints/images/profileinfo.png
 EPrints/install.pl
+EPrints/install-redif.pl
 EPrints/perl_lib/ACIS/EPrints/MetadataExport/AMF.pm
+EPrints/perl_lib/ACIS/EPrints/MetadataExport/ReDIF.pm
 EPrints/perl_lib/ACIS/PIDAID.pm
 EPrints/perl_lib/ACIS/PIDAID/XML.pm
 EPrints/pidaid.css
