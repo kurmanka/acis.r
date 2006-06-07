@@ -1,7 +1,10 @@
 Citations in ACIS
 =================
 
-<p><i>a work in progress</i></p>
+
+<p>
+<i>a work in progress</i>
+</p>
 
 
 <toc/>
@@ -54,24 +57,24 @@ filter the data.
 
 ### Workflow overview
 
-In simple words, this is what happens and what we do with
-citations.  Citation indexing service processes the same set
-of data on which an ACIS service is running.  It parses the
-document bodies and finds citations and tries to identify,
-which citations point to which documents.  It then encodes
-the data in the specified <a href='#data-input'>input
-format</a>.
+Here is what happens and what we do with citations.
+
+A citation indexing service processes the same set of data
+on which an ACIS service is running.  It parses the
+documents' full texts and finds citations and tries to
+identify, which citations point to which documents.  It then
+encodes the citations data in the specified <a
+href='#data-input'>input format</a>.
 
 The data is then supplied to the ACIS service.  (How the
-data is transfered is out of the scope of our concern.)  It
-is then processed by ACIS.  Service administrator will have
-to get things <a href='#input-configuration' >configured</a>
-for this.
+data is transfered is out of the scope of our concern.)
+Service administrator will have to get things <a
+href='#input-configuration' >configured</a> for this.
     
 Then ACIS starts <a href='#user-interface'>offering</a>
 citations to its users and they create their own citations
 profiles.  This means they identify citations as pointing to
-their own certain documents.  They reject some citations
+their own particular documents.  They reject some citations
 which are not relevant for them.  At this stage ACIS
 software tries hard to be helpful and make the process easy.
 
@@ -83,7 +86,8 @@ personal data that ACIS exports.
 In this document we first describe the user interface, then
 the data formats, then the administrator's configuration
 parameters.  Technical implementation details are probably
-interesting to only a few and, therefore, they come last.
+interesting to only a few; therefore, they come last.
+
 
 
 <h2 id='user-interface'>Citations profile: user interface</h2>
@@ -101,50 +105,114 @@ the users will deal with citations.  The users will:
  - refuse errorneously-suggested citations and review
    previously refused citations to correct possible errors.
 
+
+
 ACIS will search for citations in the database (among
 the data provided on input), attempt to match the citations
 to the documents of the user's research profile, and offer
-them to the user for validation.
+them to the user for review and identification.
 
 
-*Design principles.* The screens of the citations profile should
-look and work similar to those of the research profile.
-Consistency is valuable.
-
-*Sub-screens: identified, refused, autosearch, unidentified
-(same as autosearch), overview?.*
-
-*Search for citations: background and online.*
+*Design requirements.* The screens of the citations profile
+should look and work similar to those of the research
+profile.  Consistency has to be maintained.
 
 
+<h3 id='most-interesting-doc'>The most interesting document</h3>
 
-
-### The `New citations found' screen
-
-This is the main screen of the citations profile.  It is the
-default screen, which means it will show up every time when
-user clicks on "CITATIONS" in the profile navigation menu,
-but only if there are some new citations found.
-
-User will deal with a bunch of citations presumably pointing
-to one document per screen reload.
-
-To make the dialogue with the user most efficient, at each
-screen reload we will assess the found citations.  By
-matching the citations to the document items, we will find:
+Before we offer any citations to the user for
+identification, we will assess all the citations found for
+her.  By matching (comparing) the citations to the document
+items, we will find:
 
  1. which document is the most *interesting* in a sense that
-    it has most potential new (unidentified) citations
-    pointing to it (weighted by their respective similarity
-    measure);
+    it has most potential new citations pointing to it
+    (weighted by their respective similarity measure);
 
  2. which citations more closely resemble the interesting
     document.
 
 This will give us the order, in which to present the
 documents and citations to the user: we will always show the
-most interesting document and the most relevant citations at
-the top.
+most interesting document first (see <a
+href='#auto-suggestions'>auto suggestions</a>) and the most
+relevant citations at the top.  Depending on the similarity
+level, some of the citations will be pre-selected for
+identification by default.
+
+
+
+
+### Per-document screens: identified and potential tabs
+
+Main work on citations happens on per-document screens,
+which means the user operates on citations for one
+particular item of her research profile at a time. The title
+and other details of the document are shown in large type at
+the top of the screen. Then there are two tabs on the page,
+labeled *identified* and *potential*.
+
+
+In the *identified* tab, the user sees the list of all the
+citations that she has identified to the document. She
+can remove the citations that have been mistakenly
+identified. Such citations become avalailable for all
+documents. They are then displayed as new citations, even in
+the potential tab for the current document.
+
+<!-- **INSERT IDENTIFIED TAB SCREENSHOT HERE** -->
+
+See <a href='http://acis.openlib.org/playground/stage-C/citations-profile/per-document-identified.html'>prototype
+page</a> of the identified tab for a document.
+
+
+In the potential tab we offer citations for user to
+identify.  We only offer citations that we found similar to
+the description of the document.
+
+Two kinds of citations may be offered: "new" and "old".
+"Old citations" are the ones that we have already suggested
+to the user for this particular document in the past.  (Thus
+a citation is only old for a certain document.)  A citation
+becomes old only after we suggested it to a user and the
+user submitted the form, but did not select this citation
+for inclusion.  If she didn't submit the form, which
+included this citation, we will still consider it new.
+
+<!-- **INSERT THE POTENTIAL TAB SCREENSHOT HERE** --> 
+
+See the potential tab <a href='http://acis.openlib.org/playground/stage-C/citations-profile/per-document-potential-v3.html'>prototype
+page</a>.
+
+We present the potential citations as shown above. The old
+citations will not be shown by default, only if the user
+requests it.  Both old and new citations are ordered by
+decreasing similarity of the citation to the document.  Some
+of the new citations, i.e. for which the similarity is
+higher than a certain threshold, will have the box checked
+by default.
+
+If the user presses the SUBMIT FORM button, all checked
+citations will be identified as pointing to that document.
+They will no longer be suggested for identification to other
+documents.
+
+When there is at least one other document with new citations
+for it, we show a checkbox near the submit button, labeled
+"Show next document with new citations".  This checkbox will
+be checked by default if the current page offers any new
+citations.  If the checkbox is checked when the form is
+submitted, we process the user's choices and then redirect
+her to the next <a href='#most-interesting-doc'>most
+interesting document</a>.
+
+
+If the user has no potential citations at all, we will show
+a message saying "We have no citations to suggest for this
+document at this time."
+
+Here is an older illustration of what now has become the
+*potential* tab:
 
 <p>
 <img class='snap'
@@ -152,71 +220,66 @@ src='img/citations/profile-page-overview.png'/>
 </p>
 
 
-The screen shows:
 
-- the usual profile menu and the citations profile menu on the right: 
 
-- phrase: "Here is a document from your research profile:"
-  where "research profile" is a link to the identified
-  research screen ("research/identified") 
+### "Auto suggestions" 
 
-- description of a document: author names, title, type, date
-  and a link to further details.
+When the system has new unidentified citations for a user,
+and the user enters citations profile we take the user to
+the AUTO SUGGESTIONS screen.  (That's the name of the link
+in the right-hand top corner menu.)  On it we always show
+and suggest the user the *potential* tab for a document with
+new citations.
 
-- phrase: "Which of these citations point to this document?"
-  (in a large font)
+On the "auto suggestions" screen we always show the
+*potential* tab for most interesting document, with new
+citations in it.  And then we will highlight the "auto
+suggestions" link in the top right menu (under "Citations:")
+as a link to the current screen (and it won't be a link).
 
-- a two-column table with the citations:
+At each screen reload we will assess the remaining new
+citations for all the documents of the user's research
+profile and will calculate the next <a
+href='#most-interesting-doc'>most interesting document</a>.
 
-  <pre>checkbox | citation string (citing document) 
-               [not mine work]</pre>
-
-  "citing document" here is a link to the description of the citing
-  document
-
-  "[not mine work]" is a button for user to click when the
-  citation actually refers to a document, which the person
-  has not authored.
-
-  The first citation in the table also has such note near
-  the [not mine work] button: "<= press this if it is not
-  your work that is cited, and this citation will not be
-  offered again."
-
-- a button, labelled: "ADD THESE CITATIONS"
-
-- phrase: "There are X other new citations waiting. But get
-  done with the above first."
-
-- phrase: "This document already has 14 citations identified
-  as pointing to it."
-
-- the usual "Where do you want to go now?" question at page
-  bottom.
+For navigation between the documents the users have the
+"Next" and "Prev" links to the right and left of the
+document title (respectively).  The "Next" link will lead to
+the second most interesting document (if there is such a
+document).
 
 
 
-*what exactly happens when user clicks "not mine work"?* 
 
-...
+**What do we show if there are no new citations?**
+
+If there are no new citations for any of the user's
+documents, we show a brief screen with this message:
+
+   We are sorry to tell you that we have no potential
+   citations data for the documents in your research
+   profile.
+
+If the user has no documents in the research profile, this
+message is instead:
+
+   We are sorry to tell you that we have no potential
+   citations data for the documents in your research
+   profile, because your research profile is empty.
 
 
-### Identified citations screen
 
-Will show all the verified and identified citations, listed
-by the document they refer to.  
+
+### Document list screen
+
+
+
 
 ### Refused citations screen
 
-### Unidentified citations screen
 
-It will look like and work in the same way as the "New
-citations found" screen.  The difference is that the "New
-citations" screen will be shown up automatically when a user
-enters the citations profile and there are new citations for
-the profile.  But the "Unidentified citations" screen will
-be called by the user himself.
 
+### Citations profile overview screen
 
 
 
