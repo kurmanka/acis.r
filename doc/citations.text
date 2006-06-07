@@ -208,8 +208,9 @@ interesting document</a>.
 
 
 If the user has no potential citations at all, we will show
-a message saying "We have no citations to suggest for this
-document at this time."
+a message saying: 
+
+    We have no citations to suggest for this document at this time.
 
 Here is an older illustration of what now has become the
 *potential* tab:
@@ -222,14 +223,13 @@ src='img/citations/profile-page-overview.png'/>
 
 
 
-### "Auto suggestions" 
+<h3 id='auto-suggestions'>"Auto suggestions" screen</h3>
 
-When the system has new unidentified citations for a user,
-and the user enters citations profile we take the user to
-the AUTO SUGGESTIONS screen.  (That's the name of the link
-in the right-hand top corner menu.)  On it we always show
-and suggest the user the *potential* tab for a document with
-new citations.
+When the system has new unidentified citations for a user, and the user enters
+citations profile we take the user to the AUTO SUGGESTIONS screen.  (That's
+the name of the link in the right-hand top corner menu.)  On it we always show
+the user the *potential* tab for a document with new citations.  And thus we
+suggest that the user deals with these citations.
 
 On the "auto suggestions" screen we always show the
 *potential* tab for most interesting document, with new
@@ -256,16 +256,16 @@ document).
 If there are no new citations for any of the user's
 documents, we show a brief screen with this message:
 
-   We are sorry to tell you that we have no potential
-   citations data for the documents in your research
-   profile.
+    We are sorry to tell you that we have no potential
+    citations data for the documents in your research
+    profile.
 
 If the user has no documents in the research profile, this
 message is instead:
 
-   We are sorry to tell you that we have no potential
-   citations data for the documents in your research
-   profile, because your research profile is empty.
+    We are sorry to tell you that we have no potential
+    citations data for the documents in your research
+    profile, because your research profile is empty.
 
 
 
@@ -273,14 +273,70 @@ message is instead:
 ### Document list screen
 
 
+A table of all documents (research profile items) is shown on the "Document
+list" screen. It also provides numbers of citations identified to each
+document and number of new potential citations for each. Each line in the
+table provides both a link to the identified tab for that document and a link
+to the potential tab for it. The table may be sorted by number of citations
+identified, or by the number of new potential citations for it.
+
+Each document in the table will be presented by a title and a link to its
+further details.
 
 
 ### Refused citations screen
 
 
 
+On the Refused Citations screen users will deal with citations, for which user
+has pressed the "Not my work" button in the past. Those are the citations to
+works that the user has told us she is not an author of. She can remove
+citations, which then become available and new to all documents.
+
+
+
+
 ### Citations profile overview screen
 
+
+The main page of the citations profile gives a brief introduction and overview
+of the profile, with links to appropriate screens.  This is similar to
+research profile overview screen.  It offers links to the document list
+screen, to the auto suggestions screen (the most interesting document), if
+there is such a document at the time, and a link to the refused citations
+screen.
+
+If there are new potential citations for some documents of a person, on the
+first enterance of the person into his citations profile, we redirect him to
+the <a href='#auto-suggestions'>auto suggested</a> page.  But we do this only
+once per user session to avoid confusion.
+
+
+<h2 id='auto-update'>Automatic citation profile update</h2>
+
+
+
+### Co-authorship and citations claim
+
+Assume authors A and B have collaborated on document D and they both have it
+claimed in their research profile. Let's say A has identified citation C as
+pointing to the document D. Should this action trigger the inclusion of this
+citation into the citations profile of B? Also, if A removes the citation from
+her citation profile, should the citation C be removed from the citations
+profile of B automatically?
+
+This might be very useful to ease the citation-processing load on our users,
+especially on those, who have a lot of research profile items and lots of
+citations. Then co-authors could collaborate on identifying the right
+citations and it will be a reason for users to invite their co-authors to
+register in our service. Good so far.
+
+This also opens a potential security hole. Through this feature malicious
+users could manipulate other users' profiles. For that they would have to
+claim authorship on a victim user's document, identify wrong citations for it
+or remove right citations for it. Through this such a user will manipulate
+another person's profile. Neither we, nor the victim himself will immediately
+realise such abuse has taken place.
 
 
 
@@ -598,7 +654,7 @@ Get the comparison result as a number between 0 and 1.
 
 
 <id>
-$Id: citations.text,v 2.16 2006/06/07 09:48:03 ivan Exp $
+$Id: citations.text,v 2.17 2006/06/07 10:02:20 ivan Exp $
 </id>
 
 
