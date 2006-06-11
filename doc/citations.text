@@ -356,7 +356,27 @@ systems.  Examples: CitEc, CiteSeer.
 
 For ACIS to process and use citation data, the data must be
 encoded in the <a href='http://amf.openlib.org/'>Academic
-Metadata Format</a>, structured this way:
+Metadata Format</a>.
+
+Two kinds of citations are expected in the input data (this
+is not yet shown in the example above):
+
+- identified;
+- unidentified.
+
+*Identified* are the citations, which have an autonomously
+identified citation target.  That is, the software on
+citations data provider side has found that such a citation
+is pointing to a particular document in the same set of
+documents and the data includes the identifier of that cited
+document.
+
+Therefore, the *unidentified* citations are those, which
+point to an unknown document, which may be present in the
+document database of ACIS and may not be present.
+
+
+<!--
 
     <amf ...>
 
@@ -384,23 +404,7 @@ data records, which should be already known to ACIS.  That
 is: the citation data should come as a supplement to a
 bibliographical dataset.
 
-
-Two kinds of citations are expected in the input data (this
-is not yet shown in the example above):
-
-- identified;
-- unidentified.
-
-*Identified* are the citations, which have an autonomously
-identified citation target.  That is, the software on
-citations data provider side has found that such a citation
-is pointing to a particular document in the same set of
-documents and the data includes the identifier of that cited
-document.
-
-Therefore, the *unidentified* citations are those, which
-point to an unknown document, which may be present in the
-document database of ACIS and may not be present.
+-->
 
 
 
@@ -689,7 +693,7 @@ or, maybe,
 
 
 <id>
-$Id: citations.text,v 2.19 2006/06/07 21:32:26 ivan Exp $
+$Id: citations.text,v 2.20 2006/06/11 20:46:27 ivan Exp $
 </id>
 
 
