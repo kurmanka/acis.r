@@ -25,7 +25,7 @@ package ACIS::Web::Admin::EventsArchiving;  ### -*-perl-*-
 #  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 #
 #  ---
-#  $Id: EventsArchiving.pm,v 2.0 2005/12/27 19:47:40 ivan Exp $
+#  $Id: EventsArchiving.pm,v 2.1 2006/06/12 07:44:06 ivan Exp $
 #  ---
 
 
@@ -175,6 +175,7 @@ sub archive_screen {
   
   $acis -> print_content_type_header( "text/plain" );
   $acis -> response -> {headers_printed} = 1;
+  print "\n";
 
   print "Archived: $worked\n";
   print "Start date: $start_date\n";
