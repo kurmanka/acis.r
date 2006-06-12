@@ -25,7 +25,7 @@ package Web::App;   ### -*-perl-*-
 #  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 #
 #  ---
-#  $Id: App.pm,v 2.11 2006/05/03 19:29:03 ivan Exp $
+#  $Id: App.pm,v 2.12 2006/06/12 07:43:52 ivan Exp $
 #  ---
 
 
@@ -749,20 +749,7 @@ sub handle_request {
 
 
   ###  primary request analysis
-
   debug "fetch request data";
-
-  use CGI::Minimal;
-  my $query;
-  eval { $query = new CGI::Minimal; };
-  if ( $@ or not $query ) {
-    ## invalid request
-    my $method = $ENV{REQUEST_METHOD};
-    die "invalid request (method: $method):\n$@";
-  }
-   
-
-  debug "CGI object: $query";
 
   my $unescaped_url = $ENV{REQUEST_URI} || '';
 
@@ -775,7 +762,7 @@ sub handle_request {
   my $requested_url = "http://$hostname$unescaped_url";
 
   my $request = $self -> {request} = {
-    CGI     => $query,
+    CGI     => undef,                    # will be set later
     referer => $ENV{HTTP_REFERER},
     agent   => $ENV{HTTP_USER_AGENT},
     method  => $ENV{REQUEST_METHOD},
@@ -787,7 +774,6 @@ sub handle_request {
 
 
   ### some mode settings
-
   my $charset = lc $config->{'character-encoding'};
   my $debug_mode = $config->{debug};
 
@@ -798,6 +784,34 @@ sub handle_request {
     };
 
 
+  ### check the request method
+  { 
+    my $method = $ENV{REQUEST_METHOD};
+    if ( $method ne 'GET' 
+         and $method ne 'HEAD'
+         and $method ne 'POST' ) {
+      $self -> response_status( '405 Method Not Allowed' );
+      $self -> print_content_type_header( "text/plain" );
+      $self -> print_http_response_headers();
+      print STDOUT "Bad request";
+      return;
+    }
+  }         
+  
+  ### create CGI request object
+  use CGI::Minimal;
+  my $query;
+  eval { $query = new CGI::Minimal; };
+  if ( $@ or not $query ) {
+    ## invalid request
+    my $method = $ENV{REQUEST_METHOD};
+    die "invalid request (method: $method):\n$@";
+  }
+  $request -> {CGI} = $query;
+  debug "CGI object: $query";
+
+
+  ### parse the request
   my ( $screen_name, $session_id ) = $self ->parse_request_url( $requested_url );
 
   {
@@ -1374,7 +1388,7 @@ sub print_content_type_header {
   my $type = shift;
 
   if ( not $self -> {response} {'content-type-printed'} ) {
-    print "Content-Type: $type\n\n";
+    print "Content-Type: $type\n";
     $self -> {response} {'content-type-printed'} = 1;
   }
 }
