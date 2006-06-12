@@ -328,12 +328,59 @@ href='#auto-suggestions'>auto suggestions</a> page.  But we
 do this only once per user session to avoid confusion.
 
 
+<!-- Moscow May 2006 text:
+
+The existing automatic research profile maintenance can be
+extended to cover citation profile as well. It could run
+background searches for citations for people, report the new
+citations found to the users via email, it could
+automatically identify high-similarity citations to the
+respective documents and notify them about it, while taking
+account of the users' preferences.
+
+This would involve at least designing the interface for the
+users' preferences and a reorganization of several screens
+and email message templates.
+
+It would be nice to have, but we first need to see the basic
+thing working. So, we are not going to implement this at
+this stage, but Ivan will keep account for such possible
+direction of ACIS development.
+
+A complication is that in case of large amounts of citations
+data coming into a service, users may get bombarded by
+automatic alerts and notification messages beyond measure. 
+
+-->
+
+
+
 <h2 id='auto-update'>Automatic citation profile update</h2>
 
-Similar to the automatic research profile update, there are cases when we may
-alter the citations profile for our users automatically.
+Similar to the automatic research profile update, we may update citations
+profiles for our users automatically.  There are three such cases:
 
-### Co-authorship and citations claim
+* when a citation has been identified by the autonomous citation indexing
+  service as pointing to a document of a user;
+
+* when we find that a new citation has a very high similarity to one of the
+  documents of a user (as measured by the citation-to-document similarity
+  assessment algorithm);
+
+* when two or more users have collectively authored a document, and that
+  document is included into their research profiles, and one of the users has
+  identified a citation as pointing to that document.
+
+Then if the citations profile is updated, an email message should be sent to the
+user (the owner of the profile) to notify her about the changes.  Also, it is
+very desireable to give users an option to refuse automatic profile update, if
+they do not trust it or experience problems with it.
+
+It is not yet decided, if we would implement these features or not.  Below are
+some materials, showing the starting points of our discussion on the topic.
+
+
+### Automatic citations claims based on co-authorship 
 
 Assume authors A and B have collaborated on document D and they both have it
 claimed in their research profile. Let's say A has identified citation C as
@@ -355,34 +402,35 @@ or remove right citations for it. Through this such a user will manipulate
 another person's profile. Neither we, nor the victim himself will immediately
 realise such abuse has taken place.
 
+(incomplete)
 
 
 
 <h2 id='data-input'>Citations data input</h2>
 
 Data comes from automatic reference and citation parsing
-systems.  Examples: CitEc, CiteSeer.
+systems, e.g. CitEc, CiteSeer.
 
 For ACIS to process and use citation data, the data must be
 encoded in the <a href='http://amf.openlib.org/'>Academic
-Metadata Format</a>.
+Metadata Format</a> and the system must be <a
+href='#input-configuration'>configured</a> appropriately.
 
-Two kinds of citations are expected in the input data (this
-is not yet shown in the example above):
+Two kinds of citations are expected in the input data:
 
 - identified;
 - unidentified.
 
 *Identified* are the citations, which have an autonomously
-identified citation target.  That is, the software on
+identified citation targets.  That is, the software on the
 citations data provider side has found that such a citation
-is pointing to a particular document in the same set of
-documents and the data includes the identifier of that cited
-document.
+points to a particular document in the same set of documents
+and the identifier of that cited document is included with
+the citation itself.
 
 Therefore, the *unidentified* citations are those, which
 point to an unknown document, which may be present in the
-document database of ACIS and may not be present.
+document database of ACIS or may not be present.
 
 Identified citations will be encoded in this way:
 
@@ -393,12 +441,14 @@ Identified citations will be encoded in this way:
        </references>
     </text>
 
-where acis is a prefix for the namespace "http://acis.openlib.org/" and text2
-is the identifier of the text that the citation points to. The citation string
-comes in the text content of the foreign-namespace element referencestring.
+where acis is a prefix for the namespace
+"http://acis.openlib.org/" and text2 is the identifier of
+the document that the citation points to. The citation
+string comes in the text content of the foreign-namespace
+element referencestring.
 
 While it is technically valid AMF to have several text nouns as children of
-the references verb, ACIS will only accept the first. Thus
+the references verb, ACIS will only accept the first one. Thus
 
     <text ref="text">
        <references>
@@ -423,7 +473,7 @@ will ignore citation 2. To get both citation 1 and citation 2, you have to say
     </text>
 
 
-Unidentified citations are written as
+Unidentified citations are written as:
 
     <text ref="text">
        <reference>
@@ -444,71 +494,45 @@ then nothing is being done with it.
 
 
 
-<!--
-
-    <amf ...>
-
-      <text ref="id1">
-        <reference>
-          <literal> text of citation </literal>
-        </reference>
-        <reference>
-          <literal> another citation </literal>
-        </reference>
-        ...
-      </text>
-
-      <text ref="id2">
-        ....
-      </text>
-
-      ...
-
-    </amf>
-
-Document identifiers in the above example (see <c>ref</c>
-attributes of <c>text</c> elements) refer to bibliographical
-data records, which should be already known to ACIS.  That
-is: the citation data should come as a supplement to a
-bibliographical dataset.
-
--->
-
-
 
 
 <h2 id='data-output'>Citations data output</h2>
 
 
 
-*Also, probably, this section should cover display of the
-identified citations to the general public on the personal
-profile pages, that ACIS generates.*
 
+We will output citations data as part of the personal
+profile AMF datafiles. The citations data will be added to
+the document data, i.e. the research profile.  Personal AMF
+data always includes a person noun.  Here is an incomplete
+example showing how would identified citations added to the
+documents data:
 
-We will output citations data as part of the personal profile AMF datafiles. The citations data will be added to the document data, i.e. the research profile. Thus the top level of the output data is a person noun. This has some text 
-
-<person id="donald_duck">
+    <person id="donald_duck">
       <name>Donald Duck</name>
       <isauthorof>
         <text ref="text0">
-             <isreferencedby>
-               <text ref='text4'/>
-             </isreferencedby>
+           <isreferencedby>
+              <text ref='text4'/>
+           </isreferencedby>
         </text>
       </isauthorof>
       <isauthorof>
          <text ref="text20">
-             <isreferencedby>
-               <text ref='text5'/>
-             </isreferencedby>
+           <isreferencedby>
+              <text ref='text5'/>
+           </isreferencedby>
+           <isreferencedby>
+              <text ref='text6'/>
+           </isreferencedby>
          </text>
       </isauthorof>
-</person>
+    </person>
 
 
 
-
+The identified citations would not be displayed on the
+personal profile pages, generated for each profile in ACIS.
 
 
 
@@ -518,8 +542,8 @@ We will output citations data as part of the personal profile AMF datafiles. The
 
 <h3 id='input-configuration'>Input data</h3>
 
-Citation data can be "fed" to an ACIS service in the form of 
-a collection of metadata files.  
+Citation data can be "fed" to an ACIS service only in the
+form of a collection of metadata files.
 
 That means you should configure a new <a
 ref='collection'>metadata collection</a> via the
@@ -558,7 +582,6 @@ interface.
 <dd>To show the citation profile to the users or not?
 Boolean value.  Default: false.</dd>
 
-<!-- <dt>citations-profile-online-search</dt> ?? -->
 
 <dt><C>citation-document-similarity-func</C></dt>
 
@@ -567,7 +590,7 @@ Boolean value.  Default: false.</dd>
 <p>The parameter specifies a Perl function which ACIS will
 call internally.  The function will be called for assessing
 similarity between a citation string and a document record
-and must conform to the <a ref='similarity-pi'
+and must conform to the <a ref='cit-doc-similarity-pi'
 >Citation-document similarity assessment interface</a>.</p>
 
 <p>The function must accept two parameters on input and
@@ -586,7 +609,7 @@ similarity assessment algorithm</a>.</p>
 
 
 
-## Technical implementation details 
+## Technical implementation details and programmer's guide
 
 
 ### Processing the citations data
@@ -657,7 +680,7 @@ table in this case?
 ### Citation to research items similarity 
 
 
-<h4 id='similarity-pi'>Similarity assessment function interface</h4>
+<h4 id='cit-doc-similarity-pi'>Similarity assessment function interface</h4>
 
 The citation-document similarity function (see
 <c>citation-document-similarity-func</c>) will be called by
@@ -784,7 +807,7 @@ or, maybe,
 
 
 <id>
-$Id: citations.text,v 2.21 2006/06/12 14:23:57 ivan Exp $
+$Id: citations.text,v 2.22 2006/06/12 16:52:05 ivan Exp $
 </id>
 
 
