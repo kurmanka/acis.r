@@ -749,7 +749,7 @@ Fields:
 - citation checksum: <co>checksum CHAR(22) NOT NULL</co>
 - personal id, short: <co>psid CHAR(15) NOT NULL</co>
 - document id, short: <co>dsid CHAR(15) NOT NULL</co>
-- reasons: 'similar', 'pre-identified', 'co-author:pau432' <co>reasons
+- reasons: 'similar', 'pre-identified', 'co-author:pau432': <co>reasons
   CHAR(255) NOT NULL</co>
 - similarity: <co>similar TINYINT UNSIGNED</co>
 - new: yes | no <co>new BOOL</co>
@@ -760,7 +760,14 @@ Fields:
 INDEX( psid ), INDEX( dsid )</code></pre>
 
 
+When we are saving items to the suggestions table, we may experience
+complications, because the item may already be there for another reason.  Care
+is necessary here!
+
+
 Now: basic operations
+
+- citation found (and compared to documents) -> suggestions need to be saved
 
 - citation identified -> clear all suggestions for this citation to that
   person, copy it with the 'co-author:...' reason to the co-authors' matrices
@@ -1059,7 +1066,7 @@ So, a general dump & restore mechanism is highly desirable.
 
 
 <id>
-$Id: citations.text,v 2.25 2006/06/13 21:19:16 ivan Exp $
+$Id: citations.text,v 2.26 2006/06/13 21:23:02 ivan Exp $
 </id>
 
 
