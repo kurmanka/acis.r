@@ -647,13 +647,18 @@ delete all the citations from this doc and then put all the fresh back.)
 
 The fields:
 
-- document id
-- full original citation text 
-- normalized searchable citation string 
-- refers to doc id: may be NULL
-- MD5 checksum of the original citation string in base64 encoding (22 chars long) 
-- origin doc details (URL): BLOB ???
+- document id: <co>srcdocid CHAR(255) NOT NULL</co>
+- full original citation text: <co>ostring TEXT NOT NULL</co>
+- normalized searchable citation string: <co>nstring CHAR(255) NOT NULL</co>
+- refers to doc id: <co>trgdocid CHAR(255)</co>
+- MD5 checksum of the original citation string in base64 encoding:
+  <co>checksum CHAR(255) NOT NULL</co>
+- origin doc details (URL): <co>srcdocdetails BLOB</co>
 
+<p><code>PRIMARY KEY ( srcdocid, nstring ),
+INDEX ( srcdocid, checksum )</code></p>
+
+<!--
 SQL create statement (draft):
 
     CREATE TABLE $acisdb.citations ( 
@@ -661,10 +666,9 @@ SQL create statement (draft):
            nstring CHAR(255), 
            ostring TEXT,
            citdocid CHAR(255),
-           checksum CHAR(22) );
+           checksum CHAR(22), );
 
-<!-- XXX 
-*TODO:* add this table to the <a href='db.html'>Database
+XXX *TODO:* add this table to the <a href='db.html'>Database
 tables</a> document. -->
 
 
@@ -701,29 +705,15 @@ Via ARPU. ACIS::Citations::AutoUpd -> ACIS::Citations::Search
 
 For each research profile item of the user:
 
->   select * from citations where citdocid = 'repec:fdd:fodooo:555';
+    select * from citations where citdocid = 'repec:fdd:fodooo:555';
 
 For each name variation of the user:
 
->   select * from citations where nstring REGEXP '[[:<:]]JOHN MAKLORVICH[[:>:]]';
+    select * from citations where nstring REGEXP '[[:<:]]JOHN MAKLORVICH[[:>:]]';
 
 
-Then do citation-to-document matching and dump the results to a table, from
-which the online part will pick it up:
-
-#### Table: citation-to-documents-similarity 
-
-Fields:
-
-- citation docid
-- citation string (or citation checksum?)
-- document id 
-- similarity index
-
-We will have to clear the table after a citation has been identified.  This
-could serve as a cache table, to eliminate some double-calculations, but it is
-no going to be a corner-stone of the infrastructure.  Therefore, we don't have
-to, but may make it.
+Then do citation-to-document matching and dump the results to the
+cit_suggestions table, from which the online part will pick it up.
 
 
 Then, when we search for a person, we:
@@ -743,7 +733,7 @@ Then, when we search for a person, we:
    yet been saved to the citation-to-documents-similarity table and save the
    resulting similarity values.
 
- - build a similarity matrix of new citations and save it to the suggestions
+ - build a similarity matrix of new citations and save it to the cit_suggestions
    table.
 
 
@@ -751,61 +741,23 @@ Then, when we search for a person, we:
 ### Similarity matrix
 
 
-#### Can we use the suggestions table for it? 
-
-    <field name="psid"     sql-type="CHAR(10) NOT NULL"/>
-    <field name="osid"     sql-type="CHAR(10) NOT NULL"/>
-    <field name="type"     sql-type="CHAR(15) NOT NULL"/>
-    <field name="role"     sql-type="CHAR(15) NOT NULL"/>
-    <field name="reason"   sql-type="CHAR(30) NOT NULL"/>
-    <field name="target"   sql-type="CHAR(15) NOT NULL"/>
-    <field name='time'     sql-type='DATETIME NOT NULL'/>
-    <field name='data'     sql-type='BLOB NOT NULL'/>
-
-    <create-table-sql>
-      PRIMARY KEY ( psid, osid )
-    </create-table-sql>
-
-We could increase osid to 255 and put citation checksum into it.  
-
-    psid -> doc id
-    osid -> citation id
-    type -> "citation"
-    role -> "citauthor"
-    reason -> "sim040", 40 represents 0.4 similarity measure
-    target -> "citprofile"
-    time -> time
-    data -> packed citation object
-
-Or should we better create a separate citations suggestions table?
-
 #### Table cit_suggestions
 
 Fields:
 
-- citation origin doc
-- original citation string or citation checksum
-- personal id
-- document id
-- reasons: 'similar', 'pre-identified', 'co-author:pau432'
-- similarity: smallint
-- new: yes | no
+- citation origin doc id: <co>srcdocid CHAR(255) NOT NULL</co>
+- citation checksum: <co>checksum CHAR(22) NOT NULL</co>
+- personal id, short: <co>psid CHAR(15) NOT NULL</co>
+- document id, short: <co>dsid CHAR(15) NOT NULL</co>
+- reasons: 'similar', 'pre-identified', 'co-author:pau432' <co>reasons
+  CHAR(255) NOT NULL</co>
+- similarity: <co>similar TINYINT UNSIGNED</co>
+- new: yes | no <co>new BOOL</co>
+- original citation string: <co>ostring TEXT NOT NULL</co>
+- origin doc details (URL): <co>srcdocdetails BLOB</co>
 
-**OR MAYBE INSTEAD:**
-
-- citation origin doc id: CHAR(255)
-- citation checksum: CHAR(22)
-- personal id, short
-- document id, short
-- reasons: 'similar', 'pre-identified', 'co-author:pau432'
-- similarity: smallint
-- new: yes | no
-- original citation string: BLOB
-- origin doc details (URL): BLOB
-
-In the second case, we still would have to do a join with the document table
-to load the source document details link, but we won't have to do a join on
-the citations data, at least.
+<pre><code>PRIMARY KEY (srcdocid, checksum, psid, dsid ),
+INDEX( psid ), INDEX( dsid )</code></pre>
 
 
 Now: basic operations
@@ -838,8 +790,8 @@ value returned by the function.
 
 <dd><p>is a reference to a hash:</p>
 
-<pre><code>{ original => CITSTR, 
-  normalized => NORCITSTR }</code></pre>
+<pre><code>{ ostring => CITSTR, 
+  nstring => NORCITSTR }</code></pre>
 
 <p>Here CITSTR is the original citation string, and
 NORCITSTR is the normalized citation string.</p>
@@ -873,7 +825,6 @@ adjective container.</p>
 <h4 id='similarity-default-func'>The default citation-document
 similarity assessment algorithm</h4>
 
-*This section needs a revision.*
 
 For a given document and a given citation:
 
@@ -894,7 +845,7 @@ For a given document and a given citation:
    }</code></pre>
 
 
-   If the document is an author pass, it will be ranked accourding to the
+   If the document is an author pass, it will be ranked according to the
    string similarity of the title only, see next point.
 
 2. Compare titles.  Take the normalized citation string and take the normalized
@@ -942,40 +893,62 @@ Get the comparison result as a number between 0 and 1.
 
 The **<co>citations</co>** branch of the userdata structure:
 
- - identified
+ - <co>identified</co>: *hash*
      
-    - document id: a list of citations
-    - next doc id: another list of citations
+    - document short id: a list of citations
+    - next doc short id: another list of citations
     - ...
 
- - refused: a list of citations
+ - <co>refused</co>: a list of citations
 
- - potential new / old ? -- we can store it in the cit_suggestions table
-   instead, I think
+ - <co>meta</co>: hash
 
- - service: ("meta")
-     - last profile check date         (or should we not save this in sysprof table?)
-     - last citation search check date (or should we not save this in sysprof table?)
      - auto co-authorship update option
      - auto pre-identified update option
      - date of the last searched name variations set     
 
 
-### citations in the session structure
+
+ - potential new & old citations we will store in the cit_suggestions table
+
+
+<p id='userdata-citation-item'>Each citation item in the userdata is a hash
+with this contents:</p>
+
+ - srcdocid
+ - ostring 
+ - checksum
+ - srcdocdetails
 
 
 
-### Consistency maintentance
 
-Every once in a while we need to check that every citation that is mentioned
-in the personal profile is still present in the citations table, and clear it,
-if it isn't there.
 
-Also, clear citations from suggestions (cit_suggestions), if any.
+
+### Citations in the session structure
+
 
 
 
 ### Utility functions
+
+Citations will be stored as:
+
+1. citation table records
+
+2. cit_suggestions table records
+
+3. userdata items (see <a href='#userdata-citation-item'>above</a>)
+
+Basically, the citations will go from 1 to 2 and from 2 to 3 and not the other
+way around.  At each step, some hash keys may be added to a citation or may be
+removed.
+
+
+
+
+
+
 
 #### ACIS::Citations
 
@@ -983,6 +956,7 @@ Also, clear citations from suggestions (cit_suggestions), if any.
 
 - check_citation( cit ) - reload citation from the citations table or return
   undef otherwise
+
 
 #### ACIS::Citations::Input
 
@@ -993,49 +967,99 @@ Also, clear citations from suggestions (cit_suggestions), if any.
 
 #### ACIS::Citations::Search
 
-- search_for_document( id ) - find pre-identified citations
+- search\_for\_document( id ) - find pre-identified citations
 
-- compare_citation_to_doc( $cit, $doc ) - returns similarity value
+- compare\_citation\_to\_doc( $cit, $doc ) - returns similarity value
 
-- get_last_cit_search_date()
+- get\_last\_cit\_search\_date()
 
-- update_last_cit_search_date( )
+- update\_last\_cit\_search\_date( )
+
+
+- filter\_the\_set( $set, $filterset )
+
+- set_subtract( ) 
 
 
 #### ACIS::Web::Citations
 
-- acis_citations_enabled() - check that <c>citations-profile</c> parameter has
+- acis\_citations\_enabled() - check that <c>citations-profile</c> parameter has
   a true value in <f>main.conf</f>; returns true or false
 
-- get_research_profile_identified() - get the list of the documents of the
+- get\_research\_profile\_identified() - get the list of the documents of the
   research profile
 
 
 
-- get_identified_citations() - an 
+- get\_identified\_citations() - an 
 
-- get_refused_citations() 
+- get\_refused\_citations() 
 
-- get_potential_citations( docid )
-
-
-
-- store_similarity( cit, doc, value )
-
-- clear_from_cit_suggestions( cit );
-
-- load_similarity_matrix( );
-
-- get_most_interesting_document();
+- get\_potential\_citations( docid )
 
 
 
-- check_citations_profile(); 
+- store\_similarity( cit, doc, value )
+
+- clear\_from\_cit\_suggestions( cit );
+
+- load\_similarity\_matrix( );
+
+- get\_most\_interesting\_document();
+
+
+
+- check\_citations\_profile(); 
+
+
+- get\_document\_authors();  - for co-author's claims
+
+
+### Other notes
+
+
+#### SysProf table profile parameters
+
+- last profile check date:   <co>last-citations-cleanup-date</co>
+- last citation search date: <co>last-citations-search-date</co>
+
+
+
+#### Consistency maintentance
+
+Every once in a while we need to check that every citation that is mentioned
+in the personal profile is still present in the citations table, and clear it,
+if it isn't there.
+
+We will remember the date of last cleaning run and at each user login (real or
+in ARPU) we will see if the profile needs cleaning already.
+(<co>last-citations-cleanup-date</co> in sysprof).
+
+Also, we will need to check cit_suggestions for the same: that every suggested
+item is still present in the citations table.
+
+In a similar way, we need to ensure that every document for which we have the
+identified citations is still present in the database.  And that
+cit_suggestions for this user doesn't contain any items for the documents,
+which are no longer in the persons' research profile.
+
+
+####  Database maintenance
+
+It would be highly desirable to backup the cit_suggestions table regularly.
+Because of old potential citations information, it is important for users.
+
+Also, sysprof table deserves similar treatment.  And suggestions, if we at it.
+
+So, a general dump & restore mechanism is highly desirable.
+
+
+
 
 
 
 <id>
-$Id: citations.text,v 2.24 2006/06/13 13:37:55 ivan Exp $
+$Id: citations.text,v 2.25 2006/06/13 21:19:16 ivan Exp $
 </id>
 
 
