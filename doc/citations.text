@@ -2,15 +2,16 @@ Citations in ACIS
 =================
 
 
-<p>Sections 'Introduction' and 'Citations profile: user
-interface' are now complete.  The rest is <i>a work in
-progress</i> -- <a
+<p><a
 href='http://acis.openlib.org/software/doc/citations.text'>document
-source</a> in Markdown format.
+source</a> in Markdown format
 </p>
 
-
 <toc/>
+
+The sections "Automatic citation profile update" and "Technical implementation
+details / developer’s guide" are <i>in progress</i>, the rest is complete.
+
 
 ## Introduction
 
@@ -647,11 +648,11 @@ delete all the citations from this doc and then put all the fresh back.)
 The fields:
 
 - document id
-- normalized searchable citation string 
 - full original citation text 
-- refers to doc id
-- MD5 checksum in the base64 encoding (22 chars long)
-
+- normalized searchable citation string 
+- refers to doc id: may be NULL
+- MD5 checksum of the original citation string in base64 encoding (22 chars long) 
+- origin doc details (URL): BLOB ???
 
 SQL create statement (draft):
 
@@ -679,9 +680,9 @@ tables</a> document. -->
 
 #### Cutting out the editors part
 
-*Searchable citations string part -- cutting out the editors
-part.*  The original citations string may contains editor names, which we
-don't want, because they will cause the citation to be found mistakenly.
+*Searchable citations string part -- cutting out the editors part.* The
+original citation string may contain editor names, which we don't want,
+because they will cause the citation to be found mistakenly for authors.
 
 The regular expression:
 
@@ -694,12 +695,23 @@ should do the trick.
 
 ### Search for citations
 
-Via ARPU.
+Via ARPU. ACIS::Citations::AutoUpd -> ACIS::Citations::Search
 
-We can also do citation-to-document matching in the background.  And dump the
-results to a table, from which the online part will pick it up.  
+#### ACIS::Citations::Search
 
-Table: citation-to-documents-similarity 
+For each research profile item of the user:
+
+>   select * from citations where citdocid = 'repec:fdd:fodooo:555';
+
+For each name variation of the user:
+
+>   select * from citations where nstring REGEXP '[[:<:]]JOHN MAKLORVICH[[:>:]]';
+
+
+Then do citation-to-document matching and dump the results to a table, from
+which the online part will pick it up:
+
+#### Table: citation-to-documents-similarity 
 
 Fields:
 
@@ -715,6 +727,8 @@ to, but may make it.
 
 
 Then, when we search for a person, we:
+
+ - find citations, that were pre-identified for the user's documents
 
  - find citations, that match her name variations
 
@@ -754,14 +768,14 @@ Then, when we search for a person, we:
 
 We could increase osid to 255 and put citation checksum into it.  
 
-psid -> doc id
-osid -> citation id
-type -> "citation"
-role -> "citauthor"
-reason -> "sim040", 40 represents 0.4 similarity measure
-target -> "citprofile"
-time -> time
-data -> packed citation object
+    psid -> doc id
+    osid -> citation id
+    type -> "citation"
+    role -> "citauthor"
+    reason -> "sim040", 40 represents 0.4 similarity measure
+    target -> "citprofile"
+    time -> time
+    data -> packed citation object
 
 Or should we better create a separate citations suggestions table?
 
@@ -777,7 +791,7 @@ Fields:
 - similarity: smallint
 - new: yes | no
 
-**OR**
+**OR MAYBE INSTEAD:**
 
 - citation origin doc id: CHAR(255)
 - citation checksum: CHAR(22)
@@ -787,6 +801,7 @@ Fields:
 - similarity: smallint
 - new: yes | no
 - original citation string: BLOB
+- origin doc details (URL): BLOB
 
 In the second case, we still would have to do a join with the document table
 to load the source document details link, but we won't have to do a join on
@@ -871,13 +886,14 @@ For a given document and a given citation:
    the author-name-words, it is an "author pass".  Otherwise, the match is
    aborted with zero similarity measure returned.
 
-       foreach ( @names ) {
-         if ( amatch( $_, $citation ) ) {
-           $pass = 1;
-           last;
-         }
-       }
-       
+   <pre><code>foreach ( @names ) {
+      if ( amatch( $_, $citation ) ) {
+        $pass = 1;
+        last;
+      }
+   }</code></pre>
+
+
    If the document is an author pass, it will be ranked accourding to the
    string similarity of the title only, see next point.
 
@@ -955,18 +971,71 @@ Every once in a while we need to check that every citation that is mentioned
 in the personal profile is still present in the citations table, and clear it,
 if it isn't there.
 
-Also, clear citations from suggestions (if any), from the matrix table and so
-on.
+Also, clear citations from suggestions (cit_suggestions), if any.
 
 
 
-### common utility functions
+### Utility functions
 
+#### ACIS::Citations
+
+- normalize_string()
+
+- check_citation( cit ) - reload citation from the citations table or return
+  undef otherwise
+
+#### ACIS::Citations::Input
+
+- process_citation() - normalize, cut the editors, calculate the checksum
+
+- save_citation()
+
+
+#### ACIS::Citations::Search
+
+- search_for_document( id ) - find pre-identified citations
+
+- compare_citation_to_doc( $cit, $doc ) - returns similarity value
+
+- get_last_cit_search_date()
+
+- update_last_cit_search_date( )
+
+
+#### ACIS::Web::Citations
+
+- acis_citations_enabled() - check that <c>citations-profile</c> parameter has
+  a true value in <f>main.conf</f>; returns true or false
+
+- get_research_profile_identified() - get the list of the documents of the
+  research profile
+
+
+
+- get_identified_citations() - an 
+
+- get_refused_citations() 
+
+- get_potential_citations( docid )
+
+
+
+- store_similarity( cit, doc, value )
+
+- clear_from_cit_suggestions( cit );
+
+- load_similarity_matrix( );
+
+- get_most_interesting_document();
+
+
+
+- check_citations_profile(); 
 
 
 
 <id>
-$Id: citations.text,v 2.23 2006/06/12 22:56:09 ivan Exp $
+$Id: citations.text,v 2.24 2006/06/13 13:37:55 ivan Exp $
 </id>
 
 
