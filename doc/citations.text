@@ -959,44 +959,92 @@ removed.
 
 #### ACIS::Citations
 
-- normalize_string()
+
+#### ACIS::Citations::Utils
+
+- normalize_string( string )
+
+- get_document\_authors();  - for co-authors' claims
+
+
+#### ACIS::Citations::Input
+
+use ACIS::Citations::Utils;
+
+- process_citation( cit ) - normalize, cut the editors, calculate the checksum
+
+- save_citation( cit )
 
 - check_citation( cit ) - reload citation from the citations table or return
   undef otherwise
 
 
-#### ACIS::Citations::Input
+#### ACIS::Citations::Suggestions
 
-- process_citation() - normalize, cut the editors, calculate the checksum
+use ACIS::Citations::Utils;
 
-- save_citation()
+low level (internal):
+
+- add_suggestion( cit, psid, docid, reason, similarity )
+
+- store_update\_suggestion( suggestion_record )
+
+- clear_cit\_from\_suggestions( cit, psid );
+
+- load_suggestions( psid );
+
+high level (exported):
+
+- store_similarity( cit, psid, docid, value )
+
+- make_suggestion\_old( cit, psid, dsid )
+
+- suggest_citation\_to\_authors( cit, docid );
+
+- clear_multiple\_from\_cit\_suggestions( citlist, psid );
+
+
+
+#### ACIS::Citations::SimMatrix
+
+use ACIS::Citations::Suggestions;
+
+- load_similarity\_matrix( psid );
+
+- get_most\_interesting\_document( psid );
+
+
 
 
 #### ACIS::Citations::Search
 
+use ACIS::Citations::Utils;
+use ACIS::Citations::Suggestions;
+
 - search\_for\_document( id ) - find pre-identified citations
 
 - compare\_citation\_to\_doc( $cit, $doc ) - returns similarity value
-
-- get\_last\_cit\_search\_date()
-
-- update\_last\_cit\_search\_date( )
 
 
 - filter\_the\_set( $set, $filterset )
 
 - set_subtract( ) 
 
+???
 
-#### ACIS::Web::Citations
 
-- acis\_citations\_enabled() - check that <c>citations-profile</c> parameter has
-  a true value in <f>main.conf</f>; returns true or false
+#### ACIS::Web::Citations::Profile
+
+use ACIS::Citations::Input;
+use ACIS::Web::SysProfile;
+
+- get\_last\_cit\_search\_date()
+
+- update\_last\_cit\_search\_date( )
+
 
 - get\_research\_profile\_identified() - get the list of the documents of the
   research profile
-
-
 
 - get\_identified\_citations() - an 
 
@@ -1005,21 +1053,31 @@ removed.
 - get\_potential\_citations( docid )
 
 
-
-- store\_similarity( cit, doc, value )
-
-- clear\_from\_cit\_suggestions( cit );
-
-- load\_similarity\_matrix( );
-
-- get\_most\_interesting\_document();
-
-
-
 - check\_citations\_profile(); 
 
 
-- get\_document\_authors();  - for co-author's claims
+
+#### ACIS::Web::Citations
+
+- acis\_citations\_enabled() - check that <c>citations-profile</c> parameter has
+  a true value in <f>main.conf</f>; returns true or false
+
+- prepare()
+
+- prepare_identified()
+
+- process_identified()
+
+- prepare_potential()
+
+- process_potential()
+
+- prepare_refused()
+
+- process_refused()
+
+
+
 
 
 ### Other notes
@@ -1066,7 +1124,7 @@ So, a general dump & restore mechanism is highly desirable.
 
 
 <id>
-$Id: citations.text,v 2.26 2006/06/13 21:23:02 ivan Exp $
+$Id: citations.text,v 2.27 2006/06/14 09:54:54 ivan Exp $
 </id>
 
 
