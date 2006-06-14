@@ -647,7 +647,7 @@ delete all the citations from this doc and then put all the fresh back.)
 
 The fields:
 
-- document id: <co>srcdocid CHAR(255) NOT NULL</co>
+- document id: <co>srcdocid CHAR(255) NOT NULL</co>  -- Should this be short doc id?
 - full original citation text: <co>ostring TEXT NOT NULL</co>
 - normalized searchable citation string: <co>nstring CHAR(255) NOT NULL</co>
 - refers to doc id: <co>trgdocid CHAR(255)</co>
@@ -713,10 +713,8 @@ For each name variation of the user:
 
 
 Then do citation-to-document matching and dump the results to the
-cit_suggestions table, from which the online part will pick it up.
-
-
-Then, when we search for a person, we:
+cit_suggestions table, from which the online part will pick it up.  Here is
+how it will work.  When we search for a person, we:
 
  - find citations, that were pre-identified for the user's documents
 
@@ -726,16 +724,14 @@ Then, when we search for a person, we:
 
  - filter out refused citations
 
- - separate already suggested citations (those already present among the
-   current suggestions) and old citations
+ - load existing suggestions 
+
+ - separate new citations from already suggested (those already present among
+   the current suggestions) and old citations
 
  - run citation-to-document matching for every citation/document that hasn't
-   yet been saved to the citation-to-documents-similarity table and save the
-   resulting similarity values.
-
- - build a similarity matrix of new citations and save it to the cit_suggestions
-   table.
-
+   yet been saved to the cit_suggestions table and save the resulting
+   similarity values.
 
 
 ### Similarity matrix
@@ -964,8 +960,12 @@ removed.
 
 - normalize_string( string )
 
+- build_citations\_index( citlist, [index] ); - build a hash of "srcdocid\0checksum"
+
 - get_document\_authors();  - for co-authors' claims
 
+- cit_document_similarity( cit, doc ) -- <a
+  href='#similarity-default-func'>default cit-doc similarity func</a>
 
 #### ACIS::Citations::Input
 
@@ -987,7 +987,7 @@ low level (internal):
 
 - add_suggestion( cit, psid, docid, reason, similarity )
 
-- store_update\_suggestion( suggestion_record )
+- store_update\_suggestion( suggestion\_record )
 
 - clear_cit\_from\_suggestions( cit, psid );
 
@@ -1009,7 +1009,7 @@ high level (exported):
 
 use ACIS::Citations::Suggestions;
 
-- load_similarity\_matrix( psid );
+- load_similarity\_matrix( psid ); - as a list of documents? 
 
 - get_most\_interesting\_document( psid );
 
@@ -1021,61 +1021,84 @@ use ACIS::Citations::Suggestions;
 use ACIS::Citations::Utils;
 use ACIS::Citations::Suggestions;
 
+exportable:
+
 - search\_for\_document( id ) - find pre-identified citations
 
-- compare\_citation\_to\_doc( $cit, $doc ) - returns similarity value
+- search\_for\_personal\_names( names ) 
+
+- compare\_citation\_to\_doc( $cit, $doc ) - find out similarity value and
+  store it
+
+- filter\_search\_results( $results, $filterset ) - used to filter out
+  identified or refused citations
+
+- sort_search_results( $results, $matrix ) - separate new and old
 
 
-- filter\_the\_set( $set, $filterset )
-
-- set_subtract( ) 
-
-???
+The question is still here on how do we re-calculate similarity for very old
+suggestions. 
 
 
-#### ACIS::Web::Citations::Profile
+
+
+#### ACIS::Web::Citations::Profile  
 
 use ACIS::Citations::Input;
 use ACIS::Web::SysProfile;
 
-- get\_last\_cit\_search\_date()
+- get\_last\_cit\_search\_date()   [15 min]
 
-- update\_last\_cit\_search\_date( )
+- update\_last\_cit\_search\_date( ) [15 min]
 
 
 - get\_research\_profile\_identified() - get the list of the documents of the
-  research profile
+  research profile  [15 min]
 
-- get\_identified\_citations() - an 
+- get\_identified\_citations( docid ) - [15 min]
 
-- get\_refused\_citations() 
+- get\_refused\_citations() - [15 min]
 
-- get\_potential\_citations( docid )
+- get\_potential\_citations( docid ) - new and old [45 min]
 
 
-- check\_citations\_profile(); 
+- check\_citations\_profile(); - [60 min]
 
+- check_citations\_preferences() - [15 min]
 
 
 #### ACIS::Web::Citations
 
 - acis\_citations\_enabled() - check that <c>citations-profile</c> parameter has
-  a true value in <f>main.conf</f>; returns true or false
+  a true value in <f>main.conf</f>; returns true or false  [15 min]
 
-- prepare()
+- prepare() [30 min]
 
-- prepare_identified()
+- prepare_identified() [30 min]
 
-- process_identified()
+- process_identified() [60 min]
 
-- prepare_potential()
+- prepare_potential()  [30 min]
 
-- process_potential()
+- process_potential()  [60 min]
 
-- prepare_refused()
+- process_not\_my\_work() [30 min]
 
-- process_refused()
+- prepare_refused()    [30 min]
 
+- process_refused()    [60 min]
+
+- auto_suggestions()   [30 min]
+
+- prepare_doclist()    [30 min]
+
+
+???
+
+
+#### ACIS::Citations::AutoUpd  
+
+- citations_auto\_search() - called from ACIS::Web::ARPU  [30 min]
 
 
 
@@ -1124,7 +1147,7 @@ So, a general dump & restore mechanism is highly desirable.
 
 
 <id>
-$Id: citations.text,v 2.27 2006/06/14 09:54:54 ivan Exp $
+$Id: citations.text,v 2.28 2006/06/14 21:36:47 ivan Exp $
 </id>
 
 

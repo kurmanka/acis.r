@@ -1,9 +1,6 @@
 # ACIS Citations TO DO List
 
-2006-06-08 00:32
-
-
-TBSIFD = To be specified in further detail
+2006-06-15 00:34
 
 
 ### discuss 
@@ -11,173 +8,260 @@ TBSIFD = To be specified in further detail
   - co-authorship claims
 
      - what if author A rejects (refuses) citation C, should
-       we automatically refuse the citation for author B?  Should we notify her about it?
+       we automatically refuse the citation for author B?
+       And if we refuse it for B automatically, should we
+       notify her about it?
 
-     - or should we offer the citation to the author B, but not pre-selected?
+     - or should we offer the citation to the author B, but
+       not pre-selected?  And then if author B still adds it
+       to her profile, should we unrefuse it for author A?
+       (Probably not.)
+
 
 ### [citations.html](citations.html)
 
- - mainly copy from the Moscow meeting notes:
-
-    - data formats: input and output
-
- - write based on discussion
-
-    - co-authorship claims and automatic citation profile update
+  - co-authorship claims and automatic citation profile update
 
 
-### Research:
+### Research
 
-  - finding co-authors of the user on document D
-   
-Specify
+Similarity matrix details: 
+  - cit_suggestions (see below) [30 min]
+  - data formats, [30 min]
+  - recalculations [30 min]
 
- - userdata structures for citations
+Maybe change primary index on cit_suggestions to 
 
- - the citations table structure
+    PRIMARY KEY (srcdocid, checksum, psid, dsid, reason )
+
+and allow several records for the same citation / document
+pair?  Looks pretty reasonable.  But it doesn't solve the
+problem of recalculating old similarity values. 
 
 
-### Configuration Parameters
+
+
+
+### Configuration Parameters [30 min]
+
+ACIS::Web::Config:
 
   - citations-profile  (logical, on or off)
 
-  - metadata-x-type == "CitationsAMF"
+  - citation-document-similarity-func
 
-     - use it in bin/setup.ri_collections
+  - citation-document-preselect-similarity-treshold
 
-  - ...
+bin/setup.ri_collections
 
-### Database tables
+  - take care of metadata-x-type == "CitationsAMF"
+
+
+### Database tables [60 min]
 
   - add citations table
 
-  - change documents table (resources)
+  - add cit_suggestions table
 
-    - add location field (LOCATION is a string built by
-      joining the following items: the series or journal
-      name, the paper's number in the series (if it is
-      present), the issue/volume/pages.  For AMF we can take
-      all the adjectives of the serial adjective container.)
+  - change resources table (where documents' metadata is stored)
 
-  - matrix?  - TBS
+    - add location field 
 
-  - citations_actions? - TBS
+    - update ReDIF and AMF processing to make location
 
-### Implement citations input processing
+      LOCATION is a string built by joining the following
+      items: the series or journal name, the paper's number
+      in the series (if it is present), the
+      issue/volume/pages.  For AMF we can take all the
+      adjectives of the serial adjective container.
 
+    - test it
+
+    - create upgrade script with "ALTER TABLE" statement
+
+
+### ACIS::Citations::Utils [1 hour]
+
+  - ACIS::Citations::Utils::normalize_string( string ) [30 min]
+
+  - get_document\_authors(); [30 min]
+
+
+### Implement citations input processing [3 hours]
+
+  - RePEc::Index::Collections::CitationsAMF [2 hours]
+  
   - ACIS::Citations::Input (RePEc::Index collection's proc
-    interface, like ARDB::RI)
+    interface, like ARDB::RI) [60 min]
 
     - input data processing, maintaining the citations table
 
     - citation string normalization and cutting the editors part
 
-### Citations search for a personal record 
 
-  - the search itself (by the name variations)
+### ACIS::Citations::Suggestions [90 min]
 
-  - saving found citations to the suggestions table, also
-    loading from it
+low level:                      [45 min]
 
-  - similarity matrix - TBSIFD, but see citations.html
+- add_suggestion( cit, psid, docid, reason, similarity )
 
-      - building
+- store_update\_suggestion( suggestion\_record )
 
-      - saving 
+- clear_cit\_from\_suggestions( cit, psid );
 
-      - restoring
+- load_suggestions( psid );
 
-      - updating
+high level (exported):          [45 min]
 
-  - default citation-to-document similarity assessment algorithm 
+- store_similarity( cit, psid, docid, value )
+
+- make_suggestion\_old( cit, psid, dsid )
+
+- suggest_citation\_to\_authors( cit, docid );
+
+- clear_multiple\_from\_cit\_suggestions( citlist, psid );
+
+
+#### ACIS::Citations::SimMatrix  [2 hour]
+
+use ACIS::Citations::Suggestions;
+
+- load_similarity\_matrix( psid );
+
+- get_most\_interesting\_document( psid );
+
+??
+
+### Citations search 
+
+ACIS::Citations::Utils::cit\_document\_similarity( cit, doc ) - [60 min]
+
+#### ACIS::Citations::Search
+
+exportable:
+
+- search\_for\_document( docid ) - find pre-identified citations [30 min]
+
+- search\_for\_personal\_names( names ) -                        [30 min]
+
+- compare\_citation\_to\_doc( $cit, $doc ) - find out
+  similarity value and store it                                  [60 min]
+
+- filter\_search\_results( $results, $filterset ) - used to filter out
+  identified or refused citations                                [45 min]
+
+- sort_search_results( $results, $matrix )                       [45 min]
+
+
 
 
 ### Implement citation profile screens
 
-  - screens.xml
+ - citations/potential
 
-     - citations
+    - screens.xml  [10 min]
+    - handlers in ACIS::Web::Citations  [2 hour]
+    - presentation: XSLT template, CSS  [90 min]    
 
-     - citations/identified
+ - citations/identified
 
-     - citations/potential
+    - screens.xml  [10 min]
+    - handlers in ACIS::Web::Citations  [90 min]
+    - presentation: XSLT template, CSS  [90 min]    
 
-     - citations/autosug
+ - citations/autosug
 
-     - citations/refused
-
-     - citations/doclist
-
-     - citations/potential/old
-
-     - citations/potential/old/xml
-
-     - citations/refuse
-
-     - citations/refuse/xml
-
-  - presenters in presentation/default/
-
-     - citations/main.xsl
-
-     - citations/identified.xsl
-
-     - citations/potential.xsl
-
-     - citations/refused.xsl
-
-     - citations/doclist.xsl
-
-     - citations/overview.xsl
-
-     - citations/notmywork.xsl
-
-     - citations/nothingnew.xsl
-
-     - add javascript 
-
-         - to the potential tab for showing old citations
-
-         - to the potential tab for [not my work] button
-
-         - to the refused citation screen - probably not?
+    - screens.xml  [10 min]
+    - handlers in ACIS::Web::Citations  [30 min]
+    - presentation: XSLT template, CSS  [30 min]    
+         - citations/nothingnew.xsl     [15 min]
 
 
-     - citations data output in the personal AMF records
-       (presenter export/amf-person.xsl)
+ - citations/refused
 
-     - change global profile menu, but make it depending on
-       the configuration variables
+    - screens.xml                       [10 min]
+    - handlers in ACIS::Web::Citations  [90 min]
+    - presentation: XSLT template, CSS  [2 hour]
+
+ - citations/doclist
+
+    - screens.xml                       [10 min]
+    - handlers in ACIS::Web::Citations  [30 min]
+    - presentation: XSLT template, CSS  [2 hour]    
+ 
+ - citations/potential/old
+
+    - screens.xml                       [10 min]
+    - handlers in ACIS::Web::Citations  [90 min]
+    - presentation: XSLT template, CSS  [30 min]    
+
+ - citations/potential/old/xml
+
+    - screens.xml                       [10 min]
+    - handlers in ACIS::Web::Citations  [15 min]
+    - add javascript to citations/potential.xsl: [2 hour]    
+
+ - citations/notmywork
+
+    - screens.xml                       [10 min]
+    - handlers in ACIS::Web::Citations  [15 min]
+    - presentation:                      
+        - allow message templates in page.xsl [90 min]    
+        - make message template for this case [15 min]
+
+ - citations/notmywork/xml
+
+    - screens.xml                       [10 min]
+    - handlers in ACIS::Web::Citations  [15 min]
+    - add javascript to citations/refuse.xsl: [2 hour]    
+
+ - citations (overview)
+
+    - screens.xml                       [10 min]
+    - handlers in ACIS::Web::Citations  [30 min]
+    - add javascript to citations/potential.xsl: [2 hour]
 
 
-  - module lib/ACIS/Web/Citations.pm - TBSIFD
+Also:
 
-     - prepare for work
+ - change global profile menu, but make it depending on
+   the configuration variables [1 hour]
 
-     - load citation data
+ - modify research profile research/identifed handler and
+   presenter to give links to the citations/identified pages
 
-     - display currently verified and identified citations
+   Load identified citations and load citations-documents
+   matrix, let presenter access it.
 
-     - general post handler
+   Let presenter show a link to identified and potential
+   citations (with the number of new ones).
 
-     - check all citations to see if they are still in the database
+
+
+
+### Citations data output
+
+- citations data output in the personal AMF records
+(presenter export/amf-person.xsl) [30 min]
+
+- SaveProfile - make sure citations data is loaded [15 min]
+
+
 
 
 ### Automatic citations profile update
 
-  - add it to the ARPU
+  - add citations search to the ARPU [60 min]
+      
+  - checking co-authors' claims [2 hour]
 
-  - finding co-authors (should we delay this or make it a separate process?)
-
-  - storing suggestions
-
-  - loading suggestions
-
-  - notification emails
+  - notification emails [2 hour]
 
 
 
 ### Test and fix
+
+   - add citations screens to the existing MaxQ test script [60 min]
 
    - collect the users' feedback
 
