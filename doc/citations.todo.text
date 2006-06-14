@@ -2,6 +2,10 @@
 
 2006-06-15 00:34
 
+This plan does not include any work on AMF parser, on ReDIF
+parser, on RAS maintenance or fixing bugs in the existing
+ACIS code.
+
 
 ### discuss 
 
@@ -23,7 +27,23 @@
   - co-authorship claims and automatic citation profile update
 
 
-### Research
+### update acis.openlib.org website ?
+
+ - post a little news item
+
+ - announce citations.html doc 
+
+
+Read citations.html again, make sure I missed nothing in the
+plan below... [2 hours]
+
+
+<hr/> 
+
+Day 1:
+
+
+### Research   [90 min]
 
 Similarity matrix details: 
   - cit_suggestions (see below) [30 min]
@@ -37,7 +57,6 @@ Maybe change primary index on cit_suggestions to
 and allow several records for the same citation / document
 pair?  Looks pretty reasonable.  But it doesn't solve the
 problem of recalculating old similarity values. 
-
 
 
 
@@ -87,6 +106,11 @@ bin/setup.ri_collections
   - get_document\_authors(); [30 min]
 
 
+<hr/> 
+
+Day 2:
+
+
 ### Implement citations input processing [3 hours]
 
   - RePEc::Index::Collections::CitationsAMF [2 hours]
@@ -122,7 +146,11 @@ high level (exported):          [45 min]
 - clear_multiple\_from\_cit\_suggestions( citlist, psid );
 
 
-#### ACIS::Citations::SimMatrix  [2 hour]
+<hr/>
+
+Day 3:
+
+#### ACIS::Citations::SimMatrix  [2 hours]
 
 use ACIS::Citations::Suggestions;
 
@@ -144,6 +172,11 @@ exportable:
 
 - search\_for\_personal\_names( names ) -                        [30 min]
 
+
+<hr/>
+
+Day 4: (continuing Citations search, ACIS::Citations::Search)
+
 - compare\_citation\_to\_doc( $cit, $doc ) - find out
   similarity value and store it                                  [60 min]
 
@@ -154,6 +187,26 @@ exportable:
 
 
 
+#### ACIS::Web::Citations::Profile  [2 hours]
+
+- get\_last\_cit\_search\_date()   [15 min]
+
+- update\_last\_cit\_search\_date( ) [15 min]
+
+
+- get\_research\_profile\_identified() - get the list of the documents of the
+  research profile  [15 min]
+
+- get\_identified\_citations( docid ) - [15 min]
+
+- get\_refused\_citations() - [15 min]
+
+- get\_potential\_citations( docid ) - new and old [45 min]
+
+<hr/>
+
+Day 5:
+
 
 ### Implement citation profile screens
 
@@ -163,11 +216,16 @@ exportable:
     - handlers in ACIS::Web::Citations  [2 hour]
     - presentation: XSLT template, CSS  [90 min]    
 
+
  - citations/identified
 
     - screens.xml  [10 min]
     - handlers in ACIS::Web::Citations  [90 min]
     - presentation: XSLT template, CSS  [90 min]    
+
+<hr /> 
+
+Day 6:
 
  - citations/autosug
 
@@ -183,6 +241,11 @@ exportable:
     - handlers in ACIS::Web::Citations  [90 min]
     - presentation: XSLT template, CSS  [2 hour]
 
+
+<hr /> 
+
+Day 7:
+
  - citations/doclist
 
     - screens.xml                       [10 min]
@@ -194,6 +257,10 @@ exportable:
     - screens.xml                       [10 min]
     - handlers in ACIS::Web::Citations  [90 min]
     - presentation: XSLT template, CSS  [30 min]    
+
+<hr /> 
+
+Day 8:
 
  - citations/potential/old/xml
 
@@ -209,6 +276,12 @@ exportable:
         - allow message templates in page.xsl [90 min]    
         - make message template for this case [15 min]
 
+
+<hr /> 
+
+Day 9:
+
+
  - citations/notmywork/xml
 
     - screens.xml                       [10 min]
@@ -222,48 +295,79 @@ exportable:
     - add javascript to citations/potential.xsl: [2 hour]
 
 
-Also:
+<hr /> 
+
+Day 10:  (screens)
 
  - change global profile menu, but make it depending on
    the configuration variables [1 hour]
 
  - modify research profile research/identifed handler and
-   presenter to give links to the citations/identified pages
+   presenter to give links to the respective citations
+   profile pages [1 hour]
 
    Load identified citations and load citations-documents
    matrix, let presenter access it.
 
-   Let presenter show a link to identified and potential
+   Make presenter show a link to identified and potential
    citations (with the number of new ones).
 
 
+ - Testing: add citations screens to the existing MaxQ test
+   script [60 min]
 
 
-### Citations data output
+### Citations data output [45 min]
 
 - citations data output in the personal AMF records
-(presenter export/amf-person.xsl) [30 min]
+  (presenter export/amf-person.xsl) [30 min]
 
 - SaveProfile - make sure citations data is loaded [15 min]
 
 
+<hr /> 
+
+Day 11:
 
 
-### Automatic citations profile update
+#### ACIS::Web::Citations::Profile (cont.)  [1 h, 15 min]
+
+- check\_citations\_profile(); - [60 min]
+
+- check_citations\_preferences() - [15 min]
+
+
+
+
+
+### Automatic citations profile update 
 
   - add citations search to the ARPU [60 min]
-      
-  - checking co-authors' claims [2 hour]
+
+  - ACIS::Citations::AutoUpd::citations_auto\_search() - called from ACIS::Web::ARPU  [30 min]
+     
+  - checking co-authors' claims ??? [? hour] 
 
   - notification emails [2 hour]
 
 
+<hr /> 
+
+Day 12:
+
+Database backup / restore strategy [2 hour]
+
+ - backup script [30 min]
+
+ - restore script ? [30 min]
+
 
 ### Test and fix
 
-   - add citations screens to the existing MaxQ test script [60 min]
+   - install on test.acis and invite public to test it
 
-   - collect the users' feedback
 
-### Bring documentation up to date
+### Optimization ?
+
+
 
