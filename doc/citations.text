@@ -196,7 +196,8 @@ default, only if the user requests it.  Both old and new
 citations are ordered by decreasing similarity of the
 citation to the document.  Some of the new citations,
 i.e. for which the similarity is higher than a certain
-threshold, will have the checkbox checked by default.
+threshold, will have the checkbox checked by default.  The
+threshold level is configureable by system administrator.
 
 The "Not my work" button removes a citation from the pool of
 potential citations for all the documents, and puts it into the
@@ -288,15 +289,20 @@ show this message instead:
 ### Document list screen
 
 
-A table of all documents (research profile items) is shown on the "Document
-list" screen. It also provides numbers of citations identified to each
-document and number of new potential citations for each. Each line in the
-table provides both a link to the identified tab for that document and a link
-to the potential tab for it. The table may be sorted by number of citations
-identified, or by the number of new potential citations for it.
+A table of all documents (research profile items) is shown
+on the "Document list" screen. It also provides numbers of
+citations identified to each document and number of new
+potential citations for each. Each line in the table
+provides both a link to the identified tab for that document
+and a link to the potential tab for it. The table may be
+sorted by the number of citations identified, or by the
+number of new potential citations for it.
 
 Each document in the table will be presented by a title and a link to its
 further details.
+
+The screen will also display the total number of identified
+citations.
 
 
 ### Refused citations screen
@@ -561,8 +567,8 @@ It may look like this:
     metadata-CitEc-home=/data/CitEc/amf
     metadata-CitEc-type=CitationsAMF
 
-The data files **must have <c>.amf.xml</c> name extension**
-to be processed by ACIS.
+The data files **must** have **<c>.amf.xml</c>** name
+extension to be processed by ACIS.
 
 
 
@@ -575,6 +581,8 @@ The citations profile is enabled and configured via the
 href='conf.html'>main.conf</a> configuration file.  In this
 it is not much different from other parts of the ACIS web
 interface.
+
+The configuration parameters are:
 
 <dl>
 
@@ -619,7 +627,9 @@ re-calculated with then-current similarity function.</p></dd>
 
 <dd><p>Citations, which have similarity value higher or equal
 than this treshold, will be offered as pre-selected by default
-(for a specific document).</p></dd>
+(for a specific document).</p>
+
+<p>Default value: 0.75</p></dd>
 
 
 </dl>
@@ -674,23 +684,11 @@ The fields:
   <co>checksum CHAR(22) NOT NULL</co>
 - origin doc details (URL): <co>srcdocdetails BLOB</co>
 
-<p><code>PRIMARY KEY ( srcdocsid, nstring ),
-INDEX ( srcdocsid, checksum ) -???</code></p>
+<p><code>PRIMARY KEY ( srcdocsid, checksum )</code></p>
 
 
-
-<!--
-SQL create statement (draft):
-
-    CREATE TABLE $acisdb.citations ( 
-           docid   CHAR(255),
-           nstring CHAR(255), 
-           ostring TEXT,
-           citdocid CHAR(255),
-           checksum CHAR(22), );
-
-XXX *TODO:* add this table to the <a href='db.html'>Database
-tables</a> document. -->
+<!-- XXX *TODO:* add this table to the <a
+href='db.html'>Database tables</a> document. -->
 
 
 #### Citation string normalization:
@@ -705,9 +703,9 @@ tables</a> document. -->
 
 #### Cutting out the editors part
 
-*Searchable citations string part -- cutting out the editors part.* The
-original citation string may contain editor names, which we don't want,
-because they will cause the citation to be found mistakenly for authors.
+The original citation string may contain editor names, which
+we don't want, because they will cause the citation to be
+found mistakenly for authors.
 
 The regular expression:
 
@@ -726,7 +724,7 @@ Via ARPU. ACIS::Citations::AutoUpd -> ACIS::Citations::Search
 
 For each research profile item of the user:
 
-    select * from citations where citdocid = 'repec:fdd:fodooo:555';
+    select * from citations where trgdocid = 'repec:fdd:fodooo:555';
 
 For each name variation of the user:
 
@@ -814,8 +812,11 @@ matrix:
 
   - totals_new (hash):
   
-     - document sid1 | total similarity of new citations, a
-       real positive value
+     - document sid1 | total similarity of the new
+       citations, a real positive value
+
+  - doclist (list): list of document sids in the order of
+    decreasing similarity (based on totals_new)
 
 
 "dxx44"                     -- research profile item's sid
@@ -1242,7 +1243,7 @@ So, a general dump & restore mechanism is highly desirable.
 
 
 <id>
-$Id: citations.text,v 2.31 2006/06/19 13:29:42 ivan Exp $
+$Id: citations.text,v 2.32 2006/06/19 14:57:45 ivan Exp $
 </id>
 
 
