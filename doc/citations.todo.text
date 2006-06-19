@@ -7,22 +7,7 @@ parser, on RAS maintenance or fixing bugs in the existing
 ACIS code.
 
 
-### discuss 
-
-  - co-authorship claims
-
-     - what if author A rejects (refuses) citation C, should
-       we automatically refuse the citation for author B?
-       And if we refuse it for B automatically, should we
-       notify her about it?
-
-     - or should we offer the citation to the author B, but
-       not pre-selected?  And then if author B still adds it
-       to her profile, should we unrefuse it for author A?
-       (Probably not.)
-
-
-### [citations.html](citations.html)
+### discuss and specify in [citations.html](citations.html)
 
   - co-authorship claims and automatic citation profile update
 
@@ -41,23 +26,6 @@ plan below... [2 hours]
 <hr/> 
 
 Day 1:
-
-
-### Research   [90 min]
-
-Similarity matrix details: 
-  - cit_suggestions (see below) [30 min]
-  - data formats, [30 min]
-  - recalculations [30 min]
-
-Maybe change primary index on cit_suggestions to 
-
-    PRIMARY KEY (srcdocid, checksum, psid, dsid, reason )
-
-and allow several records for the same citation / document
-pair?  Looks pretty reasonable.  But it doesn't solve the
-problem of recalculating old similarity values. 
-
 
 
 
