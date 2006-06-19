@@ -1002,12 +1002,7 @@ with this contents:</p>
 
 
 
-### Citations in the session structure
-
-
-
-
-### Utility functions
+### Storing and passing citations around
 
 Citations will be stored as:
 
@@ -1022,10 +1017,22 @@ way around.  At each step, some hash keys may be added to a citation or may be
 removed.
 
 
+As for the session, it will have a <co>citations</co> item,
+which, in its turn will contain:
+
+ - <co>matrix</co> -- similarity matrix
+
+ - <co>identified</co> -- as in userdata
+
+ - <co>refused</co> -- as in userdata
+
+ - <co>meta</co>
+
+ - <co>research_index</co> -- indices of the RP by sid and
+   by id and as a list?
 
 
-
-
+### Modules
 
 #### ACIS::Citations
 
@@ -1235,7 +1242,7 @@ So, a general dump & restore mechanism is highly desirable.
 
 
 <id>
-$Id: citations.text,v 2.30 2006/06/19 12:55:56 ivan Exp $
+$Id: citations.text,v 2.31 2006/06/19 13:29:42 ivan Exp $
 </id>
 
 
