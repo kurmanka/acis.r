@@ -605,6 +605,23 @@ similarity assessment algorithm</a>.</p>
 
 </dd>
 
+<dt><C>citation-document-similarity-ttl</C></dt>
+
+<dd><p>Time-to-live for calculated similarity values in days.
+After a similarity value is calculated by the similarity
+function, the value is stored in the database.  After
+time-to-live days pass since the original calculation took
+place, this value will be considered expired and will be
+re-calculated with then-current similarity function.</p></dd>
+
+
+<dt><C>citation-document-preselect-similarity-treshold</C></dt>
+
+<dd><p>Citations, which have similarity value higher or equal
+than this treshold, will be offered as pre-selected by default
+(for a specific document).</p></dd>
+
+
 </dl>
 
 
@@ -624,6 +641,8 @@ Citations originating from a document will comprise one record.
 
 ACIS::Citations::Input saves the data into the citations table and removes
 disappeared citations.
+
+ - find the document's sid and details URL
 
  - load from the citations table all the known citations originating from the
    document
@@ -647,16 +666,18 @@ delete all the citations from this doc and then put all the fresh back.)
 
 The fields:
 
-- document id: <co>srcdocid CHAR(255) NOT NULL</co>  -- Should this be short doc id?
+- document short id: <co>srcdocsid CHAR(15) NOT NULL</co>  
 - full original citation text: <co>ostring TEXT NOT NULL</co>
 - normalized searchable citation string: <co>nstring CHAR(255) NOT NULL</co>
 - refers to doc id: <co>trgdocid CHAR(255)</co>
 - MD5 checksum of the original citation string in base64 encoding:
-  <co>checksum CHAR(255) NOT NULL</co>
+  <co>checksum CHAR(22) NOT NULL</co>
 - origin doc details (URL): <co>srcdocdetails BLOB</co>
 
-<p><code>PRIMARY KEY ( srcdocid, nstring ),
-INDEX ( srcdocid, checksum )</code></p>
+<p><code>PRIMARY KEY ( srcdocsid, nstring ),
+INDEX ( srcdocsid, checksum ) -???</code></p>
+
+
 
 <!--
 SQL create statement (draft):
@@ -726,12 +747,17 @@ how it will work.  When we search for a person, we:
 
  - load existing suggestions 
 
- - separate new citations from already suggested (those already present among
-   the current suggestions) and old citations
+ - separate new citations from already suggested (those
+   already present among the current suggestions) and old
+   citations
 
- - run citation-to-document matching for every citation/document that hasn't
-   yet been saved to the cit_suggestions table and save the resulting
-   similarity values.
+ - expire old citation suggestions (based on the time field
+   and time-to-live config param)
+
+ - run citation-to-document matching for every
+   citation/document that hasn't yet been saved to the
+   cit_suggestions table or have expired and save the
+   resulting similarity values.
 
 
 ### Similarity matrix
@@ -741,27 +767,28 @@ how it will work.  When we search for a person, we:
 
 Fields:
 
-- citation origin doc id: <co>srcdocid CHAR(255) NOT NULL</co>
+- citation origin doc sid: <co>srcdocsid CHAR(15) NOT NULL</co>
 - citation checksum: <co>checksum CHAR(22) NOT NULL</co>
-- personal id, short: <co>psid CHAR(15) NOT NULL</co>
-- document id, short: <co>dsid CHAR(15) NOT NULL</co>
-- reasons: 'similar', 'pre-identified', 'co-author:pau432': <co>reasons
-  CHAR(255) NOT NULL</co>
+- personal sid, short: <co>psid CHAR(15) NOT NULL</co>
+- document sid, short: <co>dsid CHAR(15) NOT NULL</co>
+- reason: 'similar' | 'pre-identified', 'co-author:pau432': <co>reason
+  CHAR(20) NOT NULL</co>
 - similarity: <co>similar TINYINT UNSIGNED</co>
 - new: yes | no <co>new BOOL</co>
 - original citation string: <co>ostring TEXT NOT NULL</co>
 - origin doc details (URL): <co>srcdocdetails BLOB</co>
+- suggestion's creation/update date: <co>time DATE NOT NULL</co>
 
-<pre><code>PRIMARY KEY (srcdocid, checksum, psid, dsid ),
+<pre><code>PRIMARY KEY (srcdocsid, checksum, psid, dsid, reason),
 INDEX( psid ), INDEX( dsid )</code></pre>
 
 
-When we are saving items to the suggestions table, we may experience
-complications, because the item may already be there for another reason.  Care
-is necessary here!
+The table may contain several rows for a single
+citation/document pair, because a citation may be offered
+based on different reasons. 
 
 
-Now: basic operations
+Basic operations with the table
 
 - citation found (and compared to documents) -> suggestions need to be saved
 
@@ -771,6 +798,54 @@ Now: basic operations
 - citation refused -> clear all suggestions for this citation to that person
 
 - citation not accepted, became old 
+
+
+#### Data structure
+
+matrix:
+
+  - new (hash):
+
+     - document sid1 | citations list (each with reason & similarity)
+
+  - old (hash):
+
+     - document sid1 | citations list (each with reason & similarity)
+
+  - totals_new (hash):
+  
+     - document sid1 | total similarity of new citations, a
+       real positive value
+
+
+"dxx44"                     -- research profile item's sid
+
+$matrix -> {new} {dxx44}[0] -- the first of the new citations
+                               suggested for research profile
+                               item dxx44
+
+$matrix -> {new} {dxx44}[1]->{similarity} -- similarity of the
+                            second citation's to dxx44 document
+
+
+Also we need a index of document sids to full document
+records.  (And, possibly, an index of full document ids to
+document records.)
+
+
+#### matrix operations
+
+basic:
+
+- load the matrix
+
+advanced:
+
+- remove citation
+
+- citation status change new to old
+
+- recalculate totals
 
 
 
@@ -863,8 +938,10 @@ For a given document and a given citation:
    title is present and take a substring from start to end.  Compare in the
    same way.)
 
-   (Alternatively, do a String::Approx amatch on the citation string, with the
-   document's title used as the pattern.)
+   (Alternatively, do a String::Approx amatch on the citation
+   string, with the document's title used as the pattern. --
+   No, this will result in just yes/no value, but we need a
+   numeric measure.)
 
 <!--
 
@@ -908,23 +985,20 @@ The **<co>citations</co>** branch of the userdata structure:
 
      - auto co-authorship update option
      - auto pre-identified update option
-     - date of the last searched name variations set     
+     - date of the last searched name variations set
 
 
-
- - potential new & old citations we will store in the cit_suggestions table
+ - potential new & old citations we will store in the
+   cit_suggestions table (and, in the similarity matrix)
 
 
 <p id='userdata-citation-item'>Each citation item in the userdata is a hash
 with this contents:</p>
 
- - srcdocid
+ - srcdocsid
  - ostring 
  - checksum
  - srcdocdetails
-
-
-
 
 
 
@@ -960,11 +1034,12 @@ removed.
 
 - normalize_string( string )
 
-- build_citations\_index( citlist, [index] ); - build a hash of "srcdocid\0checksum"
+- build_citations\_index( citlist, [index] ); - build a hash
+  of [ "srcdocsid-checksum": citation ] pairs ???
 
 - get_document\_authors();  - for co-authors' claims
 
-- cit_document_similarity( cit, doc ) -- <a
+- cit_document\_similarity( cit, doc ) -- <a
   href='#similarity-default-func'>default cit-doc similarity func</a>
 
 #### ACIS::Citations::Input
@@ -985,7 +1060,7 @@ use ACIS::Citations::Utils;
 
 low level (internal):
 
-- add_suggestion( cit, psid, docid, reason, similarity )
+- add_suggestion( cit, psid, docsid, reason, similarity )
 
 - store_update\_suggestion( suggestion\_record )
 
@@ -995,11 +1070,11 @@ low level (internal):
 
 high level (exported):
 
-- store_similarity( cit, psid, docid, value )
+- store_similarity( cit, psid, docsid, value )
 
-- make_suggestion\_old( cit, psid, dsid )
+- make_suggestion\_old( cit, psid, docsid )
 
-- suggest_citation\_to\_authors( cit, docid );
+- suggest_citation\_to\_authors( cit, docsid );
 
 - clear_multiple\_from\_cit\_suggestions( citlist, psid );
 
@@ -1009,11 +1084,24 @@ high level (exported):
 
 use ACIS::Citations::Suggestions;
 
-- load_similarity\_matrix( psid ); - as a list of documents? 
+internal:
 
-- get_most\_interesting\_document( psid );
+- calculate_totals( $matrix );       [20 min]
 
+exported:
 
+- load_similarity\_matrix( psid ); - returns matrix structure
+  as specified above     [45 min]
+
+- get_most\_interesting\_document( psid ); [10 min]
+
+advanced:
+
+- remove_citation( $matrix, $cit );   [20 min]
+
+- make_citation\_old( $matrix, $cit ); [20 min]
+
+- recalculate_totals( $matrix );       [1 min]
 
 
 #### ACIS::Citations::Search
@@ -1027,7 +1115,7 @@ exportable:
 
 - search\_for\_personal\_names( names ) 
 
-- compare\_citation\_to\_doc( $cit, $doc ) - find out similarity value and
+- compare\_citation\_to\_doc( $cit, $doc, $psid ) - find out similarity value and
   store it
 
 - filter\_search\_results( $results, $filterset ) - used to filter out
@@ -1147,7 +1235,7 @@ So, a general dump & restore mechanism is highly desirable.
 
 
 <id>
-$Id: citations.text,v 2.29 2006/06/14 22:12:39 ivan Exp $
+$Id: citations.text,v 2.30 2006/06/19 12:55:56 ivan Exp $
 </id>
 
 
