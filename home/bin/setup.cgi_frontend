@@ -12,7 +12,7 @@ echo "use lib qw( $homelib );"
 echo "use vars qw( \$acis );"
 echo 
 if [[ $perllibadd ]]; then
-  echo "push @INC, '$perllibadd';"      
+  echo "BEGIN{ push @INC, '$perllibadd'; }"      
   echo ""                               
 fi
 echo 'use strict;'

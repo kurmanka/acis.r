@@ -9,6 +9,9 @@ for col in $metadata_collections; do
    if test -z "$colproc"; then
       colproc='proc=ARDB::RI,records_db=1'
    fi
+   if test "$coltype" = "CitationsAMF"; then
+      colproc='proc=ACIS::Citations::Input'
+   fi
    echo $colhome $coltype $col $colproc
 done
 

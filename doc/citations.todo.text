@@ -26,21 +26,6 @@ Day 1:
 
 
 
-### Configuration Parameters [30 min]
-
-ACIS::Web::Config:
-
-  - citations-profile  (logical, on or off)
-
-  - citation-document-similarity-func
-
-  - citation-document-preselect-similarity-treshold
-
-bin/setup.ri_collections
-
-  - take care of metadata-x-type == "CitationsAMF"
-
-
 ### Database tables [60 min]
 
   - add citations table

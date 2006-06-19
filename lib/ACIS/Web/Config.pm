@@ -28,7 +28,7 @@ package ACIS::Web::Config;   ### -*-perl-*-
 #  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 #
 #  ---
-#  $Id: Config.pm,v 2.1 2006/01/25 14:19:38 ivan Exp $
+#  $Id: Config.pm,v 2.2 2006/06/19 21:03:48 ivan Exp $
 #  ---
 
 
@@ -84,6 +84,12 @@ sub configuration_parameters {
     # ACIS Metadata Update (/meta/update)
     'meta-update-clients', 'not-defined',
     'meta-update-object-fetch-func', 'not-defined',
+
+    # citations:
+    'citations-profile', 'not-defined',
+    'citation-document-similarity-func', 'not-defined',
+    'citation-document-similarity-ttl',  'not-defined',     
+    'citation-document-similarity-preselect-treshold', '0.75',
 
    };
 

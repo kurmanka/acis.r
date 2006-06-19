@@ -623,7 +623,7 @@ place, this value will be considered expired and will be
 re-calculated with then-current similarity function.</p></dd>
 
 
-<dt><C>citation-document-preselect-similarity-treshold</C></dt>
+<dt><C>citation-document-similarity-preselect-treshold</C></dt>
 
 <dd><p>Citations, which have similarity value higher or equal
 than this treshold, will be offered as pre-selected by default
@@ -1243,7 +1243,7 @@ So, a general dump & restore mechanism is highly desirable.
 
 
 <id>
-$Id: citations.text,v 2.32 2006/06/19 14:57:45 ivan Exp $
+$Id: citations.text,v 2.33 2006/06/19 21:03:48 ivan Exp $
 </id>
 
 
