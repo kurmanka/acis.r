@@ -1,10 +1,10 @@
 # ACIS Citations TO DO List
 
-2006-06-15 00:34
+2006-06-19 16:44
 
-This plan does not include any work on AMF parser, on ReDIF
-parser, on RAS maintenance or fixing bugs in the existing
-ACIS code.
+This plan does not include any work on ReDIF parser, on RAS
+maintenance or fixing bugs in the existing ACIS code.
+It does include one work item to do on the AMF parser
 
 
 ### discuss and specify in [citations.html](citations.html)
@@ -18,9 +18,6 @@ ACIS code.
 
  - announce citations.html doc 
 
-
-Read citations.html again, make sure I missed nothing in the
-plan below... [2 hours]
 
 
 <hr/> 
@@ -89,6 +86,10 @@ Day 2:
     - input data processing, maintaining the citations table
 
     - citation string normalization and cutting the editors part
+
+  - AMF::Parser 
+
+    - allow external-namespace data to go through
 
 
 ### ACIS::Citations::Suggestions [90 min]
@@ -169,7 +170,8 @@ Day 4: (continuing Citations search, ACIS::Citations::Search)
 
 - get\_refused\_citations() - [15 min]
 
-- get\_potential\_citations( docid ) - new and old [45 min]
+- get\_potential\_citations( docid ) - new and old, with
+  sorting by decreasing similarity [45 min]
 
 <hr/>
 
