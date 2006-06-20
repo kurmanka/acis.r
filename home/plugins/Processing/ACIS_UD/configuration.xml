@@ -229,5 +229,38 @@
     </create-table-sql>
   </table>
 
+
+  <!-- Stage C: Citations -->
+
+  <table name='acis:citations'>
+    <field name='srcdocsid'       sql-type='CHAR(15) NOT NULL'/>
+    <field name='ostring'         sql-type='TEXT NOT NULL'/>
+    <field name='nstring'         sql-type='VARCHAR(255) NOT NULL'/>
+    <field name='trgdocid'        sql-type='VARCHAR(255)'/>
+    <field name='checksum'        sql-type='CHAR(22) NOT NULL'/>
+    <field name='srcdocdetails'   sql-type='BLOB'/>
+
+    <create-table-sql> PRIMARY KEY ( srcdocsid, checksum ) </create-table-sql>
+  </table>
+
+  <table name='acis:cit_suggestions'>
+    <field name='srcdocsid'      sql-type='CHAR(15) NOT NULL'/>
+    <field name='checksum'       sql-type='CHAR(22) NOT NULL'/>
+    <field name='psid'           sql-type='CHAR(15) NOT NULL'/>
+    <field name='dsid'           sql-type='CHAR(15) NOT NULL'/>
+    <field name='reason'         sql-type='CHAR(20) NOT NULL'/>
+    <field name='similar'        sql-type='TINYINT UNSIGNED'/>
+    <field name='new'            sql-type='BOOL'/>
+    <field name='ostring'        sql-type='TEXT NOT NULL'/>
+    <field name='srcdocdetails'  sql-type='BLOB'/>
+    <field name='time'           sql-type='DATE NOT NULL'/>
+
+    <create-table-sql>
+      PRIMARY KEY (srcdocsid, checksum, psid, dsid, reason),
+      INDEX(psid), INDEX(dsid)
+    </create-table-sql>
+
+  </table>
+
   
 </configuration>

@@ -111,9 +111,20 @@ sub process_text {
     
     my $table  = $config -> table( 'resources' );
     $row -> {title}   = $item->{title};
-# XX
-#    $row -> {classif} = join ' ', $rec ->get_value( 'classification-jel' );
-    
+
+    my $location = '';
+    foreach ( qw( journaltitle journalabbreviatedtitle
+                  journalidentifier 
+                  issuedate volume part issue 
+                  season quarter startpage endpage pages 
+                  articlenumber
+                  ) ) {
+      $location .= ' ' . $record -> get_value( "serial/$_" );
+    }
+    $location =~ s/\s+/ /g;
+    $location =~ s/(^\s+|\s+$)//g;
+
+    $row -> {location} = $location;
     $table -> store_record ( $row, $sql );
   }
 

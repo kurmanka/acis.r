@@ -466,7 +466,16 @@ sub process_resource {
     my $table  = $config -> table( 'resources' );
     $row -> {title}   = $item->{title};
     $row -> {classif} = join ' ', $record ->get_value( 'classification-jel' );
-    
+
+    my $location = '';
+    foreach ( qw( series journal number issue volume pages year ) ) {
+      $location .= ' ' . $record -> get_value( $_ );
+    }
+    $location =~ s/\s+/ /g;
+    $location =~ s/(^\s+|\s+$)//g;
+
+    $row -> {location} = $location;
+
     $table -> store_record ( $row, $sql );
   }
 
