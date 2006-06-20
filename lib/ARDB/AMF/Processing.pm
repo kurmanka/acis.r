@@ -119,7 +119,7 @@ sub process_text {
                   season quarter startpage endpage pages 
                   articlenumber
                   ) ) {
-      $location .= ' ' . $record -> get_value( "serial/$_" );
+      $location .= ' ' . $rec -> get_value( "serial/$_" );
     }
     $location =~ s/\s+/ /g;
     $location =~ s/(^\s+|\s+$)//g;
