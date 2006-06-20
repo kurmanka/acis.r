@@ -8,8 +8,10 @@ doc/apache-conf.text
 doc/bdb-private.html
 doc/bdb-private.text
 doc/check-filelist.pl
-doc/citations.text
 doc/citations.html
+doc/citations.text
+doc/citations.todo.html
+doc/citations.todo.text
 doc/conf.html
 doc/conf.text
 doc/cooperate.html
@@ -24,9 +26,9 @@ doc/eprints.html
 doc/eprints.text
 doc/iku-plan.html
 doc/iku-plan.text
+doc/img/citations/profile-page-overview.png
 doc/img/eprints/core-bibliographic-info-author-area-with-shortid-or-email-field-with-empty-fields.png
 doc/img/eprints/core-bibliographic-info-author-area-with-shortid-or-email-field-with-walsh-and-menu.png
-doc/img/citations/profile-page-overview.png
 doc/index.html
 doc/index.text
 doc/install.html
@@ -50,8 +52,9 @@ EPrints/images/choose.png
 EPrints/images/face.gif
 EPrints/images/homepage.png
 EPrints/images/profileinfo.png
-EPrints/install.pl
 EPrints/install-redif.pl
+EPrints/install.pl
+EPrints/INSTALL.ReDIF
 EPrints/perl_lib/ACIS/EPrints/MetadataExport/AMF.pm
 EPrints/perl_lib/ACIS/EPrints/MetadataExport/ReDIF.pm
 EPrints/perl_lib/ACIS/PIDAID.pm
@@ -77,8 +80,8 @@ home/bin/templates/arpu.pl
 home/bin/templates/clean-up.pl
 home/bin/templates/create_tables.pl
 home/bin/templates/dump_email_handle_table.pl
-home/bin/templates/export_name_variations.pl
 home/bin/templates/events_archiving.pl
+home/bin/templates/export_name_variations.pl
 home/bin/templates/mvrec.pl
 home/bin/templates/offline_maintain.pl
 home/bin/templates/recreate_profile_pages.pl
@@ -86,6 +89,8 @@ home/bin/templates/reparse_config.pl
 home/bin/templates/sanitar.pl
 home/bin/templates/sanitar2.pl
 home/bin/templates/sanitar3.pl
+home/bin/templates/sanitize_names_table.pl
+home/bin/templates/sanitize_redif_files.pl
 home/bin/templates/setup_ardb.pl
 home/bin/templates/sid_base.pl
 home/bin/templates/updareq.pl
@@ -94,6 +99,7 @@ home/bin/templates/upgrade_to_1.0.pl
 home/bin/templates/upgrade_to_1.01.pl
 home/bin/templates/upgrade_to_1.02.pl
 home/bin/templates/upgrade_to_1.04.pl
+home/bin/templates/upgrade_to_1.4.61.pl
 home/configuration.xml
 home/contributions.conf.xml
 home/plugins/Processing/ACIS_UD/configuration.xml
@@ -174,9 +180,10 @@ home/presentation/default/person/research/ir-guide.xsl
 home/presentation/default/person/research/listings.xsl
 home/presentation/default/person/research/main.xsl
 home/presentation/default/person/research/old-table.xsl
-home/presentation/default/person/research/search.xsl
 home/presentation/default/person/research/refused.xsl
+home/presentation/default/person/research/search.xsl
 home/presentation/default/phrase.xml
+home/presentation/default/script/jquery.js
 home/presentation/default/script/main.js
 home/presentation/default/stub.xsl
 home/presentation/default/style/brownish.css.add
@@ -256,6 +263,7 @@ lib/ARDB/SiteConfig.pm
 lib/ARDB/Table.pm
 lib/ARDB/Test.pm
 lib/RePEc/Index/Collection/ACIS_UD.pm
+lib/RePEc/Index/Collection/CitationsAMF.pm
 lib/Web/App.pm
 lib/Web/App/Common.pm
 lib/Web/App/Config.pm
@@ -281,6 +289,3 @@ sql_helper/sql_helper.pm
 sql_helper/sql_result.pm
 TODO
 VERSION
-home/bin/templates/sanitize_names_table.pl
-home/bin/templates/sanitize_redif_files.pl
-home/presentation/default/script/jquery.js
