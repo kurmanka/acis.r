@@ -61,6 +61,7 @@ WriteMakefile
                      'XML::LibXSLT' => "1.52",
                      'AppConfig'    => "1.52",
                      'Proc::Daemon' => "0.03",
+                     'Unicode::Normalize' => '0',
                     },
    DIR => [ @dirs ],
    ABSTRACT      => 'Academic Contributor Information System',
