@@ -8,7 +8,7 @@ use Exporter;
 use base qw( Exporter );
 use vars qw( @EXPORT_OK );
 
-@EXPORT_OK = qw( );
+@EXPORT_OK = qw( normalize_string get_document_authors );
 
 use Unicode::Normalize;
 
