@@ -1,6 +1,6 @@
 # ACIS Citations TO DO List
 
-2006-06-19 16:44
+2006-06-21 00:48
 
 This plan does not include any work on ReDIF parser, on RAS
 maintenance or fixing bugs in the existing ACIS code.
@@ -24,36 +24,6 @@ It does include one work item to do on the AMF parser
 
 Day 1:
 
-
-
-### Database tables [60 min]
-
-  - add citations table
-
-  - add cit_suggestions table
-
-  - change resources table (where documents' metadata is stored)
-
-    - add location field 
-
-    - update ReDIF and AMF processing to make location
-
-      LOCATION is a string built by joining the following
-      items: the series or journal name, the paper's number
-      in the series (if it is present), the
-      issue/volume/pages.  For AMF we can take all the
-      adjectives of the serial adjective container.
-
-    - test it
-
-    - create upgrade script with "ALTER TABLE" statement
-
-
-### ACIS::Citations::Utils [1 hour]
-
-  - ACIS::Citations::Utils::normalize_string( string ) [30 min]
-
-  - get_document\_authors(); [30 min]
 
 
 <hr/> 
