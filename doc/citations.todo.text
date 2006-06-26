@@ -31,16 +31,6 @@ Day 1:
 Day 2:
 
 
-### Implement citations input processing []
-
-  - ACIS::Citations::Input (RePEc::Index collection's proc
-    interface, like ARDB::RI) [60 min]
-
-      - cleaning the citations table
-
-      - cutting the editors part
-
-
 
 ### ACIS::Citations::Suggestions [90 min]
 
@@ -285,6 +275,11 @@ Database backup / restore strategy [2 hour]
 ### Test and fix
 
    - install on test.acis and invite public to test it
+
+   - remove debuggings from:
+
+       - ACIS::Citations::Input
+
 
 
 ### Optimization ?

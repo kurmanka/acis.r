@@ -1070,11 +1070,11 @@ low level (internal):
 
 - add_suggestion( cit, psid, docsid, reason, similarity )
 
+- replace_suggestion( cit, psid, docsid, reason, similarity )
+
 - store_update\_suggestion( suggestion\_record )
 
 - clear_cit\_from\_suggestions( cit, psid );
-
-- load_suggestions( psid );
 
 high level (exported):
 
@@ -1082,7 +1082,9 @@ high level (exported):
 
 - make_suggestion\_old( cit, psid, docsid )
 
-- suggest_citation\_to\_authors( cit, docsid );
+- load_suggestions( psid );
+
+- suggest_citation\_to\_authors( cit, psid, docsid );
 
 - clear_multiple\_from\_cit\_suggestions( citlist, psid );
 
@@ -1243,7 +1245,7 @@ So, a general dump & restore mechanism is highly desirable.
 
 
 <id>
-$Id: citations.text,v 2.33 2006/06/19 21:03:48 ivan Exp $
+$Id: citations.text,v 2.34 2006/06/26 13:03:51 ivan Exp $
 </id>
 
 
