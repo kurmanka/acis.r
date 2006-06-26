@@ -8,7 +8,7 @@ use Exporter;
 use base qw( Exporter );
 use vars qw( @EXPORT_OK );
 
-@EXPORT_OK = qw( normalize_string get_document_authors );
+@EXPORT_OK = qw( normalize_string get_document_authors get_author_sid );
 
 use Unicode::Normalize;
 
@@ -27,11 +27,13 @@ sub normalize_string($) {
   return $string;
 }
 
-sub get_document_authors($) {
-  die if not $ACIS::Web::ACIS;
 
-  my $app = $ACIS::Web::ACIS;
+sub get_document_authors($) {
   my $docsid = shift;
+
+  die if not $ACIS::Web::ACIS;
+  my $app = $ACIS::Web::ACIS;
+
   my $docid  = $docsid;
 
   my $mdb = $app -> config( "metadata-db-name" );
@@ -72,5 +74,21 @@ sub test_get_document_authors () {
   }
 }
 
+
+sub get_author_sid ($) {
+  my $id = shift;
+
+  die if not $ACIS::Web::ACIS;
+  my $app = $ACIS::Web::ACIS;
+
+  my $sql = $app -> sql_object() || die;
+
+  $sql -> prepare( "select shortid from records where id=?" );
+  my $res = $sql -> execute( $id );
+  if ( $res -> {row} and $res -> {row} ) {
+    return $res -> {row} ->{id};
+  }
+  return undef;
+}
 
 1;
