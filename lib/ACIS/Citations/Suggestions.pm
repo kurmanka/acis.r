@@ -44,7 +44,7 @@ sub prepare() {
 #     * personal sid, short: psid CHAR(15) NOT NULL
 #     * document sid, short: dsid CHAR(15) NOT NULL
 #     * reason: ‘similar’ | ‘pre-identified’, ‘co-author:pau432’: reason CHAR(20) NOT NULL
-#     * similarity: similar TINYINT UNSIGNED
+#     * similarity: similar TINYINT UNSIGNED // (0...100)
 #     * new: yes | no new BOOL
 #     * original citation string: ostring TEXT NOT NULL
 #     * origin doc details (URL): srcdocdetails BLOB
@@ -56,30 +56,25 @@ sub prepare() {
 
 
 sub add_suggestion($$$$$) {
-  my ( $cit, $psid, $dsid, $reason, $similarity ) = @_;
+  my ( $cit, $psid, $dsid, $reason, $similar ) = @_;
   if ( not $sql ) { prepare; }
-
-  my $similar = $similarity;
-#  my $similar = $similarity * 100;
 
   $sql -> prepare_cached( "insert into cit_suggestions values (?,?,?,?,?,?,true,?,?,NOW())" );
   $sql -> execute( $cit->{srcdocsid}, $cit->{checksum},
                    $psid, $dsid,
-                   $reason, $similarity,
+                   $reason, $similar,
                    $cit->{ostring}, $cit->{srcdocdetails} );
 
 }
 
 sub replace_suggestion($$$$$) {
-  my ( $cit, $psid, $dsid, $reason, $similarity ) = @_;
+  my ( $cit, $psid, $dsid, $reason, $similar ) = @_;
   if ( not $sql ) { prepare; }
-
-  my $similar = $similarity;
 
   $sql -> prepare_cached( "replace into cit_suggestions values (?,?,?,?,?,?,true,?,?,NOW())" );
   $sql -> execute( $cit->{srcdocsid}, $cit->{checksum},
                    $psid, $dsid,
-                   $reason, $similarity,
+                   $reason, $similar,
                    $cit->{ostring}, $cit->{srcdocdetails} );
 
 }
@@ -111,6 +106,7 @@ sub clear_cit_from_suggestions ($$) {
 
 sub load_suggestions ($) {
   my $psid = shift;
+  if ( not $sql ) { prepare; }
   my @slist = ();
 
   $sql -> prepare_cached( "select * from cit_suggestions where psid=?" );
@@ -126,65 +122,12 @@ sub load_suggestions ($) {
 }
 
 
-sub testme_lowlevel() {
-  require ACIS::Web;
-  # home=> '/home/ivan/proj/acis.zet'
-  my $acis = ACIS::Web->new(  );
-  my $sql = $acis-> sql_object;
-  $sql ->prepare( "select * from citations where nstring REGEXP ?" );
-  my $r = $sql ->execute(   "[[:<:]]KATZ, HARRY[[:>:]]" );
-  my @cl;
-  while( $r and $r->{row} ) {
-    my $c = { %{$r->{row}} };
-    push @cl, $c;
-    $r->next;
-  }
-  foreach ( @cl ) {
-    print "citation: \n";
-    my $c = $_;
-    foreach ( keys %$c ) {
-      print "\t$_: ", 
-        ( defined $c->{$_} ) ? $c->{$_} : ''
-        , "\n";
-    }
-  }
-  
-  my $psid = 'ptestsid0';
-  $r = add_suggestion $cl[0], $psid, 'dtestsid0', 'similar', 70;
-  print "Added a suggestion: $r\n";
-
-  my $set1 = load_suggestions $psid;
-  print "loaded: ", scalar @$set1, "\n";
-
-  print "before update: similarity:", $set1->[0]{similar}, 
-    " new:", $set1->[0]{new}, "\n\n";  
-
-  $set1->[0]->{similar} = 75;
-  $set1->[0]->{new} = 0;
-  print "updated: ", store_update_suggestion $set1->[0];
-  print "\n(similarity:75, new:0)\n";
-
-  my $set2 = load_suggestions $psid;
-  print "loaded: ", scalar @$set2, "\n";
-
-  print "after update: similarity:", $set2->[0]{similar}, 
-    " new:", $set2->[0]{new}, "\n\n";  
-
-  print "cleared: ", clear_cit_from_suggestions $cl[0], $psid;
-  print "\n";
-
-  $set2 = load_suggestions $psid;
-  print "loaded: ", scalar @$set2, "\n";
-
-}
-
 
 sub store_similarity ($$$$) {
   my ( $cit, $psid, $dsid, $value ) = @_;
   my $reason = 'similar';
   
-  my $sv = $value * 100;
-  replace_suggestion $cit, $psid, $dsid, $reason, $sv;  
+  replace_suggestion $cit, $psid, $dsid, $reason, $value;  
 }
 
 sub make_suggestion_old($) {
@@ -194,7 +137,7 @@ sub make_suggestion_old($) {
 }
 
 
-use ACIS::Suggestions::Utils qw( get_document_authors get_author_sid );
+use ACIS::Citations::Utils qw( get_document_authors get_author_sid );
 
 sub suggest_citation_to_authors($$$) {
   my ( $cit, $psid, $dsid ) = @_;
@@ -203,6 +146,7 @@ sub suggest_citation_to_authors($$$) {
   foreach ( @authors ) {
     my $sid = get_author_sid $_;
     next if $sid eq $psid;
+    # XXX what similarity value should be saved here?
     replace_suggestion $cit, $sid, $dsid, "coauth:$psid", 1;
   }
 
@@ -216,6 +160,85 @@ sub clear_multiple_from_cit_suggestions($$) {
   }
   
 }
+
+
+
+
+
+sub testme_lowlevel() {
+  require ACIS::Web;
+  # home=> '/home/ivan/proj/acis.zet'
+  my $acis = ACIS::Web->new(  );
+  my $sql = $acis-> sql_object;
+  $sql ->prepare( "select * from citations where nstring REGEXP ?" );
+  my $r = $sql ->execute(   "[[:<:]]KATZ, HARRY[[:>:]]" );
+  my @cl;
+  while( $r and $r->{row} ) {
+    my $c = { %{$r->{row}} };
+    push @cl, $c;
+    $r->next;
+  }
+
+  foreach ( @cl ) {
+    print "citation: \n";
+    my $c = $_;
+    foreach ( keys %$c ) {
+      print "\t$_: ", 
+        ( defined $c->{$_} ) ? $c->{$_} : ''
+        , "\n";
+    }
+  }
+  
+  my $psid = 'ptestsid0';
+  $r = add_suggestion $cl[0], $psid, 'dtestsid0', 'similar', 70;
+  $r |= 0;
+  print "Added a suggestion: $r\n";
+  $r = add_suggestion $cl[0], $psid, 'dtestsid1', 'similar', 40; 
+  $r = add_suggestion $cl[0], $psid, 'dtestsid2', 'similar', 10; 
+
+
+  $r = add_suggestion $cl[1], $psid, 'dtestsid0', 'similar', 40; 
+  $r = add_suggestion $cl[1], $psid, 'dtestsid1', 'similar', 30; $r |= 0;
+  print "Added another suggestion: $r\n";
+  $r = add_suggestion $cl[1], $psid, 'dtestsid2', 'similar', 15; 
+
+
+  $r = add_suggestion $cl[2], $psid, 'dtestsid2', 'similar', 40; $r |= 0;
+  print "Added another suggestion: $r\n";
+
+  $r = add_suggestion $cl[2], $psid, 'dtestsid0', 'similar', 40; $r |= 0;
+
+
+  my $set1 = load_suggestions $psid;
+  print "loaded: ", scalar @$set1, "\n";
+
+  print "before update: similarity:", $set1->[1]{similar}, 
+    " new:", $set1->[1]{new}, "\n\n";  
+
+  $set1->[1]->{similar} = 75;
+  $set1->[1]->{new} = 0;
+  print "updated: ", store_update_suggestion $set1->[1];
+  print "\n(similarity:75, new:0)\n";
+
+  my $set2 = load_suggestions $psid;
+  print "loaded: ", scalar @$set2, "\n";
+
+  print "after update: similarity:", $set2->[1]{similar}, 
+    " new:", $set2->[1]{new}, "\n\n";  
+
+#  print "cleared: ", clear_cit_from_suggestions $cl[0], $psid;
+#  print "\n";
+
+  $set2 = load_suggestions $psid;
+  print "loaded: ", scalar @$set2, "\n";
+
+}
+
+
+
+
+
+
 
 
 

@@ -771,7 +771,8 @@ Fields:
 - document sid, short: <co>dsid CHAR(15) NOT NULL</co>
 - reason: 'similar' | 'pre-identified', 'co-author:pau432': <co>reason
   CHAR(20) NOT NULL</co>
-- similarity: <co>similar TINYINT UNSIGNED</co>
+- similarity: <co>similar TINYINT UNSIGNED</co> - a number
+  from 0 to 100 inclusive
 - new: yes | no <co>new BOOL</co>
 - original citation string: <co>ostring TEXT NOT NULL</co>
 - origin doc details (URL): <co>srcdocdetails BLOB</co>
@@ -832,6 +833,11 @@ $matrix -> {new} {dxx44}[1]->{similarity} -- similarity of the
 Also we need a index of document sids to full document
 records.  (And, possibly, an index of full document ids to
 document records.)
+
+Similarity values in the matrix and in the cit_suggestions
+table are all in percent form.  It is produced by
+multiplying the similarity value calculated by the
+cit-to-document comparison function by 100.
 
 
 #### matrix operations
@@ -1245,7 +1251,7 @@ So, a general dump & restore mechanism is highly desirable.
 
 
 <id>
-$Id: citations.text,v 2.34 2006/06/26 13:03:51 ivan Exp $
+$Id: citations.text,v 2.35 2006/06/26 20:48:12 ivan Exp $
 </id>
 
 
