@@ -52,14 +52,17 @@ my @cits;
 sub new_citation($;$) {
   my $ostring  = shift;
   my $trgdocid = shift;
+
+  $ostring =~ s/^\s+//g;
+  $ostring =~ s/\s+$//g;
   
   my $c = { ostring => $ostring };
   if ( $trgdocid ) {
     $c ->{trgdocid} = $trgdocid;
-    print "citation '$ostring' points to: '$trgdocid'\n";
+#    print "citation '$ostring' points to: '$trgdocid'\n";
 
   } else {
-    print "unidentified citation '$ostring'\n";
+#    print "unidentified citation '$ostring'\n";
   }
 
   push @cits, $c;

@@ -31,20 +31,15 @@ Day 1:
 Day 2:
 
 
-### Implement citations input processing [3 hours]
+### Implement citations input processing []
 
-  - RePEc::Index::Collections::CitationsAMF [2 hours]
-  
   - ACIS::Citations::Input (RePEc::Index collection's proc
     interface, like ARDB::RI) [60 min]
 
-    - input data processing, maintaining the citations table
+      - cleaning the citations table
 
-    - citation string normalization and cutting the editors part
+      - cutting the editors part
 
-  - AMF::Parser 
-
-    - allow external-namespace data to go through
 
 
 ### ACIS::Citations::Suggestions [90 min]

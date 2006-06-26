@@ -6,12 +6,54 @@ use Carp::Assert;
 
 require ARDB::Local;
 my $ardb;
-
+my $config;
+my $sql;
+my $adb;
 
 use Digest::MD5;
 use ACIS::Citations::Utils qw( normalize_string );
 
 use Storable;
+
+sub prepare() {
+  if ( not $ardb ) { 
+    $ardb = ARDB -> new();
+    $config = $ardb -> {config};
+    $sql = $ardb -> sql_object();
+    $adb = $ardb -> {site_config} -> resolve_db_alias( 'acis' );
+  }
+}
+
+
+sub find_doc_details($) { 
+  my $id  = shift;
+  $id = lc $id;
+
+  # prepare
+  assert( $ardb );
+
+  # find srcdocsid
+  my $srcdocsid = '';
+  my $srcdocdetails = '';
+  {
+    my $rec = $ardb -> get_record( $id );
+    if ( $rec ) {
+      $srcdocsid =     $rec -> {sid};
+      $srcdocdetails = $rec -> {'url-about'};
+      
+    } else {
+      $sql -> prepare( "select sid from resources where id=?" );
+      my $res = $sql -> execute( $id );
+      if ( $res -> {row} and $res -> {row} ->{sid} ) {
+        $srcdocsid = $res -> {row} ->{sid};
+      }
+    }
+  }
+
+  return ($srcdocsid, $srcdocdetails);
+}
+
+
 
 sub process_record {
   shift;
@@ -21,40 +63,16 @@ sub process_record {
   my $record = shift;
   
   my $srcdocid = $record -> id;
+  print "src doc id: $srcdocid\n";
 
   # prepare
-  if ( not $ardb ) { 
-    $ardb = ARDB -> new();
-  }
+  prepare;
   assert( $ardb );
-
-  my $config = $ardb -> {config};
-  my $sql = $ardb -> sql_object();
-  my $adb = $ardb -> {site_config} -> resolve_db_alias( 'acis' );
-
-  print "src doc id: $srcdocid\n";
   
-  # find srcdocsid
+  # find srcdocsid and URL
   my $srcdocsid = '';
   my $srcdocdetails = '';
-  {
-
-    my $rec = $ardb -> get_record( $srcdocid );
-
-    if ( $rec ) {
-      $srcdocsid =     $rec -> {sid};
-      $srcdocdetails = $rec -> {'url-about'};
-
-    } else {
-      print "  ... ask resources table\n";
-      $sql -> prepare( "select sid from resources where id=?" );
-      my $res = $sql -> execute( $srcdocid );
-      if ( $res -> {row} and $res -> {row} ->{sid} ) {
-        $srcdocsid = $res -> {row} ->{sid};
-      }
-
-    }
-  }
+  ( $srcdocsid, $srcdocdetails ) = find_doc_details( $srcdocid );
 
   print "src doc sid: $srcdocsid\n";
   print "src doc details: $srcdocdetails\n";
@@ -68,35 +86,73 @@ sub process_record {
 
   my $table  = $config -> table( 'acis:citations' );
 
+  # build index of already known citations (originating from
+  # this doc)
+  my $index = {};
+  {
+    $sql -> prepare_cached( "select checksum from $adb.citations where srcdocsid=?" );
+    my $res = $sql -> execute( $srcdocsid );
+    while ( $res and $res->{row} ) {
+      my $s = $res->{row}{checksum};
+      $index ->{$s} = 1;
+    } continue { 
+      $res->next;
+    }
+  }
+  print "citations already known: ", scalar keys %$index, "\n";
+  print "citations now: ", scalar( @$record )-1, "\n";
+
+  # process and save citations
   foreach ( @$record ) {
     next if not ref $_;
 
     my $trg = $_->{trgdocid};
     my $ost = $_->{ostring};
     
-    ### XXX cut the editors part 
-    my $nst = normalize_string( $ost );
+    my $nst = $ost;
+    $nst =~ s/\b((I|i)n\W.+?\Wed\..*)$//; # cut the editors part 
+    $nst = normalize_string( $nst );
     my $md5 = Digest::MD5::md5_base64( $ost );
 
-    $cit -> {ostring} = $ost;
+    delete $index->{$md5};
+
+    $cit -> {ostring}  = $ost;
     $cit -> {trgdocid} = $trg;
-    $cit -> {nstring} = $nst;
+    $cit -> {nstring}  = $nst;
     $cit -> {checksum} = $md5;
     
     $table -> store_record ( $cit, $sql );
   }
 
-  # XXX delete the records which disappeared
+  # delete the records were in this doc before, but not
+  # anyore (i.e. which disappeared)
+  $sql -> prepare_cached( "delete from $adb.citations where srcdocsid=? and checksum=?" );
+  foreach ( keys %$index ) {
+    $sql -> execute( $srcdocsid, $_ );
+  }
+  print "citations disappeared: ", scalar keys %$index, "\n";
 
   return 1;
 }
 
-sub delete_record {
 
+
+
+sub delete_record {
   shift;
   my $id = shift;
 
+  prepare;
+  assert( $ardb );
+
+  $id =~ s/#citations$//g;
+  my ( $sid ) = find_doc_details( $id );
+  
+  $sql -> prepare_cached( "delete from $adb.citations where srcdocsid=?" );
+  $sql -> execute( $sid );
 }
+
+
 
 
 1;
