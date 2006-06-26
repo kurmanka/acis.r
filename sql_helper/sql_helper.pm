@@ -1,5 +1,5 @@
 package sql_helper;
-# $Id: sql_helper.pm,v 2.1 2006/03/23 11:07:07 ivan Exp $
+# $Id: sql_helper.pm,v 2.2 2006/06/26 13:03:33 ivan Exp $
 
 use DBI;
 # ? just for early detection of DBD::mysql absence
@@ -143,7 +143,7 @@ sub new {
   $self ->{id} = $id;
   $self ->connect( @par );
 
-  if ( LOG_EVERYTHING ) {
+  if ( LOG_EVERYTHING or $ENV{SQL_LOG_EVERYTHING} ) {
     $self -> {verbose_log} = 1;
   }
 

@@ -25,7 +25,7 @@ package Web::App::Common;   ### -*-perl-*-
 #  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 #
 #  ---
-#  $Id: Common.pm,v 2.3 2006/03/23 09:00:00 ivan Exp $
+#  $Id: Common.pm,v 2.4 2006/06/26 13:03:33 ivan Exp $
 #  ---
 
 
@@ -51,6 +51,9 @@ sub clear_undefined ($);
 
 
 ###  enable debugging mode
+
+$Web::App::DEBUG = $ENV{WEBAPPDEBUG};
+$Web::App::DEBUGIMMEDIATELY = $ENV{WEBAPPDEBUGIMM};
 
 foreach ( @::ARGV ) {
   if ( m/^--debug$/ ) {
