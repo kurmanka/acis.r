@@ -62,6 +62,8 @@ WriteMakefile
                      'AppConfig'    => "1.52",
                      'Proc::Daemon' => "0.03",
                      'Unicode::Normalize' => '0',
+                     'String::Approx' => '0',
+                     'String::Similarity' => '1',
                     },
    DIR => [ @dirs ],
    ABSTRACT      => 'Academic Contributor Information System',
