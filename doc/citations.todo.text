@@ -1,10 +1,10 @@
 # ACIS Citations TO DO List
 
-2006-06-21 00:48
+2006-06-27 23:05
 
 This plan does not include any work on ReDIF parser, on RAS
 maintenance or fixing bugs in the existing ACIS code.
-It does include one work item to do on the AMF parser
+It did include one work item to do on the AMF parser, but it has been done already.
 
 
 ### discuss and specify in [citations.html](citations.html)
@@ -20,80 +20,14 @@ It does include one work item to do on the AMF parser
 
 
 
-<hr/> 
-
-Day 1:
-
-
-
-<hr/> 
-
-Day 2:
-
-
-
-### ACIS::Citations::Suggestions [90 min]
-
-low level:                      [45 min]
-
-- add_suggestion( cit, psid, docid, reason, similarity )
-
-- store_update\_suggestion( suggestion\_record )
-
-- clear_cit\_from\_suggestions( cit, psid );
-
-- load_suggestions( psid );
-
-high level (exported):          [45 min]
-
-- store_similarity( cit, psid, docid, value )
-
-- make_suggestion\_old( cit, psid, dsid )
-
-- suggest_citation\_to\_authors( cit, docid );
-
-- clear_multiple\_from\_cit\_suggestions( citlist, psid );
-
-
-<hr/>
-
-Day 3:
-
-#### ACIS::Citations::SimMatrix  [2 hours]
-
-use ACIS::Citations::Suggestions;
-
-- load_similarity\_matrix( psid );
-
-- get_most\_interesting\_document( psid );
-
-??
-
-### Citations search 
-
-ACIS::Citations::Utils::cit\_document\_similarity( cit, doc ) - [60 min]
-
 #### ACIS::Citations::Search
 
-exportable:
-
-- search\_for\_document( docid ) - find pre-identified citations [30 min]
-
-- search\_for\_personal\_names( names ) -                        [30 min]
-
-
-<hr/>
-
-Day 4: (continuing Citations search, ACIS::Citations::Search)
+- similarity matrix maintenance
 
 - compare\_citation\_to\_doc( $cit, $doc ) - find out
   similarity value and store it                                  [60 min]
 
-- filter\_search\_results( $results, $filterset ) - used to filter out
-  identified or refused citations                                [45 min]
-
-- sort_search_results( $results, $matrix )                       [45 min]
-
+...
 
 
 #### ACIS::Web::Citations::Profile  [2 hours]
@@ -281,8 +215,11 @@ Database backup / restore strategy [2 hour]
        - ACIS::Citations::Input
 
 
+### Optimizations
 
-### Optimization ?
+ - ACIS::Citations::SimMatrix' advanced operations
+
+
 
 
 
