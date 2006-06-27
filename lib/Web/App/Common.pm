@@ -25,7 +25,7 @@ package Web::App::Common;   ### -*-perl-*-
 #  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 #
 #  ---
-#  $Id: Common.pm,v 2.4 2006/06/26 13:03:33 ivan Exp $
+#  $Id: Common.pm,v 2.5 2006/06/27 19:59:54 ivan Exp $
 #  ---
 
 
@@ -234,19 +234,22 @@ sub convert_date_to_ISO {
 ####  will remove undefined values from an array
 ####
 sub clear_undefined ($) {
-  my $ar = shift;
+  my $ar = $_[0];
 
-  my $i = 0;
+  my $cc = 0;
+  my $i  = 0;
   while ( $i < scalar @$ar ) {
 
     my $v = $ar ->[$i];
     if ( not defined $v ) {
       splice @$ar, $i, 1;
+      $cc ++;
       next;
     }
 
     $i ++;
   }
+  return $cc;
 }
 
 
