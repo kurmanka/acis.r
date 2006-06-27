@@ -104,6 +104,8 @@ sub clear_cit_from_suggestions ($$) {
 #   my $r = { %$h };
 # }
 
+require Encode;
+
 sub load_suggestions ($) {
   my $psid = shift;
   if ( not $sql ) { prepare; }
@@ -114,6 +116,8 @@ sub load_suggestions ($) {
 
   while ( $r and $r->{row} ) {
     my $s = { %{ $r->{row} } };  # hash copy
+    $s->{ostring} = Encode::decode_utf8( $s->{ostring} );
+
     push @slist, $s;
     $r-> next;
   }
@@ -171,7 +175,7 @@ sub testme_lowlevel() {
   my $acis = ACIS::Web->new(  );
   my $sql = $acis-> sql_object;
   $sql ->prepare( "select * from citations where nstring REGEXP ?" );
-  my $r = $sql ->execute(   "[[:<:]]KATZ, HARRY[[:>:]]" );
+  my $r = $sql ->execute(   "[[:<:]]KATZ HARRY[[:>:]]" );
   my @cl;
   while( $r and $r->{row} ) {
     my $c = { %{$r->{row}} };
