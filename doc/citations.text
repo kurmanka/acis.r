@@ -695,8 +695,7 @@ href='db.html'>Database tables</a> document. -->
 
 - Unicode decomposition, 
 - convert letters to upper case, 
-- add a space after each dot and each comma,
-- remove spaces after a dot if a comma follows it,
+- remove all non-letter, non-digit and non-whitespace characters,
 - compact all whitespace, 
 - remove leading and trailing whitespace.
 
@@ -732,30 +731,65 @@ For each name variation of the user:
 
 
 Then do citation-to-document matching and dump the results to the
-cit_suggestions table, from which the online part will pick it up.  Here is
-how it will work.  When we search for a person, we:
+cit\_suggestions table, from which the online part will pick
+it up.  So on the exit of this process we have a set of
+citation suggestions to save to the cit\_suggestions table.
 
- - find citations, that were pre-identified for the user's documents
+Here is how it will work.  When we search for a person, we
+do two distinct things for her.  1: search.  2: maintenance
+of the similarity matrix consistency, completeness and
+currentness.  
 
- - find citations, that match her name variations
+1: search
 
- - filter out identified citations
+ - by the person's research profile documents:
 
- - filter out refused citations
+    - find citations, that were pre-identified for a document
 
- - load existing suggestions 
+    - filter out identified citations
 
- - separate new citations from already suggested (those
-   already present among the current suggestions) and old
-   citations
+    - filter out refused citations
+
+    - save them to the cit_suggestions table accordingly
+
+ - the person's name:
+
+    - find citations, that match the person's name variations
+
+    - filter out identified citations
+
+    - filter out refused citations
+
+    - load existing suggestions, i.e. similarity matrix
+
+    - for each of the citation items still in the search
+      results:
+
+      - loop through the research profile documents:
+
+          - is this citation already suggested with reason='similar'?
+
+            - no: -- compare (find similarity) and save a suggestion
+            - yes: -- ok, do nothing
+
+2: matrix maintenance
 
  - expire old citation suggestions (based on the time field
    and time-to-live config param)
 
- - run citation-to-document matching for every
-   citation/document that hasn't yet been saved to the
-   cit_suggestions table or have expired and save the
-   resulting similarity values.
+ - load existing suggestions, i.e. similarity matrix
+
+ - remove the suggestions for documents, which are no longer
+   in the research profile
+
+ - run citation-to-document matching for the expired
+   similarity values, if any
+
+ - run citation-to-document matching for the new research
+   profile documents, if any
+
+ - save changed / new suggestions
+
 
 
 ### Similarity matrix
@@ -769,7 +803,7 @@ Fields:
 - citation checksum: <co>checksum CHAR(22) NOT NULL</co>
 - personal sid, short: <co>psid CHAR(15) NOT NULL</co>
 - document sid, short: <co>dsid CHAR(15) NOT NULL</co>
-- reason: 'similar' | 'pre-identified', 'co-author:pau432': <co>reason
+- reason: 'similar' | 'preidentified', 'co-author:pau432': <co>reason
   CHAR(20) NOT NULL</co>
 - similarity: <co>similar TINYINT UNSIGNED</co> - a number
   from 0 to 100 inclusive
@@ -1137,11 +1171,9 @@ exportable:
 - filter\_search\_results( $results, $filterset ) - used to filter out
   identified or refused citations
 
-- sort_search_results( $results, $matrix ) - separate new and old
+- sort_search\_results( $results, $matrix ) - separate new and old
 
 
-The question is still here on how do we re-calculate similarity for very old
-suggestions. 
 
 
 
@@ -1251,7 +1283,7 @@ So, a general dump & restore mechanism is highly desirable.
 
 
 <id>
-$Id: citations.text,v 2.35 2006/06/26 20:48:12 ivan Exp $
+$Id: citations.text,v 2.36 2006/06/27 19:59:18 ivan Exp $
 </id>
 
 
