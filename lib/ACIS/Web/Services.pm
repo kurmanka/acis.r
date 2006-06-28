@@ -28,7 +28,7 @@ package ACIS::Web;   ### -*-perl-*-
 #  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 #
 #  ---
-#  $Id: Services.pm,v 2.10 2006/05/03 21:33:59 ivan Exp $
+#  $Id: Services.pm,v 2.11 2006/06/28 13:40:01 ivan Exp $
 #  ---
 
 use strict;
@@ -728,15 +728,12 @@ sub set_form_value {
   my $self    = shift;
   my $element = shift || croak;
   my $value   = shift;
-  
-  if ( not defined $value ) {
-    Carp::cluck( "value undefined! setting to empty string" );
-    $value = '';
-  }
-  $self -> {'presenter-data'} {response} 
-           {form} {values} {$element} = $value;
 
-  debug "set form value $element: $value";
+  $self -> {'presenter-data'} {response} 
+    {form} {values} {$element} = 
+      ( defined $value ) ? $value : undef;
+
+  debug "set form value $element: ", (defined $value)? $value : '*undef*';
 }
 
 
@@ -825,7 +822,7 @@ sub prepare_form_data {
         $data = $self -> session;
       }
 
-      my $val = path_to_val ($data, $place) || '';
+      my $val = path_to_val ($data, $place);
       $self -> set_form_value ( $_ -> {name}, $val );
     }
   }
