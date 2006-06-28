@@ -12,6 +12,8 @@ requires:
     CGI::Untaint:                  1.25
     Proc::Daemon:                  0.03
     Storable:                      1.013
+    String::Approx:                0
+    String::Similarity:            1
     Unicode::Normalize:            0
     XML::LibXML:                   1.52
     XML::LibXSLT:                  1.52

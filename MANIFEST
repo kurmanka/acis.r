@@ -200,6 +200,7 @@ home/presentation/default/widgets.xsl
 home/screens.xml
 install.sh
 lib/ACIS/Citations/Input.pm
+lib/ACIS/Citations/Search.pm
 lib/ACIS/Citations/SimMatrix.pm
 lib/ACIS/Citations/Suggestions.pm
 lib/ACIS/Citations/Utils.pm

@@ -70,8 +70,8 @@
 
   <p><strong>Q1.</strong> 
   When a document's record points to your
-  personal record with its short-id ("<code class='id' ><xsl:value-of
-  select='$record-sid'/></code>"), do you want such document to be
+  personal record with its short-id (<code class='id' ><xsl:value-of
+  select='$record-sid'/></code>), do you want such document to be
   automatically added to your research profile?</p>
 
 
