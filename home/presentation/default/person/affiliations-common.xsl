@@ -148,7 +148,7 @@
     <hl screen='new-institution'>
          <xsl:text>&#160;</xsl:text>
          <a ref='@new-institution' 
-         >submit institution</a>
+         >submit&#160;institution</a>
          <xsl:text>&#160;</xsl:text>
     </hl>
 
