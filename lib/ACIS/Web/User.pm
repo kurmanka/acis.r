@@ -26,7 +26,7 @@ package ACIS::Web::User; ### -*-perl-*-
 #  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 #
 #  ---
-#  $Id: User.pm,v 2.1 2006/04/25 18:10:52 ivan Exp $
+#  $Id: User.pm,v 2.2 2006/07/04 09:21:17 ivan Exp $
 #  ---
 
 
@@ -472,7 +472,7 @@ sub settings {
 
     } else {
 
-      my $mode = $session -> {'auto-logon-mode'};
+      my $mode = $session -> {'auto-logon-mode'} || '';
       if ( $mode eq 'full' 
            or $mode eq 'login' ) {
         $app -> clear_auth_cookies;
