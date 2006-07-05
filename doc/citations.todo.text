@@ -1,6 +1,6 @@
 # ACIS Citations TO DO List
 
-2006-06-27 23:05
+2006-07-05 16:39
 
 This plan does not include any work on ReDIF parser, on RAS
 maintenance or fixing bugs in the existing ACIS code.  It
@@ -16,14 +16,27 @@ has been done already.
 
 
 
+#### ACIS::Citations::SimMatrix
+
+- matrix maintenance [90 min]
+
+- remove a citation  [30 min]
+
+- move citation new to old [45 min]
+
 #### ACIS::Citations::Search
 
-- similarity matrix maintenance
+- add auto-identified citation [30 min]
 
-- compare\_citation\_to\_doc( $cit, $doc ) - find out
-  similarity value and store it                                  [60 min]
+- check citations profile auto-update preferences [30 min]
 
-...
+- prepare the name set in a proper fashion      
+  (as in ACIS::Web::Contributions) [30 min]
+
+- report auto-changes for the email notification [60 min]
+
+- finish search for per-document pre-identified citations
+  (auto-additions) [30 min]
 
 
 #### ACIS::Web::Citations::Profile  [2 hours]

@@ -858,11 +858,14 @@ currentness.
 
     - filter out refused citations
 
-    - then:
+    - filter out already existing suggestions
+
+    - then, for the rest of citations:
 
       - auto add them (ACPU), based on preferences
 
-      - or save them to the cit_suggestions table accordingly
+      - or save them to the cit_suggestions table
+        accordingly (SimMatrix)
 
 
  - the person's name:
@@ -875,35 +878,21 @@ currentness.
 
     - load existing suggestions, i.e. similarity matrix
 
-    
+    - filter out already existing suggestions
 
-    - for each of the citation items still in the search
-      results:
+    - then, for the rest of citations:
 
-      - loop through the research profile documents:
+      - add them to the similarity matrix
 
-          - is this citation already suggested with reason='similar'?
+    - then, if auto-add is enabled for this profile
 
-            - no: -- compare (find similarity) and save a suggestion
-            - yes: -- ok, do nothing
+      - find which of the new citations have high similarity
+        measure to a document (but to only one document)
 
-2: matrix maintenance
+      - auto add them (ACPU), based on preferences
 
- - expire old citation suggestions (based on the time field
-   and time-to-live config param)
+      - remove them from the similarity matrix
 
- - load existing suggestions, i.e. similarity matrix
-
- - remove the suggestions for documents, which are no longer
-   in the research profile
-
- - run citation-to-document matching for the expired
-   similarity values, if any
-
- - run citation-to-document matching for the new research
-   profile documents, if any
-
- - save changed / new suggestions
 
 
 
@@ -968,6 +957,14 @@ matrix:
   - doclist (list): list of document sids in the order of
     decreasing similarity (based on totals_new)
 
+  - citations (hash):
+
+     - citation id | hash:
+         - docsid | list of [ 'new', $suggestion ] or
+     ['old', $suggestion ]
+
+  - psid: personal record short id
+
 
 "dxx44"                     -- research profile item's sid
 
@@ -975,16 +972,21 @@ $matrix -> {new} {dxx44}[0] -- the first of the new citations
                                suggested for research profile
                                item dxx44
 
-$matrix -> {new} {dxx44}[1]->{similarity} -- similarity of the
+$matrix -> {new} {dxx44}[1]->{similar} -- similarity of the
                             second citation's to dxx44 document
 
+$matrix -> {citations} {'dcen4-n6Ci5dmzFdBAtQx4K+mEjg'}
+{dxx44} -- array of where this citation is suggested.
 
-Also we need a index of document sids to full document
-records.  (And, possibly, an index of full document ids to
-document records.)
+$matrix -> {citations} {'dcen4-n6Ci5dmzFdBAtQx4K+mEjg'}
+{dxx44}[0][0] -- 'new' or 'old'
+
+$matrix -> {citations} {'dcen4-n6Ci5dmzFdBAtQx4K+mEjg'}
+{dxx44}[0][1] -- reference to the particular suggestion hash
+
 
 Similarity values in the matrix and in the cit_suggestions
-table are all in percent form.  It is produced by
+table are all in percent scale.  It is produced by
 multiplying the similarity value calculated by the
 cit-to-document comparison function by 100.
 
@@ -995,14 +997,33 @@ basic:
 
 - load the matrix
 
+- calculate totals
+
+
 advanced:
+
+- add new citations
 
 - remove citation
 
 - citation status change new to old
 
-- recalculate totals
 
+- matrix maintenance
+
+  - expire old citation suggestions (based on the time field
+    and time-to-live config param)
+
+  - remove the suggestions for documents, which are no longer
+    in the research profile
+
+  - run citation-to-document matching for the expired
+    similarity values, if any
+
+  - run citation-to-document matching for the new research
+    profile documents, if any
+
+ 
 
 
 ### Citation to research items similarity 
@@ -1280,15 +1301,7 @@ exportable:
 
 - search\_for\_personal\_names( names ) 
 
-- compare\_citation\_to\_doc( $cit, $doc, $psid ) - find out similarity value and
-  store it
-
-- filter\_search\_results( $results, $filterset ) - used to filter out
-  identified or refused citations
-
-- sort_search\_results( $results, $matrix ) - separate new and old
-
-
+...
 
 
 
@@ -1349,7 +1362,7 @@ use ACIS::Web::SysProfile;
 
 #### ACIS::Citations::AutoUpd  
 
-- citations_auto\_search() - called from ACIS::Web::ARPU  [30 min]
+- citations_auto\_search() - called from ACIS::Web::ARPU  [90 min]
 
 
 
@@ -1398,7 +1411,7 @@ So, a general dump & restore mechanism is highly desirable.
 
 
 <id>
-$Id: citations.text,v 2.38 2006/07/05 13:36:17 ivan Exp $
+$Id: citations.text,v 2.39 2006/07/05 14:28:20 ivan Exp $
 </id>
 
 
