@@ -6,7 +6,7 @@ use warnings;
 use Carp;
 use Encode;
 
-use ACIS::Citations::Utils;
+use ACIS::Citations::Utils qw( build_citations_index );
 use ACIS::Citations::Suggestions;
 
 # exportable:
@@ -59,7 +59,7 @@ sub search_for_document($) {
 }
 
 
-use ACIS::Citations::SimMatrix;
+use ACIS::Citations::SimMatrix qw( load_similarity_matrix );
 
 sub search_for_personal_names($) {
   my $names = shift || die;
@@ -72,7 +72,7 @@ sub search_for_personal_names($) {
   $sql -> prepare_cached( "select * from citations where nstring REGEXP ?" );
   foreach ( @$names ) {
     my $n = $_;
-    $n =~ s/[\.{}()|*?]/\\$1/g;
+    $n =~ s/([\.{}()|*?])/\\$1/g;
     my $r = $sql -> execute( "[[:<:]]$n\[[:>:]]" );
     while ( $r and $r->{row} ) {
       my $c = { %{$r->{row}} };
@@ -116,12 +116,38 @@ sub filter_search_results($$) {
   # clear_undefined returns the number of items cleared
 }
 
+my $identified;
+my $refused;
+my $identified_for_sid;
+
+sub make_identified_n_refused ($) {
+  my $rec = shift;
+
+  if ( $identified ) {
+    if ( $identified_for_sid eq $rec->{sid} ) { return; }
+    else { undef $identified; }
+  }
+
+  $identified_for_sid = $rec->{sid} || die;
+  $identified ||= {};
+  my $identified_hl = $rec->{citations}{identified} || {};
+  my $refused_l     = $rec->{citations}{refused}    || [];
+    
+  foreach ( keys %$identified_hl ) {
+    my $list = $identified_hl ->{$_};
+    build_citations_index $list, $identified;
+  }
+
+  $refused = build_citations_index $refused_l;
+}
 
 
 sub personal_search_by_documents {
   my $rec  = shift;
   my $psid = $rec->{sid};
   my $rp   = $rec->{contributions}{accepted} || [];
+
+  debug "personal_search_by_documents() for rec $psid";
 
   # make an index of research profile items by sid
   my $rp_sid = {};
@@ -133,20 +159,8 @@ sub personal_search_by_documents {
   }
 
   # build identified index and refused index
-  my $identified = {};
-  my $refused    ;
+  make_identified_n_refused $rec;
 
-  {  
-    my $identified_hl = $rec->{citations}{identified} || {};
-    my $refused_l     = $rec->{citations}{refused}    || [];
-    
-    foreach ( keys %$identified_hl ) {
-      my $list = $identified_hl ->{$_};
-      build_citations_index $list, $identified;
-    }
-
-    $refused = build_citations_index $refused_l;
-  }
 
   # search 
   foreach ( @$rp ) {
@@ -158,6 +172,8 @@ sub personal_search_by_documents {
     # process results
     filter_search_results( $r, $identified );
     filter_search_results( $r, $refused );
+
+#    $mat -> add_new_citations();
     foreach ( @$r ) {
       replace_suggestion( $_, $psid, $dsid, "preidentified", undef );
     }
@@ -173,78 +189,132 @@ sub personal_search_by_names {
   my $psid = $rec->{sid};
   my $rp   = $rec->{contributions}{accepted} || [];
 
-  # make an index of research profile items by sid
-  my $rp_sid = {};
-  foreach ( @$rp ) {
-    my $sid = $_->{sid};
-    if ( $sid ) {
-      $rp_sid->{$sid} = $_;
-    }
-  }
+  debug "personal_search_by_names() for rec $psid";
+
+  if ( not $sql ) { prepare; }
 
   # build identified index and refused index
-  my $identified = {};
-  my $refused    ;
+  make_identified_n_refused $rec;
 
-  {  
-    my $identified_hl = $rec->{citations}{identified} || {};
-    my $refused_l     = $rec->{citations}{refused}    || [];
-    
-    foreach ( keys %$identified_hl ) {
-      my $list = $identified_hl ->{$_};
-      build_citations_index $list, $identified;
-    }
-
-    $refused = build_citations_index $refused_l;
-  }
 
   # list of names 
-  my $names = $rec->{names}{additional-variations};
+  my $names = $rec->{names}{'additional-variations'};
+     $names = $rec->{contributions}{autosearch}{'names-list'};
   # XXX prepare the names, normalize them or at least remove final dots
 
   # search 
   my $r = search_for_personal_names( $names );
+  debug "\$r: ", scalar @$r;
 
   # filter
+  debug "filtering...";
   filter_search_results( $r, $identified );
   filter_search_results( $r, $refused );
+  debug "\$r: ", scalar @$r;
 
+  return if not scalar @$r;
 
   # load the matrix
   my $mat = load_similarity_matrix( $psid );
+  $mat-> upgrade( $acis, $rec );
 
+
+  # filter known suggestions
+  my $known = $mat -> filter_out_known( $r );
+  my $new   = $r;
+  debug "\$new: ", scalar @$new;
+  my $n=0;
+  foreach ( @$new ) {
+    $n++;
+    debug "$n: ", $_->{nstring};
+  }
+#  return;
+
+  # load citations-profile user preferences
+  
   # compare to documents!
+  $mat -> add_new_citations( $new );
 
-  foreach ( @$r ) {
+  # if user allows auto-additions, based on high similarity...
+  my $autoadd = 1;
+  my $sim_threshold = 75; # XXX
+
+  # now find, which of the newly added citations have high
+  # similarity value (but to only one of the documents)
+  
+  # auto add
+  return if not $autoadd;
+
+  foreach ( @$new ) {
     my $citation = $_;
+    my $cid = $_->{srcdocsid} . '-' . $_->{checksum};
+    my $candidate;
+
     foreach ( @$rp ) {
       my $doc  = $_;
-      my $dsid = $_->{sid};
-      my $potentialnew = $mat->{new}{$dsid} || [];
-      my $potentialold = $mat->{old}{$dsid} || [];
+      my $dsid = $_->{sid} || next;
 
-      my $found;
-      foreach ( @$potentialnew, @$potentialold ) {
-        if ( $_->{srcdocsid} eq $citation->{srcdocsid} 
-             and $_->{checksum} eq $citation->{checksum} ) {
-          if ( $_->{reason} eq 'similar' ) {
-            $found = $_;
+      my $l = $mat->{citations}{$cid}{$dsid};
+      
+      for ( @$l ) {
+        if ( $_->[1]{reason} eq 'similar' 
+             and $_->[1]{similar} >= $sim_threshold ) {
+          # similarity is high enough
+          if ( $candidate ) {
+            # more than one candidate, abort; XXX ???
+            undef $candidate;
             last;
+
+          } else {
+            $candidate = $dsid;
           }
         }
       }
+    }
 
-      if ( not $found ) {
-        # compare $citation and $doc and save
-        # XXX
-        replace_suggestion( $_, $psid, $dsid, "similar", XXX );
-      }
+    if ( $candidate ) {
+      # 
+      debug "citation: '", $citation->{nstring} , "' should be added to $candidate";
+#      identify_cit_to_doc( $citation, $dsid );
+#      $mat->remove_citation( $citation );
+    }
+
   }
   
 }
 
 
 
+
+sub test_personal_search_by_names {
+  
+  require ACIS::Web;
+  # home=> '/home/ivan/proj/acis.zet'
+  #  $home = '/home/ivan/proj/acis.zet';
+  my $acis = ACIS::Web->new(  );
+
+  my $sql = $acis -> sql_object;
+  $sql ->prepare( "delete from cit_suggestions where psid='piv1' ");
+  $sql ->execute;
+
+  $sql ->prepare( "delete from cit_suggestions where psid='ptestsid0' ");
+  $sql ->execute;
+
+  require ACIS::Web::UserData;
+
+  my $udata = load ACIS::Web::UserData ( 'local/tests/testuserdata.xml' );
+  my $rec = $udata->{records}[0] || die;
+
+  debug "id: ", $rec->{id};
+
+  my $names = $rec->{contributions}{autosearch}{'names-list'} || die;
+  
+  personal_search_by_names( $rec );
+#  search_for_document( 'repec:fdd:fodooo:555' );
+#  search_for_personal_names( [ 'JOHN MAKLORVICH', 'KATZ HARRY', 'KATZ, HARRY'  ] );
+
+
+}
 
 
 

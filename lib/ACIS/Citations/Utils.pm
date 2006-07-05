@@ -130,7 +130,7 @@ sub cit_document_similarity {
   my $startpos = index $nstring, $first;
   debug "citation has title starting at: $startpos";
 
-  if ($startpos) {
+  if ($startpos > -1) {
     # now compare
     my $cittitle = substr $nstring, $startpos, length( $ntitle );
     $result = similarity $ntitle, $cittitle;

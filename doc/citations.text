@@ -1,6 +1,7 @@
 Citations in ACIS
 =================
 
+Document status: implementation in progress.
 
 <p><a
 href='http://acis.openlib.org/software/doc/citations.text'>document
@@ -9,8 +10,6 @@ source</a> in Markdown format
 
 <toc/>
 
-The sections "Automatic citation profile update" and "Technical implementation
-details / developer’s guide" are <i>in progress</i>, the rest is complete.
 
 
 ## Introduction
@@ -811,7 +810,24 @@ should do the trick.
 
 Via ARPU. ACIS::Citations::AutoUpd -> ACIS::Citations::Search
 
+The search is not only search.  It involves 3 things:
+
+1. search
+2. matrix maintenance  (keeping clean)
+3. profile maintenance (keeping clean)
+
+
+
 #### ACIS::Citations::Search
+
+
+
+Search is difficult, really.  
+
+
+
+
+
 
 For each research profile item of the user:
 
@@ -842,7 +858,12 @@ currentness.
 
     - filter out refused citations
 
-    - save them to the cit_suggestions table accordingly
+    - then:
+
+      - auto add them (ACPU), based on preferences
+
+      - or save them to the cit_suggestions table accordingly
+
 
  - the person's name:
 
@@ -853,6 +874,8 @@ currentness.
     - filter out refused citations
 
     - load existing suggestions, i.e. similarity matrix
+
+    
 
     - for each of the citation items still in the search
       results:
@@ -1375,7 +1398,7 @@ So, a general dump & restore mechanism is highly desirable.
 
 
 <id>
-$Id: citations.text,v 2.37 2006/06/28 13:34:05 ivan Exp $
+$Id: citations.text,v 2.38 2006/07/05 13:36:17 ivan Exp $
 </id>
 
 

@@ -176,7 +176,7 @@ package ACIS::Citations::SimMatrix; # ::Manager
 use strict;
 use warnings;
 use Carp::Assert;
-use ACIS::Citations::Suggestions qw( load_suggestions replace_suggestion store_similarity );
+use ACIS::Citations::Suggestions qw( load_suggestions add_suggestion replace_suggestion store_similarity );
 use Web::App::Common;
 
 sub upgrade {
@@ -295,12 +295,14 @@ sub compare_citation_to_documents {
     $docs = {};
     my $rp = $self->{rec}{contributions}{accepted} || [];
     foreach ( @$rp ) {
+      my $sid = $_->{sid} || warn && next;
       my $doc = { %$_ };
       $doc->{authors} = [ split / \& /, $doc->{authors} ];
       if ( not $doc->{location} ) { }  # XXX 
-      $docs -> {$_->{sid}} = $doc;
+      $docs -> {$sid} = $doc;
     }
   }
+  debug "documents: ", join ' ', keys %$docs;
 
   my $psid = $self->{psid} || die;
   my $acis = $self->{acis} || die;
@@ -309,7 +311,7 @@ sub compare_citation_to_documents {
 
   debug "will use similarity function: $func";
 
-  foreach ( my( $dsid, $doc ) = each %$docs ) {
+  while ( my( $dsid, $doc ) = each %$docs ) {
     no strict 'refs';
     debug "comparing to $dsid (", $doc->{title}, ")";
 
@@ -374,6 +376,14 @@ sub remove_citation {  # [30 min]
   # 
 }
 
+
+sub test_advanced {
+  require ACIS::Citations::Search;
+  require ACIS::Web;
+  require ACIS::Web::UserData;
+  
+
+}
 
 
 1;

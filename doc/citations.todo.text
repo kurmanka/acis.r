@@ -3,13 +3,9 @@
 2006-06-27 23:05
 
 This plan does not include any work on ReDIF parser, on RAS
-maintenance or fixing bugs in the existing ACIS code.
-It did include one work item to do on the AMF parser, but it has been done already.
-
-
-### discuss and specify in [citations.html](citations.html)
-
-  - co-authorship claims and automatic citation profile update
+maintenance or fixing bugs in the existing ACIS code.  It
+did include one work item to do on the AMF parser, but it
+has been done already.
 
 
 ### update acis.openlib.org website ?
