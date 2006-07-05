@@ -6,18 +6,21 @@ use warnings;
 use Exporter;
 use base qw( Exporter );
 use vars qw( @EXPORT_OK );
-@EXPORT_OK = qw( store_similarity make_suggestion_old 
+@EXPORT_OK = qw( add_suggestion replace_suggestion
+                 store_similarity make_suggestion_old 
                  suggest_citation_to_authors 
-                 load_suggestions
+                 load_suggestions check_suggestions
                  clear_multiple_from_cit_suggestions );
 
 ### ACIS::Citations::Suggestions [90 min]
 
 # low level:                      [45 min]
 # - add_suggestion( cit, psid, docsid, reason, similarity )
+# - replace_suggestion( cit, psid, docsid, reason, similarity, new )
 # - store_update_suggestion( suggestion_record )
 # - clear_cit_from_suggestions( cit, psid );
 # - load_suggestions( psid );
+# - check_suggestions( cit, psid, [reason] );
 
 # high level (exported):          [45 min]
 # - store_similarity( cit, psid, docid, value )
@@ -43,7 +46,7 @@ sub prepare() {
 #     * citation checksum: checksum CHAR(22) NOT NULL
 #     * personal sid, short: psid CHAR(15) NOT NULL
 #     * document sid, short: dsid CHAR(15) NOT NULL
-#     * reason: ‘similar’ | ‘pre-identified’, ‘co-author:pau432’: reason CHAR(20) NOT NULL
+#     * reason: ‘similar’ | ‘pre-identified’, ‘coauth:pau432’: reason CHAR(20) NOT NULL
 #     * similarity: similar TINYINT UNSIGNED // (0...100)
 #     * new: yes | no new BOOL
 #     * original citation string: ostring TEXT NOT NULL
@@ -67,16 +70,46 @@ sub add_suggestion($$$$$) {
 
 }
 
-sub replace_suggestion($$$$$) {
-  my ( $cit, $psid, $dsid, $reason, $similar ) = @_;
+sub replace_suggestion($$$$$$) {
+  my ( $cit, $psid, $dsid, $reason, $similar, $new ) = @_;
   if ( not $sql ) { prepare; }
 
-  $sql -> prepare_cached( "replace into cit_suggestions values (?,?,?,?,?,?,true,?,?,NOW())" );
+  $sql -> prepare_cached( "replace into cit_suggestions values (?,?,?,?,?,?,?,?,?,NOW())" );
   $sql -> execute( $cit->{srcdocsid}, $cit->{checksum},
                    $psid, $dsid,
-                   $reason, $similar,
+                   $reason, $similar, $new,
                    $cit->{ostring}, $cit->{srcdocdetails} );
 
+}
+
+sub check_suggestions($$$;$) {
+  my ( $cit, $psid, $dsid, $reason ) = @_;
+  if ( not $sql ) { prepare; }
+
+  my @slist = ();
+  my $r;
+  if ( $reason ) {
+    $sql -> prepare_cached( 
+    "select * from cit_suggestions where srcdocsid=? and checksum=? and psid=? and dsid=? and reason=?" );
+    $r = $sql -> execute( $cit->{srcdocsid}, $cit->{checksum}, $psid, $dsid, $reason );
+  } else {
+    $sql -> prepare_cached( 
+    "select * from cit_suggestions where srcdocsid=? and checksum=? and psid=? and dsid=?" );
+    $r = $sql -> execute( $cit->{srcdocsid}, $cit->{checksum}, $psid, $dsid );
+  }
+
+  die if not $r;
+  return undef if not $r->{row};
+
+  while ( $r and $r->{row} ) {
+    my $s = { %{ $r->{row} } };  # hash copy
+    $s->{ostring} = Encode::decode_utf8( $s->{ostring} );
+
+    push @slist, $s;
+    $r-> next;
+  }
+  
+  return \@slist;
 }
 
 sub store_update_suggestion ($) {
@@ -128,10 +161,10 @@ sub load_suggestions ($) {
 
 
 sub store_similarity ($$$$) {
-  my ( $cit, $psid, $dsid, $value ) = @_;
+  my ( $cit, $psid, $dsid, $value, $new ) = @_;
   my $reason = 'similar';
   
-  replace_suggestion $cit, $psid, $dsid, $reason, $value;  
+  replace_suggestion $cit, $psid, $dsid, $reason, $value, $new;  
 }
 
 sub make_suggestion_old($) {
@@ -150,10 +183,14 @@ sub suggest_citation_to_authors($$$) {
   foreach ( @authors ) {
     my $sid = get_author_sid $_;
     next if $sid eq $psid;
-    # XXX what similarity value should be saved here?
-    replace_suggestion $cit, $sid, $dsid, "coauth:$psid", 1;
+    my $sug = check_suggestions( $cit, $psid, "coauth:$psid" ); 
+    if ( $sug ) {
+      # do nothing, already suggested
+    } else {
+      # XXX what similarity value should be saved here?
+      add_suggestion $cit, $sid, $dsid, "coauth:$psid", 1;
+    }
   }
-
 }
 
 sub clear_multiple_from_cit_suggestions($$) {

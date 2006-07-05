@@ -36,7 +36,7 @@ sub normalize_string($) {
 
 sub build_citations_index($;$) {
   my ( $citlist, $index ) = @_;
-  $index |= {};
+  $index ||= {};
   
   foreach (@$citlist) {
     my $key = $_->{srcdocsid} . '-' . $_->{checksum};
