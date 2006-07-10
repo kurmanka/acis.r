@@ -711,7 +711,9 @@ After a similarity value is calculated by the similarity
 function, the value is stored in the database.  After
 time-to-live days pass since the original calculation took
 place, this value will be considered expired and will be
-re-calculated with then-current similarity function.</p></dd>
+re-calculated with then-current similarity function.</p>
+
+<p>Default value: 100</p></dd>
 
 
 <dt><C>citation-document-similarity-preselect-treshold</C></dt>
@@ -1411,7 +1413,7 @@ So, a general dump & restore mechanism is highly desirable.
 
 
 <id>
-$Id: citations.text,v 2.39 2006/07/05 14:28:20 ivan Exp $
+$Id: citations.text,v 2.40 2006/07/10 21:12:42 ivan Exp $
 </id>
 
 

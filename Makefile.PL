@@ -64,6 +64,7 @@ WriteMakefile
                      'Unicode::Normalize' => '0',
                      'String::Approx' => '0',
                      'String::Similarity' => '1',
+                     'Date::Manip'  => '0',
                     },
    DIR => [ @dirs ],
    ABSTRACT      => 'Academic Contributor Information System',

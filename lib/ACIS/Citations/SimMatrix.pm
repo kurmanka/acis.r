@@ -237,7 +237,7 @@ sub add_sugg {
   my $psid = $self->{psid} || die;
   my $l    = $self->{new} {$dsid} ||= [];
 
-  my $sug = { %$cit, reason => $reason, similar => $sim };
+  my $sug = { %$cit, reason => $reason, similar => $sim, time => 'today' };
   push @$l, $sug;
 
   # maintain the index
@@ -281,14 +281,8 @@ sub set_similarity_unused {
 #  warn "suggestion was not found" if not $found;
 }
 
-  
-
-sub compare_citation_to_documents {
+sub _docs {
   my $self = shift || die;
-  my $cit  = shift || die;
-
-  debug "compare_citation_do_documents()";
-
   my $docs = $self-> {docs};
   if ( not $docs ) {
     ### prepare doc objects, as per Similarity assessment function interface
@@ -301,7 +295,18 @@ sub compare_citation_to_documents {
       if ( not $doc->{location} ) { }  # XXX 
       $docs -> {$sid} = $doc;
     }
+    $self->{docs} = $docs;
   }
+  return $docs;
+}
+
+sub compare_citation_to_documents {
+  my $self = shift || die;
+  my $cit  = shift || die;
+
+  debug "compare_citation_do_documents()";
+
+  my $docs = $self -> _docs;
   debug "documents: ", join ' ', keys %$docs;
 
   my $psid = $self->{psid} || die;
@@ -325,6 +330,7 @@ sub compare_citation_to_documents {
       debug "replacing";
       my $newsug = ( $no eq 'new' ) ? 1 : 0;
       $sug->{similar} = $similarity;
+      $sug->{time}    = 'today';
       replace_suggestion( $cit, $psid, $dsid, "similar", $similarity, $newsug );
 #      $self->set_similarity( $cit, $dsid, $similarity, $newsug );
 
@@ -367,6 +373,110 @@ sub add_new_citations {
 
 sub run_maintenance {   # [60 min]
   my $self = shift || die;
+
+  my $acis = $self->{acis} || die;
+  my $rec  = $self->{rec}  || die;
+  my $psid = $self->{psid} || die;
+  my $sql  = $acis->sql_object() || die;
+
+  my $new  = $self->{new};
+  my $old  = $self->{old};
+
+  # should we really run maintenance now?  Maybe we did this
+  # just recently? XXX
+ 
+  # check every citation for still being present in the
+  # citations table
+  $sql -> prepare_cached( "select checksum from citations where srcdocsid=? and checksum=?" );
+  my $citations = $self->{citations};
+  my @gone = ();
+  foreach my $cid ( keys %$citations ) { 
+    my ( $sid, $chk ) = split '-', $cid, 2;
+    my $r = $sql->execute( $sid, $chk );
+    if ( not $r ) { die; }
+    if ( not $r->{row} or not $r->{row}{checksum} ) {
+      # citation is no longer present, it is gone; it is
+      # sad, but we have to keep on
+      push @gone, $cid;
+      my $docs = $citations->{$cid};
+      foreach ( @$docs ) {
+        warn "citation's document list is corrupt" if not ref $_;
+        my $sug = $_->[1];
+        $sug ->{gone} = 1;
+      }
+      delete $citations->{$cid};
+
+      my $s = $sql->other;
+      $s -> do( "delete from cit_suggestions where srcdocsid=? and checksum=?", {}, $sid, $chk );
+    }
+  }
+  debug "citations gone: ", join( ' ', @gone );
+
+
+  # remove the suggestions for documents, which are no
+  # longer in the research profile
+  my $docs = $self->_docs;
+
+  foreach my $hash ( $new, $old ) {
+    while ( my ( $docsid, $list ) = each %$hash ) {
+      if ( not $docs->{$docsid} ) { 
+        $sql -> do( "delete from cit_suggestions where dsid=? and psid=?", {}, $docsid, $psid );
+        delete $hash->{$docsid}; 
+        debug "document gone: ", $docsid;
+        next; 
+      }
+
+      # also remove those which are gone (see the previous step)
+      foreach ( @$list ) {
+        if ( $_->{gone} ) { undef $_; }
+      }
+      clear_undefined $list;
+    }
+  }
+
+  # clean $self->{citations} also
+  foreach my $cid ( keys %$citations ) { 
+    my ( $sid, $chk ) = split '-', $cid, 2;
+    my $cdocs = $citations->{$cid} || die;
+    foreach ( keys %$cdocs ) {
+      if ( not $docs->{$_} ) {
+        delete $cdocs->{$_};
+      }
+    }
+  }
+
+
+  # re-run citation/document comparisons
+  # for those suggestions which are more then the
+  # time-to-live days old, store them in db
+  
+  # CONDITION: if cit->time is less than now() -
+  # citation-document-similarity-ttl days
+
+  use Date::Manip; # qw( DateCalc ParseDate Date_Cmp );
+  my $ttl = $acis-> config( 'citation-document-similarity-ttl' ) || die;
+  my $bell = Date::Manip::DateCalc( "today", "- $ttl days" ) || die;
+
+  foreach my $hash ( $new, $old ) {
+    while ( my ( $docsid, $list ) = each %$hash ) {
+      foreach my $sug ( @$list ) {
+        my $stime = $sug ->{time} || die;
+        next if $stime eq 'today';
+        my $sdate = Date::Manip::ParseDate( $stime );
+        if ( Date::Manip::Date_Cmp( $sdate, $bell ) < 0 ) {
+          # too old
+          $self->compare_citation_to_documents( $sug );
+          debug "suggestion too old: ", $sug;
+        }
+      }
+    }
+  }
+  
+  # recalculate totals now
+  $self -> _calculate_totals();
+
+  # record the current date in the profile
+  # XXX
 }
 
 sub remove_citation {  # [30 min]

@@ -186,6 +186,7 @@ sub personal_search_by_documents {
 
 sub personal_search_by_names {
   my $rec  = shift;
+  my $mat  = shift;
   my $psid = $rec->{sid};
   my $rp   = $rec->{contributions}{accepted} || [];
 
@@ -211,13 +212,11 @@ sub personal_search_by_names {
   filter_search_results( $r, $identified );
   filter_search_results( $r, $refused );
   debug "\$r: ", scalar @$r;
-
-  return if not scalar @$r;
+  return() if not scalar @$r;
 
   # load the matrix
-  my $mat = load_similarity_matrix( $psid );
+  $mat ||= load_similarity_matrix( $psid );
   $mat-> upgrade( $acis, $rec );
-
 
   # filter known suggestions
   my $known = $mat -> filter_out_known( $r );
@@ -228,9 +227,9 @@ sub personal_search_by_names {
     $n++;
     debug "$n: ", $_->{nstring};
   }
-#  return;
 
   # load citations-profile user preferences
+  # xxx
   
   # compare to documents!
   $mat -> add_new_citations( $new );
@@ -243,7 +242,7 @@ sub personal_search_by_names {
   # similarity value (but to only one of the documents)
   
   # auto add
-  return if not $autoadd;
+  return() if not $autoadd;
 
   foreach ( @$new ) {
     my $citation = $_;
@@ -280,7 +279,7 @@ sub personal_search_by_names {
     }
 
   }
-  
+  return();
 }
 
 
@@ -294,11 +293,11 @@ sub test_personal_search_by_names {
   my $acis = ACIS::Web->new(  );
 
   my $sql = $acis -> sql_object;
-  $sql ->prepare( "delete from cit_suggestions where psid='piv1' ");
-  $sql ->execute;
+#  $sql ->prepare( "delete from cit_suggestions where psid='piv1' ");
+#  $sql ->execute;
 
-  $sql ->prepare( "delete from cit_suggestions where psid='ptestsid0' ");
-  $sql ->execute;
+#  $sql ->prepare( "delete from cit_suggestions where psid='ptestsid0' ");
+#  $sql ->execute;
 
   require ACIS::Web::UserData;
 
@@ -308,8 +307,12 @@ sub test_personal_search_by_names {
   debug "id: ", $rec->{id};
 
   my $names = $rec->{contributions}{autosearch}{'names-list'} || die;
+  my $mat   = load_similarity_matrix( $rec->{sid} );
   
-  personal_search_by_names( $rec );
+  $mat -> upgrade( $acis, $rec );
+  $mat -> run_maintenance();
+
+  personal_search_by_names( $rec, $mat );
 #  search_for_document( 'repec:fdd:fodooo:555' );
 #  search_for_personal_names( [ 'JOHN MAKLORVICH', 'KATZ HARRY', 'KATZ, HARRY'  ] );
 
