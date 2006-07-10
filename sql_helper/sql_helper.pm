@@ -1,5 +1,5 @@
 package sql_helper;
-# $Id: sql_helper.pm,v 2.2 2006/06/26 13:03:33 ivan Exp $
+# $Id: sql_helper.pm,v 2.3 2006/07/10 18:59:03 ivan Exp $
 
 use DBI;
 # ? just for early detection of DBD::mysql absence
@@ -154,6 +154,16 @@ sub new {
 }
 
 
+sub other {
+  my $self = shift;
+  my $id  = $self->{id};
+  my $new = { dbh => $self->{dbh}, id => "${id}.copy" };
+  bless $new, $self;
+
+  if ( $self -> {verbose_log} ) { $new -> {verbose_log} = 1; }
+
+  return $new;
+}
 
 
 
