@@ -15,15 +15,6 @@ has been done already.
  - announce citations.html doc 
 
 
-
-#### ACIS::Citations::SimMatrix
-
-- matrix maintenance [90 min]
-
-- remove a citation  [30 min]
-
-- move citation new to old [45 min]
-
 #### ACIS::Citations::Search
 
 - add auto-identified citation [30 min]
@@ -55,6 +46,11 @@ has been done already.
 
 - get\_potential\_citations( docid ) - new and old, with
   sorting by decreasing similarity [45 min]
+
+#### ACIS::Citations::SimMatrix
+
+- matrix maintenance; mostly done [10 min]
+
 
 <hr/>
 
