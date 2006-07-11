@@ -484,8 +484,93 @@ sub remove_citation {  # [30 min]
   my $cit  = shift || die; 
 
   # 
+  my $acis = $self->{acis} || die;
+  my $rec  = $self->{rec}  || die;
+  my $psid = $self->{psid} || die;
+  my $sql  = $acis->sql_object() || die;
+  
+  my $cid  = $cit->{srcdocsid} . '-' . $cit->{checksum};
+  my $dhash = $self->{citations} {$cid};
+  return if not $dhash;
+  
+  delete $self->{citations}{$cid};
+
+  $sql -> do( "delete from cit_suggestions where srcdocsid=? and checksum=?", 
+              {}, 
+              $cit->{srcdocsid}, $cit->{checksum} );
+
+  while ( my($dsid,$slist) = each %$dhash ) {
+    die if not $dsid;
+    die if not $slist;
+    die if not ref $slist;
+
+    foreach ( @$slist ) {
+      next if not $_;
+      die  if not ref $_;
+      my $no = $_->[0];
+      my $su = $_->[1];
+      $su ->{gone} = 1;
+    }
+  }
+
+  my $new = $self->{new};
+  my $old = $self->{old};
+  
+  foreach my $hash ( $new, $old ) {
+    while ( my ( $docsid, $list ) = each %$hash ) {
+      # remove those which are gone 
+      foreach ( @$list ) {
+        if ( $_->{gone} ) { undef $_; }
+      }
+      clear_undefined $list;
+    }
+  }
+  
 }
 
+
+sub citation_new_make_old($$$) {
+  my $self = shift || die;
+  my $dsid = shift || die;
+  my $cit  = shift || die;
+#  my $par  = shift || die;
+#  my $val  = shift || die;
+
+  my $cits = $self->{citations};
+  my $new  = $self->{new};
+  my $old  = $self->{old};
+  
+  my $src = $cit->{srcdocsid};
+  my $chk = $cit->{checksum};
+
+  my $list = $new->{$dsid} || die;
+
+  foreach ( @$list ) {
+    if ( $_->{srcdocsid} eq $src
+         and $_->{checksum} eq $chk ) { 
+      my $s = $_;
+      undef $_; 
+      push @{ $old->{$dsid} }, $s;
+    }
+    clear_undefined $list;
+  }
+
+  my $dh = $cits->{"$src-$chk"};
+  $list = $dh->{$dsid};
+  foreach ( @$list ) {
+    $_->[0] = 'old';
+  }
+  
+
+  my $acis = $self->{acis} || die;
+  my $psid = $self->{psid} || die;
+  my $sql  = $acis->sql_object() || die;
+  $sql -> do( "update cit_suggestions set new=FALSE where psid=? and dsid=? and srcdocsid=? and checksum=?", 
+              {}, 
+              $psid, $dsid,
+              $cit->{srcdocsid}, $cit->{checksum} );
+
+}
 
 sub test_advanced {
   require ACIS::Citations::Search;
