@@ -312,7 +312,10 @@ sub test_personal_search_by_names {
   $mat -> upgrade( $acis, $rec );
   $mat -> run_maintenance();
 
+#  print "Matrix consistency: ", $mat -> check_consistency;
+
   personal_search_by_names( $rec, $mat );
+
 #  search_for_document( 'repec:fdd:fodooo:555' );
 #  search_for_personal_names( [ 'JOHN MAKLORVICH', 'KATZ HARRY', 'KATZ, HARRY'  ] );
 

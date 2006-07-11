@@ -366,12 +366,13 @@ sub add_new_citations {
   }
 
   $self -> _calculate_totals;
-
+  # XX DEBUGGING
+  $self->check_consistency;
   
 }
 
 
-sub run_maintenance {   # [60 min]
+sub run_maintenance { 
   my $self = shift || die;
 
   my $acis = $self->{acis} || die;
@@ -474,12 +475,14 @@ sub run_maintenance {   # [60 min]
   
   # recalculate totals now
   $self -> _calculate_totals();
+  # XX DEBUGGING
+  $self->check_consistency;
 
   # record the current date in the profile
   # XXX
 }
 
-sub remove_citation {  # [30 min]
+sub remove_citation { 
   my $self = shift || die;
   my $cit  = shift || die; 
 
@@ -526,10 +529,13 @@ sub remove_citation {  # [30 min]
     }
   }
   
+  # XX DEBUGGING
+  $self->_calculate_totals;
+  $self->check_consistency;
 }
 
 
-sub citation_new_make_old($$$) {
+sub citation_new_make_old {
   my $self = shift || die;
   my $dsid = shift || die;
   my $cit  = shift || die;
@@ -570,6 +576,133 @@ sub citation_new_make_old($$$) {
               $psid, $dsid,
               $cit->{srcdocsid}, $cit->{checksum} );
 
+  # XX DEBUGGING
+  $self->_calculate_totals;
+  $self->check_consistency;
+}
+
+sub check_consistency {
+  my $self = shift || die;
+
+  my $acis = $self->{acis} || die;
+  my $rec  = $self->{rec}  || die;
+  my $psid = $self->{psid} || die;
+  my $sql  = $acis->sql_object() || die;
+
+  my $old  = $self->{old};
+  my $new  = $self->{new};
+  my $cits = $self->{citations};
+  
+  #  $self->_calculate_totals;
+
+  # reload it from the database and see that it produces the
+  # same matrix 
+  my $copy = load_similarity_matrix( $psid );
+
+  my $str1 = $self->as_string;
+  my $str2 = $copy->as_string;
+
+  if ( $str1 eq $str2 ) {
+    debug "the matrix is consistent as hell";
+    return "OK";
+  }
+ 
+  foreach ( qw( new old citations ) ) {
+    my $my = $self->{$_};
+    my $co = $copy->{$_};
+    my $diff = compare_hash_keys( $my, $co );
+    if ( $diff ) {
+      warn "$_ differs by keys";
+    }
+  }
+  
+  use File::Temp;
+  my $f1 = File::Temp->new( TEMPLATE=> 'acis_sim_matrix_memory_XXXXX', UNLINK=> 0 );
+  print $f1 $str1;
+  close $f1;
+
+  my $f2 = File::Temp->new( TEMPLATE=> 'acis_sim_matrix_db_XXXXX', UNLINK=> 0 );
+  print $f2 $str2;
+  close $f2;
+
+  print "matrices are different; see " . $f1->filename . " and " . $f2->filename, "\n";
+  die "matrices are different; see " . $f1->filename . " and " . $f2->filename;
+ 
+
+  # the tests:
+
+  # for each document in $new and $old, check that each
+  # citation-suggestion is properly well-formed, ie. has all
+  # the necessary data fields in it
+
+  # for each document in $new and $old, check that each
+  # citation-suggestion is present in $cits with the same
+  # new/old status
+
+  # check that each citation is either new or old for each
+  # document, but not both
+}
+
+sub compare_hash_keys {
+  my ( $h1, $h2 ) = @_;
+  my $h1k = join ' ', sort keys %$h1;
+  my $h2k = join ' ', sort keys %$h2;
+  return $h1k cmp $h2k;
+}
+
+
+sub as_string {
+  my $self = shift;
+  my @keys = qw( psid new old citations doclist totals_new );
+  my $s = "- SIMILARITY MATRIX -\n";
+  foreach ( @keys ) {
+    $s .= "- MATRIX:$_ -\n";
+    $s .= make_string( $self->{$_} );
+    $s .= "- MATRIX:$_ end -\n";
+  }
+  return $s;
+}
+
+use UNIVERSAL qw( isa );
+
+sub make_string ($;$);
+sub make_string ($;$) {
+  my $obj = $_[0];
+  my $prefix = $_[1] || "";
+
+  if ( not defined $obj ) { return "undef"; }
+  if ( ref $obj ) {
+    my $class = ":" . ref $obj;
+    if ( $class eq ':HASH' or $class eq ':ARRAY' ) {
+      $class = '';
+    }
+    my $s = '';
+    if ( UNIVERSAL::isa( $obj, 'HASH' ) ) {
+      $s .= "HASH$class\n";
+      my @ks = sort keys %$obj;
+      foreach ( @ks ) {
+        $s .= "$prefix$_: ";
+        $s .= make_string( $obj->{$_}, "$prefix  " );
+        $s .= "\n";
+      }
+      $s .= "${prefix}HASH END\n";
+
+    } elsif ( UNIVERSAL::isa( $obj, 'ARRAY')  ) {
+
+      $s .= "ARRAY$class\n";
+      my $n = 0;
+      foreach ( @$obj ) {
+        $s .= "${prefix}$n: ";
+        $s .= make_string( $_, "$prefix  " );
+        $s .= "\n";
+        $n ++;
+      }
+      $s .= "${prefix}ARRAY END\n";
+      
+    } else { return "unknown"; };
+  } else { 
+    return $obj;
+  }
 }
 
 sub test_advanced {
