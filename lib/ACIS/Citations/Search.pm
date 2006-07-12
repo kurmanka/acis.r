@@ -7,7 +7,7 @@ use Carp;
 use Carp::Assert;
 use Encode;
 
-use ACIS::Citations::Utils qw( build_citations_index );
+use ACIS::Citations::Utils qw( build_citations_index today );
 use ACIS::Citations::Suggestions;
 
 # exportable:
@@ -180,7 +180,7 @@ sub personal_search_by_documents {
     if ( $autoadd ) {
       foreach ( @$r ) {
         debug "citation: '", $_->{nstring} , "' should be added to $dsid";
-        $_->{autoadded} = ACIS::Citations::SimMatrix::today(); # localtime( time );
+        $_->{autoadded} = today(); # localtime( time );
         $_->{autoaddreason} = 'preidentified';
         identify_cit_to_doc( $rec, $dsid, $_ );
         $mat->remove_citation( $_ );
@@ -302,7 +302,7 @@ sub personal_search_by_names {
 
     if ( $candidate ) {
       debug "citation: '", $citation->{nstring} , "' should be added to $candidate";
-      $citation->{autoadded} = ACIS::Citations::SimMatrix::today(); # localtime( time );
+      $citation->{autoadded} = today(); # localtime( time );
       $citation->{autoaddreason} = 'high-similarity';
       identify_cit_to_doc( $rec, $candidate, $citation );
       $mat->remove_citation( $citation );

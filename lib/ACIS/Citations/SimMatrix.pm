@@ -31,8 +31,11 @@ use vars qw( @EXPORT_OK );
 @EXPORT_OK = qw( load_similarity_matrix );
 
 
-use ACIS::Citations::Suggestions qw( load_suggestions );
 use Web::App::Common;
+use ACIS::Citations::Suggestions qw( load_suggestions );
+use ACIS::Citations::Utils qw( today );
+
+
 
 sub load_similarity_matrix($) {
   my $psid = shift || die;
@@ -345,10 +348,6 @@ sub compare_citation_to_documents {
   return 1;
 }
 
-use POSIX qw(strftime);
-sub today {
-  strftime '%F', localtime( time );
-}
 
 
 sub add_new_citations {

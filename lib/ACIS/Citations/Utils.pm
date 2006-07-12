@@ -10,7 +10,7 @@ use base qw( Exporter );
 use vars qw( @EXPORT_OK );
 
 @EXPORT_OK = qw( normalize_string build_citations_index
-                 get_document_authors get_author_sid );
+                 get_document_authors get_author_sid today );
 
 
 use Unicode::Normalize;
@@ -243,5 +243,13 @@ sub get_author_sid ($) {
   }
   return undef;
 }
+
+
+use POSIX qw(strftime);
+sub today() {
+  strftime '%F', localtime( time );
+}
+
+
 
 1;
