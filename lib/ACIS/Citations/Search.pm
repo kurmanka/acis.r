@@ -4,6 +4,7 @@ use strict;
 use warnings;
 
 use Carp;
+use Carp::Assert;
 use Encode;
 
 use ACIS::Citations::Utils qw( build_citations_index );
@@ -66,7 +67,7 @@ sub search_for_personal_names($) {
 
   if ( not $sql ) { prepare; }
 
-  debug "search_for_personal_names: $names (" , scalar @$names, " items)";
+  debug "search_for_personal_names: $names (" , scalar @$names, " names)";
 
   my @cl = ();
   $sql -> prepare_cached( "select * from citations where nstring REGEXP ?" );
@@ -189,6 +190,7 @@ sub personal_search_by_names {
   my $mat  = shift;
   my $psid = $rec->{sid};
   my $rp   = $rec->{contributions}{accepted} || [];
+  my $rc   = $rec->{citations} ||= {};
 
   debug "personal_search_by_names() for rec $psid";
 
@@ -198,10 +200,21 @@ sub personal_search_by_names {
   make_identified_n_refused $rec;
 
 
-  # list of names 
-  my $names = $rec->{names}{'additional-variations'};
-     $names = $rec->{contributions}{autosearch}{'names-list'};
-  # XXX prepare the names, normalize them or at least remove final dots
+  # list of names
+  my $names;
+  debug "preparing the nameset";
+  {
+    my $variations = $rec -> {name}{variations};
+    assert( $variations );
+    assert( ref $variations eq 'ARRAY' );
+    my @namelist = sort { length( $b ) <=> length( $a ) } @$variations;
+    # normalize the names or at least remove final dots
+    foreach ( @namelist ) {
+      s/\.$//;
+    }
+    $names = \@namelist;
+  }
+  
 
   # search 
   my $r = search_for_personal_names( $names );
@@ -228,22 +241,25 @@ sub personal_search_by_names {
     debug "$n: ", $_->{nstring};
   }
 
-  # load citations-profile user preferences
-  # xxx
-  
+
   # compare to documents!
   $mat -> add_new_citations( $new );
 
   # if user allows auto-additions, based on high similarity...
-  my $autoadd = 1;
-  my $sim_threshold = 75; # XXX
+  my $autoadd = $rc->{meta}{'auto-identified-auto-add'} || 1;
+  my $sim_threshold = $rc->{meta}{'auto-add-similarity-threshold'} 
+    || $acis->config( 'citation-document-similarity-preselect-treshold' ) * 100; 
 
   # now find, which of the newly added citations have high
   # similarity value (but to only one of the documents)
   
-  # auto add
+  $rc->{meta}{'last-searched-nameset-date'} = $rec -> {name}{'last-change-date'};
+
+  # return if nothing else to do
   return() if not $autoadd;
 
+  # auto add
+  my @added = ();
   foreach ( @$new ) {
     my $citation = $_;
     my $cid = $_->{srcdocsid} . '-' . $_->{checksum};
@@ -272,16 +288,29 @@ sub personal_search_by_names {
     }
 
     if ( $candidate ) {
-      # 
       debug "citation: '", $citation->{nstring} , "' should be added to $candidate";
-#      identify_cit_to_doc( $citation, $dsid );
-#      $mat->remove_citation( $citation );
+      $citation->{autoadded} = ACIS::Citations::SimMatrix::today(); # localtime( time );
+      $citation->{autoaddreason} = 'high-similarity';
+      identify_cit_to_doc( $rec, $candidate, $citation );
+      $mat->remove_citation( $citation );
+      push @added, [ $candidate, $citation ];
     }
 
   }
-  return();
+  return(\@added);
 }
 
+
+
+sub identify_cit_to_doc($$$) {
+  my ( $rec, $dsid, $citation ) = @_;
+  my $citations = $rec->{citations}    ||= {};
+  my $identified= $citations->{identified} ||= {};
+  my $doclist   = $identified->{$dsid} ||= [];
+  push @$doclist, $citation;
+  debug "added citation " . $citation->{srcdocsid} . '-' . 
+    $citation->{checksum} . ' to identified for ' . $dsid;
+}
 
 
 
@@ -296,8 +325,8 @@ sub test_personal_search_by_names {
 #  $sql ->prepare( "delete from cit_suggestions where psid='piv1' ");
 #  $sql ->execute;
 
-#  $sql ->prepare( "delete from cit_suggestions where psid='ptestsid0' ");
-#  $sql ->execute;
+  $sql ->prepare( "delete from cit_suggestions where psid='ptestsid0' ");
+  $sql ->execute;
 
   require ACIS::Web::UserData;
 
