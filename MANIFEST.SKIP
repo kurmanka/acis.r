@@ -54,3 +54,4 @@ LocalConfig\.pm$
 /200[4567]\-
 ^doc/wp.archive
 \.shell$
+^acis_sim_matrix_
