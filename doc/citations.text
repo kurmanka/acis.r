@@ -1,3 +1,4 @@
+
 Citations in ACIS
 =================
 
@@ -1162,9 +1163,10 @@ The **<co>citations</co>** branch of the userdata structure:
 
  - <co>meta</co>: hash
 
-     - auto co-authorship update option
-     - auto pre-identified update option
-     - date of the last searched name variations set
+     - <co>co-auth-auto-add</co>: auto co-authorship update option
+     - <co>auto-identified-auto-add</co>: auto pre-identified update option
+     - <co>auto-add-similarity-threshold</co>: a number
+     - <co>last-searched-nameset-date</co>: date of the last searched name variations set
 
 
  - potential new & old citations we will store in the
@@ -1413,7 +1415,7 @@ So, a general dump & restore mechanism is highly desirable.
 
 
 <id>
-$Id: citations.text,v 2.40 2006/07/10 21:12:42 ivan Exp $
+$Id: citations.text,v 2.41 2006/07/12 11:46:41 ivan Exp $
 </id>
 
 
