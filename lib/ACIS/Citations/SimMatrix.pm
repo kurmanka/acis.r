@@ -237,8 +237,10 @@ sub add_sugg {
   my $psid = $self->{psid} || die;
   my $l    = $self->{new} {$dsid} ||= [];
 
-  my $sug = { %$cit, reason => $reason, similar => $sim, time => 'today' };
+  my $sug = { %$cit, reason => $reason, similar => $sim, time => today() };
   push @$l, $sug;
+  delete $sug->{nstring};
+  delete $sug->{trgdocid};
 
   # maintain the index
   my $known = $self->{citations};
@@ -320,7 +322,7 @@ sub compare_citation_to_documents {
     no strict 'refs';
     debug "comparing to $dsid (", $doc->{title}, ")";
 
-    my $similarity = &{$func}( $cit, $doc ) * 100.0;
+    my $similarity = sprintf( '%u', &{$func}( $cit, $doc ) * 100 );
     debug "similarity: $similarity";
 
 #    my $sug = check_suggestions( $cit, $psid, $dsid, 'similar' );
@@ -330,7 +332,7 @@ sub compare_citation_to_documents {
       debug "replacing";
       my $newsug = ( $no eq 'new' ) ? 1 : 0;
       $sug->{similar} = $similarity;
-      $sug->{time}    = 'today';
+      $sug->{time}    = today();
       replace_suggestion( $cit, $psid, $dsid, "similar", $similarity, $newsug );
 #      $self->set_similarity( $cit, $dsid, $similarity, $newsug );
 
@@ -343,6 +345,10 @@ sub compare_citation_to_documents {
   return 1;
 }
 
+use POSIX qw(strftime);
+sub today {
+  strftime '%F', localtime( time );
+}
 
 
 sub add_new_citations {
@@ -691,7 +697,28 @@ sub make_string ($;$) {
 
       $s .= "ARRAY$class\n";
       my $n = 0;
-      foreach ( @$obj ) {
+      my $l = $obj;
+      my $first = $obj->[0];
+      if ( not defined $first ) {
+        $s .= "${prefix}unsorted\n"; 
+
+      } elsif ( ref $first eq 'HASH' and defined $first->{checksum} ) {
+        my @l = sort { $a->{checksum} cmp $b->{checksum}
+                       || $a->{reason} cmp $b->{reason} } @$obj;
+        $l = \@l;
+
+      } elsif ( ref $first eq 'ARRAY' and defined $first->[1] and $first->[1]{reason} ) {
+        my @l = sort { $a->[0] cmp $b->[0]
+                      || $a->[1]{checksum} cmp $b->[1]{checksum} 
+                      || $a->[1]{reason} cmp $b->[1]{reason} } @$obj;
+        $l = \@l;
+
+      } else { 
+        $s .= "${prefix}unsorted\n"; 
+      }
+        
+      
+      foreach ( @$l ) {
         $s .= "${prefix}$n: ";
         $s .= make_string( $_, "$prefix  " );
         $s .= "\n";
