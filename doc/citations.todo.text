@@ -15,23 +15,11 @@ has been done already.
  - announce citations.html doc 
 
 
-#### ACIS::Citations::Search
-
-- report auto-changes for the email notification [60 min]
-
-- finish search for per-document pre-identified citations
-  (auto-additions) [30 min]
-
-
 #### ACIS::Web::Citations::Profile  [2 hours]
 
-- get\_last\_cit\_search\_date()   [15 min]
+- understand, how will we use it
 
-- update\_last\_cit\_search\_date( ) [15 min]
-
-
-- get\_potential\_citations( docid ) - new and old, with
-  sorting by decreasing similarity [45 min]
+- fix
 
 #### ACIS::Citations::SimMatrix
 
