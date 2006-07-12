@@ -910,7 +910,7 @@ Fields:
 - citation checksum: <co>checksum CHAR(22) NOT NULL</co>
 - personal sid, short: <co>psid CHAR(15) NOT NULL</co>
 - document sid, short: <co>dsid CHAR(15) NOT NULL</co>
-- reason: 'similar' | 'preidentified', 'co-author:pau432': <co>reason
+- reason: 'similar' | 'preidentified', 'coauth:pau432': <co>reason
   CHAR(20) NOT NULL</co>
 - similarity: <co>similar TINYINT UNSIGNED</co> - a number
   from 0 to 100 inclusive
@@ -1415,7 +1415,7 @@ So, a general dump & restore mechanism is highly desirable.
 
 
 <id>
-$Id: citations.text,v 2.41 2006/07/12 11:46:41 ivan Exp $
+$Id: citations.text,v 2.42 2006/07/12 14:13:59 ivan Exp $
 </id>
 
 

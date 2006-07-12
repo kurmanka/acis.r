@@ -25,7 +25,7 @@ package ACIS::Web::Contributions;  ### -*-perl-*-
 #  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 #
 #  ---
-#  $Id: Contributions.pm,v 2.17 2006/05/15 13:06:09 ivan Exp $
+#  $Id: Contributions.pm,v 2.18 2006/07/12 14:13:59 ivan Exp $
 #  ---
 
 use strict;
@@ -1763,6 +1763,7 @@ sub search_resources_for_exact_phrase {
   my $result = [];
 
   ###  regular expression
+  $name =~ s/\.$//g; # remove final dot (or word boundary won't match)
   my $re = '[[:<:]]'. lc $name . '[[:>:]]';
 
   ###  the query
@@ -1796,6 +1797,7 @@ sub search_resources_for_exact_phrases {
 
   foreach ( @$namelist ) {
     my $name = $_;
+    $name =~ s/\.$//g; # remove final dot (or word boundary won't match)
     # escape unsafe chars
     $name =~ s!([\.*?+{}()|^[\];])!\\$1!g;
     $re .= $name;

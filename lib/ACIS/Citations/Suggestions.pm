@@ -46,7 +46,7 @@ sub prepare() {
 #     * citation checksum: checksum CHAR(22) NOT NULL
 #     * personal sid, short: psid CHAR(15) NOT NULL
 #     * document sid, short: dsid CHAR(15) NOT NULL
-#     * reason: ‘similar’ | ‘pre-identified’, ‘coauth:pau432’: reason CHAR(20) NOT NULL
+#     * reason: ‘similar’ | ‘preidentified’, ‘coauth:pau432’: reason CHAR(20) NOT NULL
 #     * similarity: similar TINYINT UNSIGNED // (0...100)
 #     * new: yes | no new BOOL
 #     * original citation string: ostring TEXT NOT NULL

@@ -144,42 +144,55 @@ sub make_identified_n_refused ($) {
 
 
 sub personal_search_by_documents {
-  my $rec  = shift;
+  my $rec  = shift || die; 
+  my $mat  = shift;
   my $psid = $rec->{sid};
   my $rp   = $rec->{contributions}{accepted} || [];
+  my $rc   = $rec->{citations} ||= {};
 
   debug "personal_search_by_documents() for rec $psid";
 
-  # make an index of research profile items by sid
-  my $rp_sid = {};
-  foreach ( @$rp ) {
-    my $sid = $_->{sid};
-    if ( $sid ) {
-      $rp_sid->{$sid} = $_;
-    }
-  }
+  if ( not $sql ) { prepare; }
+
+  my $autoadd = $rc->{meta}{'auto-identified-auto-add'} || 1;
+  my @added   = ();
 
   # build identified index and refused index
   make_identified_n_refused $rec;
 
 
+  $mat ||= load_similarity_matrix( $psid );
+  $mat -> upgrade( $acis, $rec );
+
   # search 
   foreach ( @$rp ) {
-    my $did  = $_->{id};
-    my $dsid = $_->{sid};
+    my $did  = $_->{id}  || next;
+    my $dsid = $_->{sid} || next;
     
     my $r = search_for_document( $did );
+    next if not scalar @$r;
 
     # process results
     filter_search_results( $r, $identified );
     filter_search_results( $r, $refused );
+    next if not scalar @$r;
 
-#    $mat -> add_new_citations();
-    foreach ( @$r ) {
-      replace_suggestion( $_, $psid, $dsid, "preidentified", undef );
-    }
+    if ( $autoadd ) {
+      foreach ( @$r ) {
+        debug "citation: '", $_->{nstring} , "' should be added to $dsid";
+        $_->{autoadded} = ACIS::Citations::SimMatrix::today(); # localtime( time );
+        $_->{autoaddreason} = 'preidentified';
+        identify_cit_to_doc( $rec, $dsid, $_ );
+        $mat->remove_citation( $_ );
+        push @added, [ $dsid, $_ ];
+      }
+
+    } else {
+      $mat -> add_new_citations( $r, $dsid );
+    } 
   }
-  
+
+  return ( \@added );
 }
 
 
@@ -314,7 +327,7 @@ sub identify_cit_to_doc($$$) {
 
 
 
-sub test_personal_search_by_names {
+sub test_personal_citations_search {
   
   require ACIS::Web;
   # home=> '/home/ivan/proj/acis.zet'
@@ -343,6 +356,7 @@ sub test_personal_search_by_names {
 
 #  print "Matrix consistency: ", $mat -> check_consistency;
 
+  personal_search_by_documents( $rec, $mat );
   personal_search_by_names( $rec, $mat );
 
 #  search_for_document( 'repec:fdd:fodooo:555' );

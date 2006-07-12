@@ -17,13 +17,6 @@ has been done already.
 
 #### ACIS::Citations::Search
 
-- add auto-identified citation [30 min]
-
-- check citations profile auto-update preferences [30 min]
-
-- prepare the name set in a proper fashion      
-  (as in ACIS::Web::Contributions) [30 min]
-
 - report auto-changes for the email notification [60 min]
 
 - finish search for per-document pre-identified citations
@@ -37,19 +30,12 @@ has been done already.
 - update\_last\_cit\_search\_date( ) [15 min]
 
 
-- get\_research\_profile\_identified() - get the list of the documents of the
-  research profile  [15 min]
-
-- get\_identified\_citations( docid ) - [15 min]
-
-- get\_refused\_citations() - [15 min]
-
 - get\_potential\_citations( docid ) - new and old, with
   sorting by decreasing similarity [45 min]
 
 #### ACIS::Citations::SimMatrix
 
-- matrix maintenance; mostly done [10 min]
+- matrix maintenance; finish (remove XXX marks) [10 min]
 
 
 <hr/>

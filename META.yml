@@ -10,6 +10,7 @@ requires:
     CGI::Cookie:                   1.25
     CGI::Minimal:                  1.24
     CGI::Untaint:                  1.25
+    Date::Manip:                   0
     Proc::Daemon:                  0.03
     Storable:                      1.013
     String::Approx:                0
