@@ -809,27 +809,90 @@ should do the trick.
 
 
 
-### Search for citations
+### Search for citations and ACPU
 
 Via ARPU. ACIS::Citations::AutoUpd -> ACIS::Citations::Search
 
-The search is not only search.  It involves 3 things:
+The search is not only search.  
+
+#### Automatic citations profile update
+
+ARPU will be extended to cover ACPU and they will be
+jointly called APU: automatic profile update.
+
+APU will have two configuration parameters: minimum APU period
+(default: 3 weeks or 21 day(?)) and maximum APU period (default:
+twice the minimum, i.e. 6 weeks).
+
+ACPU itself includes 3 things:
 
 1. search
-2. matrix maintenance  (keeping clean)
-3. profile maintenance (keeping clean)
+2. matrix maintenance  (clean-up)
+3. profile maintenance (clean-up)
+
+Every time ACPU is done, a timestamp is added to the sysprof
+table for that record ('last-auto-citations-time').
+
+When APU is about to run, it chooses those records, which have
+their ACPU or ARPU timestamps oldest, just as it is now done
+for ARPU only.  
+
+Then, we run one of ARPU, ACPU for the profile.  Then we
+check, how long ago did we run the other of these two.  If it
+was longer than X time ago, we run it also.  Here X is the
+minimum APU period divided by 2.
+
+
+##### Questions
+
+* How do we initialize sysprof ACPU values for the new
+  records?  Should we do this at account creation or at APU
+  itself?  
+
+  - For upgraded systems (RAS) I need some way to initialize
+    it for existing records anyway.
+
+    - APU self-maintenance would be desirable.  It could
+      estimate progress and adjust so-called APU chunk-size,
+      then initialize ACPU values for acis.records
+ 
+    - before searching sysprof, search for acis.records
+      records, which don't have a corresponding sysprof
+      record.
+
+* On the other hand, matrix maintenance and profile
+  maintenance will be done online, if the user logs in.  Should
+  we separate it from citations search?
+
+  - we could ignore these steps in APU if it was done less
+    then X time ago.
+
+  - or we could do it anyway; it may be a waste, but it won't
+    hurt (presumably; unless citations data is volatile...)
+
+    (REMEMBER: BEWARE PREMATURE OPTIMIZATION)
+
+* APRU handles specially the case of multi-record user
+  accounts, does it not?  How should this logic be adapted to
+  ACPU?
+
+  - I think this is a mistake.  They are not handled specially.
+
+
+* other automatic tasks that we need to run every once in a
+  while: session clean-up; updareq for the collections;
+  consistency checking: sanitize ... sanitize4, et cetera;
+  bin/events_archiving, but they are not per-record or
+  per-profile, they are system-global.
+
+
+
 
 
 
 #### ACIS::Citations::Search
 
-
-
-Search is difficult, really.  
-
-
-
-
+Search is complicated, really.  
 
 
 For each research profile item of the user:
@@ -1213,6 +1276,10 @@ which, in its turn will contain:
    by id and as a list?
 
 
+
+
+
+
 ### Modules
 
 #### ACIS::Citations
@@ -1415,7 +1482,7 @@ So, a general dump & restore mechanism is highly desirable.
 
 
 <id>
-$Id: citations.text,v 2.42 2006/07/12 14:13:59 ivan Exp $
+$Id: citations.text,v 2.43 2006/07/17 21:38:26 ivan Exp $
 </id>
 
 
