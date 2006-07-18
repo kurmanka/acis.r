@@ -40,6 +40,50 @@ sub logit (@) {
 }
 
 
+# resolve long id & short id into email address of the owner
+
+sub get_login_from_queue_item {
+  my $ACIS = shift;
+  my $item = shift;
+  my $login;
+
+  if ( length( $item ) > 8 
+       and $item =~ /^.+\@.+\.\w+$/ ) {
+    return lc $item;
+
+  } else {
+
+    my $sql = $ACIS -> sql_object;
+    if ( length( $item ) > 15
+         or index( $item, ":" ) > -1 ) {
+      $sql -> prepare( "select owner from records where id=?" );
+      my $r = $sql -> execute( lc $item );
+      if ( $r and $r -> {row} ) {
+        $login = $r ->{row} {owner};
+
+      } else {
+        logit "get_login_from_queue_item: id $item not found";
+      }
+
+    } elsif ( $item =~ m/^p[a-z]+\d+$/ 
+              and length( $item ) < 15 ) {
+      $sql -> prepare( "select owner,id from records where shortid=?" );
+      my $r = $sql -> execute( $item );
+      if ( $r and $r -> {row} ) {
+        $login = $r ->{row} {owner};
+
+      } else {
+        logit "get_login_from_queue_item: sid $item not found";
+      }
+
+    }
+  }
+
+  return $login;
+}
+
+
+
 my $QUEUE_TABLE_NAME = "arpm_queue";
 my @QUERIES = ( 
     # select explicitly queue-ed records
@@ -62,9 +106,12 @@ my @QUERIES = (
         ORDER BY data+1 ASC LIMIT ? !
 );
 
+
+# get_the_queue: prepare the queue for APU
+#
 # assumes $QUEUE_TABLE_NAME, $ACIS, @QUERIES
 
-sub prepare_to_process_queue {
+sub get_the_queue {
   my $size = shift || die;
   my @to_process; # return value
   logit "prepare the process queue: size=$size";
@@ -84,6 +131,7 @@ sub prepare_to_process_queue {
   # first source of the queue items
   my $query = shift( @q );
   $sql -> prepare( $query );
+  debug "QUERY: $query";
   $r = $sql -> execute( $get );
 
   # the main loop
@@ -119,6 +167,7 @@ sub prepare_to_process_queue {
     
     my $login = get_login_from_queue_item( $ACIS, $item );
     if ( $login ) {
+      debug "ITEM: $item";
       push @items, $item;
       push @to_process, [ $login, $item, $lastrun, $type ];
       push @to_process_logins, $login;
@@ -145,6 +194,7 @@ sub prepare_to_process_queue {
       if ( scalar @q ) {
         $query = shift( @q );
         $sql -> prepare( $query );
+        debug "QUERY: $query";
         $r = $sql -> execute( $get );
       } else { last; }
 
@@ -160,47 +210,115 @@ sub prepare_to_process_queue {
 }
 
 
-sub get_login_from_queue_item {
-  my $ACIS = shift;
-  my $item = shift;
-  my $login;
+sub run_apu_by_queue {
+  my $chunk = shift || 3;
+  
+  $ACIS || die;
+  my $sql = $ACIS->sql_object || die;
 
-  if ( length( $item ) > 8 
-       and $item =~ /^.+\@.+\.\w+$/ ) {
+  my $apu_too_recent_days  = $ACIS->config( 'minimum-apu-period-days' ) || 21;
+  my $apu_too_recent_hours = $apu_too_recent_days * 24;
 
-    return lc $item;
+  my @queue = get_the_queue( $chunk );
 
-  } else {
+  my $number = $chunk;
 
-    my $sql = $ACIS -> sql_object;
+  while ( $number ) {
+    my $qitem = shift @queue;
+    my $login = $qitem -> [0];
+    my $rid   = $qitem -> [1];
+    my $type  = $qitem -> [2];
+    my $res;
+    my $notes;
 
-    if ( length( $item ) > 15
-         or index( $item, ":" ) > -1 ) {
-      $sql -> prepare( "select owner from records where id=?" );
-      my $r = $sql -> execute( lc $item );
-      if ( $r and $r -> {row} ) {
-        $login = $r ->{row} {owner};
+    if ( $login ) {
 
+      if ( $rid ne $login ) { 
+        logit "about to process: $rid ($login)";
       } else {
-        logit "get_login_from_queue_item: id $item not found";
+        logit "about to process: $login";
+      }
+      
+      require ACIS::Web::Admin;
+
+      eval {
+        ###  get hands on the userdata (if possible),
+        ###  create a session and then do the work
+
+        ###  XXX $qitem is not always a record identifier, but
+        ###  offline_userdata_service expects an indentifier if anything on
+        ###  4th parameter position
+
+        $res = ACIS::Web::Admin::offline_userdata_service
+                        ( $ACIS, $login, 'ACIS::APU::record_apu', $rid, $type );
+      };
+      if ( $@ ) {
+        $res   = "FAIL"; 
+        $notes = $@;
       }
 
-    } elsif ( $item =~ m/^p[a-z]+\d+$/ 
-              and length( $item ) < 15 ) {
-      $sql -> prepare( "select owner,id from records where shortid=?" );
-      my $r = $sql -> execute( $item );
-      if ( $r and $r -> {row} ) {
-        $login = $r ->{row} {owner};
-
-      } else {
-        logit "get_login_from_queue_item: sid $item not found";
+      if ( $res ) {
+        set_queue_item_status( $sql, $rid, $res, $notes );
+        $number--;
       }
-
+      
+    } else {
+      last; 
     }
+
+
+  } continue {
+    $ACIS -> clear_after_request();
   }
 
-  return $login;
+
 }
+
+
+
+use ACIS::Web::SysProfile;
+use ACIS::Web::ARPM;
+use ACIS::Citations::AutoUpdate;
+
+sub record_apu {
+  my $acis = shift;
+
+  my $session = $acis -> session;
+  my $vars    = $acis -> variables;
+  my $record  = $session -> current_record;
+  my $id      = $record ->{id};
+  my $sid     = $record ->{sid};
+  my $sql     = $acis -> sql_object;
+
+  my $pri_type = shift;
+
+  my $now = time;
+  my $last_research  = get_sysprof_value( $sid, 'last-autosearch-time' );
+  my $last_citations = get_sysprof_value( $sid, 'last-auto-citations-time' );
+
+  my $apu_too_recent_days  = $ACIS->config( 'minimum-apu-period-days' ) || 21;
+  my $apu_too_recent_seconds = $apu_too_recent_days * 24 * 60 * 60;
+
+  # research
+  if ( not $pri_type 
+       or $pri_type eq 'research' 
+       or not $last_research
+       or ($now - $last_research >= $apu_too_recent_seconds/2)  
+     ) {
+    ACIS::Web::ARPM::search( $acis );
+  }
+
+  # citations 
+  if ( not $pri_type 
+       or $pri_type eq 'citatitons' 
+       or not $last_citations
+       or ($now - $last_citations >= $apu_too_recent_seconds/2)  
+     ) {
+    ACIS::Citations::AutoUpdate::auto_processing( $acis );
+  }
+
+}
+
 
 
 sub testme {
@@ -210,7 +328,7 @@ sub testme {
   my $acis = ACIS::Web->new();
 
   die if not $ACIS;
-  my @queue = prepare_to_process_queue( 5 );
+  my @queue = get_the_queue( 5 );
 }
 
 
