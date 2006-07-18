@@ -122,6 +122,7 @@ home/presentation/default/adm/sessions.xsl
 home/presentation/default/adm/sql.xsl
 home/presentation/default/email/account-deleted.xsl
 home/presentation/default/email/arpm-notice.xsl
+home/presentation/default/email/citations-auto-profile-update.xsl
 home/presentation/default/email/confirmation.xsl
 home/presentation/default/email/forgotten-password.xsl
 home/presentation/default/email/general.xsl
@@ -199,7 +200,10 @@ home/presentation/default/user/welcome.xsl
 home/presentation/default/widgets.xsl
 home/screens.xml
 install.sh
+lib/ACIS/APU.pm
+lib/ACIS/Citations/AutoUpdate.pm
 lib/ACIS/Citations/Input.pm
+lib/ACIS/Citations/Profile.pm
 lib/ACIS/Citations/Search.pm
 lib/ACIS/Citations/SimMatrix.pm
 lib/ACIS/Citations/Suggestions.pm

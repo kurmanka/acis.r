@@ -17,14 +17,7 @@ has been done already.
 
 ### Auto cit profile update and search
 
-ACIS::APU
-
-  - add item type (aCpu or aRpu) to the return list of the
-    prepare_to_process_queue() [20 min]
-
-  - write the actual APU processing function, which will
-    call ARPU and citations search and matrix
-    maintenance... [2 hours]
+ACIS::Citations::AutoUpdate and email template 
 
 bin/apu - updated version of bin/arpu
 

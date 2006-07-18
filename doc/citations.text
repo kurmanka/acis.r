@@ -487,7 +487,7 @@ may look like this:
 
     If necessary, review and change your preferences with
     regard to future automatic citations profile updates at:
-    http://acis.zet/research/autoupdate
+    http://gas.somewhere.org/citations/autoupdate
 
     Your password in our service is:
 
@@ -820,7 +820,8 @@ The search is not only search.
 ARPU will be extended to cover ACPU and they will be
 jointly called APU: automatic profile update.
 
-APU will have two configuration parameters: minimum APU period
+APU will have two configuration parameters:
+<C>minimum-apu-period-days</C> minimum APU period
 (default: 3 weeks or 21 day(?)) and maximum APU period (default:
 twice the minimum, i.e. 6 weeks).
 
@@ -1482,7 +1483,7 @@ So, a general dump & restore mechanism is highly desirable.
 
 
 <id>
-$Id: citations.text,v 2.43 2006/07/17 21:38:26 ivan Exp $
+$Id: citations.text,v 2.44 2006/07/18 14:13:26 ivan Exp $
 </id>
 
 
