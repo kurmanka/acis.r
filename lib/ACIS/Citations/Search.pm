@@ -7,6 +7,12 @@ use Carp;
 use Carp::Assert;
 use Encode;
 
+use base qw( Exporter );
+use vars qw( @EXPORT_OK );
+
+@EXPORT_OK = qw( personal_search_by_names personal_search_by_documents );
+
+
 use ACIS::Citations::Utils qw( build_citations_index today );
 use ACIS::Citations::Suggestions;
 
