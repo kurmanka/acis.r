@@ -25,7 +25,7 @@ package ACIS::Web::Admin;   ### -*-perl-*-
 #  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 #
 #  ---
-#  $Id: Admin.pm,v 2.9 2006/05/15 18:17:49 ivan Exp $
+#  $Id: Admin.pm,v 2.10 2006/07/18 14:10:40 ivan Exp $
 #  ---
 
 
@@ -253,6 +253,7 @@ sub offline_userdata_service {
   my $login = shift || die;
   my $func  = shift || die;
   my $rec   = shift;
+
   my $resu;
 
   debug "offline work for $login";
@@ -316,7 +317,7 @@ sub offline_userdata_service {
   
   eval {
     no strict;
-    $resu = &{ $func } ( $acis );
+    $resu = &{ $func } ( $acis, @_ );
   };
   if ( $@ ) {
     debug "offline service failed: $@";
