@@ -7,6 +7,7 @@ use strict;
 
 #####   This module can nicely format email messages from the intermediary
 #####   strings, as produced by format-email XSLT template from HTML source.
+#####   (format-email is in presentation/default/email/general.xsl)
 #####
 #####   Basically, every single line in the input is one paragraph.  If a
 #####   paragraph has any breaks in it, they must be replaced with "^^^"
