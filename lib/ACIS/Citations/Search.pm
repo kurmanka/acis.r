@@ -12,9 +12,12 @@ use vars qw( @EXPORT_OK );
 
 @EXPORT_OK = qw( personal_search_by_names personal_search_by_documents );
 
+use Web::App::Common;
 
 use ACIS::Citations::Utils qw( build_citations_index today );
-use ACIS::Citations::Suggestions;
+use ACIS::Citations::Suggestions qw( load_coauthor_suggestions_new );
+use ACIS::Citations::SimMatrix qw( load_similarity_matrix );
+
 
 # exportable:
 # 
@@ -34,7 +37,6 @@ use ACIS::Citations::Suggestions;
 #
 #
 
-use Web::App::Common;
 
 my $acis;
 my $sql;
@@ -65,8 +67,6 @@ sub search_for_document($) {
   return \@cl;
 }
 
-
-use ACIS::Citations::SimMatrix qw( load_similarity_matrix );
 
 sub search_for_personal_names($) {
   my $names = shift || die;
@@ -186,7 +186,7 @@ sub personal_search_by_documents {
     if ( $autoadd ) {
       foreach ( @$r ) {
         debug "citation: '", $_->{nstring} , "' should be added to $dsid";
-        $_->{autoadded} = today(); # localtime( time );
+        $_->{autoadded}     = today(); # localtime( time );
         $_->{autoaddreason} = 'preidentified';
         identify_cit_to_doc( $rec, $dsid, $_ );
         $mat->remove_citation( $_ );
@@ -200,6 +200,7 @@ sub personal_search_by_documents {
 
   return ( \@added );
 }
+
 
 
 
@@ -308,11 +309,14 @@ sub personal_search_by_names {
 
     if ( $candidate ) {
       debug "citation: '", $citation->{nstring} , "' should be added to $candidate";
-      $citation->{autoadded} = today(); # localtime( time );
-      $citation->{autoaddreason} = 'high-similarity';
+      $citation->{autoadded}     = today(); 
+      $citation->{autoaddreason} = 'similar';
       identify_cit_to_doc( $rec, $candidate, $citation );
       $mat->remove_citation( $citation );
       push @added, [ $candidate, $citation ];
+      # XXX Should I add here a call to 
+      #suggest_citation_to_authors($_, $psid, $candidate)
+      # ? for co-authorship claims? TBD
     }
 
   }
@@ -323,35 +327,32 @@ sub personal_search_by_names {
 
 sub identify_cit_to_doc($$$) {
   my ( $rec, $dsid, $citation ) = @_;
+  delete $citation->{reason};
+  delete $citation->{time};
+
   my $citations = $rec->{citations}    ||= {};
-  my $identified= $citations->{identified} ||= {};
-  my $doclist   = $identified->{$dsid} ||= [];
+  my $cidentified = $citations->{identified} ||= {};
+  my $doclist   = $cidentified->{$dsid} ||= [];
   push @$doclist, $citation;
-  debug "added citation " . $citation->{srcdocsid} . '-' . 
-    $citation->{checksum} . ' to identified for ' . $dsid;
+
+  # add to index
+  my $cid = $citation->{srcdocsid} . '-' . $citation->{checksum};
+  $identified -> {$cid} = $citation;
+
+  debug "added citation $cid to identified for $dsid";
 }
 
 
-
 sub test_personal_citations_search {
-  
   require ACIS::Web;
-  # home=> '/home/ivan/proj/acis.zet'
-  #  $home = '/home/ivan/proj/acis.zet';
   my $acis = ACIS::Web->new(  );
-
   my $sql = $acis -> sql_object;
-#  $sql ->prepare( "delete from cit_suggestions where psid='piv1' ");
-#  $sql ->execute;
-
   $sql ->prepare( "delete from cit_suggestions where psid='ptestsid0' ");
   $sql ->execute;
 
   require ACIS::Web::UserData;
-
   my $udata = load ACIS::Web::UserData ( 'local/tests/testuserdata.xml' );
   my $rec = $udata->{records}[0] || die;
-
   debug "id: ", $rec->{id};
 
   my $names = $rec->{contributions}{autosearch}{'names-list'} || die;
@@ -360,16 +361,68 @@ sub test_personal_citations_search {
   $mat -> upgrade( $acis, $rec );
   $mat -> run_maintenance();
 
-#  print "Matrix consistency: ", $mat -> check_consistency;
-
   personal_search_by_documents( $rec, $mat );
   personal_search_by_names( $rec, $mat );
-
-#  search_for_document( 'repec:fdd:fodooo:555' );
-#  search_for_personal_names( [ 'JOHN MAKLORVICH', 'KATZ HARRY', 'KATZ, HARRY'  ] );
-
-
+  personal_search_by_coauthors( $rec, $mat );
 }
+
+
+
+sub personal_search_by_coauthors {
+  my $rec  = shift || die; 
+  my $mat  = shift;
+  my $psid = $rec->{sid};
+  my $rp   = $rec->{contributions}{accepted} || [];
+  my $rc   = $rec->{citations} ||= {};
+
+  debug "personal_search_by_coauthors() for rec $psid";
+
+  if ( not $sql ) { prepare; }
+
+  my $autoadd = $rc->{meta}{'co-auth-auto-add'} || 1;
+  if ( !$autoadd ) { return (); }
+
+  my @added   = ();
+
+  # build identified index and refused index
+  make_identified_n_refused $rec;
+
+  if ( not $mat ) {
+    $mat = load_similarity_matrix( $psid );
+    $mat -> upgrade( $acis, $rec );
+  }
+
+  my $r = load_coauthor_suggestions_new( $psid );
+
+  filter_search_results( $r, $identified );
+  filter_search_results( $r, $refused );
+
+  foreach ( @$r ) {
+    my $dsid = $_->{dsid};
+    my $citation = $_;
+    my $reason = $_->{reason};
+
+    # a suggestion becomes just a citation
+    # copied 3 lines from ::SimMatrix
+    delete $_->{dsid};
+    delete $_->{psid};
+    delete $_->{new};
+    
+    $citation->{autoadded}     = today(); 
+    $citation->{autoaddreason} = $reason;
+    identify_cit_to_doc( $rec, $dsid, $citation );
+    $mat->remove_citation( $citation );
+    push @added, [ $dsid, $citation ];
+  }
+
+  return ( \@added );
+}
+
+
+
+
+
+
 
 
 

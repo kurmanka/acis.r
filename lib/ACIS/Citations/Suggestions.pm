@@ -9,7 +9,8 @@ use vars qw( @EXPORT_OK );
 @EXPORT_OK = qw( add_suggestion replace_suggestion
                  store_similarity make_suggestion_old 
                  suggest_citation_to_authors 
-                 load_suggestions check_suggestions
+                 load_suggestions load_coauthor_suggestions_new
+                 check_suggestions
                  clear_multiple_from_cit_suggestions );
 
 ### ACIS::Citations::Suggestions [90 min]
@@ -156,6 +157,24 @@ sub load_suggestions ($) {
   }
   
   return \@slist;
+}
+
+sub load_coauthor_suggestions_new($) {
+  my $psid = shift || die;
+  if ( not $sql ) { prepare; }
+#  debug "load_coauthor_suggestions: $psid";
+
+  $sql -> prepare_cached( "select * from cit_suggestions where reason like 'coauth:%' and psid=? and new=TRUE" );
+  my $r = $sql -> execute( $psid );
+  my @cl = ();
+  while ( $r and $r->{row} ) {
+    my $c = { %{$r->{row}} };
+    $c->{ostring} = Encode::decode_utf8( $c->{ostring} );
+    push @cl, $c;
+    $r->next;
+  }
+#  debug "load_coauthor_suggestions: found ", scalar @cl, " items";
+  return \@cl;
 }
 
 
