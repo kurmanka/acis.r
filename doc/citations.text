@@ -717,10 +717,10 @@ re-calculated with then-current similarity function.</p>
 <p>Default value: 100</p></dd>
 
 
-<dt><C>citation-document-similarity-preselect-treshold</C></dt>
+<dt><C>citation-document-similarity-preselect-threshold</C></dt>
 
 <dd><p>Citations, which have similarity value higher or equal
-than this treshold, will be offered as pre-selected by default
+than this threshold, will be offered as pre-selected by default
 (for a specific document).</p>
 
 <p>Default value: 0.75</p></dd>
@@ -1483,7 +1483,7 @@ So, a general dump & restore mechanism is highly desirable.
 
 
 <id>
-$Id: citations.text,v 2.44 2006/07/18 14:13:26 ivan Exp $
+$Id: citations.text,v 2.45 2006/07/19 14:15:10 ivan Exp $
 </id>
 
 

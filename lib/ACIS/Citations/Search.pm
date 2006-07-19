@@ -268,7 +268,7 @@ sub personal_search_by_names {
   # if user allows auto-additions, based on high similarity...
   my $autoadd = $rc->{meta}{'auto-identified-auto-add'} || 1;
   my $sim_threshold = $rc->{meta}{'auto-add-similarity-threshold'} 
-    || $acis->config( 'citation-document-similarity-preselect-treshold' ) * 100; 
+    || $acis->config( 'citation-document-similarity-preselect-threshold' ) * 100; 
 
   # now find, which of the newly added citations have high
   # similarity value (but to only one of the documents)
