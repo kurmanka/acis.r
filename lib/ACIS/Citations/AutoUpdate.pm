@@ -67,8 +67,21 @@ sub processing {
       push @$dcl, $c;
     }
     $vars->{'docs-w-cit'}   = \@docs;
+
+    require ACIS::Web::SaveProfile;
+    ACIS::Web::SaveProfile::save_profile( $acis );
+
+    my %params = ();
+    if ( $app -> config( "echo-apu-mails" ) ) {
+      $params{-bcc} = $app -> config( "admin-email" );
+    }
     
-    $acis -> send_mail( "email/citations-auto-profile-update.xsl" );
+    $acis -> send_mail( "email/citations-auto-profile-update.xsl", %params );
+
+    foreach ( qw( doc-w-cit ) ) {
+      delete $vars -> {$_};
+    }
+    
   }
   
 }
