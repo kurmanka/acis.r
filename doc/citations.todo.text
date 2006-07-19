@@ -1,6 +1,6 @@
 # ACIS Citations TO DO List
 
-2006-07-17 
+2006-07-20 00:14
 
 This plan does not include any work on ReDIF parser, on RAS
 maintenance or fixing bugs in the existing ACIS code.  It
@@ -17,9 +17,27 @@ has been done already.
 
 ### Auto cit profile update and search
 
-ACIS::Citations::AutoUpdate and email template 
+ACIS::Citations::AutoUpdate
+
+ - update sysprof last-auto-citations-time parameter
+
+ - add matrix maintenance
+
+ - add "XXX" for profile maintenance to add it when its ready
+
+ - replace echo-arpu-mails configuration parameter
+   everywhere with echo-apu-mails
+
+ - add an upgrade script to fix it in the future
+
+ - test
+
+email/citations-auto-profile-update.xsl
+
+ - test
 
 bin/apu - updated version of bin/arpu
+
 
 
 #### ACIS::Web::Citations::Profile  [1 hours]
