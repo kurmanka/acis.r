@@ -24,7 +24,6 @@ sub processing {
 
   debug "id: ", $rec->{id};
 
-  my $names = $rec->{contributions}{autosearch}{'names-list'} || die;
   my $mat   = load_similarity_matrix( $rec->{sid} );
   
   $mat -> upgrade( $acis, $rec );
@@ -75,7 +74,7 @@ sub processing {
     my %params = ();
     my $echoapu = $app -> config( "echo-apu-mails" );
     if ( not defined $echoapu ) {
-      $echoapu = $app -> config( "echo-arpu-mails" );
+      $echoapu =  $app -> config( "echo-arpu-mails" );
     }
     if ( $echoapu ) {
       $params{-bcc} = $app -> config( "admin-email" );
