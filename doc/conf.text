@@ -244,12 +244,17 @@ might be helpful for debugging the XSLT stylesheets.
 Default: undef, ie. feature is off.</dd>
 
 
-<dt><C>echo-arpu-mails</C></dt>
+<dt><C>echo-apu-mails</C></dt>
 
 <dd>Whether or not send a copy of all ARPU mails to the
 service admin.  If set to true, admin's email will be added
 into the <code>BCC:</code> field.
 </dd>
+
+<dt><C>echo-arpu-mails</C></dt>
+
+<dd>an obsolete parameter, which was replaced with
+<c>echo-apu-mails</c></dd>
 
 
 <dt><C>log-profiling-data</C></dt>

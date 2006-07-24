@@ -38,6 +38,12 @@ perl -Ilib bin/conf.pl mainconf
 ###  load parsed and translated into shell format configuration
 . thisconf.sh
 
+if test "$ACIS_echo_arpu_mails"; then
+   echo ''
+   echo WARNING! You have an obsolete echo-arpu-mails parameter in main.conf.  Replace it with echo-apu-mails.
+   echo ''
+fi
+
 function print_perl_preamble ()
 {
     file=$1

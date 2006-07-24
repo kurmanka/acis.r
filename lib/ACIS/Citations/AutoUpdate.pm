@@ -10,6 +10,7 @@ use Web::App::Common;
 use ACIS::Citations::Search qw( personal_search_by_names personal_search_by_documents );
 use ACIS::Citations::SimMatrix qw( load_similarity_matrix );
 use Web::App::Email;
+use ACIS::Web::SysProfile;
 
 sub processing {
   my $acis = shift || die;
@@ -72,7 +73,11 @@ sub processing {
     ACIS::Web::SaveProfile::save_profile( $acis );
 
     my %params = ();
-    if ( $app -> config( "echo-apu-mails" ) ) {
+    my $echoapu = $app -> config( "echo-apu-mails" );
+    if ( not defined $echoapu ) {
+      $echoapu = $app -> config( "echo-arpu-mails" );
+    }
+    if ( $echoapu ) {
       $params{-bcc} = $app -> config( "admin-email" );
     }
     
@@ -83,6 +88,10 @@ sub processing {
     }
     
   }
+
+  put_sysprof_value( $sid, "last-auto-citations-time", time );
+
+  # XXX TODO: Add citations profile maintenance
   
 }
 

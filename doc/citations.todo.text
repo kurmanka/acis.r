@@ -19,17 +19,6 @@ has been done already.
 
 ACIS::Citations::AutoUpdate
 
- - update sysprof last-auto-citations-time parameter
-
- - add matrix maintenance
-
- - add "XXX" for profile maintenance to add it when its ready
-
- - replace echo-arpu-mails configuration parameter
-   everywhere with echo-apu-mails
-
- - add an upgrade script to fix it in the future
-
  - test
 
 email/citations-auto-profile-update.xsl
