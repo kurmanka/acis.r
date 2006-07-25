@@ -152,6 +152,7 @@ sub make_identified_n_refused ($) {
 sub personal_search_by_documents {
   my $rec  = shift || die; 
   my $mat  = shift;
+  my $pretend = shift; # "pretend" mode: do not change stuff, but show what would be changed
   my $psid = $rec->{sid};
   my $rp   = $rec->{contributions}{accepted} || [];
   my $rc   = $rec->{citations} ||= {};
@@ -165,7 +166,6 @@ sub personal_search_by_documents {
 
   # build identified index and refused index
   make_identified_n_refused $rec;
-
 
   $mat ||= load_similarity_matrix( $psid );
   $mat -> upgrade( $acis, $rec );
@@ -188,13 +188,17 @@ sub personal_search_by_documents {
         debug "citation: '", $_->{nstring} , "' should be added to $dsid";
         $_->{autoadded}     = today(); # localtime( time );
         $_->{autoaddreason} = 'preidentified';
-        identify_cit_to_doc( $rec, $dsid, $_ );
-        $mat->remove_citation( $_ );
+        if ( not $pretend ) {
+          identify_cit_to_doc( $rec, $dsid, $_ );
+          $mat->remove_citation( $_ )
+        };
         push @added, [ $dsid, $_ ];
       }
 
     } else {
-      $mat -> add_new_citations( $r, $dsid );
+      debug "citation: '", $_->{nstring} , "' should be suggested to $dsid";
+      $mat -> add_new_citations( $r, $dsid )
+        if not $pretend;
     } 
   }
 
@@ -206,8 +210,9 @@ sub personal_search_by_documents {
 
 
 sub personal_search_by_names {
-  my $rec  = shift;
+  my $rec  = shift || die;
   my $mat  = shift;
+  my $pretend = shift; # "pretend" mode: do nothing destructive, but act as if we are serious
   my $psid = $rec->{sid};
   my $rp   = $rec->{contributions}{accepted} || [];
   my $rc   = $rec->{citations} ||= {};
@@ -263,7 +268,7 @@ sub personal_search_by_names {
 
 
   # compare to documents!
-  $mat -> add_new_citations( $new );
+  $mat -> add_new_citations( $new, undef, undef, $pretend );
 
   # if user allows auto-additions, based on high similarity...
   my $autoadd = $rc->{meta}{'auto-identified-auto-add'} || 1;
@@ -311,8 +316,10 @@ sub personal_search_by_names {
       debug "citation: '", $citation->{nstring} , "' should be added to $candidate";
       $citation->{autoadded}     = today(); 
       $citation->{autoaddreason} = 'similar';
-      identify_cit_to_doc( $rec, $candidate, $citation );
-      $mat->remove_citation( $citation );
+      if ( not $pretend ) {
+        identify_cit_to_doc( $rec, $candidate, $citation );
+        $mat->remove_citation( $citation );
+      }
       push @added, [ $candidate, $citation ];
       # XXX Should I add here a call to 
       #suggest_citation_to_authors($_, $psid, $candidate)

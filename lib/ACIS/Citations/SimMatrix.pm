@@ -32,6 +32,7 @@ use vars qw( @EXPORT_OK );
 
 
 use Web::App::Common;
+use ACIS::Web::SysProfile;
 use ACIS::Citations::Suggestions qw( load_suggestions );
 use ACIS::Citations::Utils qw( today );
 
@@ -236,6 +237,7 @@ sub add_sugg {
   my $dsid   = shift || die;
   my $reason = shift || die;
   my $sim    = shift;
+  my $pretend= shift;
 
   my $psid = $self->{psid} || die;
   my $l    = $self->{new} {$dsid} ||= [];
@@ -251,7 +253,8 @@ sub add_sugg {
   my $cindex = $known->{$cid}{$dsid} ||= [];
   push @$cindex, [ 'new', $sug ];
   
-  add_suggestion( $cit, $psid, $dsid, $reason, $sim );
+  add_suggestion( $cit, $psid, $dsid, $reason, $sim )
+    if not $pretend;
 }
 
 sub set_similarity_unused {
@@ -308,6 +311,7 @@ sub _docs {
 sub compare_citation_to_documents {
   my $self = shift || die;
   my $cit  = shift || die;
+  my $pretend=shift;
 
   debug "compare_citation_do_documents()";
 
@@ -328,7 +332,6 @@ sub compare_citation_to_documents {
     my $similarity = sprintf( '%u', &{$func}( $cit, $doc ) * 100 );
     debug "similarity: $similarity";
 
-#    my $sug = check_suggestions( $cit, $psid, $dsid, 'similar' );
     my ($no, $sug) = $self->find_sugg(  $cit, $dsid, 'similar' );
 
     if ( $sug ) {
@@ -336,12 +339,12 @@ sub compare_citation_to_documents {
       my $newsug = ( $no eq 'new' ) ? 1 : 0;
       $sug->{similar} = $similarity;
       $sug->{time}    = today();
-      replace_suggestion( $cit, $psid, $dsid, "similar", $similarity, $newsug );
-#      $self->set_similarity( $cit, $dsid, $similarity, $newsug );
+      replace_suggestion( $cit, $psid, $dsid, "similar", $similarity, $newsug )
+        if not $pretend;
 
     } else {
       debug "adding";
-      $self->add_sugg( $cit, $dsid, "similar", $similarity );
+      $self->add_sugg( $cit, $dsid, "similar", $similarity, $pretend );
     } 
   }
 
@@ -353,32 +356,35 @@ sub compare_citation_to_documents {
 sub add_new_citations {
   my $self = shift || die;
   my $list = shift || die;
-  my $dsid = shift;
-  my $reason = shift;
+  my $dsid    = shift;
+  my $reason  = shift;
+  my $pretend = shift; # do not add suggestions
 
   my $psid = $self->{psid} || die;
   
   if ( $dsid ) {
     foreach ( @$list ) {
-      $self->add_sugg( $_, $dsid, "preidentified", undef );
+      $self->add_sugg( $_, $dsid, "preidentified", undef, $pretend );
     }
 
   } else {
     ### run comparisons
     foreach ( @$list ) {
-      $self->compare_citation_to_documents( $_ );
+      $self->compare_citation_to_documents( $_, $pretend );
     }
   }
 
   $self -> _calculate_totals;
   # XX DEBUGGING
-  $self->check_consistency;
+  $self->check_consistency
+    if not $pretend;
   
 }
 
 
 sub run_maintenance { 
   my $self = shift || die;
+  my $pretend=shift;
 
   my $acis = $self->{acis} || die;
   my $rec  = $self->{rec}  || die;
@@ -413,7 +419,8 @@ sub run_maintenance {
       delete $citations->{$cid};
 
       my $s = $sql->other;
-      $s -> do( "delete from cit_suggestions where srcdocsid=? and checksum=?", {}, $sid, $chk );
+      $s -> do( "delete from cit_suggestions where srcdocsid=? and checksum=?", {}, $sid, $chk )
+        if not $pretend;
     }
   }
   debug "citations gone: ", join( ' ', @gone );
@@ -426,7 +433,8 @@ sub run_maintenance {
   foreach my $hash ( $new, $old ) {
     while ( my ( $docsid, $list ) = each %$hash ) {
       if ( not $docs->{$docsid} ) { 
-        $sql -> do( "delete from cit_suggestions where dsid=? and psid=?", {}, $docsid, $psid );
+        $sql -> do( "delete from cit_suggestions where dsid=? and psid=?", {}, $docsid, $psid )
+          if not $pretend;
         delete $hash->{$docsid}; 
         debug "document gone: ", $docsid;
         next; 
@@ -471,7 +479,7 @@ sub run_maintenance {
         my $sdate = Date::Manip::ParseDate( $stime );
         if ( Date::Manip::Date_Cmp( $sdate, $bell ) < 0 ) {
           # too old
-          $self->compare_citation_to_documents( $sug );
+          $self->compare_citation_to_documents( $sug, $pretend );
           debug "suggestion too old: ", $sug;
         }
       }
@@ -481,10 +489,11 @@ sub run_maintenance {
   # recalculate totals now
   $self -> _calculate_totals();
   # XX DEBUGGING
-  $self->check_consistency;
+  $self->check_consistency
+    if not $pretend;
 
-  # record the current date in the profile
-  # XXX
+  # record the current date in the sysprof table
+  put_sysprof_value( $psid, "last-citations-prof-maint-time", time );
 }
 
 sub remove_citation { 
