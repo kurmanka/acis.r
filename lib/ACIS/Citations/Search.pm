@@ -378,6 +378,7 @@ sub test_personal_citations_search {
 sub personal_search_by_coauthors {
   my $rec  = shift || die; 
   my $mat  = shift;
+  my $pretend = shift; # do not add it, just check
   my $psid = $rec->{sid};
   my $rp   = $rec->{contributions}{accepted} || [];
   my $rc   = $rec->{citations} ||= {};
@@ -417,8 +418,10 @@ sub personal_search_by_coauthors {
     
     $citation->{autoadded}     = today(); 
     $citation->{autoaddreason} = $reason;
-    identify_cit_to_doc( $rec, $dsid, $citation );
-    $mat->remove_citation( $citation );
+    if ( not $pretend ) {
+      identify_cit_to_doc( $rec, $dsid, $citation );
+      $mat->remove_citation( $citation );
+    }
     push @added, [ $dsid, $citation ];
   }
 

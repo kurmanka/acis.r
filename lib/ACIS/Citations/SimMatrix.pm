@@ -493,7 +493,8 @@ sub run_maintenance {
     if not $pretend;
 
   # record the current date in the sysprof table
-  put_sysprof_value( $psid, "last-citations-prof-maint-time", time );
+  put_sysprof_value( $psid, "last-citations-prof-maint-time", time )
+    if not $pretend;
 }
 
 sub remove_citation { 

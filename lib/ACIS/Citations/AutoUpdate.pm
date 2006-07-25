@@ -15,6 +15,8 @@ use ACIS::Web::SysProfile;
 sub processing {
   my $acis = shift || die;
 
+  my $pretend; # XXX
+
   my $session = $acis -> session || die;
   my $vars    = $acis -> variables;
   my $rec     = $session -> current_record || die; 
@@ -27,11 +29,11 @@ sub processing {
   my $mat   = load_similarity_matrix( $rec->{sid} );
   
   $mat -> upgrade( $acis, $rec );
-  $mat -> run_maintenance();
+  $mat -> run_maintenance( $pretend );
 
-  my $add_by_doc    = personal_search_by_documents( $rec, $mat ) || [];
-  my $add_by_names  = personal_search_by_names( $rec, $mat )     || [];
-  my $add_by_coauth = personal_search_by_coauthors( $rec, $mat ) || [];
+  my $add_by_doc    = personal_search_by_documents( $rec, $mat, $pretend ) || [];
+  my $add_by_names  = personal_search_by_names(     $rec, $mat, $pretend ) || [];
+  my $add_by_coauth = personal_search_by_coauthors( $rec, $mat, $pretend ) || [];
 
   if ( scalar @$add_by_doc 
        or scalar @$add_by_names
@@ -79,6 +81,12 @@ sub processing {
     if ( $echoapu ) {
       $params{-bcc} = $app -> config( "admin-email" );
     }
+
+    if ( $pretend ) {
+      $params{-to} =  $app -> config( "admin-email" );
+      undef $params{-bcc};
+      $params{'-pretend-mode'} = 'yes';
+    }
     
     $acis -> send_mail( "email/citations-auto-profile-update.xsl", %params );
 
@@ -88,10 +96,9 @@ sub processing {
     
   }
 
-  put_sysprof_value( $sid, "last-auto-citations-time", time );
+  put_sysprof_value( $sid, "last-auto-citations-time", time )
+    if not $pretend;
 
-  # XXX TODO: Add citations profile maintenance
-  
 }
 
 
