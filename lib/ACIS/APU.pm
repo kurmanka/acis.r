@@ -216,15 +216,14 @@ sub run_apu_by_queue {
   $ACIS || die;
   my $sql = $ACIS->sql_object || die;
 
-  my $apu_too_recent_days  = $ACIS->config( 'minimum-apu-period-days' ) || 21;
-  my $apu_too_recent_hours = $apu_too_recent_days * 24;
-
   my @queue = get_the_queue( $chunk );
 
   my $number = $chunk;
 
   while ( $number ) {
     my $qitem = shift @queue;
+
+    last if not $qitem;
     my $login = $qitem -> [0];
     my $rid   = $qitem -> [1];
     my $type  = $qitem -> [2];

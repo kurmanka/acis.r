@@ -1,6 +1,6 @@
 # ACIS Citations TO DO List
 
-2006-07-20 00:14
+2006-07-25 04:49
 
 This plan does not include any work on ReDIF parser, on RAS
 maintenance or fixing bugs in the existing ACIS code.  It
@@ -19,15 +19,22 @@ has been done already.
 
 ACIS::Citations::AutoUpdate
 
- - test
+ - pretend mode (for ease of testing)
+
+ - test locally
+
+ - test on test.acis
 
 email/citations-auto-profile-update.xsl
 
  - test
 
-bin/apu - updated version of bin/arpu
 
+#### ACIS::Citations::Search
 
+ - fix search routines based on Thomas feedback on acis-tech
+   Thu, 20 Jul 2006 10:57:58 +0700
+   Re: [ACIS-tech] co-authorship claims (and automatic profile update)
 
 #### ACIS::Web::Citations::Profile  [1 hours]
 
