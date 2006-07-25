@@ -10,7 +10,8 @@ use Encode;
 use base qw( Exporter );
 use vars qw( @EXPORT_OK );
 
-@EXPORT_OK = qw( personal_search_by_names personal_search_by_documents );
+@EXPORT_OK = qw( personal_search_by_names personal_search_by_documents 
+                 personal_search_by_coauthors );
 
 use Web::App::Common;
 

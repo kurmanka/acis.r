@@ -84,6 +84,7 @@ sub get_login_from_queue_item {
 
 
 
+
 my $QUEUE_TABLE_NAME = "arpm_queue";
 my @QUERIES = ( 
     # select explicitly queue-ed records
@@ -216,12 +217,12 @@ sub run_apu_by_queue {
   $ACIS || die;
   my $sql = $ACIS->sql_object || die;
 
-  my @queue = get_the_queue( $chunk );
+  my $queue = get_the_queue( $chunk );
 
   my $number = $chunk;
 
   while ( $number ) {
-    my $qitem = shift @queue;
+    my $qitem = shift @$queue;
 
     last if not $qitem;
     my $login = $qitem -> [0];
@@ -249,15 +250,23 @@ sub run_apu_by_queue {
         ###  4th parameter position
 
         $res = ACIS::Web::Admin::offline_userdata_service
-                        ( $ACIS, $login, 'ACIS::APU::record_apu', $rid, $type );
+                        ( $ACIS, $login, 'ACIS::APU::record_apu', $rid, $type ) 
+                        || '';
       };
       if ( $@ ) {
         $res   = "FAIL"; 
         $notes = $@;
       }
 
+      logit "apu for $login/$rid result: $res";
+      if ( $notes ) {
+        logit "notes: $notes";
+      }
+
       if ( $res ) {
-        set_queue_item_status( $sql, $rid, $res, $notes );
+        if ( not $type ) {
+          set_queue_item_status( $sql, $rid, $res, $notes );
+        }
         $number--;
       }
       
@@ -272,6 +281,26 @@ sub run_apu_by_queue {
 
 
 }
+
+
+# copied from ACIS::Web::ARPM::Queue
+sub set_queue_item_status {
+  my $sql  = shift;
+  my $item = shift;
+  my $stat = shift;
+  my $notes = shift;
+
+  $sql -> prepare_cached( 
+qq!
+REPLACE INTO $QUEUE_TABLE_NAME
+    ( what, status, notes, worked ) 
+VALUES 
+    ( ?, ?, ?, NOW() )
+! );
+
+  my $res = $sql -> execute( $item, $stat, $notes );
+}
+
 
 
 
@@ -290,6 +319,7 @@ sub record_apu {
   my $sql     = $acis -> sql_object;
 
   my $pri_type = shift;
+  my $pretend  = shift || $ENV{ACIS_PRETEND};
 
   my $now = time;
   my $last_research  = get_sysprof_value( $sid, 'last-autosearch-time' );
@@ -304,7 +334,7 @@ sub record_apu {
        or not $last_research
        or ($now - $last_research >= $apu_too_recent_seconds/2)  
      ) {
-    ACIS::Web::ARPM::search( $acis );
+    ACIS::Web::ARPM::search( $acis, $pretend );
   }
 
   # citations 
@@ -313,7 +343,7 @@ sub record_apu {
        or not $last_citations
        or ($now - $last_citations >= $apu_too_recent_seconds/2)  
      ) {
-    ACIS::Citations::AutoUpdate::auto_processing( $acis );
+    ACIS::Citations::AutoUpdate::auto_processing( $acis, $pretend );
   }
 
 }

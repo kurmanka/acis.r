@@ -7,15 +7,17 @@ use Carp;
 use Carp::Assert;
 use Web::App::Common;
 
-use ACIS::Citations::Search qw( personal_search_by_names personal_search_by_documents );
+use ACIS::Citations::Search qw( personal_search_by_names 
+                                personal_search_by_documents 
+                                personal_search_by_coauthors );
 use ACIS::Citations::SimMatrix qw( load_similarity_matrix );
 use Web::App::Email;
 use ACIS::Web::SysProfile;
 
-sub processing {
+sub auto_processing {
   my $acis = shift || die;
 
-  my $pretend; # XXX
+  my $pretend = shift; # XXX
 
   my $session = $acis -> session || die;
   my $vars    = $acis -> variables;
@@ -74,16 +76,16 @@ sub processing {
     ACIS::Web::SaveProfile::save_profile( $acis );
 
     my %params = ();
-    my $echoapu = $app -> config( "echo-apu-mails" );
+    my $echoapu = $acis -> config( "echo-apu-mails" );
     if ( not defined $echoapu ) {
-      $echoapu =  $app -> config( "echo-arpu-mails" );
+      $echoapu =  $acis -> config( "echo-arpu-mails" );
     }
     if ( $echoapu ) {
-      $params{-bcc} = $app -> config( "admin-email" );
+      $params{-bcc} = $acis -> config( "admin-email" );
     }
 
     if ( $pretend ) {
-      $params{-to} =  $app -> config( "admin-email" );
+      $params{-to} =  $acis -> config( "admin-email" );
       undef $params{-bcc};
       $params{'-pretend-mode'} = 'yes';
     }
