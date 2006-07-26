@@ -520,6 +520,25 @@
   </screen>
 
 
+  <screen id='citations/potential'>
+
+    <use module='ACIS::Web::Citations' />
+
+    <call function='load_session_or_authenticate' />
+    <call function='ACIS::Web::Citations::prepare'/>
+
+    <process>
+      <call function='ACIS::Web::Citations::process_potential'/>
+    </process>
+
+    <call function='ACIS::Web::Citations::prepare_potential'/>
+
+<!--
+    <presentation type='xslt'
+                  filename='person/citations/potential.xsl' />
+-->
+  </screen>
+
 
 
 <!--  new user registration screens -->
