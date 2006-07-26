@@ -289,6 +289,7 @@ sub personal_search_by_names {
   foreach ( @$new ) {
     my $citation = $_;
     my $cid = $_->{srcdocsid} . '-' . $_->{checksum};
+    my @candidates;
     my $candidate;
 
     foreach ( @$rp ) {
@@ -300,16 +301,32 @@ sub personal_search_by_names {
       for ( @$l ) {
         if ( $_->[1]{reason} eq 'similar' 
              and $_->[1]{similar} >= $sim_threshold ) {
-          # similarity is high enough
-          if ( $candidate ) {
-            # more than one candidate, abort; XXX ???
-            undef $candidate;
-            last;
 
-          } else {
-            $candidate = $dsid;
+          # similarity is high enough
+          # add to candidates
+          push @candidates, [ $dsid, $_->[1]{similar} ];
+
+          if (0) { 
+            if ( $candidate ) {
+              # more than one candidate, abort; 
+              undef $candidate;
+              last;
+              
+            } else {
+              $candidate = $dsid;
+            }
           }
         }
+      }
+    }
+
+    if ( scalar @candidates ) {
+      # sort descending by similarity value
+      @candidates = sort { $b->[1] <=> $a->[1] } @candidates;
+      # now take the first
+      $candidate = $candidates[0]->[0];
+      if ( scalar @candidates > 1 ) {
+        debug "There were ", (scalar @candidates), " candidates, picked one: $candidate";
       }
     }
 
@@ -320,11 +337,10 @@ sub personal_search_by_names {
       if ( not $pretend ) {
         identify_cit_to_doc( $rec, $candidate, $citation );
         $mat->remove_citation( $citation );
+        suggest_citation_to_authors($_, $psid, $candidate);
       }
       push @added, [ $candidate, $citation ];
-      # XXX Should I add here a call to 
-      #suggest_citation_to_authors($_, $psid, $candidate)
-      # ? for co-authorship claims? TBD
+        
     }
 
   }
