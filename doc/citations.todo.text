@@ -1,6 +1,6 @@
 # ACIS Citations TO DO List
 
-2006-07-25 04:49
+2006-07-26 23:31
 
 This plan does not include any work on ReDIF parser, on RAS
 maintenance or fixing bugs in the existing ACIS code.  It
@@ -8,47 +8,26 @@ did include one work item to do on the AMF parser, but it
 has been done already.
 
 
-### update acis.openlib.org website ?
+<hr/>
 
- - post a little news item
+Day 1:
 
- - announce citations.html doc 
-
-
-### Auto cit profile update and search
+#### Auto cit profile update and search
 
 ACIS::Citations::AutoUpdate
 
- - pretend mode (for ease of testing)
-
- - test locally
-
- - test on test.acis
+ - test on actual data on test.acis
 
 email/citations-auto-profile-update.xsl
 
  - test
 
-
-#### ACIS::Citations::Search
-
- - fix search routines based on Thomas feedback on acis-tech
-   Thu, 20 Jul 2006 10:57:58 +0700
-   Re: [ACIS-tech] co-authorship claims (and automatic profile update)
-
-#### ACIS::Web::Citations::Profile  [1 hours]
-
-#### ACIS::Citations::SimMatrix
-
-- matrix maintenance; finish (remove XXX marks) [10 min]
-
-
 <hr/>
 
-Day 5:
+Day 2:
 
 
-### Implement citation profile screens
+#### Implement citations profile screens
 
  - citations/potential
 
@@ -65,7 +44,7 @@ Day 5:
 
 <hr /> 
 
-Day 6:
+Day 3:
 
  - citations/autosug
 
@@ -84,7 +63,7 @@ Day 6:
 
 <hr /> 
 
-Day 7:
+Day 4:
 
  - citations/doclist
 
@@ -100,7 +79,7 @@ Day 7:
 
 <hr /> 
 
-Day 8:
+Day 5:
 
  - citations/potential/old/xml
 
@@ -119,7 +98,7 @@ Day 8:
 
 <hr /> 
 
-Day 9:
+Day 6:
 
 
  - citations/notmywork/xml
@@ -137,7 +116,7 @@ Day 9:
 
 <hr /> 
 
-Day 10:  (screens)
+Day 7:  (screens)
 
  - change global profile menu, but make it depending on
    the configuration variables [1 hour]
@@ -167,39 +146,26 @@ Day 10:  (screens)
 
 <hr /> 
 
-Day 11:
+Day 8:
 
 
-#### ACIS::Web::Citations::Profile (cont.)  [1 h, 15 min]
+#### ACIS::Web::Citations::Profile  [1 h]
 
 - check\_citations\_profile(); - [60 min]
 
-- check_citations\_preferences() - [15 min]
 
+#### Database backup / restore strategy [2 hour]
 
+ - backup script [30 min]
 
-
-
-### Automatic citations profile update 
-
-  - add citations search to the ARPU [60 min]
-
-  - ACIS::Citations::AutoUpd::citations_auto\_search() - called from ACIS::Web::ARPU  [30 min]
-     
-  - checking co-authors' claims ??? [? hour] 
-
-  - notification emails [2 hour]
+ - restore script or instructions [30 min]
 
 
 <hr /> 
 
-Day 12:
+Day 9:
 
-Database backup / restore strategy [2 hour]
-
- - backup script [30 min]
-
- - restore script ? [30 min]
+improve cit-doc similarity measure function!
 
 
 ### Test and fix

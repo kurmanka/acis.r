@@ -230,6 +230,7 @@ lib/ACIS/Web/CGI/Untaint/name.pm
 lib/ACIS/Web/CGI/Untaint/password.pm
 lib/ACIS/Web/CGI/Untaint/simpleemail.pm
 lib/ACIS/Web/CGI/Untaint/url.pm
+lib/ACIS/Web/Citations.pm
 lib/ACIS/Web/Config.pm
 lib/ACIS/Web/Contributions.pm
 lib/ACIS/Web/Contributions/Back.pm
