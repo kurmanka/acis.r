@@ -2,7 +2,7 @@ use ExtUtils::MakeMaker;
 # See lib/ExtUtils/MakeMaker.pm for details of how to influence
 # the contents of the Makefile that is written.
 
-print "Preparing to install ACIS.\n";
+#print "Preparing to install ACIS.\n";
 
 # $DEBUG = 1;
 
@@ -45,12 +45,7 @@ sub MY::dist {
 }
 
 
-
-WriteMakefile
-  (
-   'NAME'               => 'ACIS',
-   'VERSION'    => '0.1',
-   'PREREQ_PM'  =>  {
+my $modules =  {
                      'Carp::Assert' => "0.17",
                      'Storable'     => "1.013",
                      'CGI::Cookie'  => '1.25',
@@ -65,23 +60,42 @@ WriteMakefile
                      'String::Approx' => '0',
                      'String::Similarity' => '1',
                      'Date::Manip'  => '0',
-                    },
-   DIR => [ @dirs ],
-   ABSTRACT      => 'Academic Contributor Information System',
-   AUTHOR        => 'Ivan Bahcheyev & Ivan Kurmanov',
+                    };
 
+print "Checking required modules...\n";
+my $fine = 1;
+while ( my ($m,$v) = each %$modules ) {
+  if ( not have_module( $m, $v ) ) {
+    my $version = '';
+    if ( $v ne '0' ) { $version = " (version $v+)"; }
+    print "  - $m$version is not found\n";
+    $fine = 0;
+  }
+}
+if ( $fine ) {
+  print "Fine!\n";
+}
 
-  );
+die "to install ACIS, use install.sh script"
+  unless $ENV{ACIS_INSTALL} or $ENV{ACIS_DEV};
+
+WriteMakefile(
+              NAME       => 'ACIS',
+              VERSION    => '0.1',
+              PREREQ_PM  => $modules,
+              DIR        => [ @dirs ],
+              ABSTRACT   => 'Academic Contributor Information System',
+              AUTHOR     => 'Ivan Bahcheyev & Ivan Kurmanov',
+             )
+  if $ENV{ACIS_DEV};
 
 
 
 # copied from AxKit's Makefile.PL, http://axkit.org
 
-
 sub have_module {
     my ($module, $version) = (@_, 0);
-    printf("checking for module %s >= version %s... ", $module, $version);
-
+#    printf("checking for module %s >= version %s... ", $module, $version);
 
     if ( $version eq '0' ) { 
       $version = '';
@@ -90,10 +104,10 @@ sub have_module {
     eval "package Foo; use $module $version;";
     if ($@) {
         print $@ if $DEBUG;
-        print "no\n";
+#        print "no\n";
         return 0;
     }
-    print "yes\n";
+#    print "yes\n";
     return 1;
 }
 

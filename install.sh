@@ -39,6 +39,8 @@ else
    mkdir $dest
 fi
 
+ACIS_INSTALL=1 perl Makefile.PL
+
 cd $dest
 dest=`pwd`
 
@@ -49,6 +51,7 @@ if test -z $dest; then
     echo "Can't get absolute path to $1"
     exit 1
 fi
+
 
 cd $dest
 test -d bin           || mkdir bin
