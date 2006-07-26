@@ -1,7 +1,4 @@
-if test $perllibprepend
-then 
-    perlparams="-I$perllibprepend"
-fi
+perlparams=-w
 if test "$ACIS_cgi_pperl_binary"
 then 
     perlbin="$ACIS_cgi_pperl_binary"
@@ -9,14 +6,18 @@ fi
 echo "#!$perlbin $perlparams"
 echo 
 echo "use lib qw( $homelib );"
-echo "use vars qw( \$acis );"
+if test $perllibprepend
+then 
+    echo "use lib qw( $perllibprepend );"
+fi
 echo 
 if [[ $perllibadd ]]; then
   echo "BEGIN{ push @INC, '$perllibadd'; }"      
   echo ""                               
 fi
 echo 'use strict;'
-#echo 'use warnings;'
+echo
+echo "use vars qw( \$acis );"
 echo
 if test $ACIS_extreme_debug
 then 
