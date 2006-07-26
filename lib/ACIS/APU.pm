@@ -346,6 +346,7 @@ sub record_apu {
     ACIS::Citations::AutoUpdate::auto_processing( $acis, $pretend );
   }
 
+  return "OK";
 }
 
 

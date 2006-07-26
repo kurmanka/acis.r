@@ -299,7 +299,8 @@ sub _docs {
     foreach ( @$rp ) {
       my $sid = $_->{sid} || warn && next;
       my $doc = { %$_ };
-      $doc->{authors} = [ split / \& /, $doc->{authors} ];
+      my $authors = $doc->{authors} || '';
+      $doc->{authors} = [ split / \& /, $authors ];
       if ( not $doc->{location} ) { }  # XXX 
       $docs -> {$sid} = $doc;
     }
