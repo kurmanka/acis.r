@@ -396,7 +396,12 @@ sub run_maintenance {
   my $old  = $self->{old};
 
   # should we really run maintenance now?  Maybe we did this
-  # just recently? XXX
+  # just recently?
+  my $lasttime = get_sysprof_value( $psid, "last-citations-prof-maint-time" );
+  if ( time - $lasttime < 2 * 24 * 60 * 60 ) {
+    debug "last maintenance was done less then 2 days ago";
+    return;
+  }
  
   # check every citation for still being present in the
   # citations table
