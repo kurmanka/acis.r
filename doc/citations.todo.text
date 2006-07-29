@@ -1,12 +1,18 @@
 # ACIS Citations TO DO List
 
-2006-07-26 23:31
+2006-07-27 00:56 
 
 This plan does not include any work on ReDIF parser, on RAS
 maintenance or fixing bugs in the existing ACIS code.  It
 did include one work item to do on the AMF parser, but it
 has been done already.
 
+
+- Reformulate the plan below this point in such a way that:
+  we first do a draft, simplistic implementation of every
+  screen.  Then we test it with our tester/helpers on
+  test.acis.openlib.org.  Then we do full, proper, detailed,
+  careful, optimized implementation for every screen.
 
 <hr/>
 
