@@ -28,7 +28,7 @@ package ACIS::Web;   ### -*-perl-*-
 #  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 #
 #  ---
-#  $Id: Services.pm,v 2.11 2006/06/28 13:40:01 ivan Exp $
+#  $Id: Services.pm,v 2.12 2006/07/29 20:14:41 ivan Exp $
 #  ---
 
 use strict;
@@ -964,19 +964,16 @@ sub process_form_data {
   
   foreach my $par ( @$params ) {
 
-    my $name = $par -> {name};
-     
-    next if not defined $par -> {place};
+    my $name  = $par -> {name};
+    my $place = $par -> {place};
+
+    next if not defined $place;
 
     next if not exists $input->{$name} 
       and exists $par ->{'if-not-empty'};
 
-    my $val = $input -> {$name};
-
-    next if not defined $val;
-
-    my $place = $par -> {place};
-    next if not defined $place;
+    my $val = $input -> {$name} || '';
+#    next if not defined $val;
 
     debug "process parameter '$name', value '$val'";
     debug "store to $place";
