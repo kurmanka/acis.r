@@ -109,7 +109,7 @@ function toggle_class( id, cla ) {
 
 function set_class_if( o, cla, checked ) {
   if ( typeof o == 'string' ) {
-     o = getRef( id );
+     o = getRef( o );
   }
   var class_list;
   if ( o ) {
