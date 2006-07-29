@@ -176,12 +176,10 @@ sub search_for_resources_exact {
     my $found = ( defined $search ) ? scalar( @$search ) : 'nothing' ;
     logit "exact name: '$_', found: $found";
 
-    if ( scalar @$search ) {
+    if ( $search and scalar @$search ) {
       save_suggestions( $sql, $context, 'exact-name-variation-match', '', $search );
     }
   }
-
-
 
   logit "search_for_resources_exact: exit";
 
@@ -209,19 +207,23 @@ sub additional_searches {
   require ACIS::Web::Contributions;
 
 
-
   ###  NAME PART SEARCH
   my $search = 
     ACIS::Web::Contributions::search_resources_for_exact_phrases( 
         $sql, $context, $namelist );
   
-  my $found = ( defined $search ) ? scalar @$search : 'nothing' ;
-  logit "exact phrases search for a list of names, found: $found";
-
-  if ( scalar @$search ) {
-    save_suggestions( $sql, $context, 'name-variation-part-match', '', $search );
+  {
+    my $found = ( defined $search ) ? scalar @$search : 'nothing' ;
+    logit "exact phrases search for a list of names, found: $found";
+    
+    if ( $search and scalar @$search ) {
+      if ( $found < 200 ) { 
+        save_suggestions( $sql, $context, 'name-variation-part-match', '', $search );
+      } else {
+        logit "too many hits, ignoring";
+      }
+    }
   }
-
 
   ###  now search by email address 
   {
@@ -249,7 +251,7 @@ sub additional_searches {
     my $found = ( defined $suggestions_3 ) ? scalar @$suggestions_3 : 'nothing' ;
     logit "suggestions by surname as a word: $found";
     if ( $found > 0 ) {
-      if ( $found < 300 ) { 
+      if ( $found < 200 ) { 
         save_suggestions( $sql, $context, 'surname-part-match', '',  $suggestions_3 );
       } else {
         logit "too many hits, ignoring";
@@ -438,7 +440,7 @@ sub load_suggestions {
 }
 
 
-
+my $MAX_SUGGESTIONS_LIMIT = 1000;
 sub load_suggestions_into_contributions {
   my $app = shift;
   my $sid = shift;    ## person short id
@@ -446,6 +448,17 @@ sub load_suggestions_into_contributions {
 
   debug "load_suggestions_into_contributions: enter";
   debug "short id: $sid";
+
+  my $sql = $app -> sql_object;
+  # a sanity check for over-enthusiastic suggestions
+  {
+    $sql -> prepare ( "select count(*) as num from $back_table where psid=? and target='contributions'" );
+    my $r = $sql -> execute ( $sid );
+    if ( $r and $r->{row} and $r->{row}{num} and $r->{row}{num} > $MAX_SUGGESTIONS_LIMIT ) {
+      debug sprintf "too many suggestions for this record: %d; will clean up the inexact ones", $r->{row}{num};
+      $sql->do( "delete from $back_table where psid=? and target='contributions' and reason NOT RLIKE 'exact-'" );      
+    }
+  }
 
   my $accepted         = $contributions -> {accepted};
 
@@ -458,21 +471,25 @@ sub load_suggestions_into_contributions {
 
   my $result = [];
 
-  my $sql = $app -> sql_object;
-
   my $query = "select * from $back_table where psid=? and target='contributions'";
   $query .= " order by time ASC";
-
-  my $reasons = {};
-
   $sql -> prepare ( $query );
 
   my $r = $sql -> execute ( $sid );
 
+  my $counter = 0;
+  my $reasons = {};
   my $group;  ### suggestions are grouped by reason (and role)
   my $list ;
 
   while ( $r and $r -> {row} ) {
+
+    if ( $counter++ > $MAX_SUGGESTIONS_LIMIT ) {
+      # just in case the above check & clean-up didn't work or didn't help enough
+      debug "enough suggestions: $counter";
+      last;
+    }
+
     debug "a row";
     my $row = $r -> {row};
     my $item;

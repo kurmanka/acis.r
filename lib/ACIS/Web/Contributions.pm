@@ -25,7 +25,7 @@ package ACIS::Web::Contributions;  ### -*-perl-*-
 #  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 #
 #  ---
-#  $Id: Contributions.pm,v 2.18 2006/07/12 14:13:59 ivan Exp $
+#  $Id: Contributions.pm,v 2.19 2006/07/29 20:15:42 ivan Exp $
 #  ---
 
 use strict;
@@ -415,7 +415,11 @@ sub prepare_for_auto_search {
     my $variations = $record -> {name}{variations};
     assert( $variations );
     assert( ref $variations eq 'ARRAY' );
-    @namelist = sort { length( $b ) <=> length( $a ) } @$variations;
+    @namelist = @$variations;
+    @namelist = grep { length( $_ ) > 1 } @namelist;
+    # strip all non-letter chars and filter
+    @namelist = grep { my $l = $_; $l =~ s/\W//g; length( $l ) > 1 } @namelist;
+    @namelist = sort { length( $b ) <=> length( $a ) } @namelist;
   }
 
   $autosearch -> {'names-list'} = \@namelist;
@@ -433,7 +437,6 @@ sub auto_search_done {
   my $sid     = $record ->{sid};
 
   assert( $contributions );
-#  my $contributions = $session ->{$id} {contributions} ;
   my $autosearch    = $contributions -> {autosearch};
 
 
@@ -443,8 +446,6 @@ sub auto_search_done {
                      'last-autosearch-time', 
                      $time );
 
-  #  $vars -> {'last-autosearch-start-time'} = $time;
-  
   my $names_last_change_date = $record -> {name}{'last-change-date'};
   $autosearch -> {'for-names-last-changed'} = $names_last_change_date;
   
@@ -454,8 +455,6 @@ sub auto_search_done {
 sub automatic_search {
   my $app = shift;
 
-#  my $sql = $app -> sql_object;
-
   my $session = $app -> session;
   my $vars    = $app -> variables;
   my $record  = $session -> current_record;
@@ -463,7 +462,6 @@ sub automatic_search {
   my $sid     = $record ->{sid};
 
   assert( $contributions );
-#  my $contributions = $session ->{$id} {contributions} ;
 
   ACIS::Web::Contributions::prepare_for_auto_search( $app );
 
@@ -558,8 +556,6 @@ sub accept_item {
   assert( $contributions );
   assert( $accepted );
   assert( $acis );
-#  my $contributions =    ;
-#  my $accepted      =    ;
   my $already_accepted = $contributions -> {'already-accepted'};
   my $action;
 
@@ -743,7 +739,6 @@ sub process {
   my $psid    = $record -> {sid};
 
   assert( $contributions );
-#  my $contributions = $session -> {$id} {contributions}; 
   
   &get_configuration( $app );
 
@@ -753,8 +748,6 @@ sub process {
 
   assert( $accepted );
   assert( $refused  );
-#  my $accepted = $contributions ->{accepted};
-#  my $refused  = $contributions ->{refused};
 
   my $already_accepted = $contributions -> {'already-accepted'}; 
   my $already_refused  = $contributions -> {'already-refused' }; 
@@ -1671,18 +1664,20 @@ sub query_resources ($$) {
   my $table = shift;
   my $where = shift;
 
-  if ( $table eq 'resources' ) {
+  my $q;
 
-    return qq!SELECT catch.id as id,lib.data as data
+  if ( $table eq 'resources' ) {
+    ### by resources from objects
+    $q = qq!SELECT catch.id as id,lib.data as data
 FROM $DB.$table as catch
 LEFT JOIN $DB.objects as lib
  ON catch.id = lib.id
 WHERE $where
 !;
-  }
-  
-  ###  the query
-  return qq!
+
+  } else {
+    ### by some other table (catch) via resources (lookup) from objects 
+    $q = qq!
 SELECT lib.id as id,lib.data as data,catch.role as role
 FROM $DB.$table as catch 
 LEFT JOIN $DB.resources as lookup
@@ -1690,8 +1685,13 @@ LEFT JOIN $DB.resources as lookup
 LEFT JOIN $DB.objects as lib
  ON lookup.id = lib.id
 WHERE $where
-! ;
+!;
+  }
 
+  if ( $q !~ m/\sLIMIT\s+\d+\s*$/i ) {
+    $q .= ' LIMIT 2000'; ## magic number: maximum records returned from a search
+  }
+  return $q;
 }
 
 
@@ -1701,8 +1701,8 @@ sub search_resources_for_exact_name {
   my $context = shift;
   my $name    = shift;
 
+  return undef if not $name or length( $name ) < 2;
   my $result = [];
-
 
   ###  the query
   $sql -> prepare_cached( 
@@ -1764,6 +1764,9 @@ sub search_resources_for_exact_phrase {
 
   ###  regular expression
   $name =~ s/\.$//g; # remove final dot (or word boundary won't match)
+  return undef if not $name;
+  return undef if length ($name) < 2;
+
   my $re = '[[:<:]]'. lc $name . '[[:>:]]';
 
   ###  the query
@@ -1798,6 +1801,9 @@ sub search_resources_for_exact_phrases {
   foreach ( @$namelist ) {
     my $name = $_;
     $name =~ s/\.$//g; # remove final dot (or word boundary won't match)
+
+    next if not $name or length( $name ) < 2;
+
     # escape unsafe chars
     $name =~ s!([\.*?+{}()|^[\];])!\\$1!g;
     $re .= $name;
@@ -1832,6 +1838,7 @@ sub search_resources_for_name_word_fulltext {
   my $context = shift;
   my $query   = shift;
 
+  return undef if not $query or length( $query ) < 2;
   my $result = [];
 
   ###  the query
@@ -1858,6 +1865,8 @@ sub search_resources_for_a_name_substring {
   my $sql     = shift;
   my $context = shift;
   my $substr  = shift;
+
+  return undef if not $substr or length( $substr ) < 4;
 
   my $result = [];
 
