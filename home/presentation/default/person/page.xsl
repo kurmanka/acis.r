@@ -8,23 +8,7 @@
 
   <xsl:import href='../user/page.xsl'/>
 
-
-  <xsl:variable name='profile-menu-items'>
-    <!-- <a id='personal-menu' href='/persona'>menu</a> -->
-      <a screen='personal-name'    ref='@name'    title='name details'>names</a>
-    | <a screen='personal-contact' ref='@contact' title='contact details'>contact</a>
-    | <a screen='affiliations'  ref='@affiliations'>affiliations</a>
-    | <a screen='research/main' ref='@research'>research</a>
-<!--
-    | <a screen='personal-photo'         ref='@photo'>photo</a>
-    | <a screen='personal-interests'     ref='@interests'>interests</a>
--->
-    <!--     <a href='{}'>citations</a> -->
-  </xsl:variable>
-
-
   <xsl:variable name='current-screen-id'></xsl:variable>
-
 
 
   <xsl:template name='user-person-profile-menu'>
@@ -92,6 +76,15 @@
       <xsl:text>&#160;</xsl:text>
     </hl>
 
+    <xsl:text> </xsl:text>
+
+    <hl screen='citations'>
+      <xsl:text>&#160;</xsl:text>
+      <a ref='@citations' 
+         title='citations profile'
+      >citations</a>
+      <xsl:text>&#160;</xsl:text>
+    </hl>
 
     <xsl:text> | </xsl:text>
 
@@ -129,13 +122,10 @@
 
    <li><a ref='@affiliations' >affiliations</a></li>
 
-   <li><a ref='@research' >research profile</a></li>
+   <li><a ref='@research' >research</a></li>
 
-<!--
-   <li><a ref='@photo' >photo</a></li>
+   <li><a ref='@citations' >citations</a></li>
 
-   <li><a ref='@interests' >research interests</a></li>
--->   
  </ul>
 
  </xsl:template>
