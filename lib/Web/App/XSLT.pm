@@ -15,6 +15,8 @@ sub presentation_builder {
   my $presenter = shift; ### or stylesheet file
   my @params    = @_;
 
+  return undef if not $presenter;
+
   ###  run presenter
   if ( ref $presenter ) {
     assert defined $presenter->{file}, 'presenter file must be defined';
@@ -25,7 +27,8 @@ sub presentation_builder {
   } else {
     ### filename as presenter
     return run_xslt_presenter( $self, $presenter, @params );
-  }
+
+  } 
 
   die "unknown presenter type: $presenter->{type}";
   return undef;
