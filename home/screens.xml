@@ -533,10 +533,8 @@
 
     <call function='ACIS::Web::Citations::prepare_potential'/>
 
-<!--
-    <presentation type='xslt'
-                  filename='person/citations/potential.xsl' />
--->
+    <presentation type='xslt' filename='citations/potential.xsl' />
+
   </screen>
 
 

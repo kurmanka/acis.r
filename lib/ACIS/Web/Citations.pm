@@ -8,7 +8,7 @@ use Web::App::Common;
 
 use ACIS::Citations::Utils;
 use ACIS::Citations::Suggestions;
-use ACIS::Citations::SimMatrix;
+use ACIS::Citations::SimMatrix qw( load_similarity_matrix );
 use ACIS::Citations::Search;
 
 
@@ -48,7 +48,7 @@ sub prepare_potential {
     }    
   }
   
-  die "can't find that document: $dsid";
+  die "can't find that document: $dsid" if not $document;
 
 #  my $mat = $session ->{simmatrix} ||= load_similarity_matrix( $sid );
   my $mat = $session ->{simmatrix} ||= load_similarity_matrix( 'ptestsid0' ); # XXXXXXXX
@@ -58,9 +58,23 @@ sub prepare_potential {
   $vars -> {document} = $document;
   $vars -> {potential_new} = $citations_new;
   $vars -> {potential_old} = $citations_old;
+  $vars -> {potential_old} = $citations_new;
+
+  # XXX is this the most interesting document?
+
+  # XXX find / prepare previous and next document
+
+#  $acis -> dump_presenter_xml;
+#  undef $acis->{presenter};
+  return;
   
 }
 
+
+sub process_potential {
+
+  
+}
 
 
 1;
