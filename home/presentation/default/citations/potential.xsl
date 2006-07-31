@@ -7,26 +7,45 @@
   <xsl:import href='general.xsl'/>
 
   <xsl:variable name='current-screen-id'>citations/potential</xsl:variable>
-  <xsl:variable name='doc-sid' select='$response-data/document/sid/text()'/>
 
-
+  <xsl:variable name='doc-sid'   select='$response-data/document/sid/text()'/>
+  <xsl:variable name='preselect' select='$response-data/preselect-citations'/>
 
   <xsl:template name='citations-add-rows'>
     <xsl:param name='list'/>
     <xsl:param name='group' select='""'/>
     
     <xsl:for-each select='$list/list-item'>
-      <xsl:variable name='i' select='concat(position(),$group)'/>
-    
+      <xsl:variable name='i'   select='concat(position(),$group)'/>
+      <xsl:variable name='cid' select='concat(srcdocsid/text(), "-", checksum/text())'/>
+      <xsl:variable name='selected' select='$preselect/list-item[text()=$cid] or 
+                                            (similar &gt; number(//citation-document-similarity-preselect-threshold))'/>
+      <xsl:variable name='selected2'>
+        <xsl:choose>
+          <xsl:when test='$preselect'>
+            <xsl:value-of select='$preselect/list-item[text()=$cid]'/>
+          </xsl:when>
+          <xsl:otherwise>
+            <xsl:value-of select='similar &gt; number(//citation-document-similarity-preselect-threshold)'/>
+          </xsl:otherwise>
+        </xsl:choose>
+      </xsl:variable>
+      
       <tr>
-        <td valign='top' align='center'><input type='checkbox' name='add{$i}' id='add{$i}' value=''/></td>
+        <td valign='top' align='center'>
+          <input type='checkbox' name='add{$i}' id='add{$i}' value=''>
+            <xsl:if test='$selected'>
+              <xsl:attribute name='checked'/>
+            </xsl:if>
+          </input>
+        </td>
         <td>
           <label for='add{$i}' ><xsl:value-of select='ostring'/></label>
           <xsl:text> </xsl:text>
           <a class='citing' href='{srcdocdetails}'>citing document</a>
           
           <br/> 
-          <input type='hidden' name='checksum{$i}' value='{checksum}'/>
+          <input type='hidden' name='cid{$i}' value='{cid}'/>
           <input type='submit' name='refuse{$i}'  class='light' 
                  title='press this if it is not your work that is cited'
                  value='not my work' 

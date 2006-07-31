@@ -50,15 +50,14 @@ sub prepare_potential {
   
   die "can't find that document: $dsid" if not $document;
 
-#  my $mat = $session ->{simmatrix} ||= load_similarity_matrix( $sid );
-  my $mat = $session ->{simmatrix} ||= load_similarity_matrix( 'ptestsid0' ); # XXXXXXXX
+  my $mat = $session ->{simmatrix} ||= load_similarity_matrix( $sid );
+#  my $mat = $session ->{simmatrix} ||= load_similarity_matrix( 'ptestsid0' ); # XXXXXXXX
   my $citations_new = $mat->{new}{$dsid};
   my $citations_old = $mat->{old}{$dsid};
 
   $vars -> {document} = $document;
   $vars -> {potential_new} = $citations_new;
   $vars -> {potential_old} = $citations_old;
-  $vars -> {potential_old} = $citations_new;
 
   # XXX is this the most interesting document?
 
@@ -66,6 +65,15 @@ sub prepare_potential {
 
 #  $acis -> dump_presenter_xml;
 #  undef $acis->{presenter};
+
+  foreach ( qw( citation-document-similarity-preselect-threshold ) ) {
+    $acis->variables->{$_} = $acis->config( $_ ) * 100;
+  }
+
+#  $citations_new->[1]->{similar} = 80;
+#  my $cid = $citations_new->[0]->{srcdocsid} . '-' . $citations_new->[0]->{checksum};
+#  $vars->{'preselect-citations'} = [ $cid ];
+
   return;
   
 }
@@ -73,6 +81,7 @@ sub prepare_potential {
 
 sub process_potential {
 
+  
   
 }
 
