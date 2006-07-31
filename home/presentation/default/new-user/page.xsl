@@ -141,13 +141,6 @@ test='starts-with( $request-screen, "research" ) or starts-with($request-screen,
 
         <xsl:otherwise>
 
-<!--          
-          <xsl:call-template name='link-filter'>
-            <xsl:with-param name='content'>
-              <xsl:copy-of select='$profile-menu-items'/>
-            </xsl:with-param>          
-          </xsl:call-template>
--->
         </xsl:otherwise>
 
       </xsl:choose>
