@@ -25,7 +25,7 @@ package Web::App;   ### -*-perl-*-
 #  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 #
 #  ---
-#  $Id: App.pm,v 2.12 2006/06/12 07:43:52 ivan Exp $
+#  $Id: App.pm,v 2.13 2006/07/31 12:06:18 ivan Exp $
 #  ---
 
 
@@ -134,7 +134,7 @@ sub new {
     'home'        => $home,
     'shared'      => $shared,
     'static'      => $static,
-    'presenters'  => "$home/presentation/$template_set",
+    'presenters'  => $config -> {'presenters-dir'} || "$home/presentation/$template_set",
     'log'         => "$home/$basename.log",
     'errlog'      => "$home/$basename-err.log",
     'sessions'    => "$home/sessions",
@@ -227,7 +227,8 @@ sub configuration_parameters {
 
     'character-encoding',  'utf-8',
     'input-space-normalize', 'true',
-    
+
+    'presenters-dir',    'undef',
     
 
 
