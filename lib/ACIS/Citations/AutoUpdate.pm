@@ -90,7 +90,9 @@ sub auto_processing {
       $params{'-pretend-mode'} = 'yes';
     }
     
-    $acis -> send_mail( "email/citations-auto-profile-update.xsl", %params );
+    require Web::App::Email;
+    Web::App::Email::send_mail( $acis, "email/citations-auto-profile-update.xsl", %params );
+    debug "email sent";
 
     foreach ( qw( doc-w-cit ) ) {
       delete $vars -> {$_};

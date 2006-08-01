@@ -121,6 +121,8 @@ home/presentation/default/adm/session-deleted.xsl
 home/presentation/default/adm/session.xsl
 home/presentation/default/adm/sessions.xsl
 home/presentation/default/adm/sql.xsl
+home/presentation/default/citations/general.xsl
+home/presentation/default/citations/potential.xsl
 home/presentation/default/email/account-deleted.xsl
 home/presentation/default/email/arpm-notice.xsl
 home/presentation/default/email/citations-auto-profile-update.xsl
@@ -166,6 +168,7 @@ home/presentation/default/person/contact.xsl
 home/presentation/default/person/generic.xsl
 home/presentation/default/person/interests.xsl
 home/presentation/default/person/name.xsl
+home/presentation/default/person/page-wo-citations.xsl
 home/presentation/default/person/page.xsl
 home/presentation/default/person/photo.xsl
 home/presentation/default/person/profile-overview.xsl

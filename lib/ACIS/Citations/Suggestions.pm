@@ -193,6 +193,7 @@ sub make_suggestion_old($) {
 }
 
 
+use Web::App::Common;
 use ACIS::Citations::Utils qw( get_document_authors get_author_sid );
 
 sub suggest_citation_to_coauthors($$$) {

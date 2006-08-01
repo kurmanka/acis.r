@@ -15,8 +15,8 @@ use vars qw( @EXPORT_OK );
 
 use Web::App::Common;
 
-use ACIS::Citations::Utils qw( build_citations_index today );
-use ACIS::Citations::Suggestions qw( load_coauthor_suggestions_new );
+use ACIS::Citations::Utils;
+use ACIS::Citations::Suggestions qw( load_coauthor_suggestions_new suggest_citation_to_coauthors );
 use ACIS::Citations::SimMatrix qw( load_similarity_matrix );
 
 
@@ -162,7 +162,8 @@ sub personal_search_by_documents {
 
   if ( not $sql ) { prepare; }
 
-  my $autoadd = $rc->{meta}{'auto-identified-auto-add'} || 1;
+  my $meta = $rc->{meta} ||= {};
+  my $autoadd = (defined $meta->{'auto-identified-auto-add'} ) ? $meta->{'auto-identified-auto-add'} : 1;
   my @added   = ();
 
   # build identified index and refused index
@@ -270,16 +271,17 @@ sub personal_search_by_names {
 
   # compare to documents!
   $mat -> add_new_citations( $new, undef, undef, $pretend );
-
+  
+  my $meta = $rc->{meta} ||= {};
   # if user allows auto-additions, based on high similarity...
-  my $autoadd = $rc->{meta}{'auto-identified-auto-add'} || 1;
-  my $sim_threshold = $rc->{meta}{'auto-add-similarity-threshold'} 
+  my $autoadd = (defined $meta->{'auto-identified-auto-add'}) ? $meta -> {'auto-identified-auto-add'} : 1;
+  my $sim_threshold = $meta ->{'auto-add-similarity-threshold'} 
     || $acis->config( 'citation-document-similarity-preselect-threshold' ) * 100; 
 
   # now find, which of the newly added citations have high
   # similarity value (but to only one of the documents)
   
-  $rc->{meta}{'last-searched-nameset-date'} = $rec -> {name}{'last-change-date'};
+  $meta ->{'last-searched-nameset-date'} = $rec -> {name}{'last-change-date'};
 
   # return if nothing else to do
   return() if not $autoadd;
@@ -337,7 +339,7 @@ sub personal_search_by_names {
       if ( not $pretend ) {
         identify_cit_to_doc( $rec, $candidate, $citation );
         $mat->remove_citation( $citation );
-        suggest_citation_to_authors($_, $psid, $candidate);
+        suggest_citation_to_coauthors($_, $psid, $candidate);
       }
       push @added, [ $candidate, $citation ];
         
@@ -348,23 +350,6 @@ sub personal_search_by_names {
 }
 
 
-
-sub identify_cit_to_doc($$$) {
-  my ( $rec, $dsid, $citation ) = @_;
-  delete $citation->{reason};
-  delete $citation->{time};
-
-  my $citations = $rec->{citations}    ||= {};
-  my $cidentified = $citations->{identified} ||= {};
-  my $doclist   = $cidentified->{$dsid} ||= [];
-  push @$doclist, $citation;
-
-  # add to index
-  my $cid = $citation->{srcdocsid} . '-' . $citation->{checksum};
-  $identified -> {$cid} = $citation;
-
-  debug "added citation $cid to identified for $dsid";
-}
 
 
 sub test_personal_citations_search {
@@ -404,7 +389,9 @@ sub personal_search_by_coauthors {
 
   if ( not $sql ) { prepare; }
 
-  my $autoadd = $rc->{meta}{'co-auth-auto-add'} || 1;
+
+  my $meta = $rc->{meta} ||= {};
+  my $autoadd = (defined $meta -> {'co-auth-auto-add'}) ? $meta -> {'co-auth-auto-add'} : 1;
   if ( !$autoadd ) { return (); }
 
   my @added   = ();
@@ -445,7 +432,15 @@ sub personal_search_by_coauthors {
   return ( \@added );
 }
 
+sub identify_cit_to_doc {
+  my ( $rec, $dsid, $citation ) = @_;
 
+  identify_citation_to_doc( $rec, $dsid, $citation );
+
+  # add to index
+  my $cid = $citation->{srcdocsid} . '-' . $citation->{checksum};
+  $identified -> {$cid} = $citation;
+}
 
 
 

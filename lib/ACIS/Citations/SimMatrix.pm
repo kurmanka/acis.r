@@ -27,8 +27,8 @@ use Carp::Assert;
 
 use Exporter;
 use base qw( Exporter );
-use vars qw( @EXPORT_OK );
-@EXPORT_OK = qw( load_similarity_matrix );
+use vars qw( @EXPORT );
+@EXPORT = qw( load_similarity_matrix );
 
 
 use Web::App::Common;
@@ -211,7 +211,7 @@ sub find_sugg {
   my $self   = shift || die;
   my $cit    = shift || die;
   my $dsid   = shift || die;
-  my $reason = shift || die;
+  my $reason = shift;
 
   my $known = $self->{citations};
   
@@ -222,6 +222,7 @@ sub find_sugg {
   foreach ( @$l ) {
     # $_->[0] new / old
     # $_->[1] suggestion itself
+    if ( not $reason ) { return @$_; }
     if ( $_->[1]->{reason} eq $reason ) {
       return @$_;
     }
@@ -602,6 +603,7 @@ sub citation_new_make_old {
   $self->check_consistency;
 }
 
+use Carp qw( confess );
 sub check_consistency {
   my $self = shift || die;
 
@@ -638,16 +640,16 @@ sub check_consistency {
   }
   
   use File::Temp;
-  my $f1 = File::Temp->new( TEMPLATE=> 'acis_sim_matrix_memory_XXXXX', UNLINK=> 0 );
+  my $f1 = File::Temp->new( TEMPLATE=> 'acis_sim_matrix_memory_XXXXX', DIR=> $acis->home, UNLINK=> 0 );
   print $f1 $str1;
   close $f1;
 
-  my $f2 = File::Temp->new( TEMPLATE=> 'acis_sim_matrix_db_XXXXX', UNLINK=> 0 );
+  my $f2 = File::Temp->new( TEMPLATE=> 'acis_sim_matrix_db_XXXXX', DIR=> $acis->home, UNLINK=> 0 );
   print $f2 $str2;
   close $f2;
 
-  print "matrices are different; see " . $f1->filename . " and " . $f2->filename, "\n";
-  die "matrices are different; see " . $f1->filename . " and " . $f2->filename;
+#  print "matrices are different; see " . $f1->filename . " and " . $f2->filename, "\n";
+  confess "matrices are different; see " . $f1->filename . " and " . $f2->filename;
  
 
   # the tests:

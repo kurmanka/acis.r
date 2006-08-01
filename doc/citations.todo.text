@@ -1,6 +1,6 @@
 # ACIS Citations TO DO List
 
-2006-07-27 00:56 
+2006-08-01 09:00
 
 This plan does not include any work on ReDIF parser, on RAS
 maintenance or fixing bugs in the existing ACIS code.  It
@@ -40,6 +40,13 @@ Day 2:
     - screens.xml  [10 min]
     - handlers in ACIS::Web::Citations  [2 hour]
     - presentation: XSLT template, CSS  [90 min]    
+    - features to add:
+        - document navigation
+        - refuse a citation
+        - save other citations' status while refusing one item
+        - obey moveon button 
+        - hide moveon button when it makes no sense
+
 
 
  - citations/identified

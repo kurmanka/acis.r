@@ -521,20 +521,25 @@
 
 
   <screen id='citations/potential'>
-
     <use module='ACIS::Web::Citations' />
-
     <call function='load_session_or_authenticate' />
     <call function='ACIS::Web::Citations::prepare'/>
-
     <process>
       <call function='ACIS::Web::Citations::process_potential'/>
     </process>
-
     <call function='ACIS::Web::Citations::prepare_potential'/>
-
     <presentation type='xslt' filename='citations/potential.xsl' />
+  </screen>
 
+  <screen id='citations/identified'>
+    <use module='ACIS::Web::Citations' />
+    <call function='load_session_or_authenticate' />
+    <call function='ACIS::Web::Citations::prepare'/>
+    <process>
+      <call function='ACIS::Web::Citations::process_identified'/>
+    </process>
+    <call function='ACIS::Web::Citations::prepare_identified'/>
+    <presentation type='xslt' filename='citations/identified.xsl' />
   </screen>
 
 

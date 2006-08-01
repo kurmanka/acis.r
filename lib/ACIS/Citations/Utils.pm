@@ -7,10 +7,12 @@ use Carp::Assert;
 use Exporter;
 
 use base qw( Exporter );
-use vars qw( @EXPORT_OK );
+use vars qw( @EXPORT );
 
-@EXPORT_OK = qw( normalize_string build_citations_index
-                 get_document_authors get_author_sid today );
+@EXPORT = qw( normalize_string build_citations_index
+              get_document_authors get_author_sid today 
+              identify_citation_to_doc
+             );
 
 
 use Unicode::Normalize;
@@ -74,7 +76,7 @@ sub cit_document_similarity {
     s/^\s+/ /g;
     s/\s+$/ /g;
   }
-  my $authornamelist = [ split /\s+/, $authornames ];
+  my $authornamelist = [ split /\s+/, uc $authornames ];
 
   # We then search for approximate matches for each of these
   # words in the normalized citation string.  If there is a
@@ -89,6 +91,7 @@ sub cit_document_similarity {
   }
   
   if ( not $pass ) {
+    debug "no author name match";
     return 0;
   }
 
@@ -249,6 +252,22 @@ use POSIX qw(strftime);
 sub today() {
   strftime '%F', localtime( time );
 }
+
+
+sub identify_citation_to_doc($$$) {
+  my ( $rec, $dsid, $citation ) = @_;
+  delete $citation->{reason};
+  delete $citation->{time};
+
+  my $citations = $rec->{citations}    ||= {};
+  my $cidentified = $citations->{identified} ||= {};
+  my $doclist   = $cidentified->{$dsid} ||= [];
+  push @$doclist, $citation;
+
+  my $cid = $citation->{srcdocsid} . '-' . $citation->{checksum};
+  debug "added citation $cid to identified for $dsid";
+}
+
 
 
 

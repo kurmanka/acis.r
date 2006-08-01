@@ -20,17 +20,6 @@
       <xsl:variable name='cid' select='concat(srcdocsid/text(), "-", checksum/text())'/>
       <xsl:variable name='selected' select='$preselect/list-item[text()=$cid] or 
                                             (similar &gt; number(//citation-document-similarity-preselect-threshold))'/>
-      <xsl:variable name='selected2'>
-        <xsl:choose>
-          <xsl:when test='$preselect'>
-            <xsl:value-of select='$preselect/list-item[text()=$cid]'/>
-          </xsl:when>
-          <xsl:otherwise>
-            <xsl:value-of select='similar &gt; number(//citation-document-similarity-preselect-threshold)'/>
-          </xsl:otherwise>
-        </xsl:choose>
-      </xsl:variable>
-      
       <tr>
         <td valign='top' align='center'>
           <input type='checkbox' name='add{$i}' id='add{$i}' value=''>
@@ -45,7 +34,7 @@
           <a class='citing' href='{srcdocdetails}'>citing document</a>
           
           <br/> 
-          <input type='hidden' name='cid{$i}' value='{cid}'/>
+          <input type='hidden' name='cid{$i}' value='{$cid}'/>
           <input type='submit' name='refuse{$i}'  class='light' 
                  title='press this if it is not your work that is cited'
                  value='not my work' 
@@ -175,11 +164,12 @@ input.light {
 <td width='50%'>
   <input type='submit' class='inputsubmit important'
    value='SUBMIT FORM / ADD THESE CITATIONS' />
+  <input type='hidden' name='dsid' value='{$doc-sid}'/>
 </td>
 
 <td width='50%' >
 
-  <!-- XXX TODO: this should not be see always -->
+  <!-- XXX TODO: this should not be shown always -->
   <input type='checkbox' name='moveon' id='moveon' CHECKED='1'/> 
   <label for='moveon'>Show next document with new citations</label>
 </td>

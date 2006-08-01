@@ -159,7 +159,8 @@ sub get_the_queue {
       if ( $now - $last <= $apu_too_recent_hours * 60 * 60 ) {
         # are we running too fast?
         # XXX slow down APU throughput
-#       logit "skipping $item";
+        debug "skipping $item";
+        logit "skipping $item";
         push @skipped, $item;
         next;
       }
