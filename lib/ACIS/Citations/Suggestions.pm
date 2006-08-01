@@ -8,7 +8,7 @@ use base qw( Exporter );
 use vars qw( @EXPORT_OK );
 @EXPORT_OK = qw( add_suggestion replace_suggestion
                  store_similarity make_suggestion_old 
-                 suggest_citation_to_authors 
+                 suggest_citation_to_coauthors 
                  load_suggestions load_coauthor_suggestions_new
                  check_suggestions
                  clear_multiple_from_cit_suggestions );
@@ -26,7 +26,7 @@ use vars qw( @EXPORT_OK );
 # high level (exported):          [45 min]
 # - store_similarity( cit, psid, docid, value )
 # - make_suggestion_old( cit, psid, dsid )
-# - suggest_citation_to_authors( cit, psid, docid );
+# - suggest_citation_to_coauthors( cit, psid, docid );
 # - clear_multiple_from_cit_suggestions( citlist, psid );
 
 
@@ -195,14 +195,15 @@ sub make_suggestion_old($) {
 
 use ACIS::Citations::Utils qw( get_document_authors get_author_sid );
 
-sub suggest_citation_to_authors($$$) {
+sub suggest_citation_to_coauthors($$$) {
   my ( $cit, $psid, $dsid ) = @_;
   
   my @authors = get_document_authors $dsid;
   foreach ( @authors ) {
+    debug "suggest to author: $_?";
     my $sid = get_author_sid $_;
-    next if $sid eq $psid;
-    my $sug = check_suggestions( $cit, $psid, "coauth:$psid" ); 
+    next if $sid and $sid eq $psid;
+    my $sug = check_suggestions( $cit, $sid, $dsid, "coauth:$psid" ); 
     if ( $sug ) {
       # do nothing, already suggested
     } else {
