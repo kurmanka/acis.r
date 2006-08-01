@@ -12,6 +12,7 @@ use vars qw( @EXPORT );
 @EXPORT = qw( normalize_string build_citations_index
               get_document_authors get_author_sid today 
               identify_citation_to_doc
+              refuse_citation
              );
 
 
@@ -262,10 +263,26 @@ sub identify_citation_to_doc($$$) {
   my $citations = $rec->{citations}    ||= {};
   my $cidentified = $citations->{identified} ||= {};
   my $doclist   = $cidentified->{$dsid} ||= [];
+  ### XXX TODO: be careful not to add an already identified citation
   push @$doclist, $citation;
 
   my $cid = $citation->{srcdocsid} . '-' . $citation->{checksum};
   debug "added citation $cid to identified for $dsid";
+}
+
+sub refuse_citation($$) {
+  my ( $rec, $citation ) = @_;
+  delete $citation->{reason};
+  delete $citation->{time};
+
+  my $cid = $citation->{srcdocsid} . '-' . $citation->{checksum};
+
+  my $citations = $rec->{citations}     ||= {};
+  my $refused   = $citations->{refused} ||= [];
+  ### XXX TODO: be careful not to add an already refused citation
+  push @$refused, $citation;
+
+  debug "refused citation $cid";
 }
 
 

@@ -7,12 +7,11 @@ use Carp::Assert;
 use Web::App::Common;
 
 use ACIS::Citations::Utils;
-use ACIS::Citations::Suggestions;
+use ACIS::Citations::Suggestions qw( suggest_citation_to_coauthors );
 use ACIS::Citations::SimMatrix;
 use ACIS::Citations::Search;
 
-use constant USELESS_SIMILARITY => 30;
-
+use constant USELESS_SIMILARITY => 30; # XXX this should be higher, I guess
 
 my $acis;
 my $sql;
@@ -74,8 +73,7 @@ sub prepare_potential {
   
   die "can't find that document: $dsid" if not $document;
 
-  my $mat = $session ->{simmatrix} = load_similarity_matrix( $sid );
-#  my $mat = $session ->{simmatrix} ||= load_similarity_matrix( 'ptestsid0' ); # XXXXXXXX
+  my $mat = $session ->{simmatrix} = load_similarity_matrix( $sid ); # XXX ||=
   my $citations_new = $mat->{new}{$dsid};
   my $citations_old = $mat->{old}{$dsid};
 
@@ -140,7 +138,7 @@ sub process_potential {
   }
  
   if ( scalar @refusals ) {
-    return process_refuse( \%cids, \@adds, \@refusals );
+    return process_refuse( $acis, $dsid, \%cids, \@adds, \@refusals );
   }
 
   my $added = 0;
@@ -155,12 +153,32 @@ sub process_potential {
 
     $mat -> remove_citation( $cit );
     identify_citation_to_doc($record, $dsid, $cit);
+    suggest_citation_to_coauthors( $cit, $sid, $dsid );
     $added ++;
   }
 
   if ( $added ) {
     # XXX show a message
+    $acis->message( "added-citations" );
   }
+
+
+  my $nlist = $mat->{new}{$dsid} || [];
+  foreach( keys %cids ) {
+    # old citations' cidX parameters are named cidXo,
+    # therefore, if we have a digit at the end, it is a new
+    # citation.  unless the user used a stale webform
+    if ( # m/\d+$/ and 
+         not defined $params->{"add$_"} ) {
+      my $cid = $cids{$_};
+      my $cit; 
+      foreach (@$nlist) { my $id = $_->{srcdocsid}."-".$_->{checksum}; if ($id eq $cid) {$cit = $_;} }
+      if ( $cit ) {
+        $mat -> citation_new_make_old( $dsid, $cit );
+      }
+    }
+  }
+
   
 
 }
@@ -168,10 +186,51 @@ sub process_potential {
 
 
 
+# process_refuse( $acis, $dsid, \%cids, \@adds, \@refusals );
 sub process_refuse {
+  my $acis = shift;
+  my $dsid = shift;
   my $cids = shift;
   my $adds = shift;
   my $refuse = shift;
+
+  my $session = $acis -> session;
+  my $vars    = $acis -> variables;
+  my $record  = $session -> current_record;
+  my $id      = $record ->{id};
+  my $sid     = $record ->{sid};
+
+  my $mat  = $session->{simmatrix};
+  my $counter;
+  foreach( @$refuse ) {
+    my $cid = $cids->{$_};
+    debug "refuse citation $cid (for $dsid)";
+    if ( not $cid ) { debug "no cid in form data; ignoring citation refuse: $_"; next; }
+
+    # identify a citation
+    my $list = ($mat->{citations}{$cid}) ? $mat -> {citations}{$cid}{$dsid} : next;
+    my $cit  = ($list and $list->[0]) ? $list->[0][1] : next; 
+
+    $mat -> remove_citation( $cit );
+    refuse_citation($record, $cit);
+    $counter ++;
+  }
+
+  if ( $counter ) {
+    # XXX show a message
+    $acis->message( "refused-citations" );
+  }
+  
+  my $params = $acis->form_input;
+  my $preselect = [];
+  foreach( keys %$cids ) {
+    if ( defined $params->{"add$_"} ) {
+      my $cid = $$cids{$_};
+      push @$preselect, $cid;
+    }
+  }
+  $vars->{'preselect-citations'} = $preselect; 
+  
 
 }
 

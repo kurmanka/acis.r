@@ -548,8 +548,10 @@ sub remove_citation {
         if ( $_->{gone} ) { undef $_; }
       }
       clear_undefined $list;
+      if ( not scalar @$list ) {  delete $hash->{$docsid};  }
     }
   }
+
   
   # XX DEBUGGING
   $self->_calculate_totals;
