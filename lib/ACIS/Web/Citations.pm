@@ -11,6 +11,8 @@ use ACIS::Citations::Suggestions;
 use ACIS::Citations::SimMatrix;
 use ACIS::Citations::Search;
 
+use constant USELESS_SIMILARITY => 30;
+
 
 my $acis;
 my $sql;
@@ -23,6 +25,28 @@ sub prepare() {
 sub acis_citations_enabled() {
   prepare() if not $acis;
   return $acis->config( 'citations-profile' );
+}
+
+
+sub prepare_citations_list($) {
+  # prepare new citations list
+  my $srclist = shift;
+  my $list = []; 
+  my $index = {};
+  foreach ( @$srclist ) {
+    if ( $_ ->{reason} eq 'similar'      # this condition may be unnecessary
+         and $_->{similar} < USELESS_SIMILARITY ) { next; }
+    my $cid = $_->{srcdocsid} . '-'. $_->{checksum};
+    if ( $index->{$cid} ) {
+      $index->{$cid}{similar} += $_->{similar};
+    } else {
+      my $cit = { %$_ };
+      push @$list, $cit;
+      $index->{$cid} = $cit;
+    }
+  }
+  @$list = sort { $b->{similar} <=> $a->{similar} } @$list;
+  return $list;
 }
 
 sub prepare_potential {
@@ -56,19 +80,17 @@ sub prepare_potential {
   my $citations_old = $mat->{old}{$dsid};
 
   $vars -> {document} = $document;
-  $vars -> {potential_new} = $citations_new;
-  $vars -> {potential_old} = $citations_old;
+  $vars -> {potential_new} = prepare_citations_list $citations_new;
+  $vars -> {potential_old} = prepare_citations_list $citations_old;
 
   # XXX is this the most interesting document?
 
   # XXX find / prepare previous and next document
 
-#  $acis -> dump_presenter_xml;
-#  undef $acis->{presenter};
-
   foreach ( qw( citation-document-similarity-preselect-threshold ) ) {
     $acis->variables->{$_} = $acis->config( $_ ) * 100;
   }
+
 
 #  $citations_new->[1]->{similar} = 80;
 #  my $cid = $citations_new->[0]->{srcdocsid} . '-' . $citations_new->[0]->{checksum};
@@ -77,6 +99,8 @@ sub prepare_potential {
   return;
   
 }
+
+
 
 
 sub process_potential {

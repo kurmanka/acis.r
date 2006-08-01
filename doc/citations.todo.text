@@ -42,11 +42,14 @@ Day 2:
     - presentation: XSLT template, CSS  [90 min]    
     - features to add:
         - document navigation
+        - prepare citation list properly:
+           - order by similarity decreasing
+           - condense same-citation different-reason suggestions
         - refuse a citation
+        - move non-added citations to old
         - save other citations' status while refusing one item
         - obey moveon button 
         - hide moveon button when it makes no sense
-
 
 
  - citations/identified

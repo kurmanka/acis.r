@@ -81,11 +81,13 @@ sub search_for_personal_names($) {
   foreach ( @$names ) {
     my $n = $_;
     $n =~ s/([\.{}()|*?])/\\$1/g;
+    debug "name: $n";
     my $r = $sql -> execute( "[[:<:]]$n\[[:>:]]" );
     while ( $r and $r->{row} ) {
       my $c = { %{$r->{row}} };
       $c->{ostring} = Encode::decode_utf8( $c->{ostring} );
       $c->{nstring} = Encode::decode_utf8( $c->{nstring} );
+      debug "found: ", $c->{nstring};
       push @cl, $c;
       $r->next;
     }
@@ -238,6 +240,7 @@ sub personal_search_by_names {
     # normalize the names or at least remove final dots
     foreach ( @namelist ) {
       s/\.$//;
+      $_ = normalize_string( $_ );
     }
     $names = \@namelist;
   }
