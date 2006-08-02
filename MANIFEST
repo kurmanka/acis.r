@@ -124,6 +124,7 @@ home/presentation/default/adm/sql.xsl
 home/presentation/default/citations/doclist.xsl
 home/presentation/default/citations/general.xsl
 home/presentation/default/citations/identified.xsl
+home/presentation/default/citations/overview.xsl
 home/presentation/default/citations/potential.xsl
 home/presentation/default/email/account-deleted.xsl
 home/presentation/default/email/arpm-notice.xsl
