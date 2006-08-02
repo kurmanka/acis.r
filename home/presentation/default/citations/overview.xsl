@@ -12,31 +12,47 @@
   <xsl:template name='overview'>
     <h1>Citations Profile</h1>
 
+    <p><big>Here you deal with citations to your works by
+    other researchers.  We search for citations based on
+    your <a ref='@name#variations'>name variations</a> and
+    your <a ref='@research/identified' >research
+    profile</a>.  The search is automatic and is done in
+    offline, but you deal with its results here.</big></p>
+
+
     <xsl:choose> 
       <xsl:when test='$list/list-item[1]/new'>
-        <p>Please <a ref='@citations/autosug'>check this</a>
-        for the new potential citations to your works (the
-        most interesting document).</p>
+        <p>There are some <a ref='@citations/autosug'>new
+        potential citations</a> to your works, please check
+        them.</p>
       </xsl:when>
     </xsl:choose>
 
     <xsl:choose>
       <xsl:when test='$list/list-item'>
 
-        <p>The documents of your <a ref='@research/identified'>research profile</a>:</p>
+        <p><a ref='@citations/doclist'>The documents</a> of your <a ref='@research/identified'>research profile</a>:</p>
+
+        <div style='padding: 0px 2em 0px 2em; font-size: smaller;'>
 
         <xsl:call-template name='doclisttable'>
           <xsl:with-param name='max' select='"5"'/>
         </xsl:call-template>
 
+        <p><i>You may actually have more documents than
+        you see above, these are just the first 5.  <a
+        ref='@citations/doclist'>See full
+        table.</a></i></p>
+
+        </div>
+
       </xsl:when>
     </xsl:choose>
 
-    <p>You may have some citations <a
-    ref='@citations/refused'>refused</a>, but that screen
-    doesn't work yet.</p>
+    <p>You may have <a ref='@citations/refused'>refused</a>
+    some citations, but that screen doesn't work yet.</p>
 
-    <p>Then also we will make a <a
+    <p>Then also we will make the <a
     ref='@citations/autoupdate'>automatic update
     preferences</a> screen.  Not yet.</p>
     

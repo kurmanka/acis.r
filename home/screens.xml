@@ -577,6 +577,15 @@
       <call function='ACIS::Web::Citations::process_refused'/>
     </process>
     <call function='ACIS::Web::Citations::prepare_refused'/>
+    <presentation type='xslt' filename='citations/refused.xsl' />
+  </screen>
+
+  <screen id='citations'>
+    <use module='ACIS::Web::Citations' />
+    <call function='load_session_or_authenticate' />
+    <call function='ACIS::Web::Citations::prepare'/>
+    <call function='ACIS::Web::Citations::prepare_doclist'/>
+    <presentation type='xslt' filename='citations/overview.xsl' />
   </screen>
 
 

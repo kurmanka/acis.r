@@ -69,13 +69,19 @@
 
             <hl screen='citations/autosug'>
               <xsl:text>&#160;</xsl:text>
-              <a ref='@citations/autosug'>auto&#160;suggest</a>
+              <a ref='@citations/autosug'>auto&#160;suggestions</a>
               <xsl:text>&#160;</xsl:text>
             </hl>
 
             <hl screen='citations/refused'>
               <xsl:text>&#160;</xsl:text>
               <a ref='@citations/refused'>refused</a>
+              <xsl:text>&#160;</xsl:text>
+            </hl>
+
+            <hl screen='citations/autoupdate'>
+              <xsl:text>&#160;</xsl:text>
+              <a ref='@citations/autoupdate'>auto&#160;update</a>
               <xsl:text>&#160;</xsl:text>
             </hl>
 
