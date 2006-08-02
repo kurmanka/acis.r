@@ -9,10 +9,13 @@ use Exporter;
 use base qw( Exporter );
 use vars qw( @EXPORT );
 
-@EXPORT = qw( normalize_string build_citations_index
+@EXPORT = qw( normalize_string make_citation_nstring
+              build_citations_index
               get_document_authors get_author_sid today 
               identify_citation_to_doc
               refuse_citation
+              unidentify_citation_from_doc_by_cid
+              cid
              );
 
 
@@ -35,6 +38,12 @@ sub normalize_string($) {
   }
 
   return $string;
+}
+
+sub make_citation_nstring {
+  my $nst = $_[0];
+  $nst =~ s/\b((I|i)n\W.+?\Wed\..*)$//; # cut the editors part 
+  return normalize_string( $nst );
 }
 
 sub build_citations_index($;$) {
@@ -255,6 +264,12 @@ sub today() {
 }
 
 
+sub cid ($) {
+  my $citation = $_[0] || die;
+  return $citation->{srcdocsid} . '-' . $citation->{checksum};
+}
+
+
 sub identify_citation_to_doc($$$) {
   my ( $rec, $dsid, $citation ) = @_;
   delete $citation->{reason};
@@ -269,6 +284,7 @@ sub identify_citation_to_doc($$$) {
   my $cid = $citation->{srcdocsid} . '-' . $citation->{checksum};
   debug "added citation $cid to identified for $dsid";
 }
+
 
 sub refuse_citation($$) {
   my ( $rec, $citation ) = @_;
@@ -285,6 +301,28 @@ sub refuse_citation($$) {
   debug "refused citation $cid";
 }
 
+sub unidentify_citation_from_doc_by_cid($$$) {
+  my ( $rec, $dsid, $cid ) = @_;
+  
+  my $citations   = $rec->{citations}    ||= {};
+  my $cidentified = $citations->{identified} ||= {};
+  my $clist       = $cidentified->{$dsid} ||= [];
+
+  my $cit;
+  for ( @$clist ) {
+    if ( cid $_ eq $cid ) {
+      $cit = $_;
+      undef $_;
+      last;
+    }
+  }
+  
+  clear_undefined $clist;
+  if ( not scalar @$clist ) {
+    delete $cidentified->{$dsid};
+  }
+  return $cit;
+}
 
 
 

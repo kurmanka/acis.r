@@ -91,7 +91,7 @@ sub _calculate_totals {
     my $dsid = $_;
     my $total = 0;
     foreach ( @{ $newdoc->{$_} } ) {
-      # XXX treat co-author's claims specially
+      # XXX treat co-author's claims specially?
       $total += $_->{similar};
     }
     $totals ->{$dsid} = $total;
@@ -100,7 +100,7 @@ sub _calculate_totals {
   $self->{totals_new} = $totals;
   
   my @doclist = keys %$newdoc;
-  @doclist = grep { $totals->{$_}; } @doclist;
+  @doclist = grep { $totals->{$_} } @doclist;
   @doclist = sort { $totals->{$b} <=> $totals->{$a} } @doclist;
 
   $self -> {doclist} = \@doclist;
@@ -355,6 +355,7 @@ sub compare_citation_to_documents {
 
 
 
+use CGI::Carp qw(fatalsToBrowser);
 sub add_new_citations {
   my $self = shift || die;
   my $list = shift || die;
@@ -372,6 +373,7 @@ sub add_new_citations {
   } else {
     ### run comparisons
     foreach ( @$list ) {
+      assert( !$_->{gone} );
       $self->compare_citation_to_documents( $_, $pretend );
     }
   }
@@ -545,7 +547,7 @@ sub remove_citation {
     while ( my ( $docsid, $list ) = each %$hash ) {
       # remove those which are gone 
       foreach ( @$list ) {
-        if ( $_->{gone} ) { undef $_; }
+        if ( $_->{gone} ) { delete $_->{gone}; undef $_; }
       }
       clear_undefined $list;
       if ( not scalar @$list ) {  delete $hash->{$docsid};  }

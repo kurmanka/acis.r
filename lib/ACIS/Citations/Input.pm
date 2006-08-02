@@ -11,7 +11,7 @@ my $sql;
 my $adb;
 
 use Digest::MD5;
-use ACIS::Citations::Utils qw( normalize_string );
+use ACIS::Citations::Utils qw( normalize_string make_citation_nstring );
 
 use Storable;
 
@@ -109,9 +109,7 @@ sub process_record {
     my $trg = $_->{trgdocid};
     my $ost = $_->{ostring};
     
-    my $nst = $ost;
-    $nst =~ s/\b((I|i)n\W.+?\Wed\..*)$//; # cut the editors part 
-    $nst = normalize_string( $nst );
+    my $nst = make_citation_nstring $ost;
     my $md5 = Digest::MD5::md5_base64( $ost );
 
     delete $index->{$md5};

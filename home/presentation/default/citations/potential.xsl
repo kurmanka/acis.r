@@ -6,7 +6,12 @@
  
   <xsl:import href='general.xsl'/>
 
-  <xsl:variable name='current-screen-id'>citations/potential</xsl:variable>
+  <xsl:variable name='current-screen-id'>
+    <xsl:choose>
+      <xsl:when test='//most-interesting-doc'>citations/autosug</xsl:when>
+      <xsl:otherwise>citations/potential</xsl:otherwise>
+    </xsl:choose>
+  </xsl:variable>
 
   <xsl:variable name='doc-sid'   select='$response-data/document/sid/text()'/>
   <xsl:variable name='preselect' select='$response-data/preselect-citations'/>
@@ -170,7 +175,7 @@ input.light {
 <td width='50%' >
 
   <!-- XXX TODO: this should not be shown always -->
-  <input type='checkbox' name='moveon' id='moveon' CHECKED='1'/> 
+  <input disabled='yes' type='checkbox' name='moveon' id='moveon' CHECKED='1'/> 
   <label for='moveon'>Show next document with new citations</label>
 </td>
 

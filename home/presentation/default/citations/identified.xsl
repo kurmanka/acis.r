@@ -75,7 +75,12 @@ input.light {
       </xsl:with-param>
       <xsl:with-param name='content'>
         
-        <form >
+        <xsl:choose>
+          <xsl:when test='$response-data/identified/list-item'>
+            
+        <form>
+
+          <p>These citations are identified as pointing to this document:</p>
 
           <table>
 
@@ -89,27 +94,25 @@ input.light {
               <xsl:with-param name='list' select='$response-data/identified'/>
               <xsl:with-param name='group'></xsl:with-param>
             </xsl:call-template>
-
-
           </table>
 
-
-<table style='margin-top: 1em;'>
-<tr>
-<td width='50%'>
+<p style='margin-top: 1em;'>
   <input type='submit' class='inputsubmit important'
    value='DELETE THESE CITATIONS' />
-</td>
-
-<td width='50%' >
-</td>
-
-</tr>
-</table>
-
-
+  <input type='hidden' name='dsid' value='{$doc-sid}'/>
+</p>
         </form>
-        
+
+          </xsl:when>
+          <xsl:otherwise>
+
+            <form>
+              <p>No citations identified as pointing to this document.</p>
+            </form>
+            
+          </xsl:otherwise>
+        </xsl:choose>
+
       </xsl:with-param>
     </xsl:call-template>
    

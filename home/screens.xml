@@ -520,6 +520,14 @@
   </screen>
 
 
+  <screen id='citations'>
+    <use module='ACIS::Web::Citations' />
+    <call function='load_session_or_authenticate' />
+    <call function='ACIS::Web::Citations::prepare'/>
+    <call function='ACIS::Web::Citations::prepare_overview'/>
+    <presentation type='xslt' filename='citations/overview.xsl' />
+  </screen>
+
   <screen id='citations/potential'>
     <use module='ACIS::Web::Citations' />
     <call function='load_session_or_authenticate' />
@@ -540,6 +548,35 @@
     </process>
     <call function='ACIS::Web::Citations::prepare_identified'/>
     <presentation type='xslt' filename='citations/identified.xsl' />
+  </screen>
+
+  <screen id='citations/doclist'>
+    <use module='ACIS::Web::Citations' />
+    <call function='load_session_or_authenticate' />
+    <call function='ACIS::Web::Citations::prepare'/>
+    <call function='ACIS::Web::Citations::prepare_doclist'/>
+    <presentation type='xslt' filename='citations/doclist.xsl' />
+  </screen>
+
+  <screen id='citations/autosug'>
+    <use module='ACIS::Web::Citations' />
+    <call function='load_session_or_authenticate' />
+    <call function='ACIS::Web::Citations::prepare'/>
+    <process>
+      <call function='ACIS::Web::Citations::process_autosug'/>
+    </process>
+    <call function='ACIS::Web::Citations::prepare_autosug'/>
+    <presentation type='xslt' filename='citations/potential.xsl' />
+  </screen>
+
+  <screen id='citations/refused'>
+    <use module='ACIS::Web::Citations' />
+    <call function='load_session_or_authenticate' />
+    <call function='ACIS::Web::Citations::prepare'/>
+    <process>
+      <call function='ACIS::Web::Citations::process_refused'/>
+    </process>
+    <call function='ACIS::Web::Citations::prepare_refused'/>
   </screen>
 
 

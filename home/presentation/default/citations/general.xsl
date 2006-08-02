@@ -63,9 +63,22 @@
           <span class='body'>
             <hl screen='citations/doclist'>
               <xsl:text>&#160;</xsl:text>
-              <a ref='@citations/doclist'>doclist</a>
+              <a ref='@citations/doclist'>document&#160;list</a>
               <xsl:text>&#160;</xsl:text>
             </hl>
+
+            <hl screen='citations/autosug'>
+              <xsl:text>&#160;</xsl:text>
+              <a ref='@citations/autosug'>auto&#160;suggest</a>
+              <xsl:text>&#160;</xsl:text>
+            </hl>
+
+            <hl screen='citations/refused'>
+              <xsl:text>&#160;</xsl:text>
+              <a ref='@citations/refused'>refused</a>
+              <xsl:text>&#160;</xsl:text>
+            </hl>
+
           </span>
         </p>
         <xsl:text> 

@@ -113,15 +113,13 @@ sub run_xslt_presenter {
     assert( $stylesheet );
   };
 
-  if ( $@ ) {
-    $self -> errlog( "Can't parse xslt ($file): $@" );
-
+  if ( $@ or $XML::LibXSLT::error ) {
+    $self -> errlog( "Can't parse xslt ($file): " . ($@ || $XML::LibXSLT::error) );
     $self -> sevent ( @event,
                      -type  => 'error',
                      -descr => "stylesheet XML-invalid",
                    );
-
-    die "Can't parse stylesheet: $file.  Please report to administrator: $@";
+    die "Can't parse stylesheet $file: " . ($@ || $XML::LibXSLT::error);
   }
 
 

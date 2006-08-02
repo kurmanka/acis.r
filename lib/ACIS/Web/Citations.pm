@@ -2,6 +2,7 @@ package ACIS::Web::Citations;
 
 use strict;
 use warnings;
+use Carp qw( confess );
 use Carp::Assert;
 
 use Web::App::Common;
@@ -15,16 +16,60 @@ use constant USELESS_SIMILARITY => 30; # XXX this should be higher, I guess
 
 my $acis;
 my $sql;
+my $session;
+my $vars;
+my $id;
+my $sid;
+my $record;
+my $params;
+my $document;
+my $dsid;
+my $citations;
+my $research_accepted;
+my $mat;
+
+sub get_doc_by_sid ($) {
+  my $dsid = $_[0] || return undef;
+  foreach ( @{ $research_accepted } ) {
+    if ( $_->{sid} eq $dsid ) { 
+      return $_;
+    }    
+  }
+  return undef;
+}
+
 
 sub prepare() {
   $acis = $ACIS::Web::ACIS;
+  die "citations not enabled system-wide" 
+    if not $acis->config( 'citations-profile' );
+
   $sql  = $acis -> sql_object;
+
+  $session = $acis -> session;
+  $vars    = $acis -> variables;
+  $record  = $session -> current_record;
+  $id      = $record ->{id};
+  $sid     = $record ->{sid};
+
+  $params = $acis->form_input;
+
+  $citations         = $record ->{citations} ||= {};
+  $research_accepted = $record ->{contributions}{accepted} || [];
+
+  $mat = $session ->{simmatrix} ||= load_similarity_matrix( $sid ); 
+  $mat = load_similarity_matrix( $sid ); # XXX ||=
+  $mat -> upgrade( $acis, $record );
+
+  $dsid = $acis->{request}{subscreen} || $params->{dsid};
+  if ( $dsid ) {
+    $document = get_doc_by_sid $dsid;
+  }
+
 }
 
-sub acis_citations_enabled() {
-  prepare() if not $acis;
-  return $acis->config( 'citations-profile' );
-}
+
+
 
 
 sub prepare_citations_list($) {
@@ -35,7 +80,7 @@ sub prepare_citations_list($) {
   foreach ( @$srclist ) {
     if ( $_ ->{reason} eq 'similar'      # this condition may be unnecessary
          and $_->{similar} < USELESS_SIMILARITY ) { next; }
-    my $cid = $_->{srcdocsid} . '-'. $_->{checksum};
+    my $cid = cid $_;
     if ( $index->{$cid} ) {
       $index->{$cid}{similar} += $_->{similar};
     } else {
@@ -49,31 +94,9 @@ sub prepare_citations_list($) {
 }
 
 sub prepare_potential {
-  shift;
-  die "citations not enabled system-wide" if not acis_citations_enabled;
-
-  my $dsid = shift || $acis->{request}{subscreen};
-  if ( !$dsid ) {
-    die "no document sid to show citations for";
-    return;
-  }
-
-  my $session = $acis -> session;
-  my $vars    = $acis -> variables;
-  my $record  = $session -> current_record;
-  my $id      = $record ->{id};
-  my $sid     = $record ->{sid};
-
-  my $document;
-  foreach ( @{ $record->{contributions}{accepted} } ) {
-    if ( $_->{sid} eq $dsid ) { 
-      $document = $_;
-    }    
-  }
-  
+  die "no document sid to show citations for" if not $dsid;
   die "can't find that document: $dsid" if not $document;
 
-  my $mat = $session ->{simmatrix} = load_similarity_matrix( $sid ); # XXX ||=
   my $citations_new = $mat->{new}{$dsid};
   my $citations_old = $mat->{old}{$dsid};
 
@@ -103,34 +126,13 @@ sub prepare_potential {
 
 sub process_potential {
   shift;
-  die "citations not enabled system-wide" if not acis_citations_enabled;
-
-  my $dsid = shift || $acis->{request}{subscreen} || die;
-
-  my $session = $acis -> session;
-  my $vars    = $acis -> variables;
-  my $record  = $session -> current_record;
-  my $id      = $record ->{id};
-  my $sid     = $record ->{sid};
-
-  my $document;
-  foreach ( @{ $record->{contributions}{accepted} } ) {
-    if ( $_->{sid} eq $dsid ) { 
-      $document = $_;
-    }    
-  }
-  
+  die "no document sid to show citations for" if not $dsid;
   die "can't find that document: $dsid" if not $document;
-
-  my $mat = $session ->{simmatrix} ||= load_similarity_matrix( $sid );
-#  my $mat = load_similarity_matrix( $sid );
-  $mat -> upgrade( $acis, $record );
 
   my %cids = ();
   my @adds;
   my @refusals;
   
-  my $params = $acis->form_input;
   foreach ( keys %$params ) {
     if ( m/add(.+)/ ) { push @adds, $1; }
     if ( m/refuse(.+)/ ) { push @refusals, $1; }
@@ -138,7 +140,7 @@ sub process_potential {
   }
  
   if ( scalar @refusals ) {
-    return process_refuse( $acis, $dsid, \%cids, \@adds, \@refusals );
+    return process_refuse( \%cids, \@adds, \@refusals );
   }
 
   my $added = 0;
@@ -158,8 +160,7 @@ sub process_potential {
   }
 
   if ( $added ) {
-    # XXX show a message
-    $acis->message( "added-citations" );
+    $acis->message( "added-citations" ); # XXX make this message
   }
 
 
@@ -172,35 +173,23 @@ sub process_potential {
          not defined $params->{"add$_"} ) {
       my $cid = $cids{$_};
       my $cit; 
-      foreach (@$nlist) { my $id = $_->{srcdocsid}."-".$_->{checksum}; if ($id eq $cid) {$cit = $_;} }
+      foreach (@$nlist) { my $id = cid $_; if ($id eq $cid) {$cit = $_;last;} }
       if ( $cit ) {
         $mat -> citation_new_make_old( $dsid, $cit );
       }
     }
   }
-
-  
-
 }
 
 
 
 
-# process_refuse( $acis, $dsid, \%cids, \@adds, \@refusals );
+# process_refuse( \%cids, \@adds, \@refusals );
 sub process_refuse {
-  my $acis = shift;
-  my $dsid = shift;
   my $cids = shift;
   my $adds = shift;
   my $refuse = shift;
 
-  my $session = $acis -> session;
-  my $vars    = $acis -> variables;
-  my $record  = $session -> current_record;
-  my $id      = $record ->{id};
-  my $sid     = $record ->{sid};
-
-  my $mat  = $session->{simmatrix};
   my $counter;
   foreach( @$refuse ) {
     my $cid = $cids->{$_};
@@ -221,47 +210,23 @@ sub process_refuse {
     $acis->message( "refused-citations" );
   }
   
-  my $params = $acis->form_input;
   my $preselect = [];
   foreach( keys %$cids ) {
     if ( defined $params->{"add$_"} ) {
-      my $cid = $$cids{$_};
+      my $cid = $cids->{$_};
       push @$preselect, $cid;
     }
   }
   $vars->{'preselect-citations'} = $preselect; 
-  
-
 }
 
 
 sub prepare_identified {
-  shift;
-  die "citations not enabled system-wide" if not acis_citations_enabled;
-
-  my $dsid = shift || $acis->{request}{subscreen};
-  if ( !$dsid ) {
-    die "no document sid to show citations for";
-    return;
-  }
-
-  my $session = $acis -> session;
-  my $vars    = $acis -> variables;
-  my $record  = $session -> current_record;
-  my $id      = $record ->{id};
-  my $sid     = $record ->{sid};
-
-  my $document;
-  foreach ( @{ $record->{contributions}{accepted} } ) {
-    if ( $_->{sid} eq $dsid ) { 
-      $document = $_;
-    }    
-  }
-  
+  die "no document sid to show citations for" if not $dsid;
   die "can't find that document: $dsid" if not $document;
 
-  $vars -> {document} = $document;
-  $vars -> {identified} = $record->{citations}{identified}{$dsid};
+  $vars -> {document}   = $document;
+  $vars -> {identified} = $citations->{identified}{$dsid};
 
   # XXX is this the most interesting document?
   # XXX find / prepare previous and next document
@@ -271,6 +236,98 @@ sub prepare_identified {
   return;
 }
 
+
+use Carp::Assert;
+
+sub process_identified {
+  die "no document sid to show citations for" if not $dsid;
+  die "can't find that document: $dsid" if not $document;
+  
+  my %cids;
+  my @delete = ();
+
+  foreach ( keys %$params ) {
+    if ( m/del(.+)/ ) { push @delete, $1; }
+    if ( m/cid(.+)/ ) { $cids{$1} = $params->{"cid$1"}; }
+  }
+
+  my @citations;
+  foreach ( @delete ) {
+    my $cid = $cids{$_};
+    my $cit = unidentify_citation_from_doc_by_cid( $record, $dsid, $cid );
+
+    assert( $cit->{ostring} );
+    $cit->{nstring} = make_citation_nstring $cit->{ostring};
+    assert( $cit->{nstring} );
+    assert( $cit->{srcdocsid} );
+    if ( $cit ) {
+      warn("gone!"), delete $cit->{gone} if $cit->{gone};
+      push @citations, $cit;
+    }
+  }
+  $mat -> add_new_citations( \@citations );
+
+  if ( scalar @citations )  {
+    $acis -> message( "deleted-citations" );
+  }
+}
+
+
+
+sub prepare_doclist {
+  my $docsidlist = $mat->{doclist};
+  my $doclist = $vars ->{doclist} = [];
+  my $ind = {};
+  foreach ( @$docsidlist ) {
+    my $d = get_doc_by_sid $_;
+    confess "document not found: $_" if not $d;
+    my $new = prepare_citations_list $mat->{new}{$_};
+    my $old = prepare_citations_list $mat->{old}{$_};
+    my $id  = $citations->{identified}{$_} || [];
+    my $simtotal = $mat->{totals_new}{$_};
+    
+    push @$doclist, { doc => $d, 
+                      new => scalar @$new, 
+                      old => scalar @$old, 
+                      id  => scalar @$id,
+                      similarity => $simtotal };
+    $ind->{$_} = 1;
+  }
+
+  foreach ( @$research_accepted ) {
+    my $d   = $_;
+    my $dsid = $_->{sid};
+    next if $ind->{$dsid};
+
+    my $id  = $citations->{identified}{$dsid} || [];
+    my $old = prepare_citations_list $mat->{old}{$dsid};
+    push @$doclist, { doc => $d, 
+                      old => scalar @$old, 
+                      id  => scalar @$id,
+                    };
+  }
+}
+
+
+sub prepare_autosug {
+  my $docsidlist = $mat->{doclist};
+  $dsid = $docsidlist->[0];
+  if ( $dsid ) {
+    $document = get_doc_by_sid $dsid;
+  } else {
+    die "no more interesting documents";
+  }
+  
+  if ( $document ) {
+    prepare_potential();
+  }
+
+  $vars->{'most-interesting-doc'} = 't';
+}
+
+sub process_autosug {
+  process_potential;
+}
 
 
 1;

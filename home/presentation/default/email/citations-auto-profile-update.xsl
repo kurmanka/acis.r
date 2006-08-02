@@ -67,9 +67,11 @@
 
     </xsl:for-each>
 
-    <p>Your updated profile is at its permanent address:<br/>
-    <xsl:value-of select='//saved-profiles//link'/></p>
- 
+    <p>You may review and change your citations profile
+    at:<br/> <a href='{$base-url}/citations' ><xsl:value-of
+    select='$base-url'/>/citations</a>
+    </p>
+
     <p>If necessary, review and change your preferences with regard to
     automatic citations profile update at:<br/> <a
     href='{$base-url}/citations/autoupdate'
