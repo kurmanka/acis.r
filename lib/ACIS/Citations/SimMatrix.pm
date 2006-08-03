@@ -401,7 +401,7 @@ sub run_maintenance {
   # should we really run maintenance now?  Maybe we did this
   # just recently?
   my $lasttime = get_sysprof_value( $psid, "last-citations-prof-maint-time" );
-  if ( time - $lasttime < 2 * 24 * 60 * 60 ) {
+  if ( $lasttime and time - $lasttime < 2 * 24 * 60 * 60 ) {
     debug "last maintenance was done less then 2 days ago";
     return;
   }
