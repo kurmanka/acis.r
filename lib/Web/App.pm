@@ -25,7 +25,7 @@ package Web::App;   ### -*-perl-*-
 #  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 #
 #  ---
-#  $Id: App.pm,v 2.13 2006/07/31 12:06:18 ivan Exp $
+#  $Id: App.pm,v 2.14 2006/08/03 07:19:54 ivan Exp $
 #  ---
 
 
@@ -228,7 +228,7 @@ sub configuration_parameters {
     'character-encoding',  'utf-8',
     'input-space-normalize', 'true',
 
-    'presenters-dir',    'undef',
+    'presenters-dir',    'not-defined',
     
 
 
