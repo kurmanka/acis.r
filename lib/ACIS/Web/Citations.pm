@@ -294,6 +294,7 @@ sub prepare_doclist {
     $ind->{$_} = 1;
   }
 
+  my @tmp;
   foreach ( @$research_accepted ) {
     my $d   = $_;
     my $dsid = $_->{sid};
@@ -301,11 +302,14 @@ sub prepare_doclist {
 
     my $id  = $citations->{identified}{$dsid} || [];
     my $old = prepare_citations_list $mat->{old}{$dsid};
-    push @$doclist, { doc => $d, 
-                      old => scalar @$old, 
-                      id  => scalar @$id,
-                    };
+    push @tmp, { doc => $d, 
+                 old => scalar @$old, 
+                 id  => scalar @$id,
+               };
   }
+  @tmp = sort { $b->{id} <=> $a->{id} } @tmp;
+  push @$doclist, @tmp;
+  
 }
 
 
