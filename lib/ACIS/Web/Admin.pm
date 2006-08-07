@@ -25,7 +25,7 @@ package ACIS::Web::Admin;   ### -*-perl-*-
 #  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 #
 #  ---
-#  $Id: Admin.pm,v 2.10 2006/07/18 14:10:40 ivan Exp $
+#  $Id: Admin.pm,v 2.11 2006/08/07 17:41:18 ivan Exp $
 #  ---
 
 
@@ -859,49 +859,40 @@ sub adm_search_for_documents {
     $ope = "=";
   }
   
-
   my $query;
   my $where;
 
   if ( $by eq 'id' )         { 
-
     $table = "resources";    
     $where = "catch.id$ope?";
 
   } elsif ( $by eq 'title' ) { 
-
     $table = "resources";    
     $where = "match( catch.title ) against ( ? )";
 
   } elsif ( $by eq 'creator' ) { 
-
     $table = "res_creators_separate"; 
     $where = "catch.name$ope?";
 
   } elsif ( $by eq 'creators' ) {
-
     $table = "res_creators_bulk"; 
     $where = "catch.names$ope?";
   }
   
-
   my $db = $wa -> config( 'metadata-db-name' );
  
-  
   if ( $where ) {
+    $where .= $q->{limit};
     require ACIS::Web::Contributions;
     $query = ACIS::Web::Contributions::query_resources( $table, $where );
-    $query .= $q->{limit};
   }
 
   debug "QUERY: $query";
-
   $result -> {query} = $query;
 
   if ( sql_query_execute( $query, $value ) ) {
     build_result_document_list( );
   }
-
 
   $wa -> clear_process_queue;
   $wa -> set_presenter( "adm/search/doc" );
