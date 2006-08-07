@@ -12,7 +12,6 @@ use ACIS::Citations::Suggestions qw( suggest_citation_to_coauthors );
 use ACIS::Citations::SimMatrix;
 use ACIS::Citations::Search;
 
-use constant USELESS_SIMILARITY => 30; # XXX this should be higher, I guess
 
 my $acis;
 my $sql;
@@ -79,7 +78,7 @@ sub prepare_citations_list($) {
   my $index = {};
   foreach ( @$srclist ) {
     if ( $_ ->{reason} eq 'similar'      # this condition may be unnecessary
-         and $_->{similar} < USELESS_SIMILARITY ) { next; }
+         and $_->{similar} < min_useful_similarity ) { next; }
     my $cid = cid $_;
     if ( $index->{$cid} ) {
       $index->{$cid}{similar} += $_->{similar};
@@ -315,10 +314,7 @@ sub prepare_doclist {
     $identified_num += $_->{id};
   }
   $vars ->{'identified-number'} = $identified_num;
-  $vars ->{'potential-new-number'} = $mat->number_of_new_potential( USELESS_SIMILARITY );  
-#  $vars ->{'potential-new-number'} = scalar keys %{ $mat->{new} };
-#  $vars ->{'potential-new-number'} = scalar keys %{ $mat->{totals_new} };
-
+  $vars ->{'potential-new-number'} = $mat->number_of_new_potential;  
 }
 
 

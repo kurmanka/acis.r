@@ -11,7 +11,9 @@ use vars qw( @EXPORT );
 
 @EXPORT = qw( normalize_string make_citation_nstring
               build_citations_index
-              get_document_authors get_author_sid today 
+              get_document_authors get_author_sid 
+              min_useful_similarity
+              today 
               identify_citation_to_doc
               unidentify_citation_from_doc_by_cid
               refuse_citation
@@ -257,6 +259,16 @@ sub get_author_sid ($) {
     return $res -> {row} ->{id};
   }
   return undef;
+}
+
+
+sub min_useful_similarity() {
+  if ( not $ACIS::Web::ACIS ) {
+    warn "no acis object, can't access the configuration\n";
+    return 0.30;
+  } else {
+    $ACIS::Web::ACIS->config( 'citation-document-similarity-useful-threshold' );
+  }
 }
 
 

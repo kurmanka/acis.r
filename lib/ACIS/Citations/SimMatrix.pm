@@ -34,7 +34,7 @@ use vars qw( @EXPORT );
 use Web::App::Common;
 use ACIS::Web::SysProfile;
 use ACIS::Citations::Suggestions qw( load_suggestions );
-use ACIS::Citations::Utils qw( today cid );
+use ACIS::Citations::Utils qw( today cid min_useful_similarity );
 
 
 
@@ -92,7 +92,9 @@ sub _calculate_totals {
     my $total = 0;
     foreach ( @{ $newdoc->{$_} } ) {
       # XXX treat co-author's claims specially?
-      $total += $_->{similar};
+      if ( $_->{similar} >= min_useful_similarity ) {
+        $total += $_->{similar};
+      }
     }
     $totals ->{$dsid} = $total;
   }
@@ -610,7 +612,8 @@ sub citation_new_make_old {
 
 sub number_of_new_potential {
   my $self = shift;
-  my $sim_threshold = shift || 0;
+
+  my $sim_threshold = min_useful_similarity;
 
   my $known = $self->{citations};
   my $pot_new_num = 0;
