@@ -586,8 +586,9 @@ sub citation_new_make_old {
       undef $_; 
       push @{ $old->{$dsid} }, $s;
     }
-    clear_undefined $list;
   }
+  clear_undefined $list;
+  if ( not scalar @$list ) { delete $new->{$dsid}; }
 
   my $dh = $cits->{"$src-$chk"};
   $list = $dh->{$dsid};
@@ -617,6 +618,7 @@ sub number_of_new_potential {
 
   my $known = $self->{citations};
   my $pot_new_num = 0;
+ CIT: 
   foreach ( keys %$known ) {
     my $cid = $_;
     my $dsidh = $known->{$cid};
@@ -628,11 +630,13 @@ sub number_of_new_potential {
         die if not ref $_;
         die if not ref $_ eq 'ARRAY';
         if ( $_->[0] eq 'new' ) {
-          if ( $_->[1] ->{similar} > $sim_threshold 
+          if ( $_->[1] ->{similar} >= $sim_threshold 
                or $_->[1] ->{reason} ne 'similar' ) {
             debug "a new useful potential citation ($dsid): " , cid( $_->[1] );
             $pot_new_num++;
-            last CITDOC;
+            next CIT;
+          } else {
+            debug "new, but not good enough ($dsid): ", cid( $_->[1] );
           }
         }
       }

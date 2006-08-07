@@ -306,7 +306,8 @@ sub prepare_doclist {
                  id  => scalar @$id,
                };
   }
-  @tmp = sort { $b->{id} <=> $a->{id} } @tmp;
+  @tmp = sort { $b->{id} <=> $a->{id} 
+                or $b->{old} <=> $a->{old} } @tmp;
   push @$doclist, @tmp;
   
   my $identified_num = 0;

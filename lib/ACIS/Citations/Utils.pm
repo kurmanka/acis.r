@@ -265,9 +265,9 @@ sub get_author_sid ($) {
 sub min_useful_similarity() {
   if ( not $ACIS::Web::ACIS ) {
     warn "no acis object, can't access the configuration\n";
-    return 0.30;
+    return 0.30 * 100;
   } else {
-    $ACIS::Web::ACIS->config( 'citation-document-similarity-useful-threshold' );
+    return ( $ACIS::Web::ACIS->config( 'citation-document-similarity-useful-threshold' ) * 100 );
   }
 }
 
