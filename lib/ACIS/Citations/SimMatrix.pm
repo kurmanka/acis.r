@@ -34,7 +34,7 @@ use vars qw( @EXPORT );
 use Web::App::Common;
 use ACIS::Web::SysProfile;
 use ACIS::Citations::Suggestions qw( load_suggestions );
-use ACIS::Citations::Utils qw( today );
+use ACIS::Citations::Utils qw( today cid );
 
 
 
@@ -606,6 +606,38 @@ sub citation_new_make_old {
   $self->_calculate_totals;
   $self->check_consistency;
 }
+
+
+sub number_of_new_potential {
+  my $self = shift;
+  my $sim_threshold = shift || 0;
+
+  my $known = $self->{citations};
+  my $pot_new_num = 0;
+  foreach ( keys %$known ) {
+    my $cid = $_;
+    my $dsidh = $known->{$cid};
+    
+  CITDOC: 
+    foreach my $dsid ( keys %$dsidh ) {
+      my $dsl = $dsidh->{$dsid}; # dsl = document suggestions list
+      foreach ( @$dsl ) {
+        die if not ref $_;
+        die if not ref $_ eq 'ARRAY';
+        if ( $_->[0] eq 'new' ) {
+          if ( $_->[1] ->{similar} > $sim_threshold 
+               or $_->[1] ->{reason} ne 'similar' ) {
+            debug "a new useful potential citation ($dsid): " , cid( $_->[1] );
+            $pot_new_num++;
+            last CITDOC;
+          }
+        }
+      }
+    }
+  }
+  return $pot_new_num;
+}
+
 
 use Carp qw( confess );
 sub check_consistency {

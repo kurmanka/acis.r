@@ -28,7 +28,7 @@ input.light {
         
         <form>
           
-          <p>These following citations are refused.  For
+          <p>The following citations are refused.  For
           them you clicked the [not my work] button.</p>
 
           <table>

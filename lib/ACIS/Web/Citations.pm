@@ -310,6 +310,15 @@ sub prepare_doclist {
   @tmp = sort { $b->{id} <=> $a->{id} } @tmp;
   push @$doclist, @tmp;
   
+  my $identified_num = 0;
+  foreach (@$doclist) {
+    $identified_num += $_->{id};
+  }
+  $vars ->{'identified-number'} = $identified_num;
+  $vars ->{'potential-new-number'} = $mat->number_of_new_potential( USELESS_SIMILARITY );  
+#  $vars ->{'potential-new-number'} = scalar keys %{ $mat->{new} };
+#  $vars ->{'potential-new-number'} = scalar keys %{ $mat->{totals_new} };
+
 }
 
 

@@ -126,6 +126,7 @@ home/presentation/default/citations/general.xsl
 home/presentation/default/citations/identified.xsl
 home/presentation/default/citations/overview.xsl
 home/presentation/default/citations/potential.xsl
+home/presentation/default/citations/refused.xsl
 home/presentation/default/email/account-deleted.xsl
 home/presentation/default/email/arpm-notice.xsl
 home/presentation/default/email/citations-auto-profile-update.xsl

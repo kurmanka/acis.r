@@ -13,8 +13,9 @@ use vars qw( @EXPORT );
               build_citations_index
               get_document_authors get_author_sid today 
               identify_citation_to_doc
-              refuse_citation
               unidentify_citation_from_doc_by_cid
+              refuse_citation
+              unrefuse_citation_by_cid
               cid
              );
 

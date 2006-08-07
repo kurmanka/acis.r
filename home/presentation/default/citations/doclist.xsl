@@ -8,6 +8,8 @@
 
   <xsl:variable name='current-screen-id'>citations/doclist</xsl:variable>
   <xsl:variable name='list' select='$response-data/doclist'/>
+  <xsl:variable name='identified-num' select='number($response-data/identified-number)'/>
+  <xsl:variable name='potent-new-num' select='number($response-data/potential-new-number)'/>
   
   <xsl:template name='doclisttable'>
     <xsl:param name='max' select='count($list/list-item)'/>
@@ -80,6 +82,12 @@
     <h1>Citations for your documents</h1><!-- XXX fix grammar: plural ending -->
     <xsl:choose>
       <xsl:when test='$list/list-item'>
+        
+        <p>Overall, you have <xsl:value-of
+        select='$identified-num'/> identified citations and
+        <xsl:value-of select='$potent-new-num'/> new unique
+        potential citations.</p><!-- XXX fix grammar -->
+
         <xsl:call-template name='doclisttable'/>
       </xsl:when>
       <xsl:otherwise>
