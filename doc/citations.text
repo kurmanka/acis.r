@@ -705,6 +705,26 @@ similarity assessment algorithm</a>.</p>
 
 </dd>
 
+
+<dt><C>citation-document-similarity-useful-threshold</C></dt>
+
+<dd><p>Citations, which have similarity value less than this
+threshold, won't even be suggested for user's consideration as
+potential.</p>
+
+<p>Default value: 0.30</p></dd>
+
+
+<dt><C>citation-document-similarity-preselect-threshold</C></dt>
+
+<dd><p>Citations, which have similarity value higher or equal
+than this threshold, will be offered as pre-selected by default
+(for a specific document).</p>
+
+<p>Default value: 0.75</p></dd>
+
+
+
 <dt><C>citation-document-similarity-ttl</C></dt>
 
 <dd><p>Time-to-live for calculated similarity values in days.
@@ -715,15 +735,6 @@ place, this value will be considered expired and will be
 re-calculated with then-current similarity function.</p>
 
 <p>Default value: 100</p></dd>
-
-
-<dt><C>citation-document-similarity-preselect-threshold</C></dt>
-
-<dd><p>Citations, which have similarity value higher or equal
-than this threshold, will be offered as pre-selected by default
-(for a specific document).</p>
-
-<p>Default value: 0.75</p></dd>
 
 
 </dl>
@@ -1483,7 +1494,7 @@ So, a general dump & restore mechanism is highly desirable.
 
 
 <id>
-$Id: citations.text,v 2.45 2006/07/19 14:15:10 ivan Exp $
+$Id: citations.text,v 2.46 2006/08/07 17:46:58 ivan Exp $
 </id>
 
 
