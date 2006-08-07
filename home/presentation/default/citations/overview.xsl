@@ -9,9 +9,12 @@
 
   <xsl:variable name='current-screen-id'>citations</xsl:variable>
 
+  <xsl:variable name='refused' select='number($response-data/refused-number)'/>
+
   <xsl:template name='overview'>
     <h1>Citations Profile</h1>
 
+    <!-- intro -->
     <p><big>Here you deal with citations to your works by
     other researchers.  We search for citations based on
     your <a ref='@name#variations'>name variations</a> and
@@ -20,6 +23,7 @@
     offline, but you deal with its results here.</big></p>
 
 
+    <!-- potential, identified & doclist -->
     <xsl:choose> 
       <xsl:when test='$list/list-item[1]/new'>
         <p>There are some <a ref='@citations/autosug'>new
@@ -49,8 +53,27 @@
       </xsl:when>
     </xsl:choose>
 
-    <p>You may have <a ref='@citations/refused'>refused</a>
-    some citations, but that screen doesn't work yet.</p>
+    
+    <!-- refused -->
+    <xsl:choose>
+      <xsl:when test='number($refused)'>
+
+    <p>You have <a ref='@citations/refused'><xsl:value-of
+    select='$refused' /> refused citations</a>, which you
+    may review.</p>
+
+      </xsl:when>
+      <xsl:otherwise>
+
+    <p>There is also a screen of <a
+    ref='@citations/refused'>refused citations</a>, but you
+    currently don't have any.</p>
+
+      </xsl:otherwise>
+    </xsl:choose>
+
+
+    <!-- auto-update -->
 
     <p>Then also we will make the <a
     ref='@citations/autoupdate'>automatic update

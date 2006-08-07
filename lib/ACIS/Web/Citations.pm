@@ -333,5 +333,50 @@ sub process_autosug {
   process_potential;
 }
 
+sub prepare_overview {
+  prepare_doclist;
+  my $ref = $citations->{refused} ||=[];  
+  $vars ->{'refused-number'} = scalar @$ref;
+}
+
+
+sub prepare_refused {
+  $vars ->{refused} = $citations->{refused} ||=[];
+}
+
+sub process_refused {
+  my %cids;
+  my @delete = ();
+
+  foreach ( keys %$params ) {
+    if ( m/del(.+)/ ) { push @delete, $1; }
+    if ( m/cid(.+)/ ) { $cids{$1} = $params->{"cid$1"}; }
+  }
+
+  my @citations;
+  foreach ( @delete ) {
+    my $cid = $cids{$_};
+    my $cit = unrefuse_citation_by_cid( $record, $cid );
+
+    assert( $cit->{ostring} );
+    $cit->{nstring} = make_citation_nstring $cit->{ostring}
+      if not $cit->{nstring};
+    assert( $cit->{nstring} );
+    assert( $cit->{srcdocsid} );
+    if ( $cit ) {
+      warn("gone!"), delete $cit->{gone} if $cit->{gone};
+      push @citations, $cit;
+    }
+  }
+  $mat -> add_new_citations( \@citations );
+
+  if ( scalar @citations )  {
+    $acis -> message( "unrefused-citations" );
+  }
+}
+
+
+
+
 
 1;

@@ -584,7 +584,7 @@
     <use module='ACIS::Web::Citations' />
     <call function='load_session_or_authenticate' />
     <call function='ACIS::Web::Citations::prepare'/>
-    <call function='ACIS::Web::Citations::prepare_doclist'/>
+    <call function='ACIS::Web::Citations::prepare_overview'/>
     <presentation type='xslt' filename='citations/overview.xsl' />
   </screen>
 

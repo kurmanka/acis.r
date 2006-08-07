@@ -287,20 +287,6 @@ sub identify_citation_to_doc($$$) {
 }
 
 
-sub refuse_citation($$) {
-  my ( $rec, $citation ) = @_;
-  delete $citation->{reason};
-  delete $citation->{time};
-
-  my $cid = $citation->{srcdocsid} . '-' . $citation->{checksum};
-
-  my $citations = $rec->{citations}     ||= {};
-  my $refused   = $citations->{refused} ||= [];
-  ### XXX TODO: be careful not to add an already refused citation
-  push @$refused, $citation;
-
-  debug "refused citation $cid";
-}
 
 sub unidentify_citation_from_doc_by_cid($$$) {
   my ( $rec, $dsid, $cid ) = @_;
@@ -325,6 +311,42 @@ sub unidentify_citation_from_doc_by_cid($$$) {
   return $cit;
 }
 
+
+
+sub refuse_citation($$) {
+  my ( $rec, $citation ) = @_;
+  delete $citation->{reason};
+  delete $citation->{time};
+
+  my $cid = $citation->{srcdocsid} . '-' . $citation->{checksum};
+
+  my $citations = $rec->{citations}     ||= {};
+  my $refused   = $citations->{refused} ||= [];
+  ### XXX TODO: be careful not to add an already refused citation
+  push @$refused, $citation;
+
+  debug "refused citation $cid";
+}
+
+
+sub unrefuse_citation_by_cid($$) {
+  my ( $rec, $cid ) = @_;
+  my $citation;
+
+  my $ref = $rec->{citations}{refused} ||= [];
+  foreach ( @$ref ) {
+    if ( $cid eq cid $_ ) {
+      $citation = $_;
+      undef $_;
+    }
+  }
+  clear_undefined $ref;
+
+  debug "unrefused citation $cid"
+    if $citation;
+
+  return $citation;
+}
 
 
 1;
