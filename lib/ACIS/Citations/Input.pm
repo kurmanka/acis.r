@@ -27,7 +27,7 @@ sub prepare() {
 
 sub find_doc_details($) { 
   my $id  = shift;
-  $id = lc $id;
+  $id = lc $id; ### XXX RePEc-specific?
 
   # prepare
   assert( $ardb );
