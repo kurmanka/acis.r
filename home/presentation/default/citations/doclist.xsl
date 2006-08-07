@@ -46,7 +46,7 @@
                 <a ref='@citations/identified/{doc/sid}'><xsl:value-of select='id'/></a>
               </xsl:when>
               <xsl:otherwise>
-                <span class='a'><xsl:value-of select='id'/></span>
+<!--                <span class='a'><xsl:value-of select='id'/></span> -->
               </xsl:otherwise>
             </xsl:choose>
           </td>
@@ -57,7 +57,6 @@
                 <a ref='@citations/potential/{doc/sid}'><xsl:value-of select='new'/></a> 
               </xsl:when>
               <xsl:otherwise>
-                <span class='a'><xsl:value-of select='new'/></span>
               </xsl:otherwise>
             </xsl:choose>
           </td>
@@ -67,7 +66,6 @@
                 <a ref='@citations/potential/{doc/sid}?old=y'><xsl:value-of select='old'/></a> 
               </xsl:when>
               <xsl:otherwise>
-                <span class='a'><xsl:value-of select='old'/></span>
               </xsl:otherwise>
             </xsl:choose>
           </td>
