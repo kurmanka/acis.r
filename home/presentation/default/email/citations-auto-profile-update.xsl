@@ -41,7 +41,7 @@
     citations to your profile, but if there's an error, you
     can fix it.</p>
 
-    <xsl:for-each select='//doc-w-cit/list-item'>
+    <xsl:for-each select='//docs-w-cit/list-item'>
       <p>Document:</p>
 
       <p class='indent'><xsl:value-of select='title'/><br/>

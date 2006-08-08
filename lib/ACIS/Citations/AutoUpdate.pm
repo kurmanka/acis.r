@@ -94,7 +94,7 @@ sub auto_processing {
     Web::App::Email::send_mail( $acis, "email/citations-auto-profile-update.xsl", %params );
     debug "email sent";
 
-    foreach ( qw( doc-w-cit ) ) {
+    foreach ( qw( docs-w-cit ) ) {
       delete $vars -> {$_};
     }
     
