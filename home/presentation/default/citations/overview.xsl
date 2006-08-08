@@ -9,6 +9,8 @@
 
   <xsl:variable name='current-screen-id'>citations</xsl:variable>
 
+  <xsl:variable name='identified-num' select='number($response-data/identified-number)'/>
+  <xsl:variable name='potent-new-num' select='number($response-data/potential-new-number)'/>
   <xsl:variable name='refused' select='number($response-data/refused-number)'/>
 
   <xsl:template name='overview'>
@@ -26,16 +28,20 @@
     <!-- potential, identified & doclist -->
     <xsl:choose> 
       <xsl:when test='$list/list-item[1]/new'>
-        <p>There are some <a ref='@citations/autosug'>new
-        potential citations</a> to your works, please check
-        them.</p>
+        <p>We have <a ref='@citations/autosug'><xsl:value-of
+        select='$potent-new-num'/> new potential
+        citations</a> to your works, please check them.</p>
       </xsl:when>
     </xsl:choose>
 
     <xsl:choose>
       <xsl:when test='$list/list-item'>
 
-        <p><a ref='@citations/doclist'>The documents</a> of your <a ref='@research/identified'>research profile</a>:</p>
+        <p>A total of <xsl:value-of
+        select='$identified-num'/> citations are identified
+        to <a ref='@citations/doclist'>the documents</a> of
+        your <a ref='@research/identified'>research
+        profile</a>:</p>
 
         <div style='padding: 0px 2em 0px 2em; font-size: smaller;'>
 

@@ -25,7 +25,7 @@ package Web::App;   ### -*-perl-*-
 #  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 #
 #  ---
-#  $Id: App.pm,v 2.14 2006/08/03 07:19:54 ivan Exp $
+#  $Id: App.pm,v 2.16 2006/08/08 08:15:49 ivan Exp $
 #  ---
 
 
@@ -929,23 +929,31 @@ sub handle_request {
   
   ###  handle the request by running the processors
 
+  my $handler_error;
   $self -> time_checkpoint( 'before_processors' );
-  while ( my $processor = $self -> next_processor )  {
-    debug "launch '$processor'";
-
-    if ( $processor =~ /::/ ) {
-      ###  function call
-      no strict;
-      &$processor ($self);
-
-    } else {
-      ###  method call
-      no strict;
-      $self -> $processor;
+  eval {
+    while ( my $processor = $self -> next_processor )  {
+      debug "launch '$processor'";
+      
+      if ( $processor =~ /::/ ) {
+        ###  function call
+        no strict;
+        &$processor ($self);
+        
+      } else {
+        ###  method call
+        no strict;
+        $self -> $processor;
+      }
     }
+  };
+
+  if ( $@ ) {
+    debug "processors finished with an error: $@";
+    $handler_error = $@;
+  } else {
+    debug "processors finished";
   }
-  
-  debug "processors finished";
 
   $self -> time_checkpoint( 'processors' );
 
@@ -964,7 +972,10 @@ sub handle_request {
     debug "session saved";
   }
 
-  
+  if ( $handler_error ) {
+    $self->post_scriptum;
+    die $handler_error;
+  }
 
   ###  prepare and send response
 
@@ -1004,8 +1015,6 @@ sub handle_request {
 
 
   $self -> post_scriptum;
-
-
 }
 ####   e n d    o f    h a n d l e   r e q u e s t   s u b 
 

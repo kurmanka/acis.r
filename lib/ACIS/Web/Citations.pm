@@ -318,7 +318,6 @@ sub prepare_doclist {
   $vars ->{'potential-new-number'} = $mat->number_of_new_potential;  
 }
 
-
 sub prepare_autosug {
   my $docsidlist = $mat->{doclist};
   $dsid = $docsidlist->[0];
