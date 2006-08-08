@@ -60,7 +60,7 @@ sub prepare() {
   $mat = load_similarity_matrix( $sid ); # XXX ||=
   $mat -> upgrade( $acis, $record );
 
-  $dsid = $acis->{request}{subscreen} || $params->{dsid};
+  $dsid = $params->{dsid} || $acis->{request}{subscreen};
   if ( $dsid ) {
     $document = get_doc_by_sid $dsid;
   }
@@ -96,6 +96,7 @@ sub prepare_potential {
   die "no document sid to show citations for" if not $dsid;
   die "can't find that document: $dsid" if not $document;
 
+  debug "prepare_potential()";
   my $citations_new = $mat->{new}{$dsid};
   my $citations_old = $mat->{old}{$dsid};
 
@@ -103,21 +104,12 @@ sub prepare_potential {
   $vars -> {potential_new} = prepare_citations_list $citations_new;
   $vars -> {potential_old} = prepare_citations_list $citations_old;
 
-  # XXX is this the most interesting document?
-
-  # XXX find / prepare previous and next document
+  prepare_prev_next();
 
   foreach ( qw( citation-document-similarity-preselect-threshold ) ) {
     $acis->variables->{$_} = $acis->config( $_ ) * 100;
   }
 
-
-#  $citations_new->[1]->{similar} = 80;
-#  my $cid = $citations_new->[0]->{srcdocsid} . '-' . $citations_new->[0]->{checksum};
-#  $vars->{'preselect-citations'} = [ $cid ];
-
-  return;
-  
 }
 
 
@@ -178,6 +170,15 @@ sub process_potential {
       }
     }
   }
+
+
+  my $autosug = $acis->{request}{screen} eq 'citations/autosug';
+  if ( $params->{moveon} ) {
+    if ( $autosug ) {
+    } else {
+      $acis->redirect_to_screen( 'citations/autosug' );
+    }
+  } 
 }
 
 
@@ -227,12 +228,7 @@ sub prepare_identified {
   $vars -> {document}   = $document;
   $vars -> {identified} = $citations->{identified}{$dsid};
 
-  # XXX is this the most interesting document?
-  # XXX find / prepare previous and next document
-
-#  $acis -> dump_presenter_xml;
-#  undef $acis->{presenter};
-  return;
+  prepare_prev_next();
 }
 
 
@@ -319,19 +315,23 @@ sub prepare_doclist {
 }
 
 sub prepare_autosug {
-  my $docsidlist = $mat->{doclist};
-  $dsid = $docsidlist->[0];
-  if ( $dsid ) {
-    $document = get_doc_by_sid $dsid;
-  } else {
-    die "no more interesting documents";
+
+  if ( $dsid and $params->{moveon} 
+       or not $dsid ) {
+    my $docsidlist = $mat->{doclist};
+    $dsid = $docsidlist->[0];
+    if ( $dsid ) {
+      $document = get_doc_by_sid $dsid;
+    }
   }
   
   if ( $document ) {
     prepare_potential();
+  } else {
+    $vars->{'most-interesting-doc'} = 't';
   }
 
-  $vars->{'most-interesting-doc'} = 't';
+  debug "not the most interesting!" if not $vars->{'most-interesting-doc'};
 }
 
 sub process_autosug {
@@ -381,7 +381,39 @@ sub process_refused {
 }
 
 
+sub prepare_prev_next {
+  die "no document sid to show citations for" if not $dsid;
+  die "can't find that document: $dsid" if not $document;
 
+  debug "prepare_prev_next()";
+
+  my $docsidlist = $mat->{doclist};
+  my $prev;
+  my $next;
+  my $found;
+  foreach ( @$docsidlist ) {
+    if ( $found ) {
+      $next = $_;
+      last;
+    }
+    if ( $_ eq $dsid ) {
+      $vars->{previous} = $prev  if $prev;
+      $found = 1;
+    }
+    $prev = $_;
+  }
+    
+  $vars ->{next} = $next  if $next;
+
+  if ( $found and not $vars->{previous} ) {
+    $vars->{'most-interesting-doc'} = 't';
+    debug "most interesting doc";
+  }
+
+  if ( scalar @$docsidlist ) {
+    $vars->{'anything-interesting'} = 't';
+  }
+}
 
 
 1;

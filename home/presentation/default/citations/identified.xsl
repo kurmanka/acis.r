@@ -5,6 +5,7 @@
     version="1.0">
  
   <xsl:import href='general.xsl'/>
+  <xsl:import href='potential.xsl'/>
 
   <xsl:variable name='current-screen-id'>citations/identified</xsl:variable>
 
@@ -40,23 +41,7 @@
 
     <h1>Citations for your document: identified</h1>
 
-    <p><small>A document from your <a ref='@research/identified'>research profile</a>:</small></p>
-    
-    <table style='margin-bottom:1.3em;'><tr>
-      
-      <td>Prev</td>
-      <td style='padding:0 1em 0 1em'>
-        <big>
-        <!-- document -->
-        <xsl:call-template name='present-resource'>
-          <xsl:with-param name='resource' select='$response-data/document'/>
-        </xsl:call-template>
-        </big>
-      </td>
-      <td>Next</td>
-      
-    </tr></table>
-
+    <xsl:call-template name='document-with-navigation'/> <!-- see potential.xsl -->
 
     <style>
 span.instruction { color: #888; }

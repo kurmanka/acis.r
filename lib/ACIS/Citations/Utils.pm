@@ -267,7 +267,8 @@ sub min_useful_similarity() {
     warn "no acis object, can't access the configuration\n";
     return 0.30 * 100;
   } else {
-    return ( $ACIS::Web::ACIS->config( 'citation-document-similarity-useful-threshold' ) * 100 );
+    my $useful = $ACIS::Web::ACIS->config( 'citation-document-similarity-useful-threshold' ) || die;
+    return ( $useful * 100 );
   }
 }
 
