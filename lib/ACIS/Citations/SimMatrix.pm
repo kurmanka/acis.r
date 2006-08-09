@@ -103,7 +103,8 @@ sub _calculate_totals {
   
   my @doclist = keys %$newdoc;
   @doclist = grep { $totals->{$_} } @doclist;
-  @doclist = sort { $totals->{$b} <=> $totals->{$a} } @doclist;
+  @doclist = sort { $totals->{$b} <=> $totals->{$a} 
+                    or $a cmp $b } @doclist;
 
   $self -> {doclist} = \@doclist;
 }
@@ -763,14 +764,18 @@ sub make_string ($;$) {
         $s .= "${prefix}unsorted\n"; 
 
       } elsif ( ref $first eq 'HASH' and defined $first->{checksum} ) {
-        my @l = sort { $a->{checksum} cmp $b->{checksum}
-                       || $a->{reason} cmp $b->{reason} } @$obj;
+        my @l = sort {    $a->{checksum}  cmp $b->{checksum}
+                       or $a->{reason}    cmp $b->{reason} 
+                       or $a->{srcdocsid} cmp $b->{srcdocsid} 
+                     } @$obj;
         $l = \@l;
 
       } elsif ( ref $first eq 'ARRAY' and defined $first->[1] and $first->[1]{reason} ) {
-        my @l = sort { $a->[0] cmp $b->[0]
-                      || $a->[1]{checksum} cmp $b->[1]{checksum} 
-                      || $a->[1]{reason} cmp $b->[1]{reason} } @$obj;
+        my @l = sort {    $a->[0]            cmp $b->[0]
+                       or $a->[1]{checksum}  cmp $b->[1]{checksum} 
+                       or $a->[1]{reason}    cmp $b->[1]{reason} 
+                       or $a->[1]{srcdocsid} cmp $b->[1]{srcdocsid} 
+                     } @$obj;
         $l = \@l;
 
       } else { 
