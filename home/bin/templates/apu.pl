@@ -18,7 +18,7 @@ my $acis = ACIS::Web -> new( home => $homedir );
 
 my $pretend;
 foreach ( @::ARGV ) {
-  if ( m/^--pre(t(e(nd?)?)?)?$/ ) {
+  if ( m/^\-\-pre(t(e(nd?)?)?)?$/ ) {
     $pretend = 1;
     undef $_;
   }
