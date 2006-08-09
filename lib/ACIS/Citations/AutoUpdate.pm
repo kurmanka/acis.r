@@ -52,7 +52,7 @@ sub auto_processing {
     }
 
     my $dsids = {};
-    my @docs  = [];
+    my @docs  = ();
     
     # Make a list: [ document1, document2, ... ]; where each
     # document is a usual document hash with a "citations"
