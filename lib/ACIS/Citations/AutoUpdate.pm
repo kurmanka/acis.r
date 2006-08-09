@@ -7,6 +7,7 @@ use Carp;
 use Carp::Assert;
 use Web::App::Common;
 
+use ACIS::Citations::Utils;
 use ACIS::Citations::Search qw( personal_search_by_names 
                                 personal_search_by_documents 
                                 personal_search_by_coauthors );
@@ -41,6 +42,10 @@ sub auto_processing {
        or scalar @$add_by_names
        or scalar @$add_by_coauth ) {
 
+    debug "by doc: ",    scalar @$add_by_doc;
+    debug "by names: ",  scalar @$add_by_names;
+    debug "by coauth: ", scalar @$add_by_coauth;
+
     my $dsindex = {};
     foreach ( @{$rec->{contributions}{accepted}} ) {
       if ($_->{sid}) { $dsindex->{$_->{sid}} = $_; }
@@ -55,20 +60,28 @@ sub auto_processing {
     # list of added citations.
     foreach ( @$add_by_doc, @$add_by_names, @$add_by_coauth ) {
       ref $_ || die;
-      my $ds = $_->[0] || die;
-      my $c  = $_->[1] || die;
+      my $dsid = $_->[0] || die;
+      my $cita = $_->[1] || die;
+
+      debug "about to add to doc $dsid citation ". cid $cita;
       
-      my $dh = $dsids->{$ds};
+      my $dhash = $dsids->{$dsid};
       my $dcl;
-      if ( $dh ) {
-        $dcl = $dh->{citations};
+      if ( $dhash ) {
+        $dcl = $dhash->{citations};
       } else {
-        my $d = $dsindex->{$ds};
-        $dh = $dsids->{$ds} = { %$d };
-        $dcl = $dh ->{citations} = [];
-        push @docs, $dh;
+        my $d = $dsindex->{$dsid};
+        if ( not $d ) {
+          debug "no document, sid:$dsid";
+          $dcl = undef;
+          next;
+        } 
+        $dhash = $dsids->{$dsid} = { %$d };
+        if ( !$dhash->{title} ) { debug "no title in doc!, sid:$dsid"; $dcl=undef; next; }        
+        $dcl = $dhash ->{citations} = [];
+        push @docs, $dhash;
       } 
-      push @$dcl, $c;
+      push @$dcl, $cita;
     }
     $vars->{'docs-w-cit'}   = \@docs;
 
