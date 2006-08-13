@@ -28,7 +28,7 @@ package ACIS::Web;   ### -*-perl-*-
 #  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 #
 #  ---
-#  $Id: Services.pm,v 2.12 2006/07/29 20:14:41 ivan Exp $
+#  $Id: Services.pm,v 2.13 2006/08/13 10:16:33 ivan Exp $
 #  ---
 
 use strict;
@@ -332,7 +332,7 @@ sub check_login_and_pass {
       
     if ( not defined $session or not $session ) {
       unlink $lock;
-      debug "but session can't be loaded ($session)";
+      debug "but session can't be loaded ($file)";
       last;
     }
     

@@ -3,6 +3,7 @@ package ACIS::Citations::SimMatrix;
 use strict;
 use warnings;
 
+use Carp;
 use Carp::Assert;
 
 ##  cit_suggestions table fields:
@@ -178,7 +179,10 @@ sub testme {
 
 }
 
-package ACIS::Citations::SimMatrix; # ::Manager 
+
+#########   Advanced Similarity Matrix part   #############
+
+# package ACIS::Citations::SimMatrix; # ::Manager 
 
 use strict;
 use warnings;
@@ -647,7 +651,6 @@ sub number_of_new_potential {
 }
 
 
-use Carp qw( confess );
 sub check_consistency {
   my $self = shift || die;
 
@@ -693,7 +696,7 @@ sub check_consistency {
   close $f2;
 
 #  print "matrices are different; see " . $f1->filename . " and " . $f2->filename, "\n";
-  confess "matrices are different; see " . $f1->filename . " and " . $f2->filename;
+  Carp::confess "matrices are different; see " . $f1->filename . " and " . $f2->filename;
  
 
   # the tests:
