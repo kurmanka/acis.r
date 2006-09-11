@@ -580,12 +580,24 @@
     <presentation type='xslt' filename='citations/refused.xsl' />
   </screen>
 
-  <screen id='citations'>
+  <screen id='citations/autoupdate'>
     <use module='ACIS::Web::Citations' />
+
+    <param name='auto-identified-auto-add' 
+           place='record:citations/meta/auto-identified-auto-add'/>
+    <param name='co-auth-auto-add' 
+           place='record:citations/meta/co-auth-auto-add'/>
+
     <call function='load_session_or_authenticate' />
+
+    <process>
+      <call function='process_form_data' />
+    </process>
+
+    <call function='prepare_form_data' />
     <call function='ACIS::Web::Citations::prepare'/>
     <call function='ACIS::Web::Citations::prepare_overview'/>
-    <presentation type='xslt' filename='citations/overview.xsl' />
+    <presentation type='xslt' filename='citations/autoupdate.xsl' />
   </screen>
 
 

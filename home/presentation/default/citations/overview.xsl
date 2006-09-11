@@ -81,9 +81,9 @@
 
     <!-- auto-update -->
 
-    <p>Then also we will make the <a
+    <p>Choose your citations' profile <a
     ref='@citations/autoupdate'>automatic update
-    preferences</a> screen.  Not yet.</p>
+    preferences</a>.</p>
     
   </xsl:template>
 

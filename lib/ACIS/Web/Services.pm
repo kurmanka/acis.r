@@ -28,7 +28,7 @@ package ACIS::Web;   ### -*-perl-*-
 #  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 #
 #  ---
-#  $Id: Services.pm,v 2.13 2006/08/13 10:16:33 ivan Exp $
+#  $Id: Services.pm,v 2.14 2006/09/11 14:31:41 ivan Exp $
 #  ---
 
 use strict;
@@ -972,7 +972,8 @@ sub process_form_data {
     next if not exists $input->{$name} 
       and exists $par ->{'if-not-empty'};
 
-    my $val = $input -> {$name} || '';
+    my $val = $input -> {$name};
+    if ( not defined $val ) { $val = ''; }
 #    next if not defined $val;
 
     debug "process parameter '$name', value '$val'";
