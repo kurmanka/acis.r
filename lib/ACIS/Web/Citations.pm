@@ -92,6 +92,24 @@ sub prepare_citations_list($) {
   return $list;
 }
 
+sub count_significant_potential ($) {
+  my $list = $_[0];
+  my $count = 0;
+  my $index = {};
+  my $minsim = min_useful_similarity;
+  foreach ( @$list ) {
+    if ( $_ ->{reason} eq 'similar'      # this condition may be unnecessary
+         and $_->{similar} < $minsim ) { next; }
+    my $cid = cid $_;
+    next if $index->{$cid};
+    $index ->{$cid} = 1;
+    $count++;
+  }
+  return $count;
+}
+
+
+
 sub prepare_potential {
   die "no document sid to show citations for" if not $dsid;
   die "can't find that document: $dsid" if not $document;
@@ -412,6 +430,26 @@ sub prepare_prev_next {
 
   if ( scalar @$docsidlist ) {
     $vars->{'anything-interesting'} = 't';
+  }
+}
+
+sub prepare_research_identified {
+  my $rc = {}; # reseach citations
+  my $ci = $citations->{identified};
+  my $ri = $vars->{contributions}{accepted};
+  foreach ( @$ri ) {
+    my $dsid = $_->{sid};
+    next if not $dsid;
+    if ( $ci->{$dsid} ) {
+      $rc->{identified}{$dsid} = scalar @{ $ci->{$dsid} };
+    }
+    my $pot = count_significant_potential $mat->{new}{$dsid};
+    if ( $pot ) {
+      $rc->{potential}{$dsid} = $pot;
+    }
+  }
+  if ( scalar keys %$rc ) {
+    $vars -> {contributions}{citations} = $rc;
   }
 }
 

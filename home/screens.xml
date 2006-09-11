@@ -438,11 +438,13 @@
     <init>
       <call function='load_session_or_authenticate' />
       <call function='ACIS::Web::Contributions::prepare'/>
+      <call function='ACIS::Web::Contributions::prepare_identified'/>
     </init>
 
     <process>
       <call function='load_session_or_authenticate' />
       <call function='ACIS::Web::Contributions::prepare'/>
+      <call function='ACIS::Web::Contributions::prepare_identified'/>
       <call function='ACIS::Web::Contributions::process'/>
     </process>
     

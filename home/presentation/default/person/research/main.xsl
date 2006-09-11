@@ -21,6 +21,7 @@
   <xsl:variable name='current'       select='$contributions/accepted'/>
   <xsl:variable name='accepted'      select='$contributions/accepted'/>
   <xsl:variable name='refused'       select='$contributions/refused'/>
+  <xsl:variable name='citations'     select='$contributions/citations'/>
 
 
   <xsl:variable name='current-count' 

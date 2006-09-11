@@ -25,7 +25,7 @@ package ACIS::Web::Contributions;  ### -*-perl-*-
 #  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 #
 #  ---
-#  $Id: Contributions.pm,v 2.19 2006/07/29 20:15:42 ivan Exp $
+#  $Id: Contributions.pm,v 2.20 2006/09/11 15:58:00 ivan Exp $
 #  ---
 
 use strict;
@@ -198,6 +198,17 @@ sub prepare {
 }
 
 
+sub prepare_identified {
+  my $app = shift;
+  my $rec = $app -> session -> current_record;
+  my $vars = $app-> variables;
+  # prepare citations data, if citations are enabled in configuration and if there are some
+  if ( $app -> config( 'citations-profile' ) ) {
+    require ACIS::Web::Citations;
+    ACIS::Web::Citations::prepare();
+    ACIS::Web::Citations::prepare_research_identified();
+  }
+}
 
 sub prepare_the_role_list {
   my $app = shift;

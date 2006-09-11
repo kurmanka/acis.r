@@ -29,8 +29,9 @@
     </tr>
     
     <xsl:for-each select='$list/list-item[id and title]' xml:space='preserve'>
-      <xsl:variable name="sid" select='generate-id(.)'/>
-      <xsl:variable name="id" select='id'/>
+      <xsl:variable name="sid"  select='generate-id(.)'/>
+      <xsl:variable name="dsid" select='sid'/>
+      <xsl:variable name="id"   select='id'/>
       <xsl:variable name='role' select='role/text()'/>
 
       <xsl:variable name='alternate'><xsl:if test='position() mod 2'> alternate</xsl:if></xsl:variable>
@@ -56,7 +57,7 @@
           >
 
           <select name='role_{$sid}' id='role_{$sid}' size='1'
-	    onchange='javascript:getRef("submitB").value="REMOVE CHECKED ITEMS / SAVE CHANGES"'>
+            onchange='javascript:getRef("submitB").value="REMOVE CHECKED ITEMS / SAVE CHANGES"'>
             <xsl:if test='not( $config-this-type/roles/list-item[text()=$role] )'>
               <xsl:message>Role '<xsl:value-of select='$role'/>' is not a known role for <xsl:value-of select='type'/> type of objects.</xsl:message>
               <option value='{$role}' selected='1'><xsl:value-of select='$role'/></option>
@@ -94,6 +95,28 @@
             <xsl:with-param name='resource' select='.'/>
             <xsl:with-param name='for' select='concat( "remove_", $sid )' />
           </xsl:call-template>
+          
+          <xsl:variable name='cidentified' select='$citations/identified'/>
+          <xsl:variable name='cpotential'  select='$citations/potential'/>
+
+          <xsl:if test='$citations//*[name()=$dsid]'>
+            <br/><small>citations: 
+            <xsl:if test='$citations/identified/*[name()=$dsid]'>
+              <a ref='@citations/identified/{$dsid}' ><xsl:value-of
+              select='$citations/identified/*[name()=$dsid]/text()' />
+              identified</a >
+            </xsl:if>
+
+            <xsl:if test='count($citations/*/*[name()=$dsid])&gt;1'>|</xsl:if> 
+            
+            <xsl:if test='$citations/potential/*[name()=$dsid]'>
+              <a ref='@citations/potential/{$dsid}'><xsl:value-of
+              select='$citations/potential/*[name()=$dsid]/text()'/>
+              potential</a>
+            </xsl:if>
+
+            </small>
+          </xsl:if>
 
     </td>
     </tr>
@@ -141,7 +164,7 @@
 
             <input type='hidden' name='mode' value='edit'/>
             <input type='submit'
-	           id='submitB'
+                   id='submitB'
                    name='continue'
                    class='important'
                    value='REMOVE CHECKED ITEMS' 
