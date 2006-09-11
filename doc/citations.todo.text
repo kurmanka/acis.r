@@ -1,6 +1,6 @@
 # ACIS Citations TO DO List
 
-2006-08-09 14:29 
+2006-09-12 00:16
 
 This plan does not include any work on ReDIF parser, on RAS
 maintenance or fixing bugs in the existing ACIS code.  It
@@ -15,11 +15,27 @@ has been done already.
 
 #### Citations profile screens: fix and improve
 
+ - add messages and errors 
+
+ - global profile menu, make citations item depend on the
+   'citations-profile' configuration variable; similarly for
+   the citations item in the main menu (in the profile menu
+   page) [1 hour]
+
+
+#### ACIS::Web::Citations::Profile  [2 h]
+
+- check\_citations\_profile(); 
+
+
+#### Citations profile screens: fix and improve
+
+ - check / correct wording on the screens 
+
  - English grammar: plural endings and such 
 
  - citations/potential
     - check
-    - add seeing old citations without a reload (AJAX)?
 
  - citations/identified
     - check
@@ -34,10 +50,9 @@ has been done already.
     - check
 
  - citations/potential/old/xml
-    - do we need it?
+    - do we need it? - not necessarily
     - screens.xml                       [10 min]
     - handlers in ACIS::Web::Citations  [15 min]
-    - add javascript to citations/potential.xsl: [2 hour]    
 
  - citations/notmywork/xml
     - screens.xml                       [10 min]
@@ -47,19 +62,6 @@ has been done already.
  - citations (overview)
     - list only relevant documents 
     - check 
-
- - global profile menu, make it depending on the
-   'citations-profile'  configuration variable [1 hour]
-
- - modify research profile research/identifed handler and
-   presenter to give links to the respective
-   citations/identified pages [1 hour]
-
-   Load identified citations and load citations-documents
-   matrix, let presenter access it.
-
-   Make presenter show a link to identified and potential
-   citations (with the number of new ones).
 
  - Testing: add citations screens to the existing MaxQ test
    script [60 min]
@@ -74,11 +76,6 @@ has been done already.
 
 
 
-#### ACIS::Web::Citations::Profile  [2 h]
-
-- check\_citations\_profile(); 
-
-
 #### Database backup / restore strategy [4 hour]
 
  - backup script 
@@ -86,7 +83,9 @@ has been done already.
  - restore script or instructions 
 
 
-improve cit-doc similarity function!
+### Citation-document similarity function
+
+- Improve the comparison algorithm
 
 
 ### Test and fix
@@ -99,7 +98,7 @@ improve cit-doc similarity function!
 
 ### Optimizations
 
- - ACIS::Citations::SimMatrix' advanced operations
+ - ACIS::Citations::SimMatrix' advanced operations - ???
 
 
 
