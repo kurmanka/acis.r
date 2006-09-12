@@ -76,6 +76,7 @@
       <xsl:text>&#160;</xsl:text>
     </hl>
 
+    <!--[if-config(citations-profile)]-->
     <xsl:text> </xsl:text>
 
     <hl screen='citations'>
@@ -85,6 +86,7 @@
       >citations</a>
       <xsl:text>&#160;</xsl:text>
     </hl>
+    <!--[end-if]-->
 
     <xsl:text> | </xsl:text>
 
@@ -124,7 +126,9 @@
 
    <li><a ref='@research' >research</a></li>
 
-   <li><a ref='@citations' >citations</a></li>
+   <!--[if-config(citations-profile)]-->
+     <li><a ref='@citations' >citations</a></li>
+   <!--[end-if]-->
 
  </ul>
 

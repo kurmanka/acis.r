@@ -136,7 +136,6 @@ if test -d $ACIS_static_base_dir; then
   cat $dest/style/main.css $dest/style/brownish.css.add > $dest/style/brownish.css 
 fi
 
-
 # . bin/setup.make_author_index 
 
 # cleanupscript=$homebin/clean-up.pl
@@ -190,6 +189,7 @@ perl -e 'print "package ACIS::LocalConfig;\n\$home_dir=\"$ENV{homedir}\";\n1;\n"
 echo parsing and checking ACIS::Web configuration
 bin/reparse_config 'ACIS::Web' acis.conf
 
+bin/setup_profile_menu
 
 
 
