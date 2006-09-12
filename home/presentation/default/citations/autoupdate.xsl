@@ -21,6 +21,8 @@
 
 <h1>Automatic citations profile update</h1>
 
+    <xsl:call-template name='show-status'/>
+
      <xsl:call-template name='fieldset'>
        <xsl:with-param name='content' xmlns='http://x'>
 

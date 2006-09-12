@@ -106,6 +106,7 @@ td.docnav { color: #999; }
 
     <h1>Citations for your document: potential</h1>
 
+    <xsl:call-template name='show-status'/>
     <xsl:call-template name='document-with-navigation'/>
 
     <style>

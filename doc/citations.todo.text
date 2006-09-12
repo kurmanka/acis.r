@@ -13,15 +13,6 @@ has been done already.
  - collect user feedback, as much as possible
 
 
-#### Citations profile screens: fix and improve
-
- - add messages and errors 
-
- - global profile menu, make citations item depend on the
-   'citations-profile' configuration variable; similarly for
-   the citations item in the main menu (in the profile menu
-   page) [1 hour]
-
 
 #### ACIS::Web::Citations::Profile  [2 h]
 

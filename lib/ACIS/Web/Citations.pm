@@ -207,7 +207,7 @@ sub process_refuse {
   my $adds = shift;
   my $refuse = shift;
 
-  my $counter;
+  my $counter = 0;
   foreach( @$refuse ) {
     my $cid = $cids->{$_};
     debug "refuse citation $cid (for $dsid)";

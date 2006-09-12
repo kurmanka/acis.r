@@ -41,6 +41,8 @@
 
     <h1>Citations for your document: identified</h1>
 
+    <xsl:call-template name='show-status'/>
+
     <xsl:call-template name='document-with-navigation'/> <!-- see potential.xsl -->
 
     <style>

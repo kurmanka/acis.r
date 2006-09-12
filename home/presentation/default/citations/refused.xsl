@@ -13,6 +13,8 @@
 
     <h1>Refused citations</h1>
 
+    <xsl:call-template name='show-status'/>
+
     <style>
 span.instruction { color: #888; }
 a.citing { font-size: smaller; }
