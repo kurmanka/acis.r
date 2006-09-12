@@ -89,12 +89,54 @@ sub profile_check_and_cleanup () {
   
 }
 
-sub potential_check_and_cleanup () {
-  # have we already done that in SimMatrix? Check.
+sub potential_check_and_cleanup {
+  # Have we already done that in SimMatrix? No, as far as I see.
+  my $acis = shift;
 
-  # do a global check and clean-up via SQL join operation?
+  # Do a global check and clean-up via SQL join operation?
   # We can use join to find which rows in cit_suggestions
-  # don't have a corresponding record in the citations table
+  # don't have a corresponding record in the citations table.
+
+  # And the citations table will be kept clean by the
+  # Citations::Input module.
+
+  my $sql = $acis->sql_object;
+
+  $sql -> prepare( "select sug.srcdocsid,sug.checksum from cit_suggestions as sug left join citations as src using (srcdocsid,checksum) where src.srcdocsid is null group by sug.srcdocsid, sug.checksum" );
+  my $r = $sql->execute();
+
+  my $first = 1;
+  my $repeat = 0;
+  my $deleted = 0;
+  while ( $first or $repeat ) {
+    
+    $first = 0;
+    $repeat = 0;
+    my $count = 0;
+    
+    my @list;
+    while ( $r and $r->{row} ) {
+      my $srcdocsid = $r->{row}{srcdocsid};
+      my $checksum  = $r->{row}{checksum} ;
+      
+      push @list, [ $srcdocsid, $checksum ];
+      $count ++;
+      if ( $count > 10000 ) {
+        $repeat = 1;
+        last;
+      }
+      $r->next;
+    }
+    $r->finish;
+    
+    $sql -> prepare_cached( "delete from cit_suggestions where srcdocsid=? and checksum=?" );
+    foreach ( @list ) {
+      $sql -> execute( $_->[0], $_->[1] );
+      $deleted ++;
+    }
+  }
+
+  return $deleted;
 }
 
 1;
