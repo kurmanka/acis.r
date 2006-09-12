@@ -168,9 +168,8 @@ sub process_potential {
     $added ++;
   }
 
-  if ( $added ) {
-    $acis->message( "added-citations" ); # XXX make this message
-  }
+  if ( $added > 1 ) {     $acis->message( "added-citations" ); }
+  elsif ( $added == 1 ) { $acis->message( "added-citation"  ); }
 
 
   my $nlist = $mat->{new}{$dsid} || [];
@@ -223,10 +222,8 @@ sub process_refuse {
     $counter ++;
   }
 
-  if ( $counter ) {
-    # XXX show a message
-    $acis->message( "refused-citations" );
-  }
+  if ( $counter > 1 ) {     $acis->message( "refused-citations" ); } 
+  elsif ( $counter == 1 ) { $acis->message( "refused-citation"  ); }
   
   my $preselect = [];
   foreach( keys %$cids ) {
@@ -280,9 +277,8 @@ sub process_identified {
   }
   $mat -> add_new_citations( \@citations );
 
-  if ( scalar @citations )  {
-    $acis -> message( "deleted-citations" );
-  }
+  if ( scalar @citations > 1 )  {    $acis -> message( "deleted-citations" ); }
+  elsif ( scalar @citations == 1 ) { $acis -> message( "deleted-citation"  ); }
 }
 
 
@@ -393,9 +389,9 @@ sub process_refused {
   }
   $mat -> add_new_citations( \@citations );
 
-  if ( scalar @citations )  {
-    $acis -> message( "unrefused-citations" );
-  }
+  if ( scalar @citations > 1 )  {    $acis -> message( "unrefused-citations" ); }
+  elsif ( scalar @citations == 1 ) { $acis -> message( "unrefused-citation" );  }
+
 }
 
 

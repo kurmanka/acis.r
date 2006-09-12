@@ -121,6 +121,7 @@ home/presentation/default/adm/session-deleted.xsl
 home/presentation/default/adm/session.xsl
 home/presentation/default/adm/sessions.xsl
 home/presentation/default/adm/sql.xsl
+home/presentation/default/citations/autoupdate.xsl
 home/presentation/default/citations/doclist.xsl
 home/presentation/default/citations/general.xsl
 home/presentation/default/citations/identified.xsl
@@ -206,6 +207,7 @@ home/presentation/default/user/settings.xsl
 home/presentation/default/user/unregister.xsl
 home/presentation/default/user/welcome.xsl
 home/presentation/default/widgets.xsl
+home/presentation/default/yes-no-choice.xsl
 home/screens.xml
 install.sh
 lib/ACIS/APU.pm

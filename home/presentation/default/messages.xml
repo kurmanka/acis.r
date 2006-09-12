@@ -43,4 +43,13 @@
   <message id='institution-submission-accepted'>The submitted
   institution data is saved, thank you.</message>
 
+  <message id='added-citations'>The chosen citations were added.</message>
+  <message id='added-citation' >The chosen citation was added.</message>
+  <message id='refused-citations'>The chosen citations were refused.</message>
+  <message id='refused-citation' >The chosen citation was refused.</message>
+  <message id='deleted-citations'>The chosen citations were deleted.</message>
+  <message id='deleted-citation' >The chosen citation was deleted.</message>
+  <message id='unrefused-citations'>The citations were deleted from refused.</message>
+  <message id='unrefused-citation' >The citation was deleted from refused.</message>
+
 </table>
