@@ -90,9 +90,11 @@ home/bin/templates/reparse_config.pl
 home/bin/templates/sanitar.pl
 home/bin/templates/sanitar2.pl
 home/bin/templates/sanitar3.pl
+home/bin/templates/sanitize_cit_suggestions.pl
 home/bin/templates/sanitize_names_table.pl
 home/bin/templates/sanitize_redif_files.pl
 home/bin/templates/setup_ardb.pl
+home/bin/templates/setup_profile_menu.pl
 home/bin/templates/sid_base.pl
 home/bin/templates/updareq.pl
 home/bin/templates/upgrade.pl
