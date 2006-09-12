@@ -65,6 +65,12 @@ sub prepare() {
     $document = get_doc_by_sid $dsid;
   }
 
+  if ( not $session -> {$id} {'citations-checked-and-cleaned'} ) {
+    require ACIS::Citations::Profile;
+    ACIS::Citations::Profile::profile_check_and_cleanup();
+    $session -> {$id} {'citations-checked-and-cleaned'} = 1;
+  }
+
 }
 
 

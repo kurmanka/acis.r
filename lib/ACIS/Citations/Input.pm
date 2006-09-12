@@ -63,7 +63,7 @@ sub process_record {
   my $record = shift;
   
   my $srcdocid = $record -> id;
-  print "src doc id: $srcdocid\n";
+  print "src doc id: $srcdocid\n";  # XXX remove this and the other such?
 
   # prepare
   prepare;
