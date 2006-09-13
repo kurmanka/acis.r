@@ -166,8 +166,8 @@ displayed as new citations, even in the potential tab for
 the current document.
 
 See <a
-href='http://acis.openlib.org/playground/stage-C/citations-profile/per-document-identified.html'
->prototype page</a> of the identified tab for a document.
+href='http://acis.openlib.org/playground/stage-C/citations-profile/per-document-identified.html'>prototype
+page</a> of the identified tab for a document.
 
 
 In the potential tab we offer citations for user to
@@ -1482,7 +1482,7 @@ So, a general dump & restore mechanism is highly desirable.
 
 
 <id>
-$Id: citations.text,v 2.47 2006/09/13 14:41:34 ivan Exp $
+$Id: citations.text,v 2.48 2006/09/13 21:33:37 ivan Exp $
 </id>
 
 
