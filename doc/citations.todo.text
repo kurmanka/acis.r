@@ -19,13 +19,6 @@ has been done already.
 
  - English grammar: plural endings and such 
 
-
- - citations/doclist
-    - add sorting by the identified count and by the potential count
-    - remove (or make optional) documents with no citations
-      (potential or identified)
-    - check
-
  - citations/potential/old/xml
     - do we need it? - not necessarily
     - screens.xml                       [10 min]

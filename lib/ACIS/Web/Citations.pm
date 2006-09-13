@@ -371,6 +371,14 @@ sub prepare_overview {
   prepare_doclist;
   my $ref = $citations->{refused} ||=[];  
   $vars ->{'refused-number'} = scalar @$ref;
+  
+  # leave only interesting documents
+  my $doclist = $vars->{doclist};
+  foreach ( @$doclist ) {
+    if ( $_->{new} or $_->{old} or $_->{id} ) { next; }
+    undef $_;
+  }
+  clear_undefined $doclist;
 }
 
 

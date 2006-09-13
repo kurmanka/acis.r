@@ -30,29 +30,45 @@
       <xsl:when test='$list/list-item[1]/new'>
         <p>We have <a ref='@citations/autosug'><xsl:value-of
         select='$potent-new-num'/> new potential
-        citations</a> to your works, please check them.</p>
+        citation<xsl:if
+        test='$potent-new-num&gt;1'>s</xsl:if></a> to your
+        works, please check <xsl:choose ><xsl:when
+        test='$potent-new-num &gt;1' >them</xsl:when
+        ><xsl:otherwise >it</xsl:otherwise
+        ></xsl:choose>.</p>
       </xsl:when>
     </xsl:choose>
 
     <xsl:choose>
       <xsl:when test='$list/list-item'>
 
-        <p>A total of <xsl:value-of
-        select='$identified-num'/> citations are identified
-        to <a ref='@citations/doclist'>the documents</a> of
+        <xsl:choose>
+          <xsl:when test='$identified-num = 1'>
+
+        <p>Just 1 citation is identified to a document of
         your <a ref='@research/identified'>research
-        profile</a>:</p>
+        profile</a>.</p>
 
-        <div style='padding: 0px 2em 0px 2em; font-size: smaller;'>
+          </xsl:when>
+          <xsl:otherwise>
 
-        <xsl:call-template name='doclisttable'>
+        <p>A total of <xsl:value-of select='$identified-num'
+        /> citations are identified to <a ref=
+        '@citations/doclist' >the documents</a> of your <a
+        ref= '@research/identified' >research profile</a
+        >.</p>
+
+          </xsl:otherwise>
+        </xsl:choose>
+
+        <div style='margin: 0px 2em 2em 2em; font-size: smaller;'>
+
+        <xsl:call-template name='doclisttable-overview'>
           <xsl:with-param name='max' select='"5"'/>
         </xsl:call-template>
 
-        <p><i>You may actually have more documents than
-        you see above, these are just the first 5.  <a
-        ref='@citations/doclist'>See full
-        table.</a></i></p>
+        <p><small><a ref='@citations/doclist'>Full
+        table of documents and citations.</a ></small></p>
 
         </div>
 
@@ -65,7 +81,8 @@
       <xsl:when test='number($refused)'>
 
     <p>You have <a ref='@citations/refused'><xsl:value-of
-    select='$refused' /> refused citations</a>, which you
+    select='$refused' /> refused citation<xsl:if
+    test='number($refused) &gt; 1'>s</xsl:if></a>, which you
     may review.</p>
 
       </xsl:when>
@@ -81,7 +98,7 @@
 
     <!-- auto-update -->
 
-    <p>Choose your citations' profile <a
+    <p>You may choose your citations' profile <a
     ref='@citations/autoupdate'>automatic update
     preferences</a>.</p>
     

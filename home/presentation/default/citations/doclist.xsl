@@ -19,9 +19,8 @@
       <xsl:otherwise>by-new</xsl:otherwise>
     </xsl:choose>
   </xsl:variable>
-  
-  <xsl:template name='doclisttable'>
-    <xsl:param name='max' select='count($list/list-item)'/>
+
+  <xsl:template name='doclisttable-style'>
     <style>
       td.link span.a,
       td.link a:link,
@@ -33,31 +32,9 @@
       big.title { font-style: italic; }
       tr.secondary th { font-weight: normal; }
     </style>
+  </xsl:template>
 
-    <table>
-      <tr>
-        <th rowspan='2' align='left'
-            valign='bottom'
-            >document title</th>
-        <th colspan='3'>citations</th>
-      </tr>
-      <tr class='secondary'>
-
-        <xsl:choose>
-          <xsl:when test='$sort="by-id"'>
-            <th>identified&#160;<small title='sorting'>&#8595;</small>&#160;</th>
-            <th><a ref='@citations/doclist/by-new' title='sort by new'>new</a>&#160;&#160;</th>
-          </xsl:when>
-          <xsl:when test='$sort="by-new"'>
-            <th><a ref='@citations/doclist/by-id' title='sort by identified'>identified</a>&#160;&#160;</th>
-            <th>new&#160;<small title='sorting'>&#8595;</small>&#160;</th>
-          </xsl:when>
-        </xsl:choose>
-
-        <th>old</th>
-      </tr>
-
-      <xsl:for-each select='$list/list-item[position()&lt;=$max]'>
+  <xsl:template name='doclisttable-row'>
         <tr>
           <td class='doctitle'>
             <big class='title'>
@@ -109,10 +86,75 @@
             </xsl:choose>
           </td>
         </tr>
+  </xsl:template>
+
+  <xsl:template name='doclisttable-overview'>
+    <xsl:param name='max' select='count($list/list-item)'/>
+
+    <xsl:call-template name='doclisttable-style'/>
+    <table>
+      <tr>
+        <th rowspan='2' align='left'
+            valign='bottom'
+            >document title</th>
+        <th colspan='3'>citations</th>
+      </tr>
+      <tr class='secondary'>
+
+        <xsl:choose>
+          <xsl:when test='$sort="by-id"'>
+            <th>identified<small title='sorting'>&#8595;</small>&#160;</th>
+            <th>new&#160;</th>
+          </xsl:when>
+          <xsl:when test='$sort="by-new"'>
+            <th>identified&#160;</th>
+            <th>new&#160;</th>
+          </xsl:when>
+        </xsl:choose>
+
+        <th>old</th>
+      </tr>
+
+      <xsl:for-each select='$list/list-item[position()&lt;=$max and (number(id) or number(new) or number(old))]'>
+        <xsl:call-template name='doclisttable-row'/>
+      </xsl:for-each>
+    </table>
+  </xsl:template>
+  
+  <xsl:template name='doclisttable'>
+    <xsl:param name='max' select='count($list/list-item)'/>
+
+    <xsl:call-template name='doclisttable-style'/>
+    <table>
+      <tr>
+        <th rowspan='2' align='left'
+            valign='bottom'
+            >document title</th>
+        <th colspan='3'>citations</th>
+      </tr>
+      <tr class='secondary'>
+
+        <xsl:choose>
+          <xsl:when test='$sort="by-id"'>
+            <th>identified&#160;<small title='sorting'>&#8595;</small>&#160;</th>
+            <th><a ref='@citations/doclist/by-new' title='sort by new'>new</a>&#160;&#160;</th>
+          </xsl:when>
+          <xsl:when test='$sort="by-new"'>
+            <th><a ref='@citations/doclist/by-id' title='sort by identified'>identified</a>&#160;&#160;</th>
+            <th>new&#160;<small title='sorting'>&#8595;</small>&#160;</th>
+          </xsl:when>
+        </xsl:choose>
+
+        <th>old</th>
+      </tr>
+
+      <xsl:for-each select='$list/list-item[position()&lt;=$max]'>
+        <xsl:call-template name='doclisttable-row'/>
       </xsl:for-each>
 
     </table>
   </xsl:template>
+
 
 
   <xsl:template name='doclist'>
