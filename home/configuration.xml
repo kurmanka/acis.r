@@ -5,7 +5,7 @@
     that is a working ARDB core configuration file.  Produces:
     documents table, collections table, authors table.
 
-    $Id: configuration.xml,v 2.1 2006/06/20 09:40:58 ivan Exp $
+    $Id: configuration.xml,v 2.2 2006/09/13 21:32:18 ivan Exp $
 
 -->
 
@@ -94,60 +94,11 @@
 
 -->
 
-
-
-<field-attribute-mapping name="person">
-   <field-associations
-      name="name-full"
-      fname='name-first'
-      mname='name-middle'
-      lname='name-last'
-      email='email'
-      handle='handle'
-      />
-</field-attribute-mapping>
-
-<!-- we don't need it.  And it conflicts with acis-record-person, because they share the id namespace. 2005-10-31 17:29 -->
-<!-- 
-<put-processing record-type="ReDIF-Person 1.0">
-
-    <build-forward-relation
-      type='wrote'
-      attributes='author-paper,author-article,author-book,author-software,author-chapter'/>
-
-</put-processing>
-
-<delete-processing record-type="ReDIF-Person 1.0">
-</delete-processing>
-
--->
-
-
 <use-perl-module>ARDB::ReDIF::Processing</use-perl-module>
 
-
-<!-- ReDIF document template-types -->
-
-
-<table name="resources"> 
-
-        <field name="id"       sql-type=" CHAR(255) NOT NULL PRIMARY KEY" />
-        <field name="sid"      sql-type=" CHAR(15) NOT NULL" />
-        <field name="type"     sql-type=" CHAR(20) NOT NULL" />
-        <field name="title"    sql-type=" VARCHAR(255) NOT NULL"/>
-        <field name="classif"  sql-type=" CHAR(50)" />
-
-        <field name='location' sql-type=' TEXT'/> 
-        <!-- synthetic string containg some other details of
-             the document, see doc/citations.html -->
-
-        <create-table-sql>
-          INDEX title_i ( title ),
-          FULLTEXT INDEX title_ft ( title ),
-          INDEX sid_i ( sid )
-        </create-table-sql>
-
-</table>
+<!-- ReDIF-Person 1.0 records we don't need to process.  We
+     already have acis-record-person, which holds the same
+     data. -->
 
 
 
@@ -199,6 +150,28 @@
 
 
 
+<!-- ReDIF document template-types -->
+
+<table name="resources"> 
+
+        <field name="id"       sql-type=" CHAR(255) NOT NULL PRIMARY KEY" />
+        <field name="sid"      sql-type=" CHAR(15) NOT NULL" />
+        <field name="type"     sql-type=" CHAR(20) NOT NULL" />
+        <field name="title"    sql-type=" VARCHAR(255) NOT NULL"/>
+        <field name="classif"  sql-type=" CHAR(50)" />
+
+        <field name='location' sql-type=' TEXT'/> 
+        <!-- synthetic string containg some other details of
+             the document, see doc/citations.html -->
+
+        <create-table-sql>
+          INDEX title_i ( title ),
+          FULLTEXT INDEX title_ft ( title ),
+          INDEX sid_i ( sid )
+        </create-table-sql>
+
+</table>
+
 
  <!--  3rd generation authors/editors/... data -->
 
@@ -225,10 +198,6 @@
      INDEX ( email(10) )
    </create-table-sql>
  </table>
-
-
-
-
 
 
  <put-processing record-type='ReDIF-Series 1.0,ReDIF-Paper 1.0,ReDIF-Article 1.0,ReDIF-Book 1.0,ReDIF-Chapter 1.0,ReDIF-Software 1.0'>
@@ -330,10 +299,6 @@
 
 <delete-processing record-type="ReDIF-Archive 1.0">
 </delete-processing>
-
-
-
-
 
 
 </configuration>
