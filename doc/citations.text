@@ -161,14 +161,13 @@ In the *identified* tab, the user sees the list of all the
 citations that she has identified to the document. She can
 remove the citations that have been mistakenly
 identified. Such citations become avalailable for all
-documents of her (to which it matches). They are then
+documents of her (to which they match). They are then
 displayed as new citations, even in the potential tab for
 the current document.
 
-<!-- **INSERT IDENTIFIED TAB SCREENSHOT HERE** -->
-
-See <a href='http://acis.openlib.org/playground/stage-C/citations-profile/per-document-identified.html'>prototype
-page</a> of the identified tab for a document.
+See <a
+href='http://acis.openlib.org/playground/stage-C/citations-profile/per-document-identified.html'
+>prototype page</a> of the identified tab for a document.
 
 
 In the potential tab we offer citations for user to
@@ -184,8 +183,6 @@ and the user submitted the form, but did not select this
 citation for inclusion.  If she didn't submit the form,
 which included this citation as new, we will still consider
 it new.
-
-<!-- **INSERT THE POTENTIAL TAB SCREENSHOT HERE** --> 
 
 See the potential tab <a href='http://acis.openlib.org/playground/stage-C/citations-profile/per-document-potential-v3.html'>prototype
 page</a>.
@@ -216,21 +213,12 @@ user's choices and then redirect her to the next <a
 href='#most-interesting-doc'>most interesting document</a>.
 
 
-If the user has no potential citations at all, we will show
-a message saying: 
+If we have no potential citations for the document in
+question, we will show a message saying:
 
     We have no citations to suggest for this document at this time.
 
 
-<!--
-
-Here is an older illustration of what now has become the
-*potential* tab:
-
-<p><img class='snap'
-src='img/citations/profile-page-overview.png'/>
-</p>
--->
 
 
 
@@ -1494,7 +1482,7 @@ So, a general dump & restore mechanism is highly desirable.
 
 
 <id>
-$Id: citations.text,v 2.46 2006/08/07 17:46:58 ivan Exp $
+$Id: citations.text,v 2.47 2006/09/13 14:41:34 ivan Exp $
 </id>
 
 

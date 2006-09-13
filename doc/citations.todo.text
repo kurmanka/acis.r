@@ -13,29 +13,15 @@ has been done already.
  - collect user feedback, as much as possible
 
 
-
-#### ACIS::Web::Citations::Profile  [2 h]
-
-- check\_citations\_profile(); 
-
-
 #### Citations profile screens: fix and improve
 
  - check / correct wording on the screens 
 
  - English grammar: plural endings and such 
 
- - citations/potential
-    - check
-
- - citations/identified
-    - check
-
- - citations/autosug
-
- - citations/refused
 
  - citations/doclist
+    - add sorting by the identified count and by the potential count
     - remove (or make optional) documents with no citations
       (potential or identified)
     - check
