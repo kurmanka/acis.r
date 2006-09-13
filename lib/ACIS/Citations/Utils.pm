@@ -290,13 +290,28 @@ sub identify_citation_to_doc($$$) {
   delete $citation->{reason};
   delete $citation->{time};
 
-  my $citations = $rec->{citations}    ||= {};
+  my $citations   = $rec->{citations}        ||= {};
   my $cidentified = $citations->{identified} ||= {};
-  my $doclist   = $cidentified->{$dsid} ||= [];
-  ### XXX TODO: be careful not to add an already identified citation
-  push @$doclist, $citation;
+  my $doclist     = $cidentified->{$dsid}    ||= [];
+
+  require ACIS::ShortIDs;
+  my $srcdocid = ACIS::ShortIDs::resolve_id( $citation->{srcdocsid} );
+  $citation->{srcdocid} = $srcdocid;
 
   my $cid = $citation->{srcdocsid} . '-' . $citation->{checksum};
+
+  ### be careful not to add an already identified citation
+  foreach ( @$doclist ) {
+    my $_cid = $_->{srcdocsid} . '-' . $_->{checksum};
+    if ( $_cid eq $cid ) {
+      # citation is already identified; overwrite it
+      warn "citation $cid is already identified for $dsid";
+      $_ = $citation;
+      return;
+    }
+  }
+
+  push @$doclist, $citation;
   debug "added citation $cid to identified for $dsid";
 }
 
