@@ -55,6 +55,7 @@ sub prepare() {
 
   $citations         = $record ->{citations} ||= {};
   $research_accepted = $record ->{contributions}{accepted} || [];
+  if ( scalar @$research_accepted == 0 ) { $vars->{'empty-research-profile'} = 1; }
 
   $mat = $session ->{simmatrix} ||= load_similarity_matrix( $sid ); 
   $mat = load_similarity_matrix( $sid ); # XXX ||=
@@ -117,6 +118,7 @@ sub count_significant_potential ($) {
 
 
 sub prepare_potential {
+  return if not $dsid;
   die "no document sid to show citations for" if not $dsid;
   die "can't find that document: $dsid" if not $document;
 
@@ -141,7 +143,7 @@ sub prepare_potential {
 
 sub process_potential {
   shift;
-  die "no document sid to show citations for" if not $dsid;
+  die "no document sid to process citations for" if not $dsid;
   die "can't find that document: $dsid" if not $document;
 
   my %cids = ();
@@ -290,6 +292,9 @@ sub process_identified {
 
 
 sub prepare_doclist {
+
+  my $sort = $acis -> {request}{subscreen} || 'by-new';
+
   my $docsidlist = $mat->{doclist};
   my $doclist = $vars ->{doclist} = [];
   my $ind = {};
@@ -326,6 +331,10 @@ sub prepare_doclist {
                 or $b->{old} <=> $a->{old} } @tmp;
   push @$doclist, @tmp;
   
+  if ( $sort eq 'by-id' ) {
+    @$doclist = sort { $b->{id} <=> $a->{id} } @$doclist;
+  }
+
   my $identified_num = 0;
   foreach (@$doclist) {
     $identified_num += $_->{id};

@@ -29,6 +29,7 @@
   <xsl:template name='citations-add-rows'>
     <xsl:param name='list'/>
     <xsl:param name='group' select='""'/>
+    <xsl:param name='not-my-work-hint'/>
     
     <xsl:for-each select='$list/list-item'>
       <xsl:variable name='i'   select='concat(position(),$group)'/>
@@ -54,6 +55,13 @@
                  title='press this if it is not your work that is cited'
                  value='not my work' 
                  />
+
+          <xsl:if test='position()=1 and $not-my-work-hint'> 
+            <small style='color:red'>
+              &#8592; press this <i>if it is not your work</i> that is cited, 
+              and this citation will not be offered again.
+            </small>
+          </xsl:if>
         </td>
       </tr>
       
@@ -133,7 +141,7 @@ input.light {
 
           <p><big>Which of these point to the above document? </big>
           <span class='instruction'
-                > - Make sure the right ones have their checkboxes checked.</span></p>
+                > &#8212; Make sure the right ones have their checkboxes checked.</span></p>
 
           <table>
 
@@ -141,7 +149,7 @@ input.light {
               <xsl:when test='$new/list-item'>
 
                     <xsl:call-template name='subheader-row'>
-                      <xsl:with-param name='content'><i>new citations</i></xsl:with-param>
+                      <xsl:with-param name='content'><i>new citation<xsl:if test='count($new/list-item)&gt;1'>s</xsl:if></i></xsl:with-param>
                     </xsl:call-template>
 
               </xsl:when>
@@ -150,6 +158,7 @@ input.light {
             <xsl:call-template name='citations-add-rows'>
               <xsl:with-param name='list' select='$new'/>
               <xsl:with-param name='group'></xsl:with-param>
+              <xsl:with-param name='not-my-work-hint'>yes</xsl:with-param>
             </xsl:call-template>
 
             <xsl:choose>
@@ -158,7 +167,7 @@ input.light {
                   <xsl:when test='$form-input/old'>
                     
                     <xsl:call-template name='subheader-row'>
-                      <xsl:with-param name='content'><i>old citations</i></xsl:with-param>
+                      <xsl:with-param name='content'><i>old citation<xsl:if test='count($old/list-item)&gt;1'>s</xsl:if></i></xsl:with-param>
                     </xsl:call-template>
 
                     <xsl:call-template name='citations-add-rows'>
@@ -170,7 +179,10 @@ input.light {
                   <xsl:otherwise>
 
                     <xsl:call-template name='subheader-row'>
-                      <xsl:with-param name='content'><i>old citations hidden</i> -- <a ref='?old=yes'>Want to see them?</a></xsl:with-param>
+                      <xsl:with-param name='content'><i>old citations 
+                      hidden <small>(<xsl:value-of select='count($old/list-item)'/>)</small></i> 
+                      &#8212; <a ref='@citations/potential/{$doc-sid}?old=yes'>Want
+                      to see them?</a></xsl:with-param>
                     </xsl:call-template>
 
                   </xsl:otherwise>
@@ -217,13 +229,13 @@ input.light {
           </xsl:when>
           <xsl:otherwise>
 
-            <p>No citations to offer. 
+            <p>We have no citations to suggest for this document at this time.
             
             <xsl:if test='$form-input/old'>Not even a single old one.  </xsl:if>
 
             <xsl:if test='$old/list-item'>The <a
-            href='?old=y'>old ones</a> you have already
-            seen.  </xsl:if>
+            ref='@citations/potential/{$doc-sid}?old=y' >old
+            ones</a> you have already seen.  </xsl:if>
 
             <xsl:if test='$anything-interesting'>But there
             are some new citations <a
@@ -245,7 +257,21 @@ input.light {
 
     <h1>No document, no citations</h1>
 
-    <p>No potential citations.</p>
+    <p>We are sorry to tell you that we have no potential
+    citations data for the documents in your <a
+    ref='@research/identified' >research profile</a>.</p>
+
+  </xsl:template>
+
+
+  <xsl:template name='no-potential-poor'>
+
+    <h1>No documents, no citations</h1>
+
+    <p>We are sorry to tell you that we have no potential
+    citations data for the documents in your research
+    profile, because <a ref='@research/identified' >your
+    research profile</a> is empty.</p>
 
   </xsl:template>
 
@@ -257,6 +283,9 @@ input.light {
         <xsl:choose>
           <xsl:when test='$doc-sid'>
             <xsl:call-template name='potential'/>
+          </xsl:when>
+          <xsl:when test='not($doc-sid) and //empty-research-profile'>
+            <xsl:call-template name='no-potential-poor'/>
           </xsl:when>
           <xsl:otherwise>
             <xsl:call-template name='no-potential'/>

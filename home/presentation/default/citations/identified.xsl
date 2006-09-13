@@ -67,8 +67,13 @@ input.light {
             
         <form>
 
-          <p>These citations are identified as pointing to this document:</p>
-
+          <xsl:if test='count($response-data/identified/list-item) &gt; 1'>
+            <p>These citations are identified as pointing to this document:</p>
+          </xsl:if>
+          <xsl:if test='count($response-data/identified/list-item) = 1'>
+            <p>This citation is identified as pointing to this document:</p>
+          </xsl:if>
+          
           <table>
 
             <xsl:choose>
@@ -85,7 +90,7 @@ input.light {
 
 <p style='margin-top: 1em;'>
   <input type='submit' class='inputsubmit important'
-   value='DELETE THESE CITATIONS' />
+   value='REMOVE THESE CITATIONS' />
   <input type='hidden' name='dsid' value='{$doc-sid}'/>
 </p>
         </form>
