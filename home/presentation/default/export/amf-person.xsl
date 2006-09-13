@@ -35,6 +35,9 @@
 
   <xsl:template match='//record[id and type="person"]' 
                 xml:space='preserve'>
+    <xsl:variable name='citations'
+                  select='citations/identified'/>
+
     <person xmlns='http://amf.openlib.org'
             id='{id}'>
       <name><xsl:value-of select='name/full'/></name>
@@ -101,9 +104,20 @@
           <xsl:element name='is{$role}of'>
 <xsl:text>
 </xsl:text>
-<xsl:for-each select='$works'
-   xml:space='preserve'
+<xsl:for-each select='$works'>
+  <xsl:variable name='dsid' select='sid/text()'/>
+  <xsl:choose>
+    <xsl:when test='$citations/*[name()=$dsid]/list-item' xml:space='preserve'
+>        <text ref='{id}'>
+<xsl:for-each select='$citations/*[name()=$dsid]/list-item'
+>          <isreferencedby><text ref='{srcdocid}'/></isreferencedby>
+</xsl:for-each
+>        </text>
+</xsl:when>
+    <xsl:otherwise xml:space='preserve'
 >        <text ref='{id}'/>
+</xsl:otherwise>
+  </xsl:choose>
 </xsl:for-each>
           <xsl:text>      </xsl:text>
           </xsl:element>
