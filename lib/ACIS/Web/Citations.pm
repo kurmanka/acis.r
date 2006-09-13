@@ -119,7 +119,7 @@ sub count_significant_potential ($) {
 
 sub prepare_potential {
   return if not $dsid;
-  die "no document sid to show citations for" if not $dsid;
+#  die "no document sid to show citations for" if not $dsid;
   die "can't find that document: $dsid" if not $document;
 
   debug "prepare_potential()";
@@ -368,11 +368,27 @@ sub process_autosug {
 }
 
 sub prepare_overview {
+
+  # redirect to autosug on the first visit, if there are interesting docs to see
+  if ( not $session ->{citations_first_screen} ) {
+    $session->{citations_first_screen} = 1;
+    
+    my $docsidlist = $mat->{doclist};
+    my $_dsid = $docsidlist->[0];
+    if ( $_dsid ) {
+      $document = get_doc_by_sid $_dsid;
+    }
+    if ( $document ) {
+      $acis->redirect_to_screen( 'citations/autosug' );
+    }
+    return;
+  }
+
   prepare_doclist;
   my $ref = $citations->{refused} ||=[];  
   $vars ->{'refused-number'} = scalar @$ref;
   
-  # leave only interesting documents
+  # leave only interesting documents, clear the rest
   my $doclist = $vars->{doclist};
   foreach ( @$doclist ) {
     if ( $_->{new} or $_->{old} or $_->{id} ) { next; }

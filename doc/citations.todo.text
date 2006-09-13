@@ -29,10 +29,6 @@ has been done already.
     - handlers in ACIS::Web::Citations  [15 min]
     - add javascript to citations/potential.xsl: [2 hour]    
 
- - citations (overview)
-    - list only relevant documents 
-    - check 
-
  - Testing: add citations screens to the existing MaxQ test
    script [60 min]
 
