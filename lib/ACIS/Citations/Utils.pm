@@ -120,7 +120,6 @@ sub cit_document_similarity {
   # check title length
   if ( length( $ntitle ) <= 10 ) {
     debug "too short a title: ", $ntitle;
-    # XXX
     return 0;
   }
   
@@ -132,7 +131,12 @@ sub cit_document_similarity {
   
   if ( scalar @titlewords < 2 ) {
     debug "one word title? ", $ntitle; 
-    # XXX
+    if ( index( $nstring, "$ntitle " ) > -1 ) {
+      return 1;
+    }
+    if ( amatch( "$ntitle ", $nstring ) ) {
+      return 0.9;
+    }
     return 0;
   }
   
@@ -146,16 +150,18 @@ sub cit_document_similarity {
   my $startpos = index $nstring, " $first ";
 
   if ($startpos > -1) {
-    # now compare
+    # now compare the title to the presumed title
     $startpos++; 
     debug "citation has title starting at: $startpos";
     my $cittitle = substr $nstring, $startpos, length( $ntitle );
     $result = similarity $ntitle, $cittitle;
 
   } else {
-    debug "the title's begining was not found in the nstring; how do we compare?";
-    # XXX
-
+    debug "the title's begining was not found in the nstring";
+    
+    if ( amatch( "$ntitle ", $nstring ) ) {
+      return 0.85;
+    }
   }
 
 

@@ -8,6 +8,19 @@ did include one work item to do on the AMF parser, but it
 has been done already.
 
 
+#### Database backup / restore strategy [4 hour]
+
+ - backup script 
+
+ - restore script or instructions 
+
+
+### Citation-document similarity function
+
+- Improve the comparison algorithm
+
+
+
 #### User testing
 
  - collect user feedback, as much as possible
@@ -32,26 +45,6 @@ has been done already.
  - Testing: add citations screens to the existing MaxQ test
    script [60 min]
 
-
-### Citations data output [45 min]
-
-- citations data output in the personal AMF records
-  (presenter export/amf-person.xsl) [30 min]
-
-- SaveProfile - make sure citations data is loaded [15 min]
-
-
-
-#### Database backup / restore strategy [4 hour]
-
- - backup script 
-
- - restore script or instructions 
-
-
-### Citation-document similarity function
-
-- Improve the comparison algorithm
 
 
 ### Test and fix
