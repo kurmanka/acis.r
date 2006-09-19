@@ -91,7 +91,20 @@ sub extract_citations ($) {
     }
 
     if ( UNIVERSAL::isa( $_->[0], 'AMF::Noun' )) {
-      $target = $_->[0]->ref;
+      my $noun = $_->[0];
+      $target = $noun->ref;
+      
+      # XXX a hack to get data from current existing CitEc
+      # files, which are not properly formated and have
+      # acis:referencestring inside the texts (2006-09-19
+      # 16:17)
+      if ( not $string 
+           and $noun->{'http://amf.openlib.org/ referencestring'} ) { 
+        $string = $noun -> {'http://amf.openlib.org/ referencestring'}->[0][0];
+        die if not $string;
+        die "not a string" if ref $string;
+      }
+
     } elsif ( $_->[0] eq 'http://acis.openlib.org/ referencestring' ) {
       $string = $_->[2][0];
     }
