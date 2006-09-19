@@ -122,8 +122,8 @@ sub process_record {
     $table -> store_record ( $cit, $sql );
   }
 
-  # delete the records were in this doc before, but not
-  # anyore (i.e. which disappeared)
+  # delete the records that were in this doc before, but not
+  # anymore (i.e. which disappeared)
   $sql -> prepare_cached( "delete from $adb.citations where srcdocsid=? and checksum=?" );
   foreach ( keys %$index ) {
     $sql -> execute( $srcdocsid, $_ );
