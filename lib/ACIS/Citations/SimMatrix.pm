@@ -525,9 +525,10 @@ sub remove_citation {
   
   my $cid  = $cit->{srcdocsid} . '-' . $cit->{checksum};
   my $dhash = $self->{citations} {$cid};
-  return if not $dhash;
-  
+  return if not defined $dhash;
   delete $self->{citations}{$cid};
+  return if not $dhash; ### to make sure
+
 
   $sql -> do( "delete from cit_suggestions where srcdocsid=? and checksum=?", 
               {}, 
