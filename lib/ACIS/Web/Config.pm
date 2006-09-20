@@ -28,7 +28,7 @@ package ACIS::Web::Config;   ### -*-perl-*-
 #  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 #
 #  ---
-#  $Id: Config.pm,v 2.6 2006/08/07 17:46:58 ivan Exp $
+#  $Id: Config.pm,v 2.7 2006/09/20 23:06:57 ivan Exp $
 #  ---
 
 
@@ -69,6 +69,10 @@ sub configuration_parameters {
     
     # database parameters
     'metadata-db-name', 'required',
+    'db-backup-directory', 'not-defined',
+
+    # general
+    'temp-directory',        'not-defined',
 
     # debugging
     'extreme-debug',         'not-defined',
