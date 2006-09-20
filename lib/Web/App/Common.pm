@@ -25,7 +25,7 @@ package Web::App::Common;   ### -*-perl-*-
 #  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 #
 #  ---
-#  $Id: Common.pm,v 2.6 2006/06/28 13:40:25 ivan Exp $
+#  $Id: Common.pm,v 2.7 2006/09/20 23:07:28 ivan Exp $
 #  ---
 
 
@@ -212,6 +212,7 @@ sub force_dir {
     next if -d $base;
     mkdir $base or die "can't create '$base' dir";
   }
+  return 1;
 }
 
 
