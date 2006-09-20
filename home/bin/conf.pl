@@ -18,7 +18,7 @@ my $acisconf = [
    "filename:acis.conf",
    "format:AppConfig",
 #   { copy => "metadata-db-name db-pass db-user glimpse-binary glimpseindex-bin-path"  },
-   { copy => "metadata-db-name db-pass db-user"  },
+   { copy => "metadata-db-name db-pass db-user db-backup-directory temp-directory"  },
    { rename => "db-name<acis-db-name" },
    { trans  => 'ACIS_' },
 ];
@@ -27,7 +27,7 @@ my $ardbconf = [
    "filename:ardb.conf",
    "format:AppConfig",
   { rename => "db_name<metadata-db-name db_user<db-user db_pass<db-pass" },
-  { set    => [ "db_aliases", "'acis=[[acis-db-name]] sid=[[sid-db-name]]'" ] }
+  { set    => [ "db_aliases", "'acis=[[acis-db-name]] sid=[[sid-db-name]] rdb=[[metadata-db-name]]'" ] }
 ];
 
 my $shell = [
