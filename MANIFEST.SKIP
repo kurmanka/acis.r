@@ -15,6 +15,7 @@ home/log$
 ^t\home
 \.bak$
 ~$
+\.sh_$
 \.emacs
 doc/txt/acis-web-notes.txt.koi8
 configuration.tt

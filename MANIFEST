@@ -78,6 +78,7 @@ home/bin/setup.ri_local_setup.pm
 home/bin/setup.sid_local.pm
 home/bin/templates/apu.pl
 home/bin/templates/arpu.pl
+home/bin/templates/backup_tables.pl
 home/bin/templates/clean-up.pl
 home/bin/templates/create_tables.pl
 home/bin/templates/dump_email_handle_table.pl
@@ -87,6 +88,7 @@ home/bin/templates/mvrec.pl
 home/bin/templates/offline_maintain.pl
 home/bin/templates/recreate_profile_pages.pl
 home/bin/templates/reparse_config.pl
+home/bin/templates/restore_table_backup.pl
 home/bin/templates/sanitar.pl
 home/bin/templates/sanitar2.pl
 home/bin/templates/sanitar3.pl
