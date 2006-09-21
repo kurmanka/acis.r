@@ -1,6 +1,6 @@
 # ACIS Citations TO DO List
 
-2006-09-12 00:16
+2006-09-21 12:26
 
 This plan does not include any work on ReDIF parser, on RAS
 maintenance or fixing bugs in the existing ACIS code.  It
@@ -8,42 +8,33 @@ did include one work item to do on the AMF parser, but it
 has been done already.
 
 
-#### Database backup / restore strategy [4 hour]
+#### Database backup / restore strategy
 
- - backup script 
+ - document backup script and restore script
 
- - restore script or instructions 
+    - mysql privileges
+    - configuration parameters
+    - command-line
 
-
-### Citation-document similarity function
-
-- Improve the comparison algorithm
-
+ - add nightly script, mostly copy it from RAS
 
 
-#### User testing
+#### Fix user interface confusion
 
- - collect user feedback, as much as possible
+ - discuss citations presentation on acis-tech
+
+ - add citation source document details
+
+     - to database
+     - to emails
+     - to screens
 
 
 #### Citations profile screens: fix and improve
 
  - check / correct wording on the screens 
 
- - English grammar: plural endings and such 
-
- - citations/potential/old/xml
-    - do we need it? - not necessarily
-    - screens.xml                       [10 min]
-    - handlers in ACIS::Web::Citations  [15 min]
-
- - citations/notmywork/xml
-    - screens.xml                       [10 min]
-    - handlers in ACIS::Web::Citations  [15 min]
-    - add javascript to citations/potential.xsl: [2 hour]    
-
- - Testing: add citations screens to the existing MaxQ test
-   script [60 min]
+ - add a message to the preferences screen, when processed
 
 
 
@@ -55,10 +46,9 @@ has been done already.
 
    - clear all XXX marks
 
-### Optimizations
+### optional optimizations 
 
- - ACIS::Citations::SimMatrix' advanced operations - ???
-
+ - remove all zero-similarity rows from cit_suggestions --> move them to another table?
 
 
 
