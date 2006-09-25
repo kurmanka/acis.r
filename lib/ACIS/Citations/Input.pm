@@ -29,28 +29,17 @@ sub find_doc_details($) {
   my $id  = shift;
   $id = lc $id; ### XXX RePEc-specific?
 
-  # prepare
-  assert( $ardb );
-
   # find srcdocsid
   my $srcdocsid = '';
-  my $srcdocdetails = '';
   {
-    my $rec = $ardb -> get_record( $id );
-    if ( $rec ) {
-      $srcdocsid =     $rec -> {sid};
-      $srcdocdetails = $rec -> {'url-about'};
-      
-    } else {
-      $sql -> prepare( "select sid from resources where id=?" );
-      my $res = $sql -> execute( $id );
-      if ( $res -> {row} and $res -> {row} ->{sid} ) {
-        $srcdocsid = $res -> {row} ->{sid};
-      }
+    $sql -> prepare( "select sid from resources where id=?" );
+    my $res = $sql -> execute( $id );
+    if ( $res -> {row} and $res -> {row} ->{sid} ) {
+      $srcdocsid = $res -> {row} ->{sid};
     }
   }
 
-  return ($srcdocsid, $srcdocdetails);
+  return $srcdocsid;
 }
 
 
@@ -70,19 +59,17 @@ sub process_record {
   assert( $ardb );
   
   # find srcdocsid and URL
-  my $srcdocsid = '';
-  my $srcdocdetails = '';
-  ( $srcdocsid, $srcdocdetails ) = find_doc_details( $srcdocid );
+  my $srcdocsid = find_doc_details( $srcdocid );
 
-  print "src doc sid: $srcdocsid\n";
-  print "src doc details: $srcdocdetails\n";
+  if ( $srcdocsid ) {
+    print "srcdocsid: $srcdocsid\n";
+  } else {
+    print "srcdocsid:no\n";
+  }
 
-#  if ( not $srcdocsid ) { $srcdocsid = 'undef'; }
   if ( not $srcdocsid ) { return undef; }
 
-  my $cit = { srcdocsid => $srcdocsid,
-              srcdocdetails => $srcdocdetails,
-              };
+  my $cit = { srcdocsid => $srcdocsid, };
 
   my $table  = $config -> table( 'acis:citations' );
 

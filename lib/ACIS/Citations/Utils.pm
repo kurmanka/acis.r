@@ -19,6 +19,7 @@ use vars qw( @EXPORT );
               refuse_citation
               unrefuse_citation_by_cid
               cid
+              select_citations_sql
              );
 
 
@@ -291,6 +292,34 @@ sub cid ($) {
 }
 
 
+sub select_citations_sql {
+  my $acis = shift;
+  my $rdbname = $acis->config( 'metadata-db-name' );
+  return "select citations.*,res.id as srcdocid,res.title as srcdoctitle,res.authors as srcdocauthors,res.urlabout as srcdocurlabout 
+  from citations left join $rdbname.resources as res ON res.sid=citations.srcdocsid ";
+}  
+
+
+
+
+sub load_citation_details {
+  my $cit = shift || die;
+
+  die if not $ACIS::Web::ACIS;
+  my $app = $ACIS::Web::ACIS;
+  my $sql = $app -> sql_object() || die;
+  my $select_citations = select_citations_sql( $app );
+  $sql -> prepare( "$select_citations where srcdocsid=? and checksum=?" );
+  my $r = $sql -> execute( $cit->{srcdocsid}, $cit->{checksum} );
+  if ( $r and $r->{row} ) {
+    foreach ( qw( ostring srcdocid srcdoctitle srcdocauthors srcdocurlabout ) ) {    
+      $cit->{$_} = Encode::decode_utf8( $r->{row}{$_} );
+    }
+  }
+
+}
+
+
 sub identify_citation_to_doc($$$) {
   my ( $rec, $dsid, $citation ) = @_;
   delete $citation->{reason};
@@ -299,10 +328,6 @@ sub identify_citation_to_doc($$$) {
   my $citations   = $rec->{citations}        ||= {};
   my $cidentified = $citations->{identified} ||= {};
   my $doclist     = $cidentified->{$dsid}    ||= [];
-
-  require ACIS::ShortIDs;
-  my $srcdocid = ACIS::ShortIDs::resolve_id( $citation->{srcdocsid} );
-  $citation->{srcdocid} = $srcdocid;
 
   my $cid = $citation->{srcdocsid} . '-' . $citation->{checksum};
 
@@ -315,6 +340,11 @@ sub identify_citation_to_doc($$$) {
       $_ = $citation;
       return;
     }
+  }
+
+  if ( not $citation -> {srcdocid} 
+       or not $citation ->{srcdoctitle} ) {
+    load_citation_details( $citation );
   }
 
   push @$doclist, $citation;

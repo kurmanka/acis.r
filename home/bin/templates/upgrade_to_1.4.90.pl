@@ -15,7 +15,8 @@ my $restable = "$db.resources";
 my @alters = (
   "ALTER TABLE $restable ADD COLUMN authors TEXT NOT NULL",
   "ALTER TABLE $restable ADD COLUMN urlabout TEXT",
-                
+  "ALTER TABLE citations DROP COLUMN srcdocdetails",              
+  "ALTER TABLE cit_suggestions DROP COLUMN ostring, DROP COLUMN srcdocdetails",              
 );
 
 foreach ( @alters ) {

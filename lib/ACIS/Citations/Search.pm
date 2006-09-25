@@ -41,10 +41,12 @@ use ACIS::Citations::SimMatrix qw( load_similarity_matrix );
 
 my $acis;
 my $sql;
+my $select_citations;
 
 sub prepare() {
   $acis = $ACIS::Web::ACIS;
   $sql  = $acis -> sql_object;
+  $select_citations = select_citations_sql( $acis );
 }
 
 
@@ -54,13 +56,14 @@ sub search_for_document($) {
 
   debug "search_for_documents: $docid";
 
-  $sql -> prepare_cached( "select * from citations where trgdocid=?" );
+  $sql -> prepare_cached( "$select_citations where trgdocid=?" );
   my $r = $sql -> execute( $docid );
   my @cl = ();
   while ( $r and $r->{row} ) {
     my $c = { %{$r->{row}} };
-    $c->{ostring} = Encode::decode_utf8( $c->{ostring} );
-    $c->{nstring} = Encode::decode_utf8( $c->{nstring} );
+    foreach ( qw( ostring nstring srcdoctitle srcdocauthors ) ) {    
+      $c->{$_} = Encode::decode_utf8( $r->{row}{$_} );
+    }
     push @cl, $c;
     $r->next;
   }
@@ -77,7 +80,7 @@ sub search_for_personal_names($) {
   debug "search_for_personal_names: $names (" , scalar @$names, " names)";
 
   my @cl = ();
-  $sql -> prepare_cached( "select * from citations where nstring REGEXP ?" );
+  $sql -> prepare_cached( "$select_citations where nstring REGEXP ?" );
   foreach ( @$names ) {
     my $n = $_;
     $n =~ s/([\.{}()|*?])/\\$1/g;
@@ -85,8 +88,9 @@ sub search_for_personal_names($) {
     my $r = $sql -> execute( "[[:<:]]$n\[[:>:]]" );
     while ( $r and $r->{row} ) {
       my $c = { %{$r->{row}} };
-      $c->{ostring} = Encode::decode_utf8( $c->{ostring} );
-      $c->{nstring} = Encode::decode_utf8( $c->{nstring} );
+      foreach ( qw( ostring nstring srcdoctitle srcdocauthors ) ) {    
+        $c->{$_} = Encode::decode_utf8( $r->{row}{$_} );
+      }
       debug "found: ", $c->{nstring};
       push @cl, $c;
       $r->next;
@@ -95,7 +99,6 @@ sub search_for_personal_names($) {
 
   debug "search_for_personal_names: found ", scalar @cl, " citations";
   return \@cl;
-  
 }
 
 

@@ -15,8 +15,6 @@ use Carp::Assert;
 #     * reason: ‘similar’ | ‘preidentified’, ‘coauth:pau432’: reason CHAR(20) NOT NULL
 #     * similarity: similar TINYINT UNSIGNED (from 0 to 100 inclusive)
 #     * new: yes | no new BOOL
-#     * original citation string: ostring TEXT NOT NULL
-#     * origin doc details (URL): srcdocdetails BLOB
 #     * suggestion’s creation/update date: time DATE NOT NULL
 #
 # PRIMARY KEY (srcdocsid, checksum, psid, dsid, reason),
@@ -799,13 +797,6 @@ sub make_string ($;$) {
   }
 }
 
-sub test_advanced {
-  require ACIS::Citations::Search;
-  require ACIS::Web;
-  require ACIS::Web::UserData;
-  
-
-}
 
 
 1;

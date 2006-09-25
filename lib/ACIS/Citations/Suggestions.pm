@@ -32,11 +32,23 @@ use vars qw( @EXPORT_OK );
 
 my $acis;
 my $sql;
+my $rdbname;
+my $select_suggestions;
 
 sub prepare() {
   $acis = $ACIS::Web::ACIS;
   $sql  = $acis -> sql_object;
+  $rdbname = $acis->config( 'metadata-db-name' );
+  $select_suggestions = 
+ "SELECT cit_suggestions.*,citations.ostring,
+   res.id as srcdocid,res.title as srcdoctitle,res.authors as srcdocauthors,res.urlabout as srcdocurlabout
+  FROM cit_suggestions LEFT JOIN citations USING (srcdocsid,checksum)
+  LEFT JOIN $rdbname.resources as res ON citations.srcdocsid=res.sid ";
+
 }
+
+### XX Maybe also res.type?
+
 
 #
 ###############   cit_suggestions table
@@ -50,8 +62,6 @@ sub prepare() {
 #     * reason: ‘similar’ | ‘preidentified’, ‘coauth:pau432’: reason CHAR(20) NOT NULL
 #     * similarity: similar TINYINT UNSIGNED // (0...100)
 #     * new: yes | no new BOOL
-#     * original citation string: ostring TEXT NOT NULL
-#     * origin doc details (URL): srcdocdetails BLOB
 #     * suggestion’s creation/update date: time DATE NOT NULL
 #
 # PRIMARY KEY (srcdocsid, checksum, psid, dsid, reason),
@@ -63,11 +73,11 @@ sub add_suggestion($$$$$) {
   my ( $cit, $psid, $dsid, $reason, $similar ) = @_;
   if ( not $sql ) { prepare; }
 
-  $sql -> prepare_cached( "insert into cit_suggestions values (?,?,?,?,?,?,true,?,?,NOW())" );
+  $sql -> prepare_cached( "insert into cit_suggestions values (?,?,?,?,?,?,true,NOW())" );
   $sql -> execute( $cit->{srcdocsid}, $cit->{checksum},
                    $psid, $dsid,
                    $reason, $similar,
-                   $cit->{ostring}, $cit->{srcdocdetails} );
+                 );
 
 }
 
@@ -75,11 +85,11 @@ sub replace_suggestion($$$$$$) {
   my ( $cit, $psid, $dsid, $reason, $similar, $new ) = @_;
   if ( not $sql ) { prepare; }
 
-  $sql -> prepare_cached( "replace into cit_suggestions values (?,?,?,?,?,?,?,?,?,NOW())" );
+  $sql -> prepare_cached( "replace into cit_suggestions values (?,?,?,?,?,?,?,NOW())" );
   $sql -> execute( $cit->{srcdocsid}, $cit->{checksum},
                    $psid, $dsid,
                    $reason, $similar, $new,
-                   $cit->{ostring}, $cit->{srcdocdetails} );
+                   );
 
 }
 
@@ -91,11 +101,11 @@ sub check_suggestions($$$;$) {
   my $r;
   if ( $reason ) {
     $sql -> prepare_cached( 
-    "select * from cit_suggestions where srcdocsid=? and checksum=? and psid=? and dsid=? and reason=?" );
+    "$select_suggestions where srcdocsid=? and checksum=? and psid=? and dsid=? and reason=?" );
     $r = $sql -> execute( $cit->{srcdocsid}, $cit->{checksum}, $psid, $dsid, $reason );
   } else {
     $sql -> prepare_cached( 
-    "select * from cit_suggestions where srcdocsid=? and checksum=? and psid=? and dsid=?" );
+    "$select_suggestions where srcdocsid=? and checksum=? and psid=? and dsid=?" );
     $r = $sql -> execute( $cit->{srcdocsid}, $cit->{checksum}, $psid, $dsid );
   }
 
@@ -104,7 +114,10 @@ sub check_suggestions($$$;$) {
 
   while ( $r and $r->{row} ) {
     my $s = { %{ $r->{row} } };  # hash copy
-    $s->{ostring} = Encode::decode_utf8( $s->{ostring} );
+
+    foreach ( qw( ostring srcdoctitle srcdocauthors ) ) {    
+      $s->{$_} = Encode::decode_utf8( $r->{row}{$_} );
+    }
 
     push @slist, $s;
     $r-> next;
@@ -144,13 +157,15 @@ sub load_suggestions ($) {
   my $psid = shift;
   if ( not $sql ) { prepare; }
   my @slist = ();
-
-  $sql -> prepare_cached( "select * from cit_suggestions where psid=?" );
+  
+  $sql -> prepare_cached( "$select_suggestions WHERE psid=?" );
   my $r = $sql -> execute( $psid );
 
   while ( $r and $r->{row} ) {
     my $s = { %{ $r->{row} } };  # hash copy
-    $s->{ostring} = Encode::decode_utf8( $s->{ostring} );
+    foreach ( qw( ostring srcdoctitle srcdocauthors ) ) {    
+      $s->{$_} = Encode::decode_utf8( $r->{row}{$_} );
+    }
 
     push @slist, $s;
     $r-> next;
@@ -164,13 +179,15 @@ sub load_coauthor_suggestions_new($) {
   if ( not $sql ) { prepare; }
 #  debug "load_coauthor_suggestions: $psid";
 
-  $sql -> prepare_cached( "select * from cit_suggestions where reason like 'coauth:%' and psid=? and new=TRUE" );
+  $sql -> prepare_cached( "$select_suggestions where reason like 'coauth:%' and psid=? and new=TRUE" );
   my $r = $sql -> execute( $psid );
   my @cl = ();
   while ( $r and $r->{row} ) {
-    my $c = { %{$r->{row}} };
-    $c->{ostring} = Encode::decode_utf8( $c->{ostring} );
-    push @cl, $c;
+    my $s = { %{$r->{row}} };
+    foreach ( qw( ostring srcdoctitle srcdocauthors ) ) {    
+      $s->{$_} = Encode::decode_utf8( $r->{row}{$_} );
+    }
+    push @cl, $s;
     $r->next;
   }
 #  debug "load_coauthor_suggestions: found ", scalar @cl, " items";
@@ -277,10 +294,13 @@ sub testme_lowlevel() {
   print "before update: similarity:", $set1->[1]{similar}, 
     " new:", $set1->[1]{new}, "\n\n";  
 
-  $set1->[1]->{similar} = 75;
+  if ( $set1->[1]->{similar} == 75 ) {
+    $set1->[1]->{similar} = 40;
+  } else {
+    $set1->[1]->{similar} = 75;
+  }
   $set1->[1]->{new} = 0;
-  print "updated: ", store_update_suggestion $set1->[1];
-  print "\n(similarity:75, new:0)\n";
+  print "updated: ", store_update_suggestion $set1->[1], "\n";
 
   my $set2 = load_suggestions $psid;
   print "loaded: ", scalar @$set2, "\n";
@@ -292,7 +312,7 @@ sub testme_lowlevel() {
 #  print "\n";
 
   $set2 = load_suggestions $psid;
-  print "loaded: ", scalar @$set2, "\n";
+  print "loaded: ", scalar @$set2, " items\n";
 
 }
 
