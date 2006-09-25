@@ -2,7 +2,8 @@
 Citations in ACIS
 =================
 
-Document status: implementation in progress.
+Document status: implementation mostly complete, but some
+interface changes are in progress.
 
 <p><a
 href='http://acis.openlib.org/software/doc/citations.text'>document
@@ -769,13 +770,12 @@ delete all the citations from this doc and then put all the fresh back.)
 
 The fields:
 
-- document short id: <co>srcdocsid CHAR(15) NOT NULL</co>  
-- full original citation text: <co>ostring TEXT NOT NULL</co>
+- citing document short id: <co>srcdocsid CHAR(15) NOT NULL</co>  
+- full original citation string: <co>ostring TEXT NOT NULL</co>
 - normalized searchable citation string: <co>nstring CHAR(255) NOT NULL</co>
-- refers to doc id: <co>trgdocid CHAR(255)</co>
+- refers to document, id: <co>trgdocid CHAR(255)</co>
 - MD5 checksum of the original citation string in base64 encoding:
   <co>checksum CHAR(22) NOT NULL</co>
-- origin doc details (URL): <co>srcdocdetails BLOB</co>
 
 <p><code>PRIMARY KEY ( srcdocsid, checksum )</code></p>
 
@@ -969,7 +969,8 @@ currentness.
 
 Fields:
 
-- citation origin doc sid: <co>srcdocsid CHAR(15) NOT NULL</co>
+- citation origin doc sid: <co>srcdocsid CHAR(15) NOT
+  NULL</co> 
 - citation checksum: <co>checksum CHAR(22) NOT NULL</co>
 - personal sid, short: <co>psid CHAR(15) NOT NULL</co>
 - document sid, short: <co>dsid CHAR(15) NOT NULL</co>
@@ -978,8 +979,6 @@ Fields:
 - similarity: <co>similar TINYINT UNSIGNED</co> - a number
   from 0 to 100 inclusive
 - new: yes | no <co>new BOOL</co>
-- original citation string: <co>ostring TEXT NOT NULL</co>
-- origin doc details (URL): <co>srcdocdetails BLOB</co>
 - suggestion's creation/update date: <co>time DATE NOT NULL</co>
 
 <pre><code>PRIMARY KEY (srcdocsid, checksum, psid, dsid, reason),
@@ -1482,7 +1481,7 @@ So, a general dump & restore mechanism is highly desirable.
 
 
 <id>
-$Id: citations.text,v 2.48 2006/09/13 21:33:37 ivan Exp $
+$Id: citations.text,v 2.49 2006/09/25 21:40:40 ivan Exp $
 </id>
 
 
