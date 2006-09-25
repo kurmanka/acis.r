@@ -19,6 +19,7 @@ use vars qw( @EXPORT );
               refuse_citation
               unrefuse_citation_by_cid
               cid
+              load_citation_details
               select_citations_sql
              );
 

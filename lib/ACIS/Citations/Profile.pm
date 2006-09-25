@@ -8,7 +8,7 @@ use Carp::Assert;
 
 use ACIS::Web::SysProfile;
 
-use ACIS::Citations::Utils qw( today cid );
+use ACIS::Citations::Utils qw( today cid load_citation_details );
 
 sub last_cit_search_date($;$) {
   my ( $psid, $update ) = @_;
@@ -74,6 +74,15 @@ sub profile_check_and_cleanup () {
       my $r = $sql->execute( $_->{srcdocsid}, $_->{checksum} );
       if ( $r and $r->{row} and $r->{row}{srcdocsid} ) {
         # ok
+
+        # update citations after a database change, temporary XX
+        if ( not $_->{srcdoctitle} or not $_->{srcdocauthors} ) {
+          load_citation_details( $_ );
+        }
+        if ( $_->{srcdocdetails} ) {
+          delete $_->{srcdocdetails};
+        }
+
       } elsif ( $r )  {
         undef $_;
         debug "delete citation $_->{srcdocsid}-$_->{checksum}";
