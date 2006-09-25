@@ -54,16 +54,16 @@
 
       <ul>
       <xsl:for-each select='citations/list-item'>
-        <li>
-          <xsl:value-of select='ostring'/><br/>
-          <xsl:if test='srcdocdetails/text()'>
-            <xsl:text>source: </xsl:text>
-            <xsl:value-of select='srcdocdetails'/>
-          </xsl:if>
+        <li><xsl:text>in: </xsl:text>
+            <xsl:value-of select='srcdoctitle'/><br/>
+            by <xsl:value-of select='srcdocauthors'/><br/>
+            <xsl:if test='srcdocurlabout'><xsl:value-of select='srcdocurlabout'/><br/></xsl:if>
+            <br/>
+
+            cited as: <xsl:value-of select='ostring'/>
         </li>
       </xsl:for-each>
       </ul>
-        
 
     </xsl:for-each>
 
