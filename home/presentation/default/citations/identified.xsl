@@ -23,10 +23,21 @@
           <input type='checkbox' name='del{$i}' id='del{$i}' value=''/>
         </td>
         <td>
-          <label for='del{$i}' ><xsl:value-of select='ostring'/></label>
-          <xsl:text> </xsl:text>
-          <a class='citing' href='{srcdocdetails}'>citing document</a>
+          <i>in: </i>
+          <xsl:choose>
+            <xsl:when test='string(srcdocurlabout)'>
+              <a class='citingtitle' href='{srcdocurlabout}'><xsl:value-of select='srcdoctitle'/></a>
+            </xsl:when>
+            <xsl:otherwise>
+              <span class='citingtitle'><xsl:value-of select='srcdoctitle'/></span>
+            </xsl:otherwise>
+          </xsl:choose>
+          <br/>
+          by <xsl:value-of select='srcdocauthors'/><br/><br/>
           
+          <i>as: </i> <label for='del{$i}' class='citstring'><xsl:value-of select='ostring'/></label>
+          <xsl:text> </xsl:text>
+                    
           <input type='hidden' name='cid{$i}' value='{$cid}'/>
         </td>
       </tr>
@@ -47,7 +58,7 @@
 
     <style>
 span.instruction { color: #888; }
-a.citing { font-size: smaller; }
+a.citing {  }
 input.light { 
   font-weight: normal;
   font-size: smaller;
