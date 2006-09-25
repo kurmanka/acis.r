@@ -107,11 +107,11 @@ sub process_text {
                id   => $id,
                sid  => $sid,
                type => $type,
+               urlabout => $url,
+               authors => $item->{authors},
+               title => $item->{title},
               };
     
-    my $table  = $config -> table( 'resources' );
-    $row -> {title}   = $item->{title};
-
     my $location = '';
     foreach ( qw( journaltitle journalabbreviatedtitle
                   journalidentifier 
@@ -123,8 +123,9 @@ sub process_text {
     }
     $location =~ s/\s+/ /g;
     $location =~ s/(^\s+|\s+$)//g;
-
     $row -> {location} = $location;
+
+    my $table  = $config -> table( 'resources' );
     $table -> store_record ( $row, $sql );
   }
 
