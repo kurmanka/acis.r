@@ -461,10 +461,10 @@ sub process_resource {
                id   => $id,
                sid  => $sid,
                type => $type,
+               urlabout => $url,
+               authors => $item->{authors},
+               title => $item->{title},
               };
-    
-    my $table  = $config -> table( 'resources' );
-    $row -> {title}   = $item->{title};
     $row -> {classif} = join ' ', $record ->get_value( 'classification-jel' );
 
     my $location = '';
@@ -476,6 +476,7 @@ sub process_resource {
 
     $row -> {location} = $location;
 
+    my $table = $config -> table( 'resources' );
     $table -> store_record ( $row, $sql );
   }
 
@@ -573,7 +574,7 @@ sub process_resource {
     if ( not scalar @back ) {
       ###  may be that's a new relation 
       if ( not $acis ) { create_acis(); }
-      require ACIS::Web::ARPM;
+      require ACIS::Web::ARPM;         ## XXXX Should I switch to APU here?
       require ACIS::Web::ARPM::Queue;
       print "putting $per into the ARPM queue!\n";
       ACIS::Web::ARPM::Queue::push_item_to_queue( $acis -> sql_object, $per, 1 );

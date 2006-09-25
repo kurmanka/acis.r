@@ -5,7 +5,7 @@
     that is a working ARDB core configuration file.  Produces:
     documents table, collections table, authors table.
 
-    $Id: configuration.xml,v 2.2 2006/09/13 21:32:18 ivan Exp $
+    $Id: configuration.xml,v 2.3 2006/09/25 11:24:18 ivan Exp $
 
 -->
 
@@ -158,6 +158,8 @@
         <field name="sid"      sql-type=" CHAR(15) NOT NULL" />
         <field name="type"     sql-type=" CHAR(20) NOT NULL" />
         <field name="title"    sql-type=" VARCHAR(255) NOT NULL"/>
+        <field name="authors"  sql-type=" text NOT NULL"/>
+        <field name="urlabout" sql-type=" text"/>
         <field name="classif"  sql-type=" CHAR(50)" />
 
         <field name='location' sql-type=' TEXT'/> 
