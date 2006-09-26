@@ -16,6 +16,47 @@
     <par id='citations'/>
   </xsl:variable>
 
+
+  <!-- render a citation -->
+  <xsl:template name='citation'>
+    <xsl:param name='label'/>
+
+    <p class='citing-document'><i class='tech'>in: </i>
+
+          <xsl:choose>
+            <xsl:when test='string(srcdocurlabout)'>
+              <a class='citingtitle' href='{srcdocurlabout}' title='the citing document'><xsl:value-of select='srcdoctitle'/></a>
+            </xsl:when>
+            <xsl:otherwise>
+              <span class='citingtitle' title='the citing document'><xsl:value-of select='srcdoctitle'/></span>
+            </xsl:otherwise>
+          </xsl:choose>
+          by <xsl:value-of select='srcdocauthors'/></p>
+          
+          <p class='cited-as'>
+   <i class='tech'>as: </i> 
+
+          <xsl:choose>
+            <xsl:when test='$label'>
+              <label for='{$label}' class='citstring' title='is this your work mentioned here?'
+                     ><xsl:value-of select='ostring'/></label>
+            </xsl:when>
+            <xsl:otherwise>
+              <span class='citstring' title='is this your work mentioned here?'
+                    ><xsl:value-of select='ostring'/></span>
+            </xsl:otherwise>
+          </xsl:choose>
+          <xsl:text> </xsl:text>
+          </p>
+
+  </xsl:template>
+
+
+
+
+
+
+
   <xsl:template name='cit-page'>
     <xsl:param name='title'/>
     <xsl:param name='content'/>

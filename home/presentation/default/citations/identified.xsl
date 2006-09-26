@@ -18,26 +18,15 @@
     <xsl:for-each select='$list/list-item'>
       <xsl:variable name='i'   select='concat(position(),$group)'/>
       <xsl:variable name='cid' select='concat(srcdocsid/text(), "-", checksum/text())'/>
-      <tr>
+      <tr class='citation'>
         <td valign='top' align='center'>
           <input type='checkbox' name='del{$i}' id='del{$i}' value=''/>
         </td>
-        <td>
-          <i>in: </i>
-          <xsl:choose>
-            <xsl:when test='string(srcdocurlabout)'>
-              <a class='citingtitle' href='{srcdocurlabout}'><xsl:value-of select='srcdoctitle'/></a>
-            </xsl:when>
-            <xsl:otherwise>
-              <span class='citingtitle'><xsl:value-of select='srcdoctitle'/></span>
-            </xsl:otherwise>
-          </xsl:choose>
-          <br/>
-          by <xsl:value-of select='srcdocauthors'/><br/><br/>
-          
-          <i>as: </i> <label for='del{$i}' class='citstring'><xsl:value-of select='ostring'/></label>
-          <xsl:text> </xsl:text>
-                    
+        <td class='citation'>
+          <xsl:call-template name='citation'>
+            <xsl:with-param name='label' select='concat( "del", $i )'/>
+          </xsl:call-template>
+
           <input type='hidden' name='cid{$i}' value='{$cid}'/>
         </td>
       </tr>

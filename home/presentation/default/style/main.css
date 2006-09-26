@@ -1,6 +1,6 @@
 /* THE MAIN ACIS CSS STYLESHEET */
 
-/* $Id: main.css,v 2.8 2006/05/30 13:27:52 ivan Exp $ */
+/* $Id: main.css,v 2.9 2006/09/26 12:26:30 ivan Exp $ */
 
 body { 
  margin: 0;
@@ -1170,7 +1170,30 @@ table.briefResources tr.disabled td a:visited { color: #777; }
 }
 
 
+.tech { color: #666; }
+
+.citstring {
+ 
+}
+
+.citingtitle,
+a.citingtitle {
+  
+}
+
+td.citation {
+  padding-bottom: 1ex;
+  padding-left: 1ex;
+}
 
 
+p.citing-document {
+  margin: 0ex 0 1ex 0;
+  padding: 0;
+}
 
+p.cited-as {
+  margin: 1ex 0 1ex 0;
+  padding: 0;
+}
 

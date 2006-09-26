@@ -44,12 +44,12 @@
             </xsl:if>
           </input>
         </td>
-        <td>
-          <label for='add{$i}' ><xsl:value-of select='ostring'/></label>
-          <xsl:text> </xsl:text>
-          <a class='citing' href='{srcdocdetails}'>citing document</a>
-          
-          <br/> 
+        <td class='citation'>
+
+          <xsl:call-template name='citation'>
+            <xsl:with-param name='label' select='concat("add", $i)'/>
+          </xsl:call-template>
+
           <input type='hidden' name='cid{$i}' value='{$cid}'/>
           <input type='submit' name='refuse{$i}'  class='light' 
                  title='press this if it is not your work that is cited'
