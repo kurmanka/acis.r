@@ -40,9 +40,9 @@ sub prepare() {
   $sql  = $acis -> sql_object;
   $rdbname = $acis->config( 'metadata-db-name' );
   $select_suggestions = 
- "SELECT cit_suggestions.*,citations.ostring,
+ "SELECT sug.*,citations.ostring,
    res.id as srcdocid,res.title as srcdoctitle,res.authors as srcdocauthors,res.urlabout as srcdocurlabout
-  FROM cit_suggestions LEFT JOIN citations USING (srcdocsid,checksum)
+  FROM cit_suggestions as sug LEFT JOIN citations USING (srcdocsid,checksum)
   LEFT JOIN $rdbname.resources as res ON citations.srcdocsid=res.sid ";
 
 }
@@ -101,11 +101,11 @@ sub check_suggestions($$$;$) {
   my $r;
   if ( $reason ) {
     $sql -> prepare_cached( 
-    "$select_suggestions where srcdocsid=? and checksum=? and psid=? and dsid=? and reason=?" );
+    "$select_suggestions where sug.srcdocsid=? and sug.checksum=? and psid=? and dsid=? and reason=?" );
     $r = $sql -> execute( $cit->{srcdocsid}, $cit->{checksum}, $psid, $dsid, $reason );
   } else {
     $sql -> prepare_cached( 
-    "$select_suggestions where srcdocsid=? and checksum=? and psid=? and dsid=?" );
+    "$select_suggestions where sug.srcdocsid=? and sug.checksum=? and psid=? and dsid=?" );
     $r = $sql -> execute( $cit->{srcdocsid}, $cit->{checksum}, $psid, $dsid );
   }
 
