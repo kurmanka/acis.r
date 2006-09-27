@@ -99,7 +99,7 @@ input.light {
           <xsl:otherwise>
 
             <form>
-              <p>No citations identified as pointing to this document.</p>
+              <p>No citations are identified as pointing to this document.</p>
             </form>
             
           </xsl:otherwise>

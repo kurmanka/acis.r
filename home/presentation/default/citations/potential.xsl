@@ -255,7 +255,7 @@ input.light {
 
   <xsl:template name='no-potential'>
 
-    <h1>No document, no citations</h1>
+    <h1>No citations</h1>
 
     <p>We are sorry to tell you that we have no potential
     citations data for the documents in your <a

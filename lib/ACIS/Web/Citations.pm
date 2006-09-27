@@ -83,9 +83,10 @@ sub prepare_citations_list($) {
   my $srclist = shift;
   my $list = []; 
   my $index = {};
+  my $minsim = min_useful_similarity;
   foreach ( @$srclist ) {
     if ( $_ ->{reason} eq 'similar'      # this condition may be unnecessary
-         and $_->{similar} < min_useful_similarity ) { next; }
+         and $_->{similar} < $minsim ) { next; }
     my $cid = cid $_;
     if ( $index->{$cid} ) {
       $index->{$cid}{similar} += $_->{similar};
@@ -380,8 +381,8 @@ sub prepare_overview {
     }
     if ( $document ) {
       $acis->redirect_to_screen( 'citations/autosug' );
+      return;
     }
-    return;
   }
 
   prepare_doclist;
