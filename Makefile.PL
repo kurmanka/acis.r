@@ -76,7 +76,7 @@ if ( $fine ) {
   print "Fine!\n";
 }
 
-die "to install ACIS, use install.sh script"
+die "to install ACIS, use install.sh script\n"
   unless $ENV{ACIS_INSTALL} or $ENV{ACIS_DEV};
 
 WriteMakefile(
