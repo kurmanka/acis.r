@@ -2,6 +2,9 @@
 
 use strict;
 
+
+#unstable alternative:
+#AMF-perl    /home/ivan/proj/AMF-perl 
 my $mods = {qw( 
 
 AMF-perl    /home/ivan/dev/AMF/AMF-perl
@@ -32,16 +35,19 @@ foreach my $m ( keys %$mods ) {
     my %versions;
     
     foreach ( @f ) {
-      if ( m/^$m-(\d[\d\.\w]+)(\-[\w\d\-]+)\.tar.gz$/ ) {
+      if ( m/^$m\-(\d[\d\.]+)(\-[\w\d\.\-]+)?\.tar\.gz$/ ) {
         my $tv = $1;
+        my $q  = $2 || '';
         $tv =~ s/\.(\d+)/ sprintf( ".%05d", $1 ) /ge;
-        
+        print "$m: $tv ($q)\n";
         $versions{$tv} = $_;
         if ( $ver 
              and $tv gt $ver ) {
           $ver = $tv;
         } 
         if ( not $ver ) { $ver = $tv; }
+      } else {
+#        print "$m: $_ ?\n";
       }
     }  
     if ( $ver and
