@@ -21,12 +21,13 @@ my $logs = {
 };
 
 
-use CGI qw/:standard/;
+use CGI::Minimal;
 
+my $cgi = CGI::Minimal->new();
 
-my $log    = param( 'log'  ) || 'main';
-my $tail   = param( 'tail' ) || 40 ;
-my $search = param( 'key'  ) || '';
+my $log    = $cgi->param( 'log'  ) || 'main';
+my $tail   = $cgi->param( 'tail' ) || 40 ;
+my $search = $cgi->param( 'key'  ) || '';
 
 print <<_THE_FORM_;
 Content-Type: text/html; charset=utf-8
