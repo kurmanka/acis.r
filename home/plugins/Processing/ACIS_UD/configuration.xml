@@ -209,7 +209,7 @@
     <field name='chain'    sql-type='char(16)'/>
     <field name='startend' sql-type='tinyint'/>
 
-    <field name='packed'   sql-type='blob'/>
+    <field name='packed'   sql-type='mediumblob'/>
 
     <create-table-sql line='index( date, chain )'/>
   </table>    
