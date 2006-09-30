@@ -24,7 +24,7 @@ package ACIS::Web::Session::SOldUser;   ### -*-perl-*-
 #  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 #
 #  ---
-#  $Id: SOldUser.pm,v 2.0 2005/12/27 19:47:40 ivan Exp $
+#  $Id: SOldUser.pm,v 2.1 2006/09/30 16:11:40 ivan Exp $
 #  ---
 
 use strict;
@@ -61,7 +61,6 @@ sub close {
 
       ###  process userdata owner login change
       if ( $owner -> {'old-login'} ) {
-        
         $app -> userlog ( "log off: login change from ", 
                           $owner->{'old-login'},
                           " to ", 
@@ -80,6 +79,7 @@ sub close {
         }
         delete $owner -> {'old-login'};
       }
+      delete $owner -> {placeholder_file};
 
       
       eval { 

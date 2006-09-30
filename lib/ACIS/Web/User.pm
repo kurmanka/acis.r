@@ -26,7 +26,7 @@ package ACIS::Web::User; ### -*-perl-*-
 #  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 #
 #  ---
-#  $Id: User.pm,v 2.2 2006/07/04 09:21:17 ivan Exp $
+#  $Id: User.pm,v 2.3 2006/09/30 16:11:40 ivan Exp $
 #  ---
 
 
@@ -216,7 +216,9 @@ sub contact_screen_process {
 
   }
 
-  $app -> redirect_to_screen_for_record( 'menu' );
+  if ( not $app->error ) {
+    $app -> redirect_to_screen_for_record( 'menu' );
+  }
 }
 
 
@@ -228,8 +230,8 @@ sub set_user_login {
   my $session = $app -> session;
   my $owner   = $session -> object -> {owner};
 
-  my $old  = $owner -> {login};
-  my $reallyold = $owner ->{'old-login'};
+  my $old      = $owner -> {login};
+  my $original = $owner -> {'old-login'};
 
   if ( not defined $new ) {
     return $old;
@@ -241,33 +243,41 @@ sub set_user_login {
   if ( $newlc ne $oldlc ) {
 
     my $f = $app -> userdata_file_for_login( $newlc );
-    if ( -e $f ) {
-      ### XXX this will not allow to change account login to its previous
-      ### value (previous -- in the same session).  I could add a check if $f
-      ### is the same file as userdata was originally read from, but its so
-      ### rare occasion... I suppose there are more important things to
-      ### do now.
 
-      $app -> error( "login-taken" );
-      return $old;
-    }
-
-    if ( open HOLDER, ">$f" ) {
-      print HOLDER "placeholder";
-      close HOLDER;
+    my $welcome_back; ### switched back to the same login she used to enter the system
+    if ( $newlc eq lc $original ) {
+      $welcome_back = 1;
+      delete $owner->{'old-login'};
+      if ( $owner->{placeholder_file} ) { 
+        unlink $owner->{placeholder_file}; 
+        delete $owner->{placeholder_file}; 
+      }
 
     } else {
-      $app -> error( "login-taken" );
-      return $old;
+      if ( -e $f ) {
+        $app -> error( "login-taken" );
+        return $old;
+      }
+
+      if ( open HOLDER, ">$f" ) {
+        print HOLDER "placeholder";
+        close HOLDER;
+        if ( $owner->{placeholder_file} ) {  unlink $owner->{placeholder_file};  }
+        $owner->{placeholder_file} = $f;
+
+      } else {
+        $app -> error( "login-taken" );
+        return $old;
+      }
+
+      if ( not defined $owner -> {'old-login'} ) {
+        $owner -> {'old-login'} = $old;
+      }
     }
 
-    $owner -> {login} = $new;
-    if ( not defined $owner -> {'old-login'} ) {
-      $owner -> {'old-login'} = $old;
-    }
-
+    $owner   -> {login} = $new;
     $session -> set_object_file( $f );
-    $app -> update_paths_for_login( $newlc );
+    $app     -> update_paths_for_login( $newlc );
 
     require ACIS::Web::SysProfile;
     ACIS::Web::SysProfile::rename_sysprof_id( $oldlc, $newlc );
@@ -276,7 +286,6 @@ sub set_user_login {
   $owner -> {login} = $new;
 
   return $new;
-
 }
 
 
