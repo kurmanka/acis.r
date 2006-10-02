@@ -166,10 +166,16 @@ documents of her (to which they match). They are then
 displayed as new citations, even in the potential tab for
 the current document.
 
+
+<p class='img'><img class='snap' src='img/citations/identified-page-at-65p.png'
+alt='identified citations screen snapshot'/>
+</p>
+
+<!--
 See <a
 href='http://acis.openlib.org/playground/stage-C/citations-profile/per-document-identified.html'>prototype
 page</a> of the identified tab for a document.
-
+-->
 
 In the potential tab we offer citations for user to
 identify.  We only offer citations that we found similar to
@@ -185,8 +191,16 @@ citation for inclusion.  If she didn't submit the form,
 which included this citation as new, we will still consider
 it new.
 
+<p class='img'><img class='snap' src='img/citations/autosuggested-page-v4-at-65p.png'
+alt='potential citations screen snapshot'/>
+</p>
+
+
+<!--
 See the potential tab <a href='http://acis.openlib.org/playground/stage-C/citations-profile/per-document-potential-v3.html'>prototype
 page</a>.
+-->
+
 
 We present the potential citations as shown in the prototype
 page linked above. The old citations will not be shown by
@@ -460,14 +474,17 @@ may look like this:
         paper by David Webb & David De Meza
         http://ideas.repec.org/p/fmg/fmgdps/dp0007.html
 
-    Citation:
+    Citations:
 
-      * Webb D., De Meza D. 1999. Imperfect Capital Markets
-        Need Not be Inefficient.  Financial Markets Group,
-        Discussion papers.
-        source: http://ideas.repec.org/p/fmg/fmgdps/dp0008.html
-       
-    ...
+      * in: Exact joint forecasts for vector aggressive 
+        models by Lu-Sam Xiu
+        http://ideas.repec.org/p/xiu/xiudps/2001.html
+
+        cited as: Webb D., De Meza D. 1999. Imperfect 
+        Capital Markets Need Not be Inefficient.  Financial 
+        Markets Group, Discussion papers.  
+        
+        ...
 
    
     To review and correct these items, log into your profile
@@ -1481,7 +1498,7 @@ So, a general dump & restore mechanism is highly desirable.
 
 
 <id>
-$Id: citations.text,v 2.49 2006/09/25 21:40:40 ivan Exp $
+$Id: citations.text,v 2.50 2006/10/02 17:40:35 ivan Exp $
 </id>
 
 

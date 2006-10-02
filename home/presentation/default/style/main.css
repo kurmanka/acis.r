@@ -1,6 +1,6 @@
 /* THE MAIN ACIS CSS STYLESHEET */
 
-/* $Id: main.css,v 2.10 2006/10/02 10:26:49 ivan Exp $ */
+/* $Id: main.css,v 2.11 2006/10/02 17:40:35 ivan Exp $ */
 
 body { 
  margin: 0;
@@ -1184,7 +1184,7 @@ td.citation {
 
 td.subheader {  /* "new citations", "old citations" */
   padding-left: 1em;
-  padding-bottom: 6px;
+  padding-bottom: 2ex;
 }
 
 td.subheader p {
