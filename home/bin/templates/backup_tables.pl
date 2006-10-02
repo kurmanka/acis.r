@@ -50,7 +50,7 @@ my $acis = ACIS::Web -> new( homedir => $homedir ) || die;
 my $ardb = ARDB -> new() || die;
 my $sql  = $ardb -> sql_object;
 
-my $directory = $acis->config( "db-backup-directory" ) || die; ### XXX default to $home/backup instead, but complain
+my $directory = $acis->config( "backup-directory" ) || die; ### XXX default to $home/backup instead, but complain
 
 if ( not -d $directory ) { die "backup directory $directory doesn't exist"; }
 

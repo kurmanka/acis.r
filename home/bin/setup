@@ -111,16 +111,16 @@ do
     cat $i >> $destname
     chmod +x $destname
 done
-# for i in bin/templates/*.sh; 
-# do
-#     name=${i##*/}
-#     name=${name%.sh}
-#     destname="bin/$name"
-#     echo -n " $name"
-#     print_sh_preamble $destname
-#     cat $i >> $destname
-#     chmod +x $destname
-# done
+for i in bin/templates/*.sh; 
+do
+     name=${i##*/}
+     name=${name%.sh}
+     destname="bin/$name"
+     echo -n " $name"
+     print_sh_preamble $destname
+     cat $i >> $destname
+     chmod +x $destname
+done
 echo ""
 
 if [ -f VERSION.NEW ]; then 

@@ -314,13 +314,6 @@ by the <c>bin/setup</c> script after installation or configuration changes.
 </dd>
 
 
-<dt><C>backup-directory</C></dt>
-
-<dd>Type: string.  Path to a directory for
-<c>bin/backup_tables</c> to put its backups into.  Must
-exist at the time <c>bin/backup_tables</c> is run.
-</dd>
-
 </dl>
 
 
@@ -405,6 +398,14 @@ values: "<co>RePEcRec</co>" or "<co>AMF</co>".</dd>
 taken from <co>`which perl`</co> during
 <c>bin/setup</c>.</dd>
 
+
+
+<dt><C>backup-directory</C></dt>
+
+<dd>Type: string.  Path to a directory for
+<c>bin/backup_tables</c> to put its backups into.  Must
+exist at the time <c>bin/backup_tables</c> is run.
+</dd>
 
 
 

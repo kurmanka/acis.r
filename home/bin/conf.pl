@@ -18,7 +18,7 @@ my $acisconf = [
    "filename:acis.conf",
    "format:AppConfig",
 #   { copy => "metadata-db-name db-pass db-user glimpse-binary glimpseindex-bin-path"  },
-   { copy => "metadata-db-name db-pass db-user db-backup-directory temp-directory"  },
+   { copy => "metadata-db-name db-pass db-user backup-directory temp-directory"  },
    { rename => "db-name<acis-db-name" },
    { trans  => 'ACIS_' },
 ];
