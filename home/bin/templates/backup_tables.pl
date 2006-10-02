@@ -12,7 +12,7 @@ use Web::App::Common;
 my $tables = {
               # the default list for tables to backup
               acis => [ qw( sysprof suggestions cit_suggestions ) ],
-              sid  => [ qw( sid_id_to_handle sid_handle_to_id ) ],
+              sid  => [ qw( sid_id_to_handle sid_last_numbers   ) ],
              };
 
 
