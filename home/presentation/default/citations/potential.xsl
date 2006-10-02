@@ -37,7 +37,7 @@
       <xsl:variable name='selected' select='$preselect/list-item[text()=$cid] or 
                                             (similar &gt; number(//citation-document-similarity-preselect-threshold))'/>
       <tr>
-        <td valign='top' align='center'>
+        <td valign='top' align='left' class='citcheckbox'>
           <input type='checkbox' name='add{$i}' id='add{$i}' value=''>
             <xsl:if test='$selected'>
               <xsl:attribute name='checked'/>
@@ -72,8 +72,7 @@
   <xsl:template name='subheader-row'>
     <xsl:param name='content'/>
 
-    <tr><td width='4%'></td><td colspan_='2' style='padding-bottom: 6px;'><p
-    style='border-bottom: 1px solid #ccc;margin:0;'><xsl:copy-of select='$content'/></p></td></tr>
+    <tr><td></td><td class='subheader'><p><xsl:copy-of select='$content'/></p></td></tr>
 
   </xsl:template>
 
@@ -143,7 +142,7 @@ input.light {
           <span class='instruction'
                 > &#8212; Make sure the right ones have their checkboxes checked.</span></p>
 
-          <table>
+          <table class='citations'>
 
             <xsl:choose>
               <xsl:when test='$new/list-item'>

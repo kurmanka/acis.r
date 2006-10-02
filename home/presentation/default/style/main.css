@@ -1,6 +1,6 @@
 /* THE MAIN ACIS CSS STYLESHEET */
 
-/* $Id: main.css,v 2.9 2006/09/26 12:26:30 ivan Exp $ */
+/* $Id: main.css,v 2.10 2006/10/02 10:26:49 ivan Exp $ */
 
 body { 
  margin: 0;
@@ -1172,20 +1172,25 @@ table.briefResources tr.disabled td a:visited { color: #777; }
 
 .tech { color: #666; }
 
-.citstring {
- 
-}
+.citstring {}
 
 .citingtitle,
-a.citingtitle {
-  
-}
+a.citingtitle {}
 
 td.citation {
   padding-bottom: 1ex;
-  padding-left: 1ex;
+  padding-left: 1em;
 }
 
+td.subheader {  /* "new citations", "old citations" */
+  padding-left: 1em;
+  padding-bottom: 6px;
+}
+
+td.subheader p {
+  border-bottom: 1px solid #ccc;
+  margin:0;
+}
 
 p.citing-document {
   margin: 0ex 0 1ex 0;
@@ -1196,4 +1201,23 @@ p.cited-as {
   margin: 1ex 0 1ex 0;
   padding: 0;
 }
+
+td.citcheckbox {
+  border: 0;
+  padding: 0;
+}
+
+.citcheckbox input {
+  margin: 0;
+}
+
+table.citations, 
+table.citations tr,
+table.citations tbody {
+  border-collapse: collapse;                    
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
+
 

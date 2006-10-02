@@ -33,7 +33,7 @@ input.light {
           <p>The following citations are refused.  For
           them you clicked the [not my work] button.</p>
 
-          <table>
+          <table class='citations'>
             <xsl:call-template name='citations-del-rows'>
               <xsl:with-param name='list' select='$response-data/refused'/>
               <xsl:with-param name='group'></xsl:with-param>

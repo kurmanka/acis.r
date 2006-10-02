@@ -19,7 +19,7 @@
       <xsl:variable name='i'   select='concat(position(),$group)'/>
       <xsl:variable name='cid' select='concat(srcdocsid/text(), "-", checksum/text())'/>
       <tr class='citation'>
-        <td valign='top' align='center'>
+        <td valign='top' align='left' class='citcheckbox'>
           <input type='checkbox' name='del{$i}' id='del{$i}' value=''/>
         </td>
         <td class='citation'>
@@ -74,7 +74,7 @@ input.light {
             <p>This citation is identified as pointing to this document:</p>
           </xsl:if>
           
-          <table>
+          <table class='citations'>
 
             <xsl:choose>
               <xsl:when test='$response-data/identified/list-item'>
