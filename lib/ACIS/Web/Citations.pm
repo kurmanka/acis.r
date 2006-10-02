@@ -489,5 +489,9 @@ sub prepare_research_identified {
   }
 }
 
+sub process_autoupdate {
+  my $acis = shift;
+  $acis-> message( "saved-citations-autoupdate-pref" );
+}
 
 1;

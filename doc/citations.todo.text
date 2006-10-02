@@ -1,15 +1,11 @@
 # ACIS Citations TO DO List
 
-2006-10-02 14:17
+2006-10-02 20:45
 
 This plan does not include any work on ReDIF parser, on RAS
 maintenance or fixing bugs in the existing ACIS code.  It
 did include one work item to do on the AMF parser, but it
 has been done already.
-
-
-
-#### Fix citations presentation in citations.html
 
 
 #### Citations profile screens: fix and improve
@@ -22,6 +18,8 @@ has been done already.
    - remove debuggings from:
 
        - ACIS::Citations::Input
+
+   - remove matrix consistency checks in SimMatrix
 
    - clear all XXX marks
 

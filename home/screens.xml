@@ -594,6 +594,7 @@
 
     <process>
       <call function='process_form_data' />
+      <call function='ACIS::Web::Citations::process_autoupdate'/>
     </process>
 
     <call function='prepare_form_data' />

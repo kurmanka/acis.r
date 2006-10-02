@@ -49,7 +49,8 @@
   <message id='refused-citation' >The chosen citation was refused.</message>
   <message id='deleted-citations'>The chosen citations were deleted.</message>
   <message id='deleted-citation' >The chosen citation was deleted.</message>
-  <message id='unrefused-citations'>The citations were deleted from refused.</message>
-  <message id='unrefused-citation' >The citation was deleted from refused.</message>
+  <message id='unrefused-citations'>The citations were deleted from the refused list.</message>
+  <message id='unrefused-citation' >The citation was deleted from the refused list.</message>
+  <message id='saved-citations-autoupdate-pref'>Your preferences were saved.</message>
 
 </table>
