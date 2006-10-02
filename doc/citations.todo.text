@@ -8,10 +8,6 @@ did include one work item to do on the AMF parser, but it
 has been done already.
 
 
-#### Database backup / restore strategy
-
- - add nightly script, mostly copy it from RAS
-
 
 #### Fix user interface confusion
 

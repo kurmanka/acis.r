@@ -77,6 +77,7 @@ home/bin/setup.ri_collections
 home/bin/setup.ri_local_setup.pm
 home/bin/setup.sid_local.pm
 home/bin/templates/apu.pl
+home/bin/templates/archive_critical.sh
 home/bin/templates/arpu.pl
 home/bin/templates/backup_tables.pl
 home/bin/templates/clean-up.pl
