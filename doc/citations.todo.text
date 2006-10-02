@@ -1,6 +1,6 @@
 # ACIS Citations TO DO List
 
-2006-09-21 12:26
+2006-10-02 14:17
 
 This plan does not include any work on ReDIF parser, on RAS
 maintenance or fixing bugs in the existing ACIS code.  It
@@ -10,24 +10,12 @@ has been done already.
 
 #### Database backup / restore strategy
 
- - document backup script and restore script
-
-    - mysql privileges
-    - configuration parameters
-    - command-line
-
  - add nightly script, mostly copy it from RAS
 
 
 #### Fix user interface confusion
 
  - discuss citations presentation on acis-tech
-
- - add citation source document details
-
-     - to database
-     - to emails
-     - to screens
 
 
 #### Citations profile screens: fix and improve
@@ -45,10 +33,6 @@ has been done already.
        - ACIS::Citations::Input
 
    - clear all XXX marks
-
-### optional optimizations 
-
- - remove all zero-similarity rows from cit_suggestions --> move them to another table?
 
 
 
