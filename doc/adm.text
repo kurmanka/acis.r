@@ -25,6 +25,50 @@ want to force re-creating the tables, give it
 <code>-f</code> command-line switch.
 
 
+### <C>bin/backup_tables</C> script
+
+Usage: 
+
+    bin/backup_tables [database table1 table2 ...]
+
+<co>bin/backup_tables</co> creates backups of the specified
+tables from the specified database.  If no database and no
+tables are specified, it backups most important tables from
+the ACIS database.  Currently these are:
+
+  acis.sysprof acis.suggestions acis.cit_suggestions
+  sid.sid_id_to_handle sid.sid_last_numbers
+
+"acis" and "sid" here stand for your configuration values
+<c>acis-db-name</c> and <c>sid-db-name</c>
+respectively.
+
+A directory is created for the backup files, based on
+<c>backup-directory</c> and the current date.  For example,
+if <c>backup-directory</c> is set to "/opt/ACIS/backup", and
+executed on 1 September 2006, it would be:
+"/opt/ACIS/backup/2006/09/01/".  The <c>backup-directory</c>
+must exist already, but its subdirectories will be created
+if the do not exist.
+
+To be able to use this utility, ACIS mysql user must have
+<tt>FILE</tt> and <tt>LOCK TABLES</tt> privileges on the
+server. 
+
+You don't have to shut down the service to create backups
+with this utility.
+
+
+### <C>bin/restore_table_backup</C> script
+
+Usage: 
+
+    bin/restore_table_backup backup_file [...]
+
+Restores one or several backups previously created by
+<c>bin/backup_tables</c>.  
+
+
 ### <C>bin/rid</C> script
 
 <co>bin/rid start</co> starts and <co>bin/rid stop</co> 
