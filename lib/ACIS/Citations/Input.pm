@@ -43,7 +43,7 @@ sub find_doc_details($) {
 }
 
 
-
+sub DEBUG { 0; }
 sub process_record {
   shift;
 
@@ -52,7 +52,8 @@ sub process_record {
   my $record = shift;
   
   my $srcdocid = $record -> id;
-  print "src doc id: $srcdocid\n";  # XXX remove this and the other such?
+  print "src doc id: $srcdocid\n"
+    if DEBUG;
 
   # prepare
   prepare;
@@ -62,9 +63,11 @@ sub process_record {
   my $srcdocsid = find_doc_details( $srcdocid );
 
   if ( $srcdocsid ) {
-    print "srcdocsid: $srcdocsid\n";
+    print "srcdocsid: $srcdocsid\n"
+      if DEBUG;
   } else {
-    print "srcdocsid:no\n";
+    print "srcdocsid:no\n"
+      if DEBUG;
   }
 
   if ( not $srcdocsid ) { return undef; }
@@ -86,8 +89,10 @@ sub process_record {
       $res->next;
     }
   }
-  print "citations already known: ", scalar keys %$index, "\n";
-  print "citations now: ", scalar( @$record )-1, "\n";
+  print "citations already known: ", scalar keys %$index, "\n"
+    if DEBUG;
+  print "citations now: ", scalar( @$record )-1, "\n"
+    if DEBUG;
 
   # process and save citations
   foreach ( @$record ) {
@@ -115,7 +120,8 @@ sub process_record {
   foreach ( keys %$index ) {
     $sql -> execute( $srcdocsid, $_ );
   }
-  print "citations disappeared: ", scalar keys %$index, "\n";
+  print "citations disappeared: ", scalar keys %$index, "\n"
+    if DEBUG;
 
   return 1;
 }

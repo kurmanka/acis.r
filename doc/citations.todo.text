@@ -1,16 +1,11 @@
 # ACIS Citations TO DO List
 
-2006-10-02 20:45
+2006-10-02 23:57
 
 This plan does not include any work on ReDIF parser, on RAS
 maintenance or fixing bugs in the existing ACIS code.  It
 did include one work item to do on the AMF parser, but it
 has been done already.
-
-
-#### Citations profile screens: fix and improve
-
- - add a message to the preferences screen, when processed
 
 
 ### Test and fix
