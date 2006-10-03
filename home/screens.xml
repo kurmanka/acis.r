@@ -47,20 +47,16 @@
   </screen>
 
   <screen id='menu'>
-
     <use module='ACIS::Web::User'/>
-
     <!-- 
 
       this screen should check the requested short-id, check what type of
       record that record is, and choose the presenter based on the type.
 
     -->
-
     <call function='load_session_or_authenticate' />
     <call function='ACIS::Web::User::check_session_type' />
-
-    <presentation type='xslt' filename='user/welcome.xsl' /> <!-- XXX -->
+    <presentation type='xslt' filename='user/welcome.xsl' /> 
   </screen>
 
   <screen id='records-menu'>

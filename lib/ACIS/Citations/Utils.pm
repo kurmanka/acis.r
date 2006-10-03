@@ -21,6 +21,7 @@ use vars qw( @EXPORT );
               cid
               load_citation_details
               select_citations_sql
+              coauthor_suggestion_similarity
              );
 
 
@@ -280,6 +281,8 @@ sub min_useful_similarity() {
   }
 }
 
+sub coauthor_suggestion_similarity { 85; }  # YYY should be configurable?
+
 
 use POSIX qw(strftime);
 sub today() {
@@ -388,7 +391,7 @@ sub refuse_citation($$) {
 
   my $citations = $rec->{citations}     ||= {};
   my $refused   = $citations->{refused} ||= [];
-  ### XXX TODO: be careful not to add an already refused citation
+  ### TODO: be careful not to add an already refused citation
   push @$refused, $citation;
 
   debug "refused citation $cid";

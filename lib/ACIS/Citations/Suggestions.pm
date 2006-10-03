@@ -44,10 +44,9 @@ sub prepare() {
    res.id as srcdocid,res.title as srcdoctitle,res.authors as srcdocauthors,res.urlabout as srcdocurlabout
   FROM cit_suggestions as sug LEFT JOIN citations USING (srcdocsid,checksum)
   LEFT JOIN $rdbname.resources as res ON citations.srcdocsid=res.sid ";
-
+  ### Maybe also res.type? - at this time we don't need it
 }
 
-### XX Maybe also res.type?
 
 
 #
@@ -211,7 +210,7 @@ sub make_suggestion_old($) {
 
 
 use Web::App::Common;
-use ACIS::Citations::Utils qw( get_document_authors get_author_sid );
+use ACIS::Citations::Utils qw( get_document_authors get_author_sid coauthor_suggestion_similarity );
 
 sub suggest_citation_to_coauthors($$$) {
   my ( $cit, $psid, $dsid ) = @_;
@@ -225,21 +224,17 @@ sub suggest_citation_to_coauthors($$$) {
     if ( $sug ) {
       # do nothing, already suggested
     } else {
-      # XXX what similarity value should be saved here?
-      add_suggestion $cit, $sid, $dsid, "coauth:$psid", 1;
+      add_suggestion $cit, $sid, $dsid, "coauth:$psid", coauthor_suggestion_similarity;
     }
   }
 }
 
 sub clear_multiple_from_cit_suggestions($$) {
   my ( $citlist, $psid ) = @_;
-
   foreach ( @$citlist ) {
     clear_cit_from_suggestions( $_, $psid );
   }
-  
 }
-
 
 
 

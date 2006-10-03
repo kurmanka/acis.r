@@ -33,8 +33,11 @@ use vars qw( @EXPORT );
 use Web::App::Common;
 use ACIS::Web::SysProfile;
 use ACIS::Citations::Suggestions qw( load_suggestions );
-use ACIS::Citations::Utils qw( today cid min_useful_similarity );
+use ACIS::Citations::Utils qw( today cid min_useful_similarity coauthor_suggestion_similarity );
 
+
+
+sub DEBUG_SIMMATRIX_CONSISTENCY { 1; } ### YYY debug until you are 100% sure
 
 
 sub load_similarity_matrix($) {
@@ -90,7 +93,6 @@ sub _calculate_totals {
     my $dsid = $_;
     my $total = 0;
     foreach ( @{ $newdoc->{$_} } ) {
-      # XXX treat co-author's claims specially?
       if ( $_->{similar} >= min_useful_similarity ) {
         $total += $_->{similar};
       }
@@ -307,7 +309,7 @@ sub _docs {
       my $doc = { %$_ };
       my $authors = $doc->{authors} || '';
       $doc->{authors} = [ split / \& /, $authors ];
-      if ( not $doc->{location} ) { }  # XXX 
+      if ( not $doc->{location} ) { }  # YYY - so what? 
       $docs -> {$sid} = $doc;
     }
     $self->{docs} = $docs;
@@ -384,9 +386,8 @@ sub add_new_citations {
   }
 
   $self -> _calculate_totals;
-  # XX DEBUGGING
-  $self->check_consistency
-    if not $pretend;
+  $self -> check_consistency
+    if not $pretend and not DEBUG_SIMMATRIX_CONSISTENCY;
   
 }
 
@@ -502,9 +503,8 @@ sub run_maintenance {
   
   # recalculate totals now
   $self -> _calculate_totals();
-  # XX DEBUGGING
   $self->check_consistency
-    if not $pretend;
+    if not $pretend and not DEBUG_SIMMATRIX_CONSISTENCY;
 
   # record the current date in the sysprof table
   put_sysprof_value( $psid, "last-citations-prof-maint-time", time )
@@ -559,9 +559,8 @@ sub remove_citation {
   }
 
   
-  # XX DEBUGGING
   $self->_calculate_totals;
-  $self->check_consistency;
+  $self->check_consistency if not DEBUG_SIMMATRIX_CONSISTENCY;
 }
 
 
@@ -607,9 +606,8 @@ sub citation_new_make_old {
               $psid, $dsid,
               $cit->{srcdocsid}, $cit->{checksum} );
 
-  # XX DEBUGGING
   $self->_calculate_totals;
-  $self->check_consistency;
+  $self->check_consistency if not DEBUG_SIMMATRIX_CONSISTENCY;
 }
 
 

@@ -18,7 +18,7 @@ use ACIS::Web::SysProfile;
 sub auto_processing {
   my $acis = shift || die;
 
-  my $pretend = shift; # XXX
+  my $pretend = shift; # XXX not implemented yet
 
   my $session = $acis -> session || die;
   my $vars    = $acis -> variables;

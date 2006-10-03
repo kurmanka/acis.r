@@ -158,7 +158,7 @@
 
 
   <xsl:template name='doclist'>
-    <h1>Citations for your documents</h1><!-- XXX fix grammar: plural ending -->
+    <h1>Citations for your documents</h1>
     <xsl:choose>
       <xsl:when test='$list/list-item'>
         

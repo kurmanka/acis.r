@@ -75,14 +75,6 @@ sub profile_check_and_cleanup () {
       if ( $r and $r->{row} and $r->{row}{srcdocsid} ) {
         # ok
 
-        # update citations after a database change, temporary XX
-        if ( not $_->{srcdoctitle} or not $_->{srcdocauthors} ) {
-          load_citation_details( $_ );
-        }
-        if ( $_->{srcdocdetails} ) {
-          delete $_->{srcdocdetails};
-        }
-
       } elsif ( $r )  {
         undef $_;
         debug "delete citation $_->{srcdocsid}-$_->{checksum}";
