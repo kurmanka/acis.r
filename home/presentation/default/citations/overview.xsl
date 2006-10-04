@@ -28,7 +28,7 @@
     <!-- potential, identified & doclist -->
     <xsl:choose> 
       <xsl:when test='$list/list-item[1]/new'>
-        <p>We have <a ref='@citations/autosug'><xsl:value-of
+        <p>We have found <a ref='@citations/autosug'><xsl:value-of
         select='$potent-new-num'/> new potential
         citation<xsl:if
         test='$potent-new-num&gt;1'>s</xsl:if></a> to your
@@ -37,6 +37,15 @@
         ><xsl:otherwise >it</xsl:otherwise
         ></xsl:choose>.</p>
       </xsl:when>
+      <xsl:when test='not($list/list-item)'>
+        <p>We haven't found any citations for you yet.</p>
+      </xsl:when>
+      <xsl:when test='$potent-new-num=0 and $list/list-item[1]/old'>
+        <p>We don't have any new citations for you.</p>
+      </xsl:when>
+      <xsl:otherwise>
+        <p>Currently we don't have any citations for you.</p>
+      </xsl:otherwise>
     </xsl:choose>
 
     <xsl:choose>
