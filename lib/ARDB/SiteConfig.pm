@@ -7,7 +7,7 @@ use ARDB::Common;
 
 use vars qw(  @parameters $AUTOLOAD );
 
-@parameters = qw( db_port db_host db_user db_pass db_name db_aliases daemon_socket );
+@parameters = qw( db-port db-host db-user db-pass db-name db-aliases );
 
 
 sub AUTOLOAD {

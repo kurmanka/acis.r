@@ -75,7 +75,6 @@ home/ardb.conf
 home/bin/conf.pl
 home/bin/rid
 home/bin/setup
-home/bin/setup.ardb_local_config.pm
 home/bin/setup.cgi_frontend
 home/bin/setup.logs-browsing
 home/bin/setup.ri_collections

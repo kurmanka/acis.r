@@ -5,24 +5,21 @@ ACIS configuration
 <toc/>
 
 
-<C>main.conf</C> file
----------------------
+The <C>main.conf</C> file
+-------------------------
 
 The primary configuration file of an ACIS installation is
-<co>main.conf</co>.  This file is an AppConfig file,
-which means it has a simple parameter=value syntax,
-described in detail in [AppConfig
+<co>main.conf</co>.  This file is an AppConfig file, which
+means it has a simple parameter=value syntax, described in
+detail in [AppConfig
 manpage](http://search.cpan.org/~abw/AppConfig/lib/AppConfig.pm).
-In addition to the obvious parameter=value syntax it has
-.ini-like sections, started by "<co>[section]</co>"
-lines.
+There is an example of such file in <f>main.conf.eg</f> in
+ACIS home directory.
 
-ACIS distribution contains an example of this file in
-<f>{HOME}/main.conf.eg</f>.
 
-<co>[ACIS]</co> section of <co>main.conf</co>
----------------------------------------------
 
+Parameters
+----------
 
 <dl>
 
@@ -31,7 +28,7 @@ ACIS distribution contains an example of this file in
 <dd>
 Short name of your website.  Will be used in generated page
 titles as a prefix, in emails as [part] of subject lines.
-Required.
+The parameter is required.
 </dd>
 
 <dt><C>site-name-long</C></dt>
@@ -89,10 +86,8 @@ Required.</dd>
 
 <dt><C>static-base-dir</C></dt>
 
-<dd>
-Path to the directory, corresponding to the <c>static-base-url</c>.
-Required.
-</dd>
+<dd>Path to the directory, corresponding to the <c>static-base-url</c>.
+Required.</dd>
 
 
 <dt><C>compact-redirected-profile-urls</C></dt>
@@ -165,7 +160,8 @@ Optional.
 
 <dd>Email address of the person maintaining the institutions
 database.  When users submit an institution's data, message
-will be sent to this address.  Required.</dd>
+will be sent to this address.  Defaults to
+<c>admin-email</c>, if not specified.</dd>
 
 
 <dt><C>admin-access-pass</C></dt>
@@ -197,6 +193,17 @@ This value directly influences the access permissions of the
 created files.  Read perl's <code>perldoc -f umask</code>
 and/or Unix' <code>man umask</code>.  Optional.</dd>
 
+
+<dt><C>backup-directory</C></dt>
+
+<dd>Type: string.  Path to a directory for
+<c>bin/backup_tables</c> to put its backups into.  Must
+exist at the time <c>bin/backup_tables</c> is run.
+</dd>
+
+
+
+<!-- DEBUGGING AND LOGGING PARAMETERS -->
 
 
 <dt><C>debug-info-visible</C></dt>
@@ -295,6 +302,18 @@ sometimes they would find works for the users, which would
 not have been found otherwise.  Default: off.</dd>
 
 
+
+<!-- GENERAL PARAMETERS -->
+
+
+
+<dt><C>perlbin</C></dt>
+
+<dd>Perl binary to use for ACIS and its utilities.  Default:
+taken from <co>`which perl`</co> during
+<c>bin/setup</c>.</dd>
+
+
 <dt><C>cgi-pperl-binary</C></dt>
 
 <dd>Type: string.  Enables support for Matt Sergeant's fine <a
@@ -314,58 +333,26 @@ by the <c>bin/setup</c> script after installation or configuration changes.
 </dd>
 
 
-</dl>
+<!-- DATABASE PARAMETERS -->
 
+<dt><C>db-name</C></dt>
 
-
-
-General parameters
-------------------
-
-
-<dl>
-
-<dt><C>RePEc-data-dir</C></dt>
-
-<dd>Directory where a local mirror of RePEc data is stored
-for ACIS to process and keep track of.  Optional.</dd>
-
-
-<dt><C>metadata-db-name</C></dt>
-
-<dd>This is name of a MySQL database that ACIS will use to
-store document data and institutions data and some other
-data of that kind.
-Required.</dd>
-
-<dt><C>sid-db-name</C></dt>
-
-<dd>Name of a MySQL database that ACIS will use to keep track
-of assigned short-ids and their corresponding full
-identifiers and numbers involved in short-ids composition.
-It can be pretty safely be the same as
-<c>metadata-db-name</c>.  
-Required.</dd>
-
-<dt><C>acis-db-name</C></dt>
-
-<dd>Name of a MySQL database that ACIS will use to store its
-own data, data about the users and created records, and
-alike.  Its better if you use a separate database from
-<c>metadata-db-name</c>, although right now the table names
-will not clash.  Required.</dd>
+<dd>Name of a MySQL database that ACIS and its components
+will use to store its own data.  Required.</dd>
 
 <dt><C>db-user</C></dt>
 
 <dd>Name of the MySQL database user to use when connecting
-to MySQL server.
-Required.
+to MySQL server.  Required.
 </dd>
 
 <dt><C>db-pass</C></dt>
 
 <dd>Password to use when connecting to MySQL server.
 Required.</dd>
+
+
+<!-- METADATA COLLECTIONS -->
 
 
 <dt><C>metadata-collections</C></dt>
@@ -389,23 +376,6 @@ values: "<co>RePEcRec</co>" or "<co>AMF</co>".</dd>
 
 <dd>Directory where the files of collection <i>X</i> are.</dd>
 
-
-
-
-<dt><C>perlbin</C></dt>
-
-<dd>Perl binary to use for ACIS and its utilities.  Default:
-taken from <co>`which perl`</co> during
-<c>bin/setup</c>.</dd>
-
-
-
-<dt><C>backup-directory</C></dt>
-
-<dd>Type: string.  Path to a directory for
-<c>bin/backup_tables</c> to put its backups into.  Must
-exist at the time <c>bin/backup_tables</c> is run.
-</dd>
 
 
 

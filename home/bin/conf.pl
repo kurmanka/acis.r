@@ -15,25 +15,36 @@ my $main = "main.conf";
 
 
 my $acisconf = [
-   "filename:acis.conf",
+   "filename:acis.conf.old",
    "format:AppConfig",
-#   { copy => "metadata-db-name db-pass db-user glimpse-binary glimpseindex-bin-path"  },
    { copy => "metadata-db-name db-pass db-user backup-directory temp-directory"  },
    { rename => "db-name<acis-db-name" },
    { trans  => 'ACIS_' },
 ];
 
+my $acisconf2 = [
+   "filename:acis.conf",
+   "format:AppConfig",
+   { copy_careful => "db-name metadata-db-name" },
+   { rename_careful => "db-name<acis-db-name metadata-db-name<db-name institutions-maintainer-email<admin-email" },
+   { trans  => '' },
+   { trans  => 'ACIS_' },
+                 
+];
+
 my $ardbconf = [
    "filename:ardb.conf",
    "format:AppConfig",
-  { rename => "db_name<metadata-db-name db_user<db-user db_pass<db-pass" },
-  { set    => [ "db_aliases", "'acis=[[acis-db-name]] sid=[[sid-db-name]] rdb=[[metadata-db-name]]'" ] }
+  { copy_careful => "db-name db-user db-pass" },
+  { rename_careful => "db-name<metadata-db-name" },
+  { set    => [ "db-aliases", "'acis=[[acis-db-name]] sid=[[sid-db-name]] rdb=[[metadata-db-name]]'" ] }
 ];
 
 my $shell = [
    "filename:thisconf.sh",
    "format:shell",
  { trans => '' },
+             { trans => 'ACIS_' },
 ];
 
 use vars qw( $conf @srcvars );
@@ -41,24 +52,85 @@ use vars qw( $conf @srcvars );
 @srcvars = ();
 
 $conf = AppConfig -> new( {
-                              CREATE => 1,
-                              CASE => 1,
-                              GLOBAL => {
+                           CREATE => 1,
+                           CASE => 1,
+                           GLOBAL => {
                                          ARGCOUNT => ARGCOUNT_ONE,
                                          EXPAND   => EXPAND_ENV,
                                          ACTION   => sub { push @srcvars, $_[1]; },
-                                         }
-});
+                                         },
+                           ERROR    => sub { },
+#                           ERROR    => sub { print "\n$0 ERR: ", @_, "\n"; },
+                          });
+
+
+my @required = qw( 
+site-name
+site-name-long
+admin-email
+base-url
+base-cgi-script-filename
+home-url
+static-base-url
+static-base-dir
+system-email
+sendmail
+person-id-prefix
+db-user
+db-pass
+metadata-collections
+);
+
+
+
 
 $conf -> define( "metadata-collections" );
 
 ###  some defaults
-$conf -> set( 'perlbin', `which perl` );
+my $perlbin = `which perl`;
+chomp( $perlbin );
+$conf -> set( 'perlbin', $perlbin );
 $conf -> set( 'repec-index-socket', "$homedir/ri-socket" );
 
 
 ###  read user's file
 $conf -> file( $main );
+
+
+sub get ($) {
+  my $p = $_[0];
+  return( $conf->get( $p ) || $conf->get( "ACIS_$p" ) );
+}
+
+
+# we want either one general db-name or specific metadata-, acis- and sid- db names.
+
+my @dbrequired = qw( db-name );
+
+if ( get 'metadata-db-name'  
+     and get 'acis-db-name' 
+     and get 'sid-db-name' ) {
+  @dbrequired = ();
+}
+
+my @absent = ();
+foreach ( @required, @dbrequired ) {
+  if ( not $conf->get( $_ ) 
+       and not $conf->get( "ACIS_$_" ) ) {
+    push @absent, $_;
+  }
+}
+
+# report absent required parameters clearly
+if ( scalar @absent ) {
+  print "=" x 55, "\n",
+    "Please define the following required parameters in main.conf: ", 
+    join( " ", @absent ) , "\n",
+    "=" x 55, "\n";
+  exit 1;
+}
+
+
 
 ###  post conf processing
 $conf -> set( 'homedir', $homedir );
@@ -106,7 +178,7 @@ $conf -> set( 'sid-home',  "$homedir/SID" );
 my $task = shift @ARGV;
 
 if ( $task eq 'mainconf' ) {
-  foreach ( $acisconf, $ardbconf, $shell ) {
+  foreach ( $acisconf, $acisconf2, $ardbconf, $shell ) {
     make_conf( $_ );
   }
 }
@@ -160,6 +232,21 @@ sub conf_op_copy {
   }
 }
 
+sub conf_op_copy_careful {
+  my $conf = shift;
+  my $context = shift;
+  my $oper = shift;
+
+  my @list = split /\s+/, $oper -> {copy_careful};
+
+  my $data = $context -> {data};
+  foreach ( @list ) {
+    my $v = $conf -> get( $_ );
+    push @$data, [ $_, $v ]
+      if $v;
+  }
+}
+
 sub conf_op_set { 
   my $conf = shift;
   my $context = shift;
@@ -201,6 +288,35 @@ sub conf_op_rename {
   }
 
 }
+
+sub conf_op_rename_careful {
+  my $conf = shift;
+  my $context = shift;
+  my $oper = shift;
+
+  my @list = split /\s+/, $oper -> {rename_careful};
+  
+  my $data = $context -> {data};
+  my $index = {};
+  foreach ( @$data ) {
+    $index->{$_->[0]} = $_->[1];
+  }
+
+  foreach ( @list ) {
+    my $att;
+    my $v  ; 
+    if ( $_ =~ m/([\w\_\-]+)<(.+)/g ) {
+      $att = $1;
+      my $what = $2;
+      $v   = $conf -> get( $what );
+    }
+    if ( $att and not exists $index->{$att} ) {
+      push @$data, [ $att, $v ];
+    }
+  }
+
+}
+
 
 
 sub conf_op_trans {

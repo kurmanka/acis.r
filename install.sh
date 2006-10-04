@@ -135,7 +135,7 @@ if test ! -f "$dest/main.conf" ; then
 fi
 
 
-$dest/bin/setup
+$dest/bin/setup || exit 1
 
 if [ ! -f RI/daemon.pid ]; then 
     echo "You may want to start update daemon now; use: bin/rid start"

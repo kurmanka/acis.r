@@ -356,7 +356,8 @@ sub new {
          ARGCOUNT => 1,
          DEFAULT  => "",
        },
-       ERROR     => \&critical, 
+#       ERROR     => \&critical, 
+       ERROR     => sub {},
      },
      @parameters
   );
@@ -368,7 +369,9 @@ sub new {
   # and storing them into $self hash
   
   foreach my $param ( @parameters ) {
-    $self ->{ $param } = $config -> get( $param );
+    my $sparam = $param;
+    $sparam =~ tr/-/_/;
+    $self ->{ $sparam } = $config -> get( $param );
   }
 
   bless $self, $class;

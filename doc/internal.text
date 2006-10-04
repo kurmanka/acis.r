@@ -428,7 +428,6 @@ href='http://daringfireball.net/projects/markdown/'
 <c>bin/setup</c> utility template
 </dd>
 
-<dt><F>home/bin/setup.ardb_local_config.pm</F></dt>
 <dt><F>home/bin/setup.cgi_frontend</F></dt>
 <dt><F>home/bin/setup.logs-browsing</F></dt>
 <dt><F>home/bin/setup.ri_collections</F></dt>

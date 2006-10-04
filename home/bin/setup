@@ -32,13 +32,13 @@ export unconfirmed_dir="$homedir/unconfirmed"
 export del_userda_dir="$homedir/deleted-userdata"
 
 
-###  parse main.conf and create configuration
-perl -Ilib bin/conf.pl mainconf
+###  parse main.conf and create specific configuration files
+perl -Ilib bin/conf.pl mainconf || exit 1
 
 ###  load parsed and translated into shell format configuration
 . thisconf.sh
 
-if test "$ACIS_echo_arpu_mails"; then
+if test "$echo_arpu_mails"; then
    echo ''
    echo WARNING! You have an obsolete echo-arpu-mails parameter in main.conf.  Replace it with echo-apu-mails.
    echo ''
@@ -76,7 +76,7 @@ function print_sh_preamble ()
 
 ###  NOW SETUP ACIS ENVIRONMENT
 
-if test -z $ACIS_static_base_dir; then
+if test -z $static_base_dir; then
   echo "You have to set static-base-dir in main.conf";
   exit 1
 fi
@@ -93,10 +93,10 @@ test -d $userdata_dir        || mkdir $userdata_dir
 test -d $unconfirmed_dir     || mkdir $unconfirmed_dir
 test -d $del_userda_dir      || mkdir $del_userda_dir
 
-test $ACIS_metadata_ReDIF_output_dir && ( test -d $ACIS_metadata_ReDIF_output_dir || mkdir $ACIS_metadata_ReDIF_output_dir )
-test $ACIS_metadata_AMF_output_dir && ( test -d $ACIS_metadata_AMF_output_dir || mkdir $ACIS_metadata_AMF_output_dir )
+test $metadata_ReDIF_output_dir && ( test -d $metadata_ReDIF_output_dir || mkdir $metadata_ReDIF_output_dir )
+test $metadata_AMF_output_dir && ( test -d $metadata_AMF_output_dir || mkdir $metadata_AMF_output_dir )
 
-test -d $ACIS_static_base_dir  || mkdir $ACIS_static_base_dir
+test -d $static_base_dir  || mkdir $static_base_dir
 
 
 ###  install support scripts 
@@ -131,24 +131,24 @@ fi
 ###  install ACIS CGI script
 ###  install static web-accessible stuff
 
-if test $ACIS_base_cgi_script_filename; then
-  echo writing $ACIS_base_cgi_script_filename
-  . bin/setup.cgi_frontend > $ACIS_base_cgi_script_filename
-  chmod +x $ACIS_base_cgi_script_filename
+if test $base_cgi_script_filename; then
+  echo writing $base_cgi_script_filename
+  . bin/setup.cgi_frontend > $base_cgi_script_filename
+  chmod +x $base_cgi_script_filename
 fi
 
-if test "$ACIS_cgi_pperl_reinit"; then
+if test "$cgi_pperl_reinit"; then
     # reinitialize the PPerl persistent environment
-    /bin/bash -c "$ACIS_cgi_pperl_reinit"
+    /bin/bash -c "$cgi_pperl_reinit"
 fi
 
-if test -z $ACIS_tempate_set; then
-    ACIS_template_set='default'
+if test -z $tempate_set; then
+    template_set='default'
 fi
 
-if test -d $ACIS_static_base_dir; then 
-  dest=$ACIS_static_base_dir
-  cp -r $presentation_dir/$ACIS_template_set/{style,script}  $dest
+if test -d $static_base_dir; then 
+  dest=$static_base_dir
+  cp -r $presentation_dir/$template_set/{style,script}  $dest
   cat $dest/style/main.css $dest/style/brownish.css.add > $dest/style/brownish.css 
 fi
 
@@ -160,8 +160,8 @@ fi
 # chmod +x $cleanupscript
 
 
-test $ACIS_log_browsing_cgi_filename && {
-    dest=$ACIS_log_browsing_cgi_filename
+test $log_browsing_cgi_filename && {
+    dest=$log_browsing_cgi_filename
     echo installing log browsing script to $dest
     . bin/setup.logs-browsing > $dest
     chmod +x $dest

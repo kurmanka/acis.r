@@ -4,7 +4,6 @@
 #
 # See doc/conf.html for details.
 #
-#
 # The file is in AppConfig format,
 # http://search.cpan.org/~abw/AppConfig/lib/AppConfig.pm
 #
@@ -22,21 +21,15 @@
 
 
 ###  DATABASE PARAMETERS
-metadata-db-name = rdb
-sid-db-name      = rdb
-acis-db-name     = acis
+db-name     = acis
 
 db-user = root
 db-pass = root
 
 
-
-
 ################################################
 ##   FOR THE ACIS WEB INTERFACE (ACIS::Web)   ##
 ################################################
-
-[ACIS]
 
 ###  Global parameters
 site-name      = ACIS
@@ -64,7 +57,7 @@ system-email = "ACIS" <acis@web.site.org>
 sendmail = /usr/sbin/sendmail -t
 
 ###  The data that ACIS produces
-#metadata-ReDIF-output-dir = ${homedir}/metadata.output
+#metadata-ReDIF-output-dir = ${homedir}/metadata.output.ReDIF
 #metadata-AMF-output-dir = ${homedir}/metadata.output
 
 person-id-prefix    = RePEc:per:

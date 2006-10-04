@@ -1,22 +1,27 @@
 # ACIS Citations TO DO List
 
-2006-10-02 23:57
-
-This plan does not include any work on ReDIF parser, on RAS
-maintenance or fixing bugs in the existing ACIS code.  It
-did include one work item to do on the AMF parser, but it
-has been done already.
+2006-10-05 00:53
 
 
 ### Test and fix
 
-   - remove debuggings from:
+   - remove matrix consistency checks in SimMatrix (after testing)
 
-       - ACIS::Citations::Input
 
-   - remove matrix consistency checks in SimMatrix
+### APU
 
-   - clear all XXX marks
+  - document bin/apu in adm.text
+
+  - implement auto-throttling?
+
+
+### admin documentation 
+
+  - update data backup instructions  (section "What to backup and how to restore")
+
+  - updage main.conf.eg?  Add comments?
+
+  - check install.html
 
 
 

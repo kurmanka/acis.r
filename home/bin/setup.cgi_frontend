@@ -1,7 +1,7 @@
 perlparams=-w
-if test "$ACIS_cgi_pperl_binary"
+if test "$cgi_pperl_binary"
 then 
-    perlbin="$ACIS_cgi_pperl_binary"
+    perlbin="$cgi_pperl_binary"
 fi
 echo "#!$perlbin $perlparams"
 echo 
@@ -19,7 +19,7 @@ echo 'use strict;'
 echo
 echo "use vars qw( \$acis );"
 echo
-if test $ACIS_extreme_debug
+if test $extreme_debug
 then 
   echo 'BEGIN {'
   echo '    print "Content-Type: text/html; charset=utf-8\nCache-Control: no-cache\n\n";'
@@ -28,19 +28,19 @@ then
   echo '}'
 fi
 echo
-if test $ACIS_debug; then
+if test $debug; then
   echo 'BEGIN { $Web::App::DEBUG = "on"; }'
 fi
 echo
 echo 'use ACIS::Web;'
 
-if test "$ACIS_cgi_pperl_binary"; then
+if test "$cgi_pperl_binary"; then
    # questionable XX
    echo 'use ACIS::Web::AllModules;'
 
-   if test $ACIS_debug_log_special; then
+   if test $debug_log_special; then
      echo 'BEGIN { $Web::App::DEBUG = "on"; }'
-     echo "BEGIN { \$Web::App::DEBUGLOGFILE = '$ACIS_debug_log_special'; "
+     echo "BEGIN { \$Web::App::DEBUGLOGFILE = '$debug_log_special'; "
      echo '}'
      echo 'if ( $PPERL::DEBUG ) {'
      echo '  $PPerlServer::SIGUSR1HANDLERS= [ \&Web::App::Common::dump_debug ];'

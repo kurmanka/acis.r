@@ -59,7 +59,7 @@ You don't have to shut down the service to create backups
 with this utility.
 
 
-### <C>bin/restore_table_backup</C> script
+### <C>bin/restore\_table\_backup</C> script
 
 Usage: 
 
@@ -159,10 +159,24 @@ capture its output into a log file.  For example
     */11 * * * * /home/user/acis/bin/clean-up >> /home/user/acis/clean-up.log
 
 
+### <C>bin/apu</C> script
+
+... is a recent replacement to the <c>bin/arpu</c> script
+explained below.  <abbr title='automatic profile update' >APU</abbr> 
+is a generalization over ARPU.  It includes
+search for <a href='citations.html'>citations</a> in
+addition to the research searches and profile maintenance.
+
+**details to be added** <!-- XXX TODO -->
+
+
 ### <C>bin/arpu</C> script
 
 Automatic research profile update utility.  Usage:
-<co>bin/arpu <i>command</i> [<i>arguments</i>]</co>.
+
+<pre>    bin/arpu <i>command</i> [<i>arguments</i>]</pre>
+
+To be specific:
 
 <dl>
 
@@ -516,6 +530,8 @@ enough space.  In that case additionally create copies of:
 
 
 #### MySQL tables
+
+**This section needs to be updated -- IKu** <!-- XXX TODO -->
 
 ACIS uses several MySQL databases, as they are defined by
 <c>acis-db-name</c>, <c>metadata-db-name</c> and
