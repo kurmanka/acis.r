@@ -25,7 +25,7 @@ package ACIS::Web::Contributions;  ### -*-perl-*-
 #  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 #
 #  ---
-#  $Id: Contributions.pm,v 2.20 2006/09/11 15:58:00 ivan Exp $
+#  $Id: Contributions.pm,v 2.21 2006/10/09 21:26:01 ivan Exp $
 #  ---
 
 use strict;
@@ -248,13 +248,9 @@ sub get_last_autosearch_time {
   my $session = $app -> session;
   my $rec     = $session -> current_record;
 
-  my $result  = get_sysprof_value( $rec -> {sid}, "last-autosearch-time" );
-  
-  if ( not defined $result ) {
-    my $contrib = $rec -> {contributions};
-    my $as      = $contrib -> {autosearch};
-    $result     = $as -> {'last-time-epoch'};
-  }
+  my $sid    = $rec->{temporarysid} || $rec->{sid};
+  my $result = get_sysprof_value( $sid, "last-autosearch-time" );
+
   return $result;
 }
 
@@ -285,8 +281,6 @@ sub main_screen {
 
   ### if no search, do this:
   if ( $status ne 'running' ) {
-
-    undef $contributions -> {searching};
 
     ###  so may be start a search?  will find out.
     debug "may be start a search?";
@@ -450,16 +444,11 @@ sub auto_search_done {
   assert( $contributions );
   my $autosearch    = $contributions -> {autosearch};
 
-
-  my $time = time;
   use ACIS::Web::SysProfile;
-  put_sysprof_value( $record -> {sid}, 
-                     'last-autosearch-time', 
-                     $time );
+  put_sysprof_value( $record -> {sid}, 'last-autosearch-time', scalar time );
 
   my $names_last_change_date = $record -> {name}{'last-change-date'};
   $autosearch -> {'for-names-last-changed'} = $names_last_change_date;
-  
 }
 
 
@@ -497,38 +486,44 @@ sub get_search_status {
   my $record  = $session -> current_record;
   my $id      = $record -> {id} ;
   my $sid     = $record -> {sid};
+  my $tsid    = $record->{temporarysid};
 
   my $status  = '';
-
-  require ACIS::Web::Background;
-
-
-  my $trstatus = ACIS::Web::Background::check_thread( $app, $sid );
+  my $threads;
 
   debug "get_search_status";
 
-  if ( $trstatus ) {
+  require ACIS::Web::Background;
 
-    my $threads = {};
+  if ( $tsid ) {
+    $threads = ACIS::Web::Background::check_thread( $app, $tsid );
+    $sql -> do( "update suggestions set psid=? where psid=?", $sid, $tsid );
+    if ( $threads ) {
+      # let it run
+    } else {
+#      delete $record->{temporarysid};
+      undef $tsid;
+    }
+  } 
+
+  if ( not $tsid ) {
+    $threads = ACIS::Web::Background::check_thread( $app, $sid );
+  }
+  
+  if ( $threads ) {
+    my $types = {};
     foreach ( @$trstatus ) {
       my $t = $_ -> {type};
-      $threads -> {$t} = 1;
+      $types -> {$t} = 1;
     }
 
-    if ( $threads -> {'res-autosearch'} 
-         or $threads -> {'res-auto-approx'} ) {
+    if ( $types -> {'res-autosearch'} 
+         or $types -> {'res-auto-approx'} ) {
       $status = 'running';
-
-      $contributions = $session -> {$id} {contributions};
-      $contributions -> {searching} = $threads;
-
-      ###  since what time?
-      ###  look in $contributions/... ?
     }
   }
 
   debug "check research-auto-search status: $status";
-  
   return $status;
 }
 

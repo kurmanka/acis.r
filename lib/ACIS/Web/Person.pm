@@ -27,7 +27,7 @@ package ACIS::Web::Person;  ### -*-perl-*-
 #  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 #
 #  ---
-#  $Id: Person.pm,v 2.1 2006/01/04 14:20:36 ivan Exp $
+#  $Id: Person.pm,v 2.2 2006/10/09 21:26:01 ivan Exp $
 #  ---
 
 use strict;
@@ -239,9 +239,20 @@ sub bring_up_to_date {
     delete $record ->{'photo-url'};
   }
 
-
   delete $record ->{'profile-url'};
   delete $record ->{'profile-file'};
+
+  if ( $record->{temporarysid} ) {
+    my $tsid = $record->{temporarysid};
+    require ACIS::Web::Background;
+    my $runs = ACIS::Web::Background::check_thread( $app, $tsid );
+    if ( $runs ) {
+      # let it run
+    } else {
+      $sql -> do( "update suggestions set psid=? where psid=?", $record->{sid}, $tsid );
+      delete $record->{temporarysid};
+    }
+  }
 
 }
 

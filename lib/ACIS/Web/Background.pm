@@ -3,11 +3,8 @@ package ACIS::Web::Background;
 ###  a package of tools to run and control background threads, which
 ###  are capable of useful background work for the user.
 
-
-
 ###  XXX Add clearing of old lost threads:
 ###  SQL: delete from threads where started < ( NOW() - INTERVAL 1 HOUR )
-
 
 use strict;
 use Exporter;
@@ -69,9 +66,10 @@ sub check_thread {
 
   if ( $sql->error ) {
     $app -> errlog ( "sql error: " . $sql->error );
+    return undef;
   }
 
-  if ( $res and not $sql->error ) {
+  if ( $res and $res->{row} ) {
     if ( $typeid ) {
       
       my $row = $res ->{row};
@@ -79,23 +77,18 @@ sub check_thread {
       return $row;
 
     } else {
-
-#      debug "will build a list of threads";
       my @res = ();
       while ( $res->{row} ) {
         my $row = $res->{row};
         push @res, $row;
         $res -> next;
-#        debug "a thread: $row->{type}";
       }
       $res -> finish;
-#      debug "finish";
       return \@res;
     }
   }
   debug "q: no good results";
 
-  if ( $res ) { $res -> finish; }
   return undef;
 }
 

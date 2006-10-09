@@ -27,7 +27,7 @@ package ACIS::Web::NewUser; ### -*-perl-*-
 #  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 #
 #  ---
-#  $Id: NewUser.pm,v 2.2 2006/05/03 21:33:59 ivan Exp $
+#  $Id: NewUser.pm,v 2.3 2006/10/09 21:26:01 ivan Exp $
 #  ---
 
 
@@ -501,15 +501,16 @@ sub confirm {
 
   if ( $new_sid ) {
     fix_temporary_sid( $app, $old_sid, $new_sid );
+    $record -> {temporarysid} = $old_sid;
     $app -> logoff_session;
 
   } else { 
 
-    ###  Your registration cannot be finalized now.  You did everything
+    ###  "Your registration cannot be finalized now.  You did everything
     ###  correctly, but an internal technical problem happened.  Administrator
     ###  will have to clear the issue.  We logged details of the problem and
     ###  your email address.  Administrator will contact you as soon as the
-    ###  issue is resolved.
+    ###  issue is resolved."
 
     $app -> errlog( "[$login] registration obstructed" );
     $app -> error( "confirmation-obstructed" ); 
@@ -686,7 +687,7 @@ sub fix_temporary_sid {
     ###  fix acis.suggestions and acis.threads tables accordingly
     ###  XX  we need a cleaner way to do that 
     my $sql = $app -> sql_object;
-    foreach ( qw( suggestions/psid threads/psid sysprof/id ) ) {
+    foreach ( qw( suggestions/psid sysprof/id ) ) {
       my ( $table, $field ) = split '/', $_;
       $sql -> do( "update $table set $field='$new_sid' where $field='$old_sid'" );
     }
