@@ -25,7 +25,7 @@ package ACIS::Web::Contributions;  ### -*-perl-*-
 #  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 #
 #  ---
-#  $Id: Contributions.pm,v 2.21 2006/10/09 21:26:01 ivan Exp $
+#  $Id: Contributions.pm,v 2.22 2006/10/09 21:35:17 ivan Exp $
 #  ---
 
 use strict;
@@ -497,7 +497,7 @@ sub get_search_status {
 
   if ( $tsid ) {
     $threads = ACIS::Web::Background::check_thread( $app, $tsid );
-    $sql -> do( "update suggestions set psid=? where psid=?", $sid, $tsid );
+    $app -> sql_object -> do( "update suggestions set psid=? where psid=?", $sid, $tsid );
     if ( $threads ) {
       # let it run
     } else {
@@ -512,7 +512,7 @@ sub get_search_status {
   
   if ( $threads ) {
     my $types = {};
-    foreach ( @$trstatus ) {
+    foreach ( @$threads ) {
       my $t = $_ -> {type};
       $types -> {$t} = 1;
     }

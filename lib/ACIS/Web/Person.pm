@@ -27,7 +27,7 @@ package ACIS::Web::Person;  ### -*-perl-*-
 #  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 #
 #  ---
-#  $Id: Person.pm,v 2.2 2006/10/09 21:26:01 ivan Exp $
+#  $Id: Person.pm,v 2.3 2006/10/09 21:35:17 ivan Exp $
 #  ---
 
 use strict;
@@ -249,7 +249,7 @@ sub bring_up_to_date {
     if ( $runs ) {
       # let it run
     } else {
-      $sql -> do( "update suggestions set psid=? where psid=?", $record->{sid}, $tsid );
+      $app -> sql_object -> do( "update suggestions set psid=? where psid=?", $record->{sid}, $tsid );
       delete $record->{temporarysid};
     }
   }

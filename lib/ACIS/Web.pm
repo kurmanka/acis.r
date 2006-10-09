@@ -25,7 +25,7 @@ package ACIS::Web;   ### -*-perl-*-
 #  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 #
 #  ---
-#  $Id: Web.pm,v 2.7 2006/04/27 12:41:58 ivan Exp $
+#  $Id: Web.pm,v 2.8 2006/10/09 21:35:17 ivan Exp $
 #  ---
 
 
@@ -598,6 +598,7 @@ sub dump_variables_xml {
 
 
 
+sub sql { $_[0]->sql_object }
 
 ##############################################################
 ####################   EMAIL  SENDING   ######################
