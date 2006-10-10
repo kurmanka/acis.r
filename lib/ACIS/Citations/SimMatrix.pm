@@ -189,16 +189,18 @@ use warnings;
 use ACIS::Citations::Suggestions qw( load_suggestions add_suggestion replace_suggestion store_similarity );
 use Web::App::Common;
 
+my $acis;
+my $rec;
 sub upgrade {
   my $self = shift || die;
-  my $acis = shift || die;
-  my $rec  = shift || die;
+  my $_acis = shift || die;
+  my $_rec  = shift || die;
 
-  assert( $acis->{home} and $acis->{screenconf} );
-  assert( $rec->{name}  and $rec->{id} );
+  assert( $_acis->{home} and $_acis->{screenconf} );
+  assert( $_rec->{name}  and $_rec->{id} );
 
-  $self->{acis} = $acis;
-  $self->{rec}  = $rec;
+  $acis = $_acis;
+  $rec  = $_rec;
 }
 
 sub find_cit {
@@ -302,7 +304,7 @@ sub _docs {
   if ( not $docs ) {
     ### prepare doc objects, as per Similarity assessment function interface
     $docs = {};
-    my $rp = $self->{rec}{contributions}{accepted} || [];
+    my $rp = $rec ->{contributions}{accepted} || [];
     foreach ( @$rp ) {
       my $sid = $_->{sid} || warn && next;
       my $doc = { %$_ };
@@ -327,7 +329,7 @@ sub compare_citation_to_documents {
   debug "documents: ", join ' ', keys %$docs;
 
   my $psid = $self->{psid} || die;
-  my $acis = $self->{acis} || die;
+  die if not $acis;
   my $func = $acis->config( 'citation-document-similarity-func' ) 
     || 'ACIS::Citations::Utils::cit_document_similarity';
 
@@ -395,8 +397,8 @@ sub run_maintenance {
   my $self = shift || die;
   my $pretend=shift;
 
-  my $acis = $self->{acis} || die;
-  my $rec  = $self->{rec}  || die;
+  die if not $acis;
+  die if not $rec;
   my $psid = $self->{psid} || die;
   my $sql  = $acis->sql_object() || die;
 
@@ -515,8 +517,8 @@ sub remove_citation {
   my $cit  = shift || die; 
 
   # 
-  my $acis = $self->{acis} || die;
-  my $rec  = $self->{rec}  || die;
+  die if not $acis;
+  die if not $rec;
   my $psid = $self->{psid} || die;
   my $sql  = $acis->sql_object() || die;
   
@@ -599,7 +601,7 @@ sub citation_new_make_old {
   }
   
 
-  my $acis = $self->{acis} || die;
+  die if not $acis;
   my $psid = $self->{psid} || die;
   my $sql  = $acis->sql_object() || die;
   $sql -> do( "update cit_suggestions set new=FALSE where psid=? and dsid=? and srcdocsid=? and checksum=?", 
@@ -650,8 +652,8 @@ sub number_of_new_potential {
 sub check_consistency {
   my $self = shift || die;
 
-  my $acis = $self->{acis} || die;
-  my $rec  = $self->{rec}  || die;
+  die if not $acis;
+  die if not $rec;
   my $psid = $self->{psid} || die;
   my $sql  = $acis->sql_object() || die;
 
@@ -796,6 +798,8 @@ sub make_string ($;$) {
   }
 }
 
+
+require Storable;
 
 
 1;

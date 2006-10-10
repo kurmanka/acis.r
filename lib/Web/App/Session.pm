@@ -26,7 +26,7 @@ package Web::App::Session; ### -*-perl-*-
 #  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 #
 #  ---
-#  $Id: Session.pm,v 2.1 2006/10/10 15:05:08 ivan Exp $
+#  $Id: Session.pm,v 2.2 2006/10/10 16:13:10 ivan Exp $
 #  ---
 
 
@@ -267,13 +267,10 @@ sub save_value_to_path {
   my $last = pop @path;
 
   foreach ( @path ) {
-
     if ( not defined $data -> {$_} ) {
       $data -> {$_} = {}; 
     }
-    
     $data = $data -> {$_};
-     
   }
   $data -> {$last} = $value;
 }
@@ -378,7 +375,12 @@ sub save  {
 
   delete $self ->{'.app'};
 
-  store $self, $filename;
+#  use Data::Dumper;
+#  debug Data::Dumper::Dumper( $self );
+  eval { store $self, $filename; };
+  if ( $@ ) {
+    warn "can't save session: $@";
+  }
 }
  
 

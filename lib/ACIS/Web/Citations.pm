@@ -58,7 +58,6 @@ sub prepare() {
   if ( scalar @$research_accepted == 0 ) { $vars->{'empty-research-profile'} = 1; }
 
   $mat = $session ->{simmatrix} ||= load_similarity_matrix( $sid ); 
-  $mat ||= load_similarity_matrix( $sid ); 
   $mat -> upgrade( $acis, $record );
 
   $dsid = $params->{dsid} || $acis->{request}{subscreen};
