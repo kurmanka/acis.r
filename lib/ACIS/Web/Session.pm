@@ -22,7 +22,7 @@ package ACIS::Web::Session;   ### -*-perl-*-
 #  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 #
 #  ---
-#  $Id: Session.pm,v 2.0 2005/12/27 19:47:40 ivan Exp $
+#  $Id: Session.pm,v 2.1 2006/10/10 15:05:08 ivan Exp $
 #  ---
 
 use strict;
@@ -298,12 +298,10 @@ sub save_userdata {
   my $udatadir = $app -> userdata_dir;
   ###  save the userdata
 
-
   
   my $udata_file = $self -> object -> save;
   
   $app -> userlog ( "log off: wrote ", $udata_file );
-
   $app -> sevent ( -class  => 'session',
                    -action => 'saved',
                    -descr  => 'userdata',

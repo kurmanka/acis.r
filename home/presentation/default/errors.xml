@@ -45,7 +45,7 @@
  </error>
 
  <error id='login-taken'>The login you tried to change your account to is
- occupied already.  You can't do that.</error>
+ occupied already.  Please enter another email address.</error>
 
  <error id='login-account-damaged'>Your account record in the system is
  damaged.  Please notify system administrator.  He should be able to restore

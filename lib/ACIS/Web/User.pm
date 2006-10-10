@@ -26,7 +26,7 @@ package ACIS::Web::User; ### -*-perl-*-
 #  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 #
 #  ---
-#  $Id: User.pm,v 2.3 2006/09/30 16:11:40 ivan Exp $
+#  $Id: User.pm,v 2.4 2006/10/10 15:05:08 ivan Exp $
 #  ---
 
 
@@ -254,7 +254,7 @@ sub set_user_login {
       }
 
     } else {
-      if ( -e $f ) {
+      if ( -e $f or -e "$f.lock" ) {
         $app -> error( "login-taken" );
         return $old;
       }

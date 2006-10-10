@@ -26,7 +26,7 @@ package Web::App::Session; ### -*-perl-*-
 #  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 #
 #  ---
-#  $Id: Session.pm,v 2.0 2005/12/27 19:47:41 ivan Exp $
+#  $Id: Session.pm,v 2.1 2006/10/10 15:05:08 ivan Exp $
 #  ---
 
 
@@ -300,7 +300,7 @@ sub object_set {
     my $lock = "$file.lock";
     my $mode = ">";
     if ( -f $lock ) {
-#      warn "lock file $lock present\n";
+      warn "lock file $lock present\n";
       $mode = ">>";  ### That's what I could do, but its tricky.  Ideally, I
                      ### shall check if such session exists...
 

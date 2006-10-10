@@ -27,7 +27,7 @@ package ACIS::Web::NewUser; ### -*-perl-*-
 #  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 #
 #  ---
-#  $Id: NewUser.pm,v 2.3 2006/10/09 21:26:01 ivan Exp $
+#  $Id: NewUser.pm,v 2.4 2006/10/10 15:05:08 ivan Exp $
 #  ---
 
 
@@ -87,7 +87,6 @@ sub initial_process {
   if ( not $app -> get_form_value ('pass') 
        or ( $app -> get_form_value ('pass') 
             ne $app -> get_form_value ('pass-confirm') ) ) {
-
     $app -> form_invalid_value( 'pass' );
     $app -> form_invalid_value( 'pass-confirm' );
     $abort = 1;

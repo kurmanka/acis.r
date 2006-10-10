@@ -24,7 +24,7 @@ package ACIS::Web::Session::SNewUser;   ### -*-perl-*-
 #  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 #
 #  ---
-#  $Id: SNewUser.pm,v 2.0 2005/12/27 19:47:40 ivan Exp $
+#  $Id: SNewUser.pm,v 2.1 2006/10/10 15:05:08 ivan Exp $
 #  ---
 
 use strict;
@@ -49,14 +49,14 @@ sub new {
     $acis    -> update_paths_for_login ( $login );
     my $udata = $acis -> create_userdata();
     $self    -> object_set( $udata );
-
     $udata -> {owner} = $self ->{'.owner'};
   }
+
   return $self;
 }
 
-sub type { 'new-user' }
 
+sub type { 'new-user' }
 
 
 sub close {
@@ -69,15 +69,12 @@ sub close {
   my $owner = $userdata -> {owner};
   $owner -> {'initial-registered-date'} = date_now();
 
-
   ### generate static pages and metadata files
   require ACIS::Web::SaveProfile;
   ACIS::Web::SaveProfile::save_profile( $app );
 
-
   ### write userdata
   $self -> save_userdata( $app );
-
 
   ### send emails
 
@@ -106,7 +103,6 @@ sub close_without_saving {
   my $self = shift;
   my $app  = shift;
   assert( $app );
-  
 
   $app -> log( "session close without saving data" );
 
