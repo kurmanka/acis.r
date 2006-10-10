@@ -62,12 +62,14 @@
       <xsl:with-param name='content'>
 
         <xsl:choose>
-	  <xsl:when test='//nosuchrecord'>
-	     <h1>Record not found</h1>
-	     
-	     <p><big><xsl:value-of select='$form-input/id'/></big></p>
+          <xsl:when test='//nosuchrecord'>
+             <h1>Record not found</h1>
+             
+             <p><big><xsl:value-of select='$form-input/id'/></big></p>
 
-	  </xsl:when>
+            <xsl:call-template name='menu'/>
+
+          </xsl:when>
           <xsl:when test='$form-input/id/text()'>
             
             <h1>Record <xsl:value-of select='$form-input/id'/></h1>
