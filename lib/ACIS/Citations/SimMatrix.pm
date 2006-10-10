@@ -186,7 +186,6 @@ sub testme {
 
 use strict;
 use warnings;
-use Carp::Assert;
 use ACIS::Citations::Suggestions qw( load_suggestions add_suggestion replace_suggestion store_similarity );
 use Web::App::Common;
 
@@ -362,7 +361,7 @@ sub compare_citation_to_documents {
 
 
 
-use CGI::Carp qw(fatalsToBrowser);
+#use CGI::Carp qw(fatalsToBrowser);
 sub add_new_citations {
   my $self = shift || die;
   my $list = shift || die;
