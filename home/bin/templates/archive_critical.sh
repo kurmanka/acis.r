@@ -12,7 +12,7 @@ if test -z "$backupdir"; then
    echo Error: specify backup-directory in main.conf and run bin/setup
    exit 1
 fi
-if !test -d "$backupdir"; then
+if test ! -d "$backupdir"; then
    echo "Error: specified backup directory doesn't exist: $backupdir"
    exit 2
 fi
@@ -59,10 +59,10 @@ cd $ridir
 tar czf $arcdir/update_logs.tgz --remove-files ri.log daemon.log update_ch*.log 
 
 ### intiate checkpoint, remove unneeded log files, archive database
-echo ${bdbbindir}db_checkpoint -1 -h $ridir/data && echo ${bdbbindir}db_archive -d -h $ridir/data && echo archived data ok 
+echo ${bdbbindir}db_checkpoint -1 -h $ridir/data && echo ${bdbbindir}db_archive -d -h $ridir/data && echo db checkpoint ok 
 
 cd $homedir
-tar czf $arcdir/update_db.tgz RI/data 
+tar czf $arcdir/update_db.tgz RI/data && echo packed the data
 
 find $backupdir -name update_db.tgz -mtime +3 -print | xargs echo will remove these old files:
 find $backupdir -name update_db.tgz -mtime +3 -print | xargs /bin/rm -f
