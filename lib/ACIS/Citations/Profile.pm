@@ -74,18 +74,31 @@ sub profile_check_and_cleanup () {
       my $r = $sql->execute( $_->{srcdocsid}, $_->{checksum} );
       if ( $r and $r->{row} and $r->{row}{srcdocsid} ) {
         # ok
-
+        
       } elsif ( $r )  {
         undef $_;
-        debug "delete citation $_->{srcdocsid}-$_->{checksum}";
+        debug "delete citation $_->{srcdocsid}-$_->{checksum} (citation gone)";
       } else {
         debug "can't check a citation: no result from execute()";
       }
     }
     clear_undefined $cits;
+
+    foreach (@$cits) {
+      if ( not $_->{srcdoctitle} or not $_->{srcdocid} ) {
+        load_citation_details( $_ );
+      }
+      if ( not $_->{srcdoctitle} or not $_->{srcdocid} ) {
+        undef $_;
+        debug "delete citation $_->{srcdocsid}-$_->{checksum} (no source doc details)";
+      }
+    }
+
+    clear_undefined $cits;
     if ( not scalar @$cits ) { 
       delete $identified->{$_};
     }
+
   }
   
 }

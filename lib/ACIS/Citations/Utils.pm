@@ -304,8 +304,6 @@ sub select_citations_sql {
 }  
 
 
-
-
 sub load_citation_details {
   my $cit = shift || die;
 
@@ -319,8 +317,9 @@ sub load_citation_details {
     foreach ( qw( ostring srcdocid srcdoctitle srcdocauthors srcdocurlabout ) ) {    
       $cit->{$_} = Encode::decode_utf8( $r->{row}{$_} );
     }
+    return 1;
   }
-
+  return undef;
 }
 
 
