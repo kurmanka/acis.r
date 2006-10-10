@@ -915,7 +915,7 @@ sub events {
   if ( $start ) {
 
     debug "start: @$start";
-    debug "end  : @$end";
+    debug "end  : ", ($end? "@$end" : '');
     
     if ( not $end->[0] ) {
       $end = [ $start->[0] ]
@@ -1116,7 +1116,7 @@ sub parse_date ($) {
     if ( m!^(\d{4})-(\d{1,2})-(\d{1,2})(?:[/\s](\d{2}:\d{2}(?::\d{2})?))?$! ) {
       my $date = sprintf( "%04d-%02d-%02d", $1, $2, $3 );
       my $time = $4;
-      if ( $time =~ /^\d\d:\d\d$/ ) {
+      if ( $time and $time =~ /^\d\d:\d\d$/ ) {
         $time = "$time:00";
       }
       return( [ $date, $time ] );
