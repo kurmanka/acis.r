@@ -522,9 +522,11 @@ sub remove_citation {
   my $sql  = $acis->sql_object() || die;
   
   my $cid  = $cit->{srcdocsid} . '-' . $cit->{checksum};
-  my $dhash = $self->{citations} {$cid};
+  my $dhash = $self->{citations}{$cid};
+  $self->{citations}{$cid} = 5;    # XXXX for debugging
   delete $self->{citations}{$cid}; ## to make sure
   return if not $dhash;
+  warn if $self->{citations}{$cid}; # XXXX for debugging
 
   $sql -> do( "delete from cit_suggestions where srcdocsid=? and checksum=?", 
               {}, 
