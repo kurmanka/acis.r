@@ -52,14 +52,25 @@ sub make_citation_nstring {
   return normalize_string( $nst );
 }
 
+use Carp qw( cluck );
+use Data::Dumper;
+
 sub build_citations_index($;$) {
   my ( $citlist, $index ) = @_;
   $index ||= {};
   
   foreach (@$citlist) {
+    if ( not $_->{srcdocsid}
+         or not $_->{checksum} ) {
+      cluck "no srcdocsid or checksum!";
+      debug "empty citation: " . Dumper($_);
+      undef $_;
+      next;
+    } 
     my $key = $_->{srcdocsid} . '-' . $_->{checksum};
     $index ->{$key} = $_;
   }
+  clear_undefined $citlist;
   return $index;
 }
 
@@ -331,6 +342,10 @@ sub identify_citation_to_doc($$$) {
   my $citations   = $rec->{citations}        ||= {};
   my $cidentified = $citations->{identified} ||= {};
   my $doclist     = $cidentified->{$dsid}    ||= [];
+
+  warn "no srcdocsid!" if not $citation->{srcdocsid};
+  warn "no checksum!"  if not $citation->{checksum};
+  return if not $citation->{srcdocsid} or not $citation->{checksum};
 
   my $cid = $citation->{srcdocsid} . '-' . $citation->{checksum};
 
