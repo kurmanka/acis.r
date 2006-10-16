@@ -258,11 +258,9 @@ service admin.  If set to true, admin's email will be added
 into the <code>BCC:</code> field.
 </dd>
 
-<dt><C>echo-arpu-mails</C></dt>
-
+<!-- <dt><C>echo-arpu-mails</C></dt>
 <dd>an obsolete parameter, which was replaced with
-<c>echo-apu-mails</c></dd>
-
+<c>echo-apu-mails</c></dd> -->
 
 <dt><C>log-profiling-data</C></dt>
 
