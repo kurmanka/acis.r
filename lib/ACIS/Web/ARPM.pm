@@ -24,7 +24,7 @@ package ACIS::Web::ARPM;        ### -*-perl-*-
 #  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 #
 #  ---
-#  $Id: ARPM.pm,v 2.2 2006/10/16 13:06:28 ivan Exp $
+#  $Id: ARPM.pm,v 2.3 2006/10/16 17:32:23 ivan Exp $
 #  ---
 
 
@@ -384,7 +384,7 @@ sub search {
     }
 
     my %params = ();
-    if ( $app -> config( "echo-arpu-mails" ) ) {
+    if ( $app -> config( "echo-apu-mails" ) ) {
       $params{-bcc} = $app -> config( "admin-email" );
     }
 

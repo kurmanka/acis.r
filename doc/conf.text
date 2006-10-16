@@ -253,7 +253,7 @@ Default: undef, ie. feature is off.</dd>
 
 <dt><C>echo-apu-mails</C></dt>
 
-<dd>Whether or not send a copy of all ARPU mails to the
+<dd>Whether or not send a copy of all APU mails to the
 service admin.  If set to true, admin's email will be added
 into the <code>BCC:</code> field.
 </dd>
@@ -300,6 +300,13 @@ research searches.  They are not required as it is, but
 increase quality of search under certain conditions;
 sometimes they would find works for the users, which would
 not have been found otherwise.  Default: off.</dd>
+
+<dt><C>minimum-apu-period-days</C></dt>
+
+<dd>Type: integer number.  This is the miminum number of
+days between APU runs for a single record.  In other words,
+APU won't be run for a record, if last time APU has already
+been done for it less than that many days ago.</dd>
 
 
 

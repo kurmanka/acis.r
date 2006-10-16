@@ -163,13 +163,13 @@ capture its output into a log file.  For example
 
 Automatic profile update utility.  Usage:
 
-<pre>    bin/arpu [<i>command</i> [<i>arguments</i>] ]</pre>
+<pre>    bin/apu [<i>command</i> [<i>arguments</i>] ]</pre>
 
 To be specific:
 
 <dl>
 
-<dt><co>bin/arpu [<i>number</i>]</co></dt>
+<dt><co>bin/apu [<i>number</i>]</co></dt>
 
 <dd>
 
@@ -190,29 +190,33 @@ To be specific:
 <p>Frequency of the APU runs and the <co><i>number</i></co>
 argument you use is important.  Make it high enough to cover
 all the users.  If you have 300 personal records, it will be
-more than enough to run "<co>bin/arpu 4</co>" three times a
+more than enough to run "<co>bin/apu 4</co>" three times a
 day.  (It will go through 12 records a day, ~360 per
 month.)</p>
 
 <p>In case you run it too often, it will start skipping
 queued items.  The script will skip a record, if it has
-already done APU for the record in the last 24 hours.</p>
+already done APU for the record recently. See
+<c>minimum-apu-period-days</c>.
+</p>
+
+
 
 
 </dd>
 
-<dt><co>bin/arpu queue <i>id</i></co></dt>
+<dt><co>bin/apu queue <i>id</i></co></dt>
 
-<dd>Put the record <i>id</i> onto the ARPU queue.  <i>id</i>
+<dd>Put the record <i>id</i> onto the APU queue.  <i>id</i>
 may be a short-id, an id, or a user account email
 address.</dd>
 
 
 </dl>
 
-Normally <f>bin/arpu</f> prints nothing and writes a log in
+Normally <f>bin/apu</f> prints nothing and writes a log in
 <f>autoprofileupdate.log</f> in home directory.  In case of
-trouble -- reports to STDERR.
+trouble it reports to STDERR.
 
 
 
@@ -307,17 +311,17 @@ diskspace quickly.
 
 
 
-### Automatic research profile update (ARPU)
+### Automatic profile update (APU)
 
-ARPU-related activity (see <c>bin/arpu</c>) is logged into
-the <f>arpu.log</f> file.
+APU-related activity (see <c>bin/apu</c>) is logged into the
+<f>autoprofileupdate.log</f> file.
 
 
 ### Background searches for documents and other resources
 
 When a user enters hers research profile after a while or
 after she changes her name variations, ACIS runs an
-automatic search for research.  ARPU processing for a record
+automatic search for research.  APU processing for a record
 also runs this search.  In both cases it is run in the
 background, not under the web-server process, as the CGI
 requests are.  So it is logged into a separate log--the
@@ -441,7 +445,7 @@ registering recently, and which works did that man claim.
 You can monitor things as they happen.  
 
 The database also covers the work of some of the scripts,
-like <c>bin/arpu</c>, because such scripts alter the user
+like <c>bin/apu</c>, because such scripts alter the user
 accounts.
 
 Also, to keep these things usable, it helps to run the

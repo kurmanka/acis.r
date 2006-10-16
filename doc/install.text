@@ -97,7 +97,7 @@ appropriately</a> and restart it, if neccessary.  (Optional.)
     When the update is done -- the system is ready, given
     that nothing has gone wrong.
 
-11. Set up <c>bin/clean-up</c>, <c>bin/arpu</c> to run
+11. Set up <c>bin/clean-up</c>, <c>bin/apu</c> to run
     regularly via crontab.  (See next section.)
 
 12. Set up log rotation and backups.
@@ -120,9 +120,9 @@ intervals and redirect its output into a log, e.g.:
       */14 * * * * /home/user/acis/bin/clean-up >> /home/user/acis/clean-up.log
 
 
-For automatic research profile update (ARPU), install
-<c>bin/arpu</c> <co>work-by-queue</co> as a cron-job or a
-batch job to be executed regularly or at low-load periods.
+For automatic profile update (APU), install <c>bin/apu</c>
+as a cron-job or a batch job to be executed regularly or at
+low-load periods.
 
 
 

@@ -28,7 +28,7 @@ package ACIS::Web::Config;   ### -*-perl-*-
 #  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 #
 #  ---
-#  $Id: Config.pm,v 2.8 2006/10/02 12:05:56 ivan Exp $
+#  $Id: Config.pm,v 2.9 2006/10/16 17:32:23 ivan Exp $
 #  ---
 
 
@@ -78,7 +78,6 @@ sub configuration_parameters {
     'extreme-debug',         'not-defined',
     'log-profiling-data',    'not-defined',
     'show-profiling-data',   'not-defined',
-    'echo-arpu-mails',       'not-defined', # deprecated? 
     'echo-apu-mails',        'not-defined',
 
     # disabling features

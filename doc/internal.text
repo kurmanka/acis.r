@@ -438,9 +438,9 @@ href='http://daringfireball.net/projects/markdown/'
 that; used by <c>bin/setup</c>.
 </dd>
 
-<dt><F>home/bin/templates/arpu.pl</F></dt>
-<dd>Template for <c>bin/arpu</c> script -- <a ref='bin/arpu'><abbr 
-title='automatic research profile update'>ARPU</abbr></a>
+<dt><F>home/bin/templates/apu.pl</F></dt>
+<dd>Template for <c>bin/apu</c> script -- <a ref='bin/apu'><abbr 
+title='automatic profile update'>APU</abbr></a>
 </dd>
 
 <dt><F>home/bin/templates/clean-up.pl</F></dt>
