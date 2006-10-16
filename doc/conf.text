@@ -304,7 +304,11 @@ not have been found otherwise.  Default: off.</dd>
 <dd>Type: integer number.  This is the miminum number of
 days between APU runs for a single record.  In other words,
 APU won't be run for a record, if last time APU has already
-been done for it less than that many days ago.</dd>
+been done for it less than that many days ago.  Default: 21
+(day).  (More often than this may cause an overwhelming
+effect on some users in case of a growing database, if every
+time at APU something is found and every time an email is
+sent.)</dd>
 
 
 
