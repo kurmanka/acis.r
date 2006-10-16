@@ -6,16 +6,26 @@ ACIS::APU -- Automatic Profile Update
 
 =cut
 
+#
+#  This module is a partial replacement for ACIS::Web::ARPM
+#  and ACIS::Web::ARPM::Queue.
+#
+
 use strict;
 use warnings;
+use Exporter;
 use Carp;
 use Carp::Assert;
 use Web::App::Common qw( debug );
 use sql_helper;
 
-
-use vars qw( $ACIS );
+use base qw( Exporter );
+use vars qw( $ACIS @EXPORT_OK @EXPORT @ISA );
 *ACIS = *ACIS::Web::ACIS;
+@EXPORT = qw( logit set_queue_item_status push_item_to_queue );
+@ISA = qw(Exporter);
+
+
 
 my $interactive;
 my $logfile;
@@ -38,6 +48,18 @@ sub logit (@) {
     print @_, "\n";
   }
 }
+
+my $error_count = 0;
+sub error {
+  my $message = shift;
+  logit "ERR: $message";
+  if ( $error_count > 15 ) {
+    die "too many errors";
+  }
+  $error_count ++;
+}
+
+
 
 
 # resolve long id & short id into email address of the owner
@@ -279,8 +301,6 @@ sub run_apu_by_queue {
   } continue {
     $ACIS -> clear_after_request();
   }
-
-
 }
 
 
@@ -305,8 +325,60 @@ VALUES
 
 
 
+sub push_item_to_queue {
+  my $sql   = shift;
+  my $item  = lc shift;
+  my $class = shift || 0;
+
+  assert( $sql );
+  assert( $item );
+
+  my $filed ;
+  my $update;
+  
+  $sql -> prepare_cached( "select filed,class,status from $QUEUE_TABLE_NAME where what = ?" );
+  my $test = $sql -> execute( $item );
+  if ( $test -> {row}{filed} ) {
+    if ( $test -> {row}{status} eq '' ) {
+      $update = 1;
+      $class |= $test ->{row}{class};
+      $filed  = $test ->{row}{filed};
+    }
+  }
+
+  my $r;
+
+  if ( $update ) {
+    $sql -> prepare_cached( qq!
+UPDATE $QUEUE_TABLE_NAME 
+SET filed=?, status='', class=?
+WHERE what=? 
+! );
+    $r =  $sql -> execute( $filed, $class, $item );
+
+  } else {
+    $sql -> prepare_cached( qq!
+REPLACE INTO $QUEUE_TABLE_NAME 
+( what, filed, status, class )
+VALUES ( ?, NOW(), '', ? )
+! );
+    $r =  $sql -> execute( $item, $class );
+  }
+
+  if ( not $r ) {
+    error "can't put the item into the queue table: $item";
+  }
+
+  return $r;
+}
+
+
+
+
+
+
 use ACIS::Web::SysProfile;
-use ACIS::Web::ARPM;
+require ACIS::Web::ARPM;
 use ACIS::Citations::AutoUpdate;
 
 sub record_apu {

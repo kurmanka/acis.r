@@ -24,7 +24,7 @@ package ACIS::Web::ARPM::Queue;
 #  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 #
 #  ---
-#  $Id: Queue.pm,v 2.0 2005/12/27 19:47:40 ivan Exp $
+#  $Id: Queue.pm,v 2.1 2006/10/16 13:06:28 ivan Exp $
 #  ---
 
 
@@ -37,6 +37,8 @@ my $table_name = "arpm_queue";
 use vars qw( $arpu_threshold_hours );
 
 $arpu_threshold_hours = 24;
+
+use ACIS::APU qw( logit push_item_to_queue );
 
 
 sub task_prepare {
@@ -63,67 +65,14 @@ sub error {
 
 sub task_queue {
   my $acis = shift;
-  
   my $sql  = $acis -> sql_object;
-
   ACIS::Web::ARPM::interactive();
-
   while ( my $item = shift @ARGV ) {
     push_item_to_queue( $sql, $item );
   }
 }
 
 use Carp::Assert;
-
-sub push_item_to_queue {
-  my $sql  = shift;
-  my $item = shift;
-  my $class = shift || 0;
-
-  assert( $sql );
-  assert( $item );
-
-  $item = lc $item;
-
-  my $filed ;
-  my $update;
-  
-  $sql -> prepare_cached( "select filed,class,status from $table_name where what = ?" );
-  my $test = $sql -> execute( $item );
-  if ( $test -> {row}{filed} ) {
-    if ( $test -> {row}{status} eq '' ) {
-      $update = 1;
-      $class |= $test ->{row}{class};
-      $filed  = $test ->{row}{filed};
-    }
-  }
-
-  my $r;
-
-  if ( $update ) {
-    $sql -> prepare_cached( qq!
-UPDATE $table_name 
-SET filed=?, status='', class=?
-WHERE what=? 
-! );
-    $r =  $sql -> execute( $filed, $class, $item );
-
-  } else {
-  
-    $sql -> prepare_cached( qq!
-REPLACE INTO $table_name 
-( what, filed, status, class )
-VALUES ( ?, NOW(), '', ? )
-! );
-    $r =  $sql -> execute( $item, $class );
-  }
-
-  if ( not $r ) {
-    error "can't put the item into the queue table: $item";
-  }
-
-  return $r;
-}
 
 
 

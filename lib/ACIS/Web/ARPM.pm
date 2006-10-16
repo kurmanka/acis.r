@@ -24,7 +24,7 @@ package ACIS::Web::ARPM;        ### -*-perl-*-
 #  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 #
 #  ---
-#  $Id: ARPM.pm,v 2.1 2006/07/25 14:14:55 ivan Exp $
+#  $Id: ARPM.pm,v 2.2 2006/10/16 13:06:28 ivan Exp $
 #  ---
 
 
@@ -42,10 +42,11 @@ use Web::App::Common qw( debug );
 *APP = *ACIS::Web::ACIS;
 use vars qw( $APP @ISA @EXPORT_OK $interactive );
 
+use ACIS::APU qw( logit );
 
-require Exporter;
-@ISA       = qw( Exporter );
-@EXPORT_OK = qw( logit );
+#require Exporter;
+#@ISA       = qw( Exporter );
+#@EXPORT_OK = qw( logit );
 
 my $app = $APP;
 
@@ -73,32 +74,6 @@ my $pretend;
 
 
 sub interactive { $interactive = 1; }
-
-my $logfile;
-
-sub logit (@);
-
-sub logit (@) {
-
-  if ( not $logfile and $APP ) {
-    $logfile = $APP -> home . "/arpu.log";
-  }
-
-  if ( $logfile ) {
-    open LOG, ">>:utf8", $logfile;
-    print LOG scalar localtime(), " [$$] ", @_, "\n";
-    close LOG;
-  } else {
-    warn "can't logit: @_";
-  }
-
-  if ( $interactive ) {
-    print @_, "\n";
-  }
-}
-  
-
-
 
 sub search {
   $app = shift;
