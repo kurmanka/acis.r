@@ -17,8 +17,8 @@ mail transport agent.
 Required Perl modules:
 
 -  XML::XPath 1.13
--  XML::LibXML 1.58
--  XML::LibXSLT 1.58
+-  XML::LibXML 1.58 (requires <a href='http://xmlsoft.org/'>gnome-libxml2</a>)
+-  XML::LibXSLT 1.58 (<a href='http://xmlsoft.org/XSLT/' >libxslt</a> 1.1.15+)
 -  Carp::Assert 0.17
 -  CGI::Cookie 1.25
 -  CGI::Minimal 1.24
@@ -30,11 +30,8 @@ Required Perl modules:
 -  DBI 1.18
 -  DBD::mysql
 
-Versions indicated are what we succesfully used with ACIS.
-Probably newer versions will work as well.  We have had
-problems with newer XML::LibXSLT versions though, <a
-href='#libxslt'>see below</a>.
-
+Versions indicated are the ones we succesfully used with
+ACIS.  Probably newer versions will work just as well.
 
 
 The Files
@@ -63,14 +60,12 @@ call that <i>ACIS home directory</i> or simply <i>home</i>.
 3. Run <code>tmp/ACIS-.../install.sh home</code> to install
 into <code>home</code> directory.
 
-4. Take a look into <a ref='bdb-private'>Berkeley DB:
-   private installation</a>.  This may be the next step to
-   do.
+4. Take a look at <a ref='bdb-private'>Berkeley DB: private
+   installation</a>.  This may be the next step to do.
 
 5. Configure MySQL. Create a MySQL user with a password, if
-necessary. Or you can use an existing MySQL account, if you
-wish. Create two databases for ACIS: one for primary
-metadata and one for ACIS' own data.
+   necessary. Or you can use an existing MySQL account, if you
+   wish. Create a database for ACIS' data tables.
 
 6. Change to the ACIS home directory.
 
@@ -79,7 +74,7 @@ your system and save as <code>main.conf</code>.  See
 [configuration guide](conf.html) for details.
 
 8. <a href='apache-conf.html'>Configure Apache
-appropriately</a> and restart it, if neccessary.
+appropriately</a> and restart it, if neccessary.  (Optional.)
 
 9. Run <code>bin/setup</code>
 
@@ -89,14 +84,15 @@ appropriately</a> and restart it, if neccessary.
 
     At this stage, if everything above was done correctly,
     the system is almost ready for a grand opening.  Users
-    can register, althouth there's no data in the database
+    can register, although there's no data in the database
     yet.  So it's not yet very useful.
 
-    The only thing left is to fill up the primary metadata
-    database with your academic metadata.  Read about <a
+    The only thing left is to fill the databases with your
+    academic metadata.  Read about <a
     ref='sending-update-requests'>how to send an update
     request for some data collection</a> and do send a
-    request to update <co>/</co> of your data collection.
+    request to update root (<co>/</co>) of your data
+    collection.
 
     When the update is done -- the system is ready, given
     that nothing has gone wrong.
@@ -150,49 +146,4 @@ href='daemon.html'>update daemon</a>, by running
 
 
 
-
-## Miscellaneous troubleshooting
-
-
-<h3 id='libxslt'>XML::LibXSLT-related difficulties</h3>
-
-The XML::LibXSLT module is Perl interface to the <a
-href='http://xmlsoft.org/XSLT/'>libxslt library</a>.  We use
-this library in ACIS to generate HTML pages and email
-messages from <a href='http://www.w3.org/TR/xslt'>XSLT</a>
-templates (usually called "stylesheets").
-
-We had severe difficulties with ACIS, which we traced back
-to this module.  The issues we have had include:
-
-- transformation process hanging with high
-  CPU load for a long time or infinitely;
-
-- transformation process terminating unexpectedly with a
-  criptic error message output to stderr like 
-
-        free(): invalid pointer 0x822b370
-
-- stylesheet errors not reported back to caller, but instead
-  stylesheets being executed partially.
-
-We found that these problems appeared after libraries
-upgrade on the machine.  So we tried to downgrade -- install
-an earlier version of the module or the library or both --
-and it helped, it cured the problems completely.
-
-Perl module XML::LibXSLT version 1.52 is known to work well
-for ACIS, as is libxslt version 1.1.12.
-
-We encourage you to try the recent versions of this software
-and only fall back to these older ones if the new versions
-to do not work well for you.
-
-PS. This dirty problem notwithstanding, the libxslt library
-and its Perl interface XML::LibXSLT has proven as very
-reliable, fast and professional opensource software.
-
-<p><b>Update from 2006-01-26:</b> we don't seem to have this
-problem anymore with libxslt version 1.1.15 and XML::LibXSLT
-version 1.58.</p>
 
