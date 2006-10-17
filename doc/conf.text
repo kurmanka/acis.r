@@ -299,6 +299,7 @@ increase quality of search under certain conditions;
 sometimes they would find works for the users, which would
 not have been found otherwise.  Default: off.</dd>
 
+
 <dt><C>minimum-apu-period-days</C></dt>
 
 <dd>Type: integer number.  This is the miminum number of
