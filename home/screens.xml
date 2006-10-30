@@ -161,7 +161,7 @@
     <use module='ACIS::Web::Affiliations'/>
 
     <param name='handle'      type='printable'/>
-    <param name='name'        type='name'/>
+    <param name='name'        type='printable'/>
     <param name='add'         type='printable'/>
     <param name='remove'      type='printable'/>
     
