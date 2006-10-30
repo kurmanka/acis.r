@@ -29,8 +29,8 @@
     <h1>Affiliations</h1>
 
 
-    <xsl:call-template name='show-status'/>
-
+    <xsl:call-template name='show-status'><xsl:with-param name='fields-spec-uri' 
+    select='"fields-institution.xml"'/></xsl:call-template>
 
 <!--
 

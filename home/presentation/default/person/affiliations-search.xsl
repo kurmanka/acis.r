@@ -75,7 +75,7 @@ function search_clear_and_focus() {
 <tr><td>
         <input name='search-what' id="what" value='{$search-what}' size='35'>
           <check nonempty=''/>
-          <name>search expression</name>
+          <name>a search expression</name>
         </input>
         <xsl:text> </xsl:text>
         
@@ -152,7 +152,8 @@ function search_clear_and_focus() {
 
     <h1>Institution search results</h1>
 
-    <xsl:call-template name='show-status'/>
+      <xsl:call-template name='show-status'><xsl:with-param name='fields-spec-uri' 
+        select='"fields-institution.xml"'/></xsl:call-template>
 
     <xsl:call-template name='search-form'/>
 

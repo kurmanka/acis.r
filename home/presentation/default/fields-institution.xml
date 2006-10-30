@@ -40,4 +40,8 @@
   <desc>identifier</desc>
  </field>
  
+ <field name='search-what'>
+   <desc>search expression</desc>
+ </field>
+
 </fields>

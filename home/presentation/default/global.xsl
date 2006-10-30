@@ -171,7 +171,7 @@
         </xsl:variable>
 
         <xsl:if test='exsl:node-set( $list )/li'>
-          <p>You have to provide values for these fields:</p>
+          <p>Please provide values for these fields:</p>
           <ul>
             <xsl:copy-of select='$list'/>
           </ul>
