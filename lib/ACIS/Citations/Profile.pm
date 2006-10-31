@@ -71,6 +71,10 @@ sub profile_check_and_cleanup () {
     $sql -> prepare_cached( "select srcdocsid from citations where srcdocsid=? and checksum=?" );
     my $cits = $identified->{$_};
     foreach (@$cits) {
+      if ( not $_->{srcdocsid} or not $_->{checksum} ) { 
+        debug "remove incomplete citation record (no scrdocsid or checksum)";
+        undef $_; 
+      }
       my $r = $sql->execute( $_->{srcdocsid}, $_->{checksum} );
       if ( $r and $r->{row} and $r->{row}{srcdocsid} ) {
         # ok
