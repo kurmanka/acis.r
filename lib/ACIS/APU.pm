@@ -25,6 +25,7 @@ use vars qw( $ACIS @EXPORT_OK @EXPORT @ISA );
 @EXPORT = qw( logit set_queue_item_status push_item_to_queue );
 @ISA = qw(Exporter);
 
+use ACIS::APU::Queue;
 
 
 my $interactive;
@@ -60,29 +61,32 @@ sub error {
 }
 
 
-
-
 # resolve long id & short id into email address of the owner
 
 sub get_login_from_queue_item {
-  my $ACIS = shift;
+  my $sql = shift;
   my $item = shift;
   my $login;
-
+ 
   if ( length( $item ) > 8 
        and $item =~ /^.+\@.+\.\w+$/ ) {
-    return lc $item;
+
+    $sql -> prepare( "select owner from records where owner=?" );
+    my $r = $sql -> execute( lc $item );
+    if ( $r and $r -> {row} ) {
+      $login = $r ->{row} {owner};
+      
+    } else {
+      logit "get_login_from_queue_item: email $item not found";
+    }
 
   } else {
-
-    my $sql = $ACIS -> sql_object;
     if ( length( $item ) > 15
          or index( $item, ":" ) > -1 ) {
       $sql -> prepare( "select owner from records where id=?" );
       my $r = $sql -> execute( lc $item );
       if ( $r and $r -> {row} ) {
         $login = $r ->{row} {owner};
-
       } else {
         logit "get_login_from_queue_item: id $item not found";
       }
@@ -97,7 +101,6 @@ sub get_login_from_queue_item {
       } else {
         logit "get_login_from_queue_item: sid $item not found";
       }
-
     }
   }
 
@@ -107,150 +110,46 @@ sub get_login_from_queue_item {
 
 
 
-my $QUEUE_TABLE_NAME = "arpm_queue";
-my @QUERIES = ( 
-    # select explicitly queue-ed records
-    qq! SELECT what FROM $QUEUE_TABLE_NAME WHERE status='' 
-        ORDER BY class DESC,filed ASC
-        LIMIT ? !,
-
-    # select records, which don't yet have a non-null value of
-    # last-auto-citations-time for them
-    qq! SELECT r.shortid as what, s.data as data, s.param as param
-    FROM records as r LEFT JOIN sysprof as s 
-       ON s.id = r.shortid  AND 
-          s.param = 'last-auto-citations-time'    
-    WHERE s.data is NULL
-    LIMIT ? !,
-
-    # select records, for which we ran APU most long ago
-    qq! SELECT id as what,data,param FROM sysprof  
-        WHERE param='last-autosearch-time' or param='last-auto-citations-time'
-        ORDER BY data+1 ASC LIMIT ? !
-);
-
-
-# get_the_queue: prepare the queue for APU
-#
-# assumes $QUEUE_TABLE_NAME, $ACIS, @QUERIES
-
-sub get_the_queue {
-  my $size = shift || die;
-  my @to_process; # return value
-  logit "prepare the process queue: size=$size";
-
-  my $sql = $ACIS -> sql_object || die;
-  my $get = ($size < 3) ? 9 : $size * 3;
-  my @skipped; 
-  my @to_process_logins;
-  my @items;
-  my %items_hash;
-  my $r;
-  my @q = @QUERIES;
-
-  my $apu_too_recent_days  = $ACIS->config( 'minimum-apu-period-days' ) || 21;
-  my $apu_too_recent_hours = $apu_too_recent_days * 24;
-
-  # first source of the queue items
-  my $query = shift( @q );
-  $sql -> prepare( $query );
-  debug "QUERY: $query";
-  $r = $sql -> execute( $get );
-
-  # the main loop
-  while ( 1 ) {
-    my $item =    $r -> {row} {what};
-    my $lastrun = $r -> {row} {data};
-    my $param   = $r -> {row} {param};
-    my $type;
-
-    if ( $param ) {
-      if ( $param eq 'last-autosearch-time' ) {
-        $type = 'research';
-      } elsif ( $param eq 'last-auto-citations-time' ) {
-        $type = 'citations';
-      }
-    }
-
-    if ( ! $item ) { next; }
-    if ( $items_hash{$item} ) { next; }
-
-    if ( $lastrun ) {
-      my $last = $lastrun || die;
-      my $now  = time;
-      if ( $now - $last <= $apu_too_recent_hours * 60 * 60 ) {
-        # are we running too fast?
-        # XXX slow down APU throughput
-        debug "skipping $item";
-        logit "skipping $item";
-        push @skipped, $item;
-        next;
-      }
-    }
-    
-    
-    my $login = get_login_from_queue_item( $ACIS, $item );
-    if ( $login ) {
-      debug "ITEM: $item";
-      push @items, $item;
-      push @to_process, [ $login, $item, $lastrun, $type ];
-      push @to_process_logins, $login;
-      $items_hash{$item} = 1;
-
-      $get--;
-      if ( not $get ) { last; }
-      
-    } else {
-      if ( not $lastrun ) {
-        $sql -> prepare_cached( "delete from $QUEUE_TABLE_NAME where what=?" );
-      } else {
-        $sql -> prepare_cached( "delete from sysprof where id=?" );
-      }
-      $sql -> execute( $item );
-      logit "cleared bogus queue item: $item";
-    }
-        
-
-  } continue {
-    
-    if ( not $r -> next ) {
-    QUERY:
-      if ( scalar @q ) {
-        $query = shift( @q );
-        $sql -> prepare( $query );
-        debug "QUERY: $query";
-        $r = $sql -> execute( $get );
-      } else { last; }
-
-      if ( not $r or !$r->{row} ) { goto QUERY; }
-    }  
-  }
-
-  logit "to process: ", join( ' ', @items  );
-  if ( scalar @skipped ) {
-    logit "skipped   : ", join( ' ', @skipped );
-  }
-  return \@to_process;
-}
-
 
 sub run_apu_by_queue {
   my $chunk = shift || 3;
+  my %para  = @_;
+  my $auto_restart_queue = $para{-auto}   || 0;
+  my $failed_ones        = $para{-failed} || 0;
+  $interactive           = $para{-interactive};
   
   $ACIS || die;
   my $sql = $ACIS->sql_object || die;
 
-  my $queue = get_the_queue( $chunk );
-
   my $number = $chunk;
+  
+  if ( $failed_ones ) {
+    logit "would only take previously failed queue items";
+  }
 
   while ( $number ) {
-    my $qitem = shift @$queue;
+    my ($qitem, $class) = get_next_queued_item( $sql );
 
-    last if not $qitem;
-    my $login = $qitem -> [0];
-    my $rid   = $qitem -> [1];
-    my $type  = $qitem -> [2];
+    if ( $failed_ones ) {
+      ($qitem, $class) = get_next_failed_queued_item( $sql );
+    }
+
+    if ( not $qitem ) {
+      logit "no more items in the queue";
+      if ( $auto_restart_queue ) {
+        logit "reinitialize the queue";
+        clear_the_queue_table( $sql );
+        fill_the_queue_table( $sql );
+        $auto_restart_queue = 0;
+        next;
+      } else {
+        logit "quitting";
+        last; 
+      }
+    }
+
+    my $login = get_login_from_queue_item( $sql, $qitem );
+    my $rid   = $qitem;
     my $res;
     my $notes;
 
@@ -271,10 +170,9 @@ sub run_apu_by_queue {
         ###  XXX $qitem is not always a record identifier, but
         ###  offline_userdata_service expects an indentifier if anything on
         ###  4th parameter position
-
         $res = ACIS::Web::Admin::offline_userdata_service
-                        ( $ACIS, $login, 'ACIS::APU::record_apu', $rid, $type ) 
-                        || '';
+                        ( $ACIS, $login, 'ACIS::APU::record_apu', $rid ) 
+                        || 'no';
       };
       if ( $@ ) {
         $res   = "FAIL"; 
@@ -286,92 +184,17 @@ sub run_apu_by_queue {
         logit "notes: $notes";
       }
 
-      if ( $res ) {
-        if ( not $type ) {
-          set_queue_item_status( $sql, $rid, $res, $notes );
-        }
-        $number--;
-      }
+      set_item_processing_result( $sql, $rid, $res, $notes );
+      if ( $res ne 'SKIP' ) { $number--; }
       
     } else {
       last; 
     }
 
-
   } continue {
     $ACIS -> clear_after_request();
   }
 }
-
-
-# copied from ACIS::Web::ARPM::Queue
-sub set_queue_item_status {
-  my $sql  = shift;
-  my $item = shift;
-  my $stat = shift;
-  my $notes = shift;
-
-  $sql -> prepare_cached( 
-qq!
-REPLACE INTO $QUEUE_TABLE_NAME
-    ( what, status, notes, worked ) 
-VALUES 
-    ( ?, ?, ?, NOW() )
-! );
-
-  my $res = $sql -> execute( $item, $stat, $notes );
-}
-
-
-
-
-sub push_item_to_queue {
-  my $sql   = shift;
-  my $item  = lc shift;
-  my $class = shift || 0;
-
-  assert( $sql );
-  assert( $item );
-
-  my $filed ;
-  my $update;
-  
-  $sql -> prepare_cached( "select filed,class,status from $QUEUE_TABLE_NAME where what = ?" );
-  my $test = $sql -> execute( $item );
-  if ( $test -> {row}{filed} ) {
-    if ( $test -> {row}{status} eq '' ) {
-      $update = 1;
-      $class |= $test ->{row}{class};
-      $filed  = $test ->{row}{filed};
-    }
-  }
-
-  my $r;
-
-  if ( $update ) {
-    $sql -> prepare_cached( qq!
-UPDATE $QUEUE_TABLE_NAME 
-SET filed=?, status='', class=?
-WHERE what=? 
-! );
-    $r =  $sql -> execute( $filed, $class, $item );
-
-  } else {
-    $sql -> prepare_cached( qq!
-REPLACE INTO $QUEUE_TABLE_NAME 
-( what, filed, status, class )
-VALUES ( ?, NOW(), '', ? )
-! );
-    $r =  $sql -> execute( $item, $class );
-  }
-
-  if ( not $r ) {
-    error "can't put the item into the queue table: $item";
-  }
-
-  return $r;
-}
-
 
 
 
@@ -394,19 +217,30 @@ sub record_apu {
   my $pri_type = shift;
   my $pretend  = shift || $ENV{ACIS_PRETEND};
 
+  if ( $record -> {pref} {'disable-apu'} ) { return "SKIP"; }
+
   my $now = time;
   my $last_research  = get_sysprof_value( $sid, 'last-autosearch-time' );
   my $last_citations = get_sysprof_value( $sid, 'last-auto-citations-time' );
+  my $last_apu       = get_sysprof_value( $sid, 'last-apu-time' );
 
   my $apu_too_recent_days  = $ACIS->config( 'minimum-apu-period-days' ) || 21;
   my $apu_too_recent_seconds = $apu_too_recent_days * 24 * 60 * 60;
 
+  if ( $now - $last_apu < $apu_too_recent_seconds ) {
+    return "SKIP";
+  }
+
+  my $research;
+  my $citations;
+  
   # research
   if ( not $pri_type 
        or $pri_type eq 'research' 
        or not $last_research
        or ($now - $last_research >= $apu_too_recent_seconds/2)  
      ) {
+    $research = 1;
     ACIS::Web::ARPM::search( $acis, $pretend );
   }
 
@@ -416,7 +250,14 @@ sub record_apu {
        or not $last_citations
        or ($now - $last_citations >= $apu_too_recent_seconds/2)  
      ) {
+    $citations = 1;
     ACIS::Citations::AutoUpdate::auto_processing( $acis, $pretend );
+  }
+
+  if ( $citations or $research ) {
+    put_sysprof_value( $sid, 'last-apu-time', $now );
+  } else {
+    return "SKIP";
   }
 
   return "OK";

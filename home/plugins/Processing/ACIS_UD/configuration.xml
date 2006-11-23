@@ -154,6 +154,13 @@
   </table>
 
 
+  <!-- user preferences -->
+  <table name='acis:preferences'>
+    <field name='shortid' sql-type=' CHAR(255) NOT NULL '/>
+    <field name='pref'    sql-type=' CHAR(255) NOT NULL '/>
+    <field name='value'   sql-type=' CHAR(255) '/>
+    <create-table-sql> PRIMARY KEY (shortid, pref)</create-table-sql>
+  </table>
 
 
 
@@ -215,7 +222,31 @@
   </table>    
 
 
+  <!-- APU Queue -->
+  
+  <table name="acis:apu_queue">
+    <field name="what"     sql-type="CHAR(255) PRIMARY KEY"/>
+    <field name='position' sql-type='BIGINT DEFAULT 0'/>
+    <field name="filed"    sql-type="TIMESTAMP NOT NULL DEFAULT NOW()"/>
+                   <!-- this is also default behaviour for the first 
+                        timestamp-type field in a table in MySQL -->
 
+    <field name="status"   sql-type="CHAR(20) DEFAULT ''"/>
+    <field name="class"    sql-type="SMALLINT DEFAULT 0"/>
+                   <!-- maybe we don't really need it
+                        anymore and can use position instead: all
+                        priority items can have lesser position?  On the
+                        other side, class can be used for urgency indicator. -->
+
+    <field name='notes'    sql-type='BLOB'/>
+    <field name="worked"   sql-type="TIMESTAMP"/>
+    
+    <create-table-sql>
+     index( position ), index( class ), index( status )
+    </create-table-sql>
+  </table>
+
+<!-- old:
   <table name="acis:arpm_queue">
     <field name="what"     sql-type="CHAR(100) PRIMARY KEY"/>
     <field name="filed"    sql-type="TIMESTAMP NOT NULL"/>
@@ -227,7 +258,8 @@
     <create-table-sql>
      index( class ), index( status )
     </create-table-sql>
-  </table>
+  </table>  -->
+
 
 
   <!-- Stage C: Citations -->
