@@ -154,15 +154,6 @@
   </table>
 
 
-  <!-- user preferences -->
-  <table name='acis:preferences'>
-    <field name='shortid' sql-type=' CHAR(255) NOT NULL '/>
-    <field name='pref'    sql-type=' CHAR(255) NOT NULL '/>
-    <field name='value'   sql-type=' CHAR(255) '/>
-    <create-table-sql> PRIMARY KEY (shortid, pref)</create-table-sql>
-  </table>
-
-
 
   <!--  ########  OTHER SPECIAL ACIS TABLES   ########  -->
 
