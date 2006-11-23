@@ -149,47 +149,47 @@ sub run_apu_by_queue {
     }
 
     my $login = get_login_from_queue_item( $sql, $qitem );
-    my $rid   = $qitem;
+    if ( not $login ) {
+      set_item_processing_result( $sql, $qitem, 'FAIL', 'not found' );
+      next;
+    }
+
+    my $rid   = $qitem; # this we assume
     my $res;
     my $notes;
 
-    if ( $login ) {
-
-      if ( $rid ne $login ) { 
-        logit "about to process: $rid ($login)";
-      } else {
-        logit "about to process: $login";
-      }
-      
-      require ACIS::Web::Admin;
-
-      eval {
-        ###  get hands on the userdata (if possible),
-        ###  create a session and then do the work
-
-        ###  XXX $qitem is not always a record identifier, but
-        ###  offline_userdata_service expects an indentifier if anything on
-        ###  4th parameter position
-        $res = ACIS::Web::Admin::offline_userdata_service
-                        ( $ACIS, $login, 'ACIS::APU::record_apu', $rid ) 
-                        || 'no';
-      };
-      if ( $@ ) {
-        $res   = "FAIL"; 
-        $notes = $@;
-      }
-
-      logit "apu for $login/$rid result: $res";
-      if ( $notes ) {
-        logit "notes: $notes";
-      }
-
-      set_item_processing_result( $sql, $rid, $res, $notes );
-      if ( $res ne 'SKIP' ) { $number--; }
-      
+    if ( $rid ne $login ) { 
+      logit "about to process: $rid ($login)";
     } else {
-      last; 
+      logit "about to process: $login";
     }
+      
+    require ACIS::Web::Admin;
+    
+    eval {
+      ###  get hands on the userdata (if possible),
+      ###  create a session and then do the work
+      
+      ###  XXX $qitem is not always a record identifier, but
+      ###  offline_userdata_service expects an indentifier if anything on
+      ###  4th parameter position
+      $res = ACIS::Web::Admin::offline_userdata_service
+                        ( $ACIS, $login, 'ACIS::APU::record_apu', $rid ) 
+                          || 'no';
+    };
+    if ( $@ ) {
+      $res   = "FAIL"; 
+      $notes = $@;
+    }
+    
+    logit "apu for $login/$rid result: $res";
+    if ( $notes ) {
+      logit "notes: $notes";
+    }
+    
+    set_item_processing_result( $sql, $rid, $res, $notes );
+    if ( $res ne 'SKIP' ) { $number--; }
+    
 
   } continue {
     $ACIS -> clear_after_request();
