@@ -18,7 +18,10 @@ sub get_next_record {
     my $id = $r ->ref;
     my $cr = extract_citations( $r );
 
-    if ( scalar @$cr == 1 ) { undef $cr; }
+    if ( scalar (@$cr) == 1 ) { 
+      #print "empty citation list: $id\n", Dumper($cr);
+      undef $cr; 
+    }
     if ( not $id or not $cr ) { goto START; }
 
     my $start = 0;
@@ -120,7 +123,6 @@ sub extract_citations ($) {
     my $string = $_;
     new_citation( $string );
   }
-
 
   my $o = bless \@cits, "ACIS::CitationsList";
   return $o;

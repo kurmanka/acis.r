@@ -27,6 +27,7 @@ use vars qw( @EXPORT );
 
 use Unicode::Normalize;
 use Web::App::Common;
+use ACIS::Citations::Events;
 
 
 sub normalize_string($) {
@@ -367,6 +368,13 @@ sub identify_citation_to_doc($$$) {
 
   push @$doclist, $citation;
   debug "added citation $cid to identified for $dsid";
+  my $note;
+  my $maybeauto = '';
+  if ( exists $citation->{autoaddreason} ) {
+    $maybeauto = 'auto';
+#    $note = 'autoaddreason: $citation->{autoaddreason}';
+  }
+  cit_event( $citation->{srcdocsid}, $citation->{checksum}, $rec->{sid}, $dsid, "${maybeauto}added", $citation->{autoaddreason}, $note );
 }
 
 
@@ -391,6 +399,8 @@ sub unidentify_citation_from_doc_by_cid($$$) {
   if ( not scalar @$clist ) {
     delete $cidentified->{$dsid};
   }
+
+  cit_event( $cit->{srcdocsid}, $cit->{checksum}, $rec->{sid}, $dsid, "unidentified" );
   return $cit;
 }
 
@@ -409,6 +419,7 @@ sub refuse_citation($$) {
   push @$refused, $citation;
 
   debug "refused citation $cid";
+  cit_event( $citation->{srcdocsid}, $citation->{checksum}, $rec->{sid}, undef, "refused" );
 }
 
 
@@ -425,8 +436,10 @@ sub unrefuse_citation_by_cid($$) {
   }
   clear_undefined $ref;
 
-  debug "unrefused citation $cid"
-    if $citation;
+  if ( $citation ) {
+    debug "unrefused citation $cid";
+    cit_event( $citation->{srcdocsid}, $citation->{checksum}, $rec->{sid}, undef, "unrefused" );
+  }
 
   return $citation;
 }

@@ -74,9 +74,6 @@ sub prepare() {
 }
 
 
-
-
-
 sub prepare_citations_list($) {
   # prepare new citations list
   my $srclist = shift;

@@ -427,7 +427,7 @@ sub personal_search_by_coauthors {
     delete $_->{new};
     
     $citation->{autoadded}     = today(); 
-    $citation->{autoaddreason} = $reason;
+    $citation->{autoaddreason} = "coauthor-sug"; # was: $reason;
     if ( not $pretend ) {
       identify_cit_to_doc( $rec, $dsid, $citation );
       $mat->remove_citation( $citation );

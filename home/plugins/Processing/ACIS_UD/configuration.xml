@@ -282,5 +282,20 @@
 
   </table>
 
+  <!-- history of citations -->
+  <table name='acis:citation_events'>
+    <field name='srcdocsid'      sql-type='CHAR(15) NOT NULL'/>
+    <field name='checksum'       sql-type='CHAR(22) NOT NULL'/>
+    <field name='psid'           sql-type='CHAR(15) NOT NULL'/>
+    <field name='dsid'           sql-type='CHAR(15)'/>
+    <field name='event'          sql-type='CHAR(15) NOT NULL'/>
+    <field name='reason'         sql-type='char(15)'/>
+    <field name='time'           sql-type='DATETIME NOT NULL'/>
+    <field name='note'           sql-type='text'/>
+    <create-table-sql>
+      INDEX(time), INDEX(psid)
+    </create-table-sql>
+  </table>
+
   
 </configuration>

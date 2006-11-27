@@ -227,7 +227,8 @@ sub record_apu {
   my $apu_too_recent_days  = $ACIS->config( 'minimum-apu-period-days' ) || 21;
   my $apu_too_recent_seconds = $apu_too_recent_days * 24 * 60 * 60;
 
-  if ( $now - $last_apu < $apu_too_recent_seconds ) {
+  if ( $last_apu 
+       and $now - $last_apu < $apu_too_recent_seconds ) {
     return "SKIP";
   }
 

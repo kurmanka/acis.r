@@ -322,3 +322,4 @@ sql_helper/sql_helper.pm
 sql_helper/sql_result.pm
 TODO
 VERSION
+lib/ACIS/Citations/Events.pm
