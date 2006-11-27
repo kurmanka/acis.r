@@ -87,25 +87,29 @@ sub auto_processing {
 
     require ACIS::Web::SaveProfile;
     ACIS::Web::SaveProfile::save_profile( $acis );
+  
+    if ( $acis->config( "citations-profile" ) 
+         and not $acis->config( "disable-citation-mails" ) ) {
 
-    my %params = ();
-    my $echoapu = $acis -> config( "echo-apu-mails" );
-    if ( not defined $echoapu ) {
-      $echoapu =  $acis -> config( "echo-arpu-mails" );
+      my %params = ();
+      my $echoapu = $acis -> config( "echo-apu-mails" );
+      if ( not defined $echoapu ) {
+        $echoapu =  $acis -> config( "echo-arpu-mails" );
+      }
+      if ( $echoapu ) {
+        $params{-bcc} = $acis -> config( "admin-email" );
+      }
+      
+      if ( $pretend ) {
+        $params{-to} =  $acis -> config( "admin-email" );
+        undef $params{-bcc};
+        $params{'-pretend-mode'} = 'yes';
+      }
+      
+      require Web::App::Email;
+      Web::App::Email::send_mail( $acis, "email/citations-auto-profile-update.xsl", %params );
+      debug "email sent";
     }
-    if ( $echoapu ) {
-      $params{-bcc} = $acis -> config( "admin-email" );
-    }
-
-    if ( $pretend ) {
-      $params{-to} =  $acis -> config( "admin-email" );
-      undef $params{-bcc};
-      $params{'-pretend-mode'} = 'yes';
-    }
-    
-    require Web::App::Email;
-    Web::App::Email::send_mail( $acis, "email/citations-auto-profile-update.xsl", %params );
-    debug "email sent";
 
     foreach ( qw( docs-w-cit ) ) {
       delete $vars -> {$_};
