@@ -15,6 +15,11 @@ use ACIS::Citations::SimMatrix qw( load_similarity_matrix );
 use Web::App::Email;
 use ACIS::Web::SysProfile;
 
+
+use ACIS::APU qw(&logit);
+
+
+
 sub auto_processing {
   my $acis = shift || die;
 
@@ -28,6 +33,8 @@ sub auto_processing {
   my $sql     = $acis -> sql_object || die;
 
   debug "id: ", $rec->{id};
+
+  logit "citations search for ", $rec->{sid};
 
   my $mat   = load_similarity_matrix( $rec->{sid} );
   
@@ -45,6 +52,9 @@ sub auto_processing {
     debug "by doc: ",    scalar @$add_by_doc;
     debug "by names: ",  scalar @$add_by_names;
     debug "by coauth: ", scalar @$add_by_coauth;
+    logit "by doc: ",    scalar @$add_by_doc;
+    logit "by names: ",  scalar @$add_by_names;
+    logit "by coauth: ", scalar @$add_by_coauth;
 
     my $dsindex = {};
     foreach ( @{$rec->{contributions}{accepted}} ) {
@@ -109,6 +119,7 @@ sub auto_processing {
       require Web::App::Email;
       Web::App::Email::send_mail( $acis, "email/citations-auto-profile-update.xsl", %params );
       debug "email sent";
+      logit "email sent";
     }
 
     foreach ( qw( docs-w-cit ) ) {

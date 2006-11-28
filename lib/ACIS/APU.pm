@@ -19,11 +19,11 @@ use Carp::Assert;
 use Web::App::Common qw( debug );
 use sql_helper;
 
-use base qw( Exporter );
-use vars qw( $ACIS @EXPORT_OK @EXPORT @ISA );
+use vars qw( $ACIS @EXPORT_OK @EXPORT);
 *ACIS = *ACIS::Web::ACIS;
-@EXPORT = qw( logit set_queue_item_status push_item_to_queue );
-@ISA = qw(Exporter);
+@EXPORT = qw( &logit set_queue_item_status push_item_to_queue );
+use base qw( Exporter );
+
 
 use ACIS::APU::Queue;
 
@@ -202,7 +202,7 @@ sub run_apu_by_queue {
 
 use ACIS::Web::SysProfile;
 require ACIS::Web::ARPM;
-use ACIS::Citations::AutoUpdate;
+require ACIS::Citations::AutoUpdate;
 
 sub record_apu {
   my $acis = shift;

@@ -24,7 +24,7 @@ package ACIS::Web::ARPM;        ### -*-perl-*-
 #  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 #
 #  ---
-#  $Id: ARPM.pm,v 2.3 2006/10/16 17:32:23 ivan Exp $
+#  $Id: ARPM.pm,v 2.4 2006/11/28 16:29:08 ivan Exp $
 #  ---
 
 
@@ -88,7 +88,7 @@ sub search {
   $sid     = $record ->{sid};
   $sql     = $app -> sql_object;
 
-  logit "ARPU search for $id ($sid)";
+  logit "research search for $sid";
 
   ####  general preparations
   ACIS::Web::Contributions::prepare( $app );

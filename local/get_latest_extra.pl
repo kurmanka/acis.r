@@ -3,11 +3,12 @@
 use strict;
 
 
-#unstable alternative:
-#AMF-perl    /home/ivan/proj/AMF-perl 
+#older
+#AMF-perl    /home/ivan/dev/AMF/AMF-perl
+
 my $mods = {qw( 
 
-AMF-perl    /home/ivan/dev/AMF/AMF-perl
+AMF-perl    /home/ivan/proj/AMF-perl 
 ReDIF-perl  /home/ivan/dev/ReDIF-perl
 RePEc-Index /home/ivan/dev/RePEc-Index
 
