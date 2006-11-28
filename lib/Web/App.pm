@@ -25,7 +25,7 @@ package Web::App;   ### -*-perl-*-
 #  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 #
 #  ---
-#  $Id: App.pm,v 2.16 2006/08/08 08:15:49 ivan Exp $
+#  $Id: App.pm,v 2.17 2006/11/28 16:04:38 ivan Exp $
 #  ---
 
 
@@ -787,7 +787,7 @@ sub handle_request {
 
   ### check the request method
   { 
-    my $method = $ENV{REQUEST_METHOD};
+    my $method = $ENV{REQUEST_METHOD} || '';
     if ( $method ne 'GET' 
          and $method ne 'HEAD'
          and $method ne 'POST' ) {
