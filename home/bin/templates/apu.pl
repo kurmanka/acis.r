@@ -15,6 +15,7 @@ require ACIS::APU::Queue;
 #####  MAIN PART  
 
 my $acis = ACIS::Web -> new( home => $homedir );
+my $clearlock;
 
 my $queue;
 my $auto = 1;
@@ -45,8 +46,6 @@ foreach ( @::ARGV ) {
     $queue = 1;
     undef $_;
   }
-  
-
 }
 clear_undefined( \@::ARGV );
 
@@ -57,7 +56,23 @@ if ( $queue ) {
   
 } else {
   my $howmuch = shift @ARGV;
-  ACIS::APU::run_apu_by_queue($howmuch, -auto => $auto, 
-                                        -failed => $failed, 
-                                        -interactive => $interactive );
+  my $lockfile = "$homedir/apu-running.lock";
+  if ( mkdir $lockfile ) {
+    $clearlock = $lockfile;
+    system( "echo $$ > $lockfile/pid" );
+    ACIS::APU::run_apu_by_queue($howmuch, -auto => $auto, 
+                                -failed => $failed, 
+                                -interactive => $interactive );
+  } else {
+    print "can't obtain the lock: $lockfile\n";
+    exit 1;
+  }
+    
+}
+
+END {
+  if ( $clearlock and -d $clearlock ) {
+    system( "rm $clearlock/*" );
+    rmdir $clearlock;
+  }
 }
