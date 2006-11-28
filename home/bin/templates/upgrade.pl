@@ -4,6 +4,11 @@ my $name;
 my $verno;
 my $old;
 
+#sub p {}; 
+sub p { print @_, "\n"; }
+
+p "$0 debugings:";
+
 if ( -f 'VERSION' ) {
   $old = `cat VERSION`;
 }
@@ -20,19 +25,32 @@ if ( $old and
 }
 
 $verno = normalize( $verno );
+p "current verno: $verno";
 
+my $index = {};
 my @call;
 
 if ( opendir BIN, "bin/" ) {
   my @scripts = readdir BIN;
   foreach ( @scripts ) {
     if ( $_ =~ /^upgrade_to_(\d[\d\.]+)$/ ) {
+      p "script: $_";
       if ( normalize( $1 ) gt $verno ) {
+        my $numberstring = normalize( $1 );
+        p "number: $numberstring";
+        p "would run it";
+        $index{$_} = numberstring;
         push @call, $_;
       }
     }
   }
 }
+
+p "\@call before sort: ", join( ' ', @call ); 
+
+@call = sort { $index{$a} cmp $index{$b} } @call;
+
+p "\@call after sort: ", join( ' ', @call ); 
 
 foreach ( @call ) {
 
