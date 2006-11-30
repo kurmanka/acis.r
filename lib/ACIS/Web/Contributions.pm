@@ -25,7 +25,7 @@ package ACIS::Web::Contributions;  ### -*-perl-*-
 #  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 #
 #  ---
-#  $Id: Contributions.pm,v 2.22 2006/10/09 21:35:17 ivan Exp $
+#  $Id: Contributions.pm,v 2.23 2006/11/30 11:18:39 ivan Exp $
 #  ---
 
 use strict;
@@ -1794,6 +1794,43 @@ sub search_resources_for_exact_phrase {
   
 
 sub search_resources_for_exact_phrases {
+  my $sql      = shift;
+  my $context  = shift;
+  my $namelist = shift;
+  my $result = [];
+  my $q = '';
+
+  foreach ( @$namelist ) {
+    my $name = $_;
+    $name =~ s/\.$//g; # remove final dot (or word boundary won't match)
+    next if not $name or length( $name ) < 2;
+
+    # escape unsafe chars
+    $name =~ s!([\.*?+{}()|^[\];])!\\$1!g;
+    $q .= '"';
+    $q .= $name;
+    $q .= '" ';
+  }
+  chop $q;
+
+  ###  the query
+  $sql -> prepare_cached( 
+     query_resources 'res_creators_separate', "match (catch.name) against (? IN BOOLEAN MODE)"
+                        );
+
+  warn "SQL: " . $sql->error if $sql->error;
+  my $res = $sql->execute( $q );
+  warn "SQL: " . $sql->error if $sql->error;
+
+  if ( $res ) {
+    debug "phrase search in creators' names, found: " . $res -> rows . " items";
+    process_resources_search_results( $res, $context, $result );
+  }
+
+  return $result;
+}
+
+sub search_resources_for_exact_phrases_original {
   my $sql      = shift;
   my $context  = shift;
   my $namelist = shift;

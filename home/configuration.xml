@@ -5,7 +5,7 @@
     that is a working ARDB core configuration file.  Produces:
     documents table, collections table, authors table.
 
-    $Id: configuration.xml,v 2.3 2006/09/25 11:24:18 ivan Exp $
+    $Id: configuration.xml,v 2.4 2006/11/30 11:18:39 ivan Exp $
 
 -->
 
@@ -197,6 +197,7 @@
 
    <create-table-sql>
      PRIMARY KEY ( sid, role, name ),
+     INDEX ( name ),
      INDEX ( email(10) )
    </create-table-sql>
  </table>

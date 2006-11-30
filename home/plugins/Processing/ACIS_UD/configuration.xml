@@ -262,7 +262,9 @@
     <field name='nstring'         sql-type='VARCHAR(255) NOT NULL'/>
     <field name='trgdocid'        sql-type='VARCHAR(255)'/>
 
-    <create-table-sql> PRIMARY KEY ( srcdocsid, checksum ) </create-table-sql>
+    <create-table-sql> PRIMARY KEY ( srcdocsid, checksum ),
+    FULLTEXT INDEX (nstring),
+    INDEX (trgdocid)</create-table-sql>
   </table>
 
   <table name='acis:cit_suggestions'>

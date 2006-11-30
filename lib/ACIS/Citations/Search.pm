@@ -80,6 +80,39 @@ sub search_for_personal_names($) {
   debug "search_for_personal_names: $names (" , scalar @$names, " names)";
 
   my @cl = ();
+  $sql -> prepare_cached( "$select_citations where MATCH (nstring) AGAINST (? IN BOOLEAN MODE)" );
+  
+  my $q = '';
+  foreach ( @$names ) {
+    debug "name: $_";
+    $q .= '"'. $_ . '" ';
+  }
+  chop $q;
+
+  my $r = $sql -> execute( $q );
+
+  while ( $r and $r->{row} ) {
+    my $c = { %{$r->{row}} };
+    foreach ( qw( ostring nstring srcdoctitle srcdocauthors ) ) {    
+      $c->{$_} = Encode::decode_utf8( $r->{row}{$_} );
+    }
+    debug "found: ", $c->{nstring};
+    push @cl, $c;
+    $r->next;
+  }
+
+  debug "search_for_personal_names: found ", scalar @cl, " citations";
+  return \@cl;
+}
+
+sub search_for_personal_names_original($) {
+  my $names = shift || die;
+
+  if ( not $sql ) { prepare; }
+
+  debug "search_for_personal_names: $names (" , scalar @$names, " names)";
+
+  my @cl = ();
   $sql -> prepare_cached( "$select_citations where nstring REGEXP ?" );
   foreach ( @$names ) {
     my $n = $_;

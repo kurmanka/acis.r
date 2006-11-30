@@ -108,6 +108,8 @@ sub prepare_search_context {
   my $id      = $record ->{id};
   my $sid     = $record ->{sid};
 
+  logit "for profile $sid ($id)";
+
   my $metadata_db = $app -> config( 'metadata-db-name' );
 
   my $contributions   = $session ->{$id} {contributions} ;
