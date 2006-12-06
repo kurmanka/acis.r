@@ -458,7 +458,7 @@ sub load_suggestions_into_contributions {
     my $r = $sql -> execute ( $sid );
     if ( $r and $r->{row} and $r->{row}{num} and $r->{row}{num} > $MAX_SUGGESTIONS_LIMIT ) {
       debug sprintf "too many suggestions for this record: %d; will clean up the inexact ones", $r->{row}{num};
-      $sql->do( "delete from $back_table where psid=? and target='contributions' and reason NOT RLIKE 'exact-'" );      
+      $sql->do( "delete from $back_table where psid=? and target='contributions' and substr(reason,1,6)<>'exact-'" );      
     }
   }
 
