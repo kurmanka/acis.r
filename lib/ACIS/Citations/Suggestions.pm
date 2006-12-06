@@ -221,7 +221,8 @@ sub suggest_citation_to_coauthors($$$) {
   foreach ( @authors ) {
     debug "suggest to author: $_?";
     my $sid = get_author_sid $_;
-    next if $sid and $sid eq $psid;
+    next if not $sid;
+    next if $sid eq $psid;
     my $sug = check_suggestions( $cit, $sid, $dsid, "coauth:$psid" ); 
     if ( $sug ) {
       # do nothing, already suggested
