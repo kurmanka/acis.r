@@ -56,18 +56,23 @@ if ( $queue ) {
   
 } else {
   my $howmuch = shift @ARGV;
+
+  if ( $howmuch +0 <= 0 ) { 
+    print "give a positive numeric argument\n"; 
+    exit 1;
+  }
+
   my $lockfile = "$homedir/apu-running.lock";
   if ( mkdir $lockfile ) {
     $clearlock = $lockfile;
     system( "echo $$ > $lockfile/pid" );
     ACIS::APU::run_apu_by_queue($howmuch, -auto => $auto, 
-                                -failed => $failed, 
-                                -interactive => $interactive );
+                                  -failed => $failed, 
+                                  -interactive => $interactive );
   } else {
     print "can't obtain the lock: $lockfile\n";
     exit 1;
   }
-    
 }
 
 END {

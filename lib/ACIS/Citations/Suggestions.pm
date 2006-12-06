@@ -72,6 +72,8 @@ sub add_suggestion($$$$$) {
   my ( $cit, $psid, $dsid, $reason, $similar ) = @_;
   if ( not $sql ) { prepare; }
 
+  
+
   $sql -> prepare_cached( "insert into cit_suggestions values (?,?,?,?,?,?,true,NOW())" );
   $sql -> execute( $cit->{srcdocsid}, $cit->{checksum},
                    $psid, $dsid,

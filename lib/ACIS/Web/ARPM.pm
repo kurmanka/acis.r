@@ -24,7 +24,7 @@ package ACIS::Web::ARPM;        ### -*-perl-*-
 #  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 #
 #  ---
-#  $Id: ARPM.pm,v 2.4 2006/11/28 16:29:08 ivan Exp $
+#  $Id: ARPM.pm,v 2.5 2006/12/06 18:18:43 ivan Exp $
 #  ---
 
 
@@ -77,7 +77,7 @@ sub interactive { $interactive = 1; }
 
 sub search {
   $app = shift;
-  $pretend = shift; ### XXXX not implemented yet
+  $pretend = shift; ### XXX not implemented yet
 
   debug "enter ARPM::search()";
 
