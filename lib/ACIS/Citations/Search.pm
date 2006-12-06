@@ -378,7 +378,9 @@ sub personal_search_by_names {
       if ( not $pretend ) {
         identify_cit_to_doc( $rec, $candidate, $citation );
         $mat->remove_citation( $citation );
-        suggest_citation_to_coauthors($_, $psid, $candidate);
+        unless ( $acis->config( 'citations-disable-coauthor-auto-suggest' ) ) {
+          suggest_citation_to_coauthors($_, $psid, $candidate);
+        }
       }
       push @added, [ $candidate, $citation ];
         
