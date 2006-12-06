@@ -267,17 +267,16 @@ sub test_get_document_authors () {
 
 
 sub get_author_sid ($) {
-  my $id = shift;
+  my $id = shift || die;
 
   die if not $ACIS::Web::ACIS;
   my $app = $ACIS::Web::ACIS;
-
   my $sql = $app -> sql_object() || die;
 
   $sql -> prepare( "select shortid from records where id=?" );
   my $res = $sql -> execute( $id );
-  if ( $res -> {row} and $res -> {row} ) {
-    return $res -> {row} ->{id};
+  if ( $res and $res -> {row} ) {
+    return $res -> {row} ->{shortid};
   }
   return undef;
 }
