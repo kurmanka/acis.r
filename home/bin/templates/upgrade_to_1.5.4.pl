@@ -1,4 +1,7 @@
 
+
+
+
 use strict;
 use warnings;
 use ACIS::Web;
@@ -10,9 +13,8 @@ my $RDB = $ACIS -> config( 'metadata-db-name' );
 
 my @q = (
 
-qq!alter table citations add fulltext index (nstring)!,
-qq!alter table citations add index (trgdocid)!,
-qq!alter table $RDB.res_creators_separate add index (name)!,
+qq!alter table $RDB.resources modify authors TEXT!,
+qq!alter table $RDB.resources drop index title_i!,
 
 );
 
