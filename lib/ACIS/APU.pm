@@ -174,7 +174,7 @@ sub run_apu_by_queue {
       ###  offline_userdata_service expects an indentifier if anything on
       ###  4th parameter position
       $res = ACIS::Web::Admin::offline_userdata_service
-                        ( $ACIS, $login, 'ACIS::APU::record_apu', $rid ) 
+                        ( $ACIS, $login, 'ACIS::APU::record_apu', $rid, $class ) 
                           || 'no';
     };
     if ( $@ ) {
@@ -214,6 +214,7 @@ sub record_apu {
   my $sid     = $record ->{sid};
   my $sql     = $acis -> sql_object;
 
+  my $class    = shift;
   my $pri_type = shift;
   my $pretend  = shift || $ENV{ACIS_PRETEND};
 
@@ -228,7 +229,8 @@ sub record_apu {
   my $apu_too_recent_seconds = $apu_too_recent_days * 24 * 60 * 60;
 
   if ( $last_apu 
-       and $now - $last_apu < $apu_too_recent_seconds ) {
+       and $now - $last_apu < $apu_too_recent_seconds 
+       and not $class ) {
     return "SKIP";
   }
 
@@ -240,6 +242,7 @@ sub record_apu {
        or $pri_type eq 'research' 
        or not $last_research
        or ($now - $last_research >= $apu_too_recent_seconds/2)  
+       or $class
      ) {
     $research = 1;
     ACIS::Web::ARPM::search( $acis, $pretend );
@@ -250,6 +253,7 @@ sub record_apu {
        or $pri_type eq 'citatitons' 
        or not $last_citations
        or ($now - $last_citations >= $apu_too_recent_seconds/2)  
+       or $class
      ) {
     $citations = 1;
     ACIS::Citations::AutoUpdate::auto_processing( $acis, $pretend );

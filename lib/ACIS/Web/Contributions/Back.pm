@@ -277,6 +277,8 @@ use Storable qw( freeze thaw );
 
 
 use Carp;
+
+require Data::Dumper;
 sub save_suggestions {
   my $sql     = shift || die;
   my $context = shift || die;
@@ -295,9 +297,11 @@ sub save_suggestions {
   if ( scalar @$doclist ) {
     $sql -> prepare_cached ( "insert into $back_table values ( ?, ?, ?, " . 
                              " ?, '$reason', '$target', now(), ? )" );
-    
     foreach ( @$doclist ) {
       my $osid = $_ -> {sid};
+      warn( "document item with no sid: " . Data::Dumper::Dumper($_) ) if not $osid;
+      next if not $osid;
+
       my $type = $_ -> {type};
       my $ro = $role;
       if ( $_ ->{role} ) {

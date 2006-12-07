@@ -25,7 +25,7 @@ package ACIS::Web::Contributions;  ### -*-perl-*-
 #  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 #
 #  ---
-#  $Id: Contributions.pm,v 2.23 2006/11/30 11:18:39 ivan Exp $
+#  $Id: Contributions.pm,v 2.24 2006/12/07 01:58:57 ivan Exp $
 #  ---
 
 use strict;
@@ -1761,7 +1761,7 @@ sub search_resources_by_creator_email {
 ####   There's very little point in such search.  I guess fulltext search
 ####   would have been more reasonable.
 
-sub search_resources_for_exact_phrase {
+sub search_resources_for_exact_phrase_NEVER_ACTUALLY_USED {
   my $sql  = shift;
   my $context = shift;
   my $name = shift;
@@ -1800,8 +1800,21 @@ sub search_resources_for_exact_phrases {
   my $result = [];
   my $q = '';
 
+  my $names_notsuitable = []; # some names may be too short for this search
+                              # method; then we have to use _regexp variant
+                              # for them
   foreach ( @$namelist ) {
     my $name = $_;
+
+    next if not $name or length( $name ) < 2;
+    if ( not m/\w{4,}/ ) {  # the phrase must contain at least a 4-letter
+                            # word (or longer) to find anything, given the
+                            # default mysql settings (ft_min_word_len server
+                            # system variable)
+      push @$names_notsuitable, $_;
+      next;
+    }
+
     $name =~ s/\.$//g; # remove final dot (or word boundary won't match)
     next if not $name or length( $name ) < 2;
 
@@ -1811,31 +1824,38 @@ sub search_resources_for_exact_phrases {
     $q .= $name;
     $q .= '" ';
   }
-  chop $q;
 
-  ###  the query
-  $sql -> prepare_cached( 
-     query_resources 'res_creators_separate', "match (catch.name) against (? IN BOOLEAN MODE)"
-                        );
+  if ( $q ) {
+    chop $q;
 
-  warn "SQL: " . $sql->error if $sql->error;
-  my $res = $sql->execute( $q );
-  warn "SQL: " . $sql->error if $sql->error;
+    ###  the query
+    $sql -> prepare_cached( 
+                           query_resources 'res_creators_separate', "match (catch.name) against (? IN BOOLEAN MODE)"
+                          );
+    
+    warn "SQL: " . $sql->error if $sql->error;
+    my $res = $sql->execute( $q );
+    warn "SQL: " . $sql->error if $sql->error;
+    
+    if ( $res ) {
+      debug "ft phrase search in creators' names, found: " . $res -> rows . " items";
+      process_resources_search_results( $res, $context, $result );
+    }
+  }
 
-  if ( $res ) {
-    debug "phrase search in creators' names, found: " . $res -> rows . " items";
-    process_resources_search_results( $res, $context, $result );
+  if ( scalar @$names_notsuitable ) {
+    debug "some phrases are not suitable for fulltext search: " . join( ' * ', @$names_notsuitable);
+    search_resources_for_exact_phrases_regexp( $sql, $context, $names_notsuitable, $result );
   }
 
   return $result;
 }
 
-sub search_resources_for_exact_phrases_original {
+sub search_resources_for_exact_phrases_regexp {
   my $sql      = shift;
   my $context  = shift;
   my $namelist = shift;
-
-  my $result = [];
+  my $result   = shift || [];
 
   my $re = ' ' x 500; # pre-allocate some space
 
@@ -1844,7 +1864,6 @@ sub search_resources_for_exact_phrases_original {
   foreach ( @$namelist ) {
     my $name = $_;
     $name =~ s/\.$//g; # remove final dot (or word boundary won't match)
-
     next if not $name or length( $name ) < 2;
 
     # escape unsafe chars
@@ -1874,8 +1893,6 @@ sub search_resources_for_exact_phrases_original {
 }
   
 
-
-
 sub search_resources_for_name_word_fulltext {
   my $sql     = shift;
   my $context = shift;
@@ -1903,8 +1920,7 @@ sub search_resources_for_name_word_fulltext {
   
 
 
-
-sub search_resources_for_a_name_substring {
+sub search_resources_for_a_name_substring_NEVER_ACTUALLY_USED {
   my $sql     = shift;
   my $context = shift;
   my $substr  = shift;
@@ -1946,7 +1962,6 @@ sub search_documents {
 
   my $table;
   if ( $field eq 'names' ) {
-    
     if ( $phrase ) {
       $table = 'res_creators_separate'; 
       $field = 'name';  
@@ -1962,8 +1977,8 @@ sub search_documents {
   my $where; 
 
   if ( $phrase ) { 
-    $key = "$key";
-    $where = "catch.$field rlike ?";
+    $key = "\"$key\"";
+    $where = "match ( catch.$field ) against ( ? IN BOOLEAN MODE )";
 
   } else {
     $where = "match ( catch.$field ) against ( ? )";

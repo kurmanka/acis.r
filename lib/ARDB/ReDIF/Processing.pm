@@ -539,9 +539,7 @@ sub process_resource {
   ####  authors' handles, Author-Person attribute
   {
     my @h =  $record -> get_value( "author/person" );
-    
     resolve_shortids( \@h );
-    
     foreach ( @h ) {
       $relations -> store( [ $_, 'wrote', $id, $id ] );
       push @person_pointers, $_;
@@ -576,7 +574,7 @@ sub process_resource {
       if ( not $acis ) { create_acis(); }
       require ACIS::APU;
       require ACIS::APU::Queue;
-      print "putting $per into the APU queue!\n";
+      print "putting $per into the APU queue\n";
       ACIS::APU::Queue::enqueue_item( $acis -> sql_object, $per, 1 );
       
     } else {
