@@ -25,7 +25,7 @@ package ACIS::Web::Contributions;  ### -*-perl-*-
 #  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 #
 #  ---
-#  $Id: Contributions.pm,v 2.24 2006/12/07 01:58:57 ivan Exp $
+#  $Id: Contributions.pm,v 2.25 2006/12/11 11:57:41 ivan Exp $
 #  ---
 
 use strict;
@@ -2028,10 +2028,13 @@ sub process_resources_search_results {
       next;
     }
     
-#    debug "making resource item (sid:$sid)";
     my $item = make_resource_item_from_db_row( $row );
-    
-    push @$result, $item;
+
+    if ( not $item or not $item->{id} or not $item->{sid} ) {
+      warn "bad document record found: ", Dumper( $row ), "(id: $id)";
+    } else {
+      push @$result, $item;
+    }
     
   } continue {
     $sqlres -> next;

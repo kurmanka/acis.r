@@ -298,6 +298,7 @@ sub set_similarity_unused {
 #  warn "suggestion was not found" if not $found;
 }
 
+use Data::Dumper;
 sub _docs {
   my $self = shift || die;
   my $docs = $self-> {docs};
@@ -306,7 +307,14 @@ sub _docs {
     $docs = {};
     my $rp = $rec ->{contributions}{accepted} || [];
     foreach ( @$rp ) {
-      my $sid = $_->{sid} || warn && next;
+      my $sid = $_->{sid};
+      if ( not $sid ) {
+        warn "accepted contribution: ", Dumper( $_ ), " with no sid";
+        if ( $rec ) {
+          warn "context: $rec->{id}\n";
+        }
+        next;
+      }
       my $doc = { %$_ };
       my $authors = $doc->{authors} || '';
       $doc->{authors} = [ split / \& /, $authors ];
