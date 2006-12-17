@@ -26,7 +26,7 @@ package ACIS::Web::User; ### -*-perl-*-
 #  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 #
 #  ---
-#  $Id: User.pm,v 2.4 2006/10/10 15:05:08 ivan Exp $
+#  $Id: User.pm,v 2.5 2006/12/17 19:40:22 ivan Exp $
 #  ---
 
 
@@ -97,8 +97,21 @@ sub name_screen_process1 {
   
   my $session = $app -> session;
   my $record  = $session -> current_record;
-  
-  $session -> {'name-data-old'} = $record ->{name};
+  $session -> {'name-data-old'} = { %{$record ->{name}} };
+
+  # a check for latin name
+  my $input     = $app -> form_input;
+  my $full_name = $input ->{'full-name'};
+  ###  name characters check
+  if ( $full_name =~ /([^a-zA-Z\.,\-\s\'\(\)])/ ) {
+    debug ( "need latin name, because of '$1' char" );
+
+    if ( not $input -> {'name-latin'} ) {
+      $app -> userlog( "require latin name" );
+      $app -> form_required_absent ( 'name-latin' );
+      $app -> clear_process_queue;
+    } 
+  }  
 }
 
 
@@ -109,7 +122,6 @@ sub name_screen_process2 {
   debug "running personal data screen";
   
   my $variations = $app -> get_form_value ('name-variations');
-
   $variations =~ s/ +/ /g;
   $variations = [ split /\s*[\n\r]+/, $variations ];
   
@@ -118,42 +130,18 @@ sub name_screen_process2 {
   my $name    = $record -> {name};
 
   $name -> {'additional-variations'} = $variations;
-
   ACIS::Web::Person::compile_name_variations( $app, $record );
 
-
   ###  check if anything really changed
-  my $change_flag = 0;
   my $old_name = $session ->{'name-data-old'};
-
   foreach ( qw( full latin last ) ) {
-    if ( defined $name ->{$_} 
+    if ( defined $name ->{$_}    # XXX undef a name part and it won't be checked for change
          and $old_name ->{$_} ne $name ->{$_} ) {
-      $change_flag = 1;
+      ###  remember the change
+      $name ->{'last-change-date'} = time;
       debug "name data changed: $_";
     }
   }
-
-  if ( $change_flag ) {
-    ###  remember the change
-    $name ->{'last-change-date'} = time;
-  }
-
-
-  my $full_name = $name ->{full};
-
-  ###  name characters check
-  if ( $full_name =~ /([^a-zA-Z\.,\-\s\'\(\)])/ ) {
-    debug ( "need latin name, because of '$1' char" );
-    $app -> userlog( "need latin name, because of '$1' char" );
-
-    if ( not $app -> form_input() -> {'name-latin'} ) {
-      $app -> form_required_absent ( 'name-latin' );
-      return;
-    } 
-  }    
-
-
   delete $session ->{'name-data-old'};
 
   if ( $app -> request ->{params} ->{back} ) {
