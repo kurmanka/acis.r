@@ -27,7 +27,7 @@ package ACIS::Web::Person;  ### -*-perl-*-
 #  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 #
 #  ---
-#  $Id: Person.pm,v 2.3 2006/10/09 21:35:17 ivan Exp $
+#  $Id: Person.pm,v 2.4 2006/12/17 19:43:07 ivan Exp $
 #  ---
 
 use strict;
@@ -140,21 +140,22 @@ sub bring_up_to_date {
   debug "bring up to date $record->{id}";
 
   ###  name branch
-
-  if ( not $record -> {name}{'variations-fixed'} ) {
+  my $name = $record -> {name};
+  if ( not $name->{'variations-fixed'} ) {
     auto_fix_name_variations( $app, $record );
     compile_name_variations( $app, $record );
     $record ->{name}{'variations-fixed'} = 1;
   }
-
+  if ( not $name->{latin} ) {
+    if ( $name->{full} =~ /([^a-zA-Z\.,\-\s\'\(\)])/ ) {
+      my $sid = $record->{sid};
+      debug "latin name is missing!";
+      $app -> errlog( "[$sid] latin name is missing!" );
+    }
+  }
   delete $record ->{'full-name'};
   delete $record ->{'name-variations'};
 
-  if ( exists $record ->{'sci-fields'} ) {
-    $record -> {interests}{freetext} = $record -> {'sci-fields'};
-    delete $record -> {'sci-fields'};
-  }
-  
   if ( not exists $record -> {id} ) {
     $record ->{id} = $record ->{handle};
   }
