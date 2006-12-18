@@ -26,7 +26,7 @@ package ACIS::Web::User; ### -*-perl-*-
 #  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 #
 #  ---
-#  $Id: User.pm,v 2.5 2006/12/17 19:40:22 ivan Exp $
+#  $Id: User.pm,v 2.6 2006/12/18 13:26:29 ivan Exp $
 #  ---
 
 
@@ -135,12 +135,16 @@ sub name_screen_process2 {
   ###  check if anything really changed
   my $old_name = $session ->{'name-data-old'};
   foreach ( qw( full latin last ) ) {
-    if ( defined $name ->{$_}    # XXX undef a name part and it won't be checked for change
-         and $old_name ->{$_} ne $name ->{$_} ) {
-      ###  remember the change
-      $name ->{'last-change-date'} = time;
-      debug "name data changed: $_";
-    }
+    if (     defined $name    ->{$_}  
+         and defined $old_name->{$_}  
+         and $old_name->{$_} eq $name->{$_} ) { next; }
+    if (     not defined $name->{$_} 
+         and not defined $old_name->{$_} ) { next; }
+    
+    # else:
+    ###  note the difference, remember the change
+    $name ->{'last-change-date'} = time;
+    debug "name data changed: $_";
   }
   delete $session ->{'name-data-old'};
 
