@@ -25,7 +25,7 @@ package ACIS::Web;   ### -*-perl-*-
 #  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 #
 #  ---
-#  $Id: Web.pm,v 2.8 2006/10/09 21:35:17 ivan Exp $
+#  $Id: Web.pm,v 2.9 2006/12/18 13:25:42 ivan Exp $
 #  ---
 
 
@@ -296,7 +296,7 @@ sub set_authentication_cookie {
 
   $app -> set_cookie( -name  => $name,
                       -value => $value,
-                      -expires => ($clear) ? '0m' : '+6M',
+                      -expires => ($clear) ? '+0m' : '+6M',
                     );
 }
 

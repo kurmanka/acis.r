@@ -28,7 +28,7 @@ package ACIS::Web;   ### -*-perl-*-
 #  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 #
 #  ---
-#  $Id: Services.pm,v 2.16 2006/10/09 21:35:17 ivan Exp $
+#  $Id: Services.pm,v 2.17 2006/12/18 13:25:39 ivan Exp $
 #  ---
 
 use strict;
@@ -229,7 +229,7 @@ sub clear_session_cookie {
   my $self = shift;
   $self -> set_cookie( -name  => 'session',
                        -value => '',
-                       -expires => '0m',
+                       -expires => '+0m',
                      );
 }
 
