@@ -26,7 +26,7 @@ package Web::App::Session; ### -*-perl-*-
 #  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 #
 #  ---
-#  $Id: Session.pm,v 2.2 2006/10/10 16:13:10 ivan Exp $
+#  $Id: Session.pm,v 2.3 2006/12/18 13:25:09 ivan Exp $
 #  ---
 
 
@@ -276,7 +276,7 @@ sub save_value_to_path {
 }
 
 
-
+use Carp;
 
 sub object_set { 
   my $self   = shift;
@@ -297,7 +297,7 @@ sub object_set {
     my $lock = "$file.lock";
     my $mode = ">";
     if ( -f $lock ) {
-      warn "lock file $lock present\n";
+      Carp::cluck( "lock file $lock present\n" );
       $mode = ">>";  ### That's what I could do, but its tricky.  Ideally, I
                      ### shall check if such session exists...
 
