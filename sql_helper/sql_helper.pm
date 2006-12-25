@@ -1,5 +1,5 @@
 package sql_helper;
-# $Id: sql_helper.pm,v 2.3 2006/07/10 18:59:03 ivan Exp $
+# $Id: sql_helper.pm,v 2.4 2006/12/25 19:14:16 ivan Exp $
 
 use DBI;
 # ? just for early detection of DBD::mysql absence
@@ -26,7 +26,6 @@ use vars qw(
  $DB_H $CONNECTED $ERROR $LOG
  %STATEMENTS 
  $QUERY $PARAMS
- $VERBOSE_LOG
  @OBJECTS
 );
 
@@ -347,7 +346,6 @@ sub prepare {
       goto TRY;
     }
     if ( not $r or $@ 
-#        or $VERBOSE_LOG 
        ) {
       $self->query_log ( "prepare result: " , $errstr );
     }

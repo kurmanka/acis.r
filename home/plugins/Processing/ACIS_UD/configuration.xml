@@ -256,6 +256,7 @@
   <!-- Stage C: Citations -->
 
   <table name='acis:citations'>
+    <field name='citid'           sql-type='SERIAL'/> <!-- BIGINT UNSIGNED NOT NULL AUTO_INCREMENT UNIQUE -->
     <field name='srcdocsid'       sql-type='CHAR(15) NOT NULL'/>
     <field name='checksum'        sql-type='CHAR(22) NOT NULL'/>
     <field name='ostring'         sql-type='TEXT NOT NULL'/>
@@ -276,12 +277,10 @@
     <field name='similar'        sql-type='TINYINT UNSIGNED'/>
     <field name='new'            sql-type='BOOL'/>
     <field name='time'           sql-type='DATE NOT NULL'/>
-
     <create-table-sql>
       PRIMARY KEY (srcdocsid, checksum, psid, dsid, reason),
       INDEX(psid), INDEX(dsid)
     </create-table-sql>
-
   </table>
 
   <!-- history of citations -->
@@ -299,5 +298,40 @@
     </create-table-sql>
   </table>
 
+
+  <table name='acis:cit_doc_similarity'>
+    <field name='citid'   sql-type='BIGINT UNSIGNED NOT NULL'/>
+    <field name='dsid'    sql-type='CHAR(15) NOT NULL'/>
+    <field name='similar' sql-type='TINYINT NOT NULL'/>
+    <field name='time'    sql-type='DATETIME NOT NULL'/>
+    <create-table-sql>PRIMARY KEY (citid,dsid)</create-table-sql>
+  </table>
+
+  <table name='acis:cit_sug'>
+    <field name='citid'  sql-type='BIGINT UNSIGNED NOT NULL'/>
+    <field name='dsid'   sql-type='CHAR(15) NOT NULL'/>
+    <field name='reason' sql-type='CHAR(20) NOT NULL'/>
+    <field name='time'   sql-type='DATETIME NOT NULL'/>
+    <create-table-sql> PRIMARY KEY (citid,dsid,reason) </create-table-sql>
+  </table>
+
+  <table name='acis:cit_old_sug'>
+     <field name='psid'  sql-type='CHAR(15) NOT NULL'/>
+     <field name='dsid'  sql-type='CHAR(15) NOT NULL'/>
+     <field name='citid' sql-type='BIGINT UNSIGNED NOT NULL'/>
+     <create-table-sql> PRIMARY KEY (psid,dsid,citid) </create-table-sql>
+  </table>
+
   
+  <table name='acis:cit_accepted'><!-- ? -->
+    <field name='psid'/>
+    <field name='citid'/>
+    <field name='dsid'/>
+    <field name='time'/>
+    <field name='auto'/>
+  </table>
+
+  <table name='acis:cit_refused'>
+  </table>
+
 </configuration>

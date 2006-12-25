@@ -116,6 +116,7 @@ home/bin/templates/upgrade_to_1.4.90.pl
 home/bin/templates/upgrade_to_1.4.95.pl
 home/bin/templates/upgrade_to_1.5.3.pl
 home/bin/templates/upgrade_to_1.5.4.pl
+home/bin/templates/upgrade_to_1.5.7.pl
 home/configuration.xml
 home/contributions.conf.xml
 home/plugins/Processing/ACIS_UD/configuration.xml
@@ -228,6 +229,7 @@ install.sh
 lib/ACIS/APU.pm
 lib/ACIS/APU/Queue.pm
 lib/ACIS/Citations/AutoUpdate.pm
+lib/ACIS/Citations/CitDocSim.pm
 lib/ACIS/Citations/Events.pm
 lib/ACIS/Citations/Input.pm
 lib/ACIS/Citations/Profile.pm

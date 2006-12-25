@@ -22,6 +22,7 @@ use vars qw( @EXPORT );
               load_citation_details
               select_citations_sql
               coauthor_suggestion_similarity
+              preidentified_suggestion_similarity
              );
 
 
@@ -292,7 +293,8 @@ sub min_useful_similarity() {
   }
 }
 
-sub coauthor_suggestion_similarity { 85; }  # YYY should be configurable?
+sub coauthor_suggestion_similarity { 85; }  # XXX should be configurable?
+sub preidentified_suggestion_similarity { 85; }  # XXX should be configurable?
 
 
 use POSIX qw(strftime);
@@ -441,6 +443,25 @@ sub unrefuse_citation_by_cid($$) {
   }
 
   return $citation;
+}
+
+
+my $bell;  # YYY potentially a problem for long-running persistent environments
+sub time_to_recompare_cit_doc($) {
+  my ($lts) = shift; # last time string
+
+  require Date::Manip;
+  if ( not $bell ) { 
+    die if not $ACIS::Web::ACIS;
+    my $app = $ACIS::Web::ACIS;
+    my $ttl = $app-> config( 'citation-document-similarity-ttl' ) || die;
+    $bell = Date::Manip::DateCalc( "today", "- $ttl days" ) || die;
+  }
+  my $sdate = Date::Manip::ParseDate( $lts );
+  if ( Date::Manip::Date_Cmp( $sdate, $bell ) < 0 ) {
+    return 1;
+  } 
+  return 0;  
 }
 
 
