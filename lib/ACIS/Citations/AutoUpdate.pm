@@ -11,7 +11,6 @@ use ACIS::Citations::Utils;
 use ACIS::Citations::Search qw( personal_search_by_names 
                                 personal_search_by_documents 
                                 personal_search_by_coauthors );
-use ACIS::Citations::SimMatrix qw( load_similarity_matrix );
 use Web::App::Email;
 use ACIS::Web::SysProfile;
 
@@ -22,8 +21,6 @@ use ACIS::APU qw(&logit);
 
 sub auto_processing {
   my $acis = shift || die;
-
-  my $pretend = shift; # XXX not implemented yet
 
   my $session = $acis -> session || die;
   my $vars    = $acis -> variables;
@@ -36,14 +33,9 @@ sub auto_processing {
 
   logit "citations search for ", $rec->{sid};
 
-  my $mat   = load_similarity_matrix( $rec->{sid} );
-  
-  $mat -> upgrade( $acis, $rec );
-  $mat -> run_maintenance( $pretend );
-
-  my $add_by_doc    = personal_search_by_documents( $rec, $mat, $pretend ) || [];
-  my $add_by_names  = personal_search_by_names(     $rec, $mat, $pretend ) || [];
-  my $add_by_coauth = personal_search_by_coauthors( $rec, $mat, $pretend ) || [];
+  my $add_by_doc    = personal_search_by_documents( $rec ) || [];
+  my $add_by_names  = personal_search_by_names(     $rec ) || [];
+  my $add_by_coauth = personal_search_by_coauthors( $rec ) || [];
 
   if ( scalar @$add_by_doc 
        or scalar @$add_by_names
@@ -110,12 +102,6 @@ sub auto_processing {
         $params{-bcc} = $acis -> config( "admin-email" );
       }
       
-      if ( $pretend ) {
-        $params{-to} =  $acis -> config( "admin-email" );
-        undef $params{-bcc};
-        $params{'-pretend-mode'} = 'yes';
-      }
-      
       require Web::App::Email;
       Web::App::Email::send_mail( $acis, "email/citations-auto-profile-update.xsl", %params );
       debug "email sent";
@@ -128,9 +114,7 @@ sub auto_processing {
     
   }
 
-  put_sysprof_value( $sid, "last-auto-citations-time", time )
-    if not $pretend;
-
+  put_sysprof_value( $sid, "last-auto-citations-time", time );
 }
 
 

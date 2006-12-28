@@ -10,7 +10,7 @@ use ACIS::Citations::Utils;
 use base qw( Exporter );
 use Exporter;
 use vars qw( @EXPORT );
-@EXPORT = qw( make_docs compare_citation_to_docs );
+@EXPORT = qw( make_docs compare_citation_to_docs compare_citation_to_doc );
 
 sub make_docs ($) {
   my $rec = shift || die;
@@ -37,6 +37,7 @@ sub make_docs ($) {
 sub compare_citation_to_docs {
   my $cit  = shift || die;
   my $docs = shift || die;
+  my $flag = shift || '';  # can be: 'includezero'
   
   my @res;
   debug "compare_citation_do_docs()";
@@ -78,11 +79,35 @@ sub compare_citation_to_docs {
 
   my @d = keys %$sims;
   @d = sort { $sims->{$b} <=> $sims->{$a} } @d;
-  @d = grep { $sims->{$_} } @d;
+  if ( $flag ne 'includezero' ) {
+    @d = grep { $sims->{$_} } @d;
+  }
   @res = map { $_, $sims->{$_} } @d;
 
   return @res;
 }
+
+
+sub compare_citation_to_doc($$) {
+  my $cit = shift || die;
+  my $doc = shift || die;
+  my $dsid = $doc->{sid} || die;
+
+  die if not $ACIS::Web::ACIS;
+  my $acis = $ACIS::Web::ACIS;
+  my $func = $acis -> config( 'citation-document-similarity-func' ) 
+    || 'ACIS::Citations::Utils::cit_document_similarity';
+  
+  my $similarity;
+  {
+    no strict 'refs';
+    $similarity = sprintf( '%u', &{$func}( $cit, $doc ) * 100 );
+  }
+  debug "similarity computed: $similarity";
+  store_cit_doc_similarity( $cit->{citid}, $dsid, $similarity );
+  return $similarity;
+}
+
 
 
 

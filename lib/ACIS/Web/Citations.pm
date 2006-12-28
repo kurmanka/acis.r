@@ -8,7 +8,7 @@ use Carp::Assert;
 use Web::App::Common;
 
 use ACIS::Citations::Utils;
-use ACIS::Citations::Suggestions qw( suggest_citation_to_coauthors );
+use ACIS::Citations::Suggestions qw( store_cit_sug add_cit_old_sug );
 use ACIS::Citations::SimMatrix;
 use ACIS::Citations::Search;
 
@@ -57,7 +57,8 @@ sub prepare() {
   $research_accepted = $record ->{contributions}{accepted} || [];
   if ( scalar @$research_accepted == 0 ) { $vars->{'empty-research-profile'} = 1; }
 
-  $mat = $session ->{simmatrix} ||= load_similarity_matrix( $sid ); 
+#  $mat = $session ->{simmatrix} ||= load_similarity_matrix( $record ); 
+  $mat = $session ->{simmatrix}   = load_similarity_matrix( $record ); 
   $mat -> upgrade( $acis, $record );
 
   $dsid = $params->{dsid} || $acis->{request}{subscreen};
@@ -169,7 +170,8 @@ sub process_potential {
 
     $mat -> remove_citation( $cit );
     identify_citation_to_doc($record, $dsid, $cit);
-    suggest_citation_to_coauthors( $cit, $sid, $dsid );
+    store_cit_sug( $cit->{citid}, $dsid, "coauth:$sid" );
+    add_cit_old_sug( $sid, $dsid, $cit->{citid} );
     $added ++;
   }
 
@@ -224,6 +226,7 @@ sub process_refuse {
 
     $mat -> remove_citation( $cit );
     refuse_citation($record, $cit);
+    add_cit_old_sug($sid, $dsid, $cit->{citid});
     $counter ++;
   }
 
@@ -275,12 +278,13 @@ sub process_identified {
     $cit->{nstring} = make_citation_nstring $cit->{ostring};
     assert( $cit->{nstring} );
     assert( $cit->{srcdocsid} );
+    add_cit_old_sug( $sid, $dsid, $cit->{citid} );
     if ( $cit ) {
       warn("gone!"), delete $cit->{gone} if $cit->{gone};
       push @citations, $cit;
     }
   }
-  $mat -> add_new_citations( \@citations );
+  $mat -> consider_new_citations( \@citations );
 
   if ( scalar @citations > 1 )  {    $acis -> message( "deleted-citations" ); }
   elsif ( scalar @citations == 1 ) { $acis -> message( "deleted-citation"  ); }
@@ -423,7 +427,7 @@ sub process_refused {
       push @citations, $cit;
     }
   }
-  $mat -> add_new_citations( \@citations );
+  $mat -> consider_new_citations( \@citations );
 
   if ( scalar @citations > 1 )  {    $acis -> message( "unrefused-citations" ); }
   elsif ( scalar @citations == 1 ) { $acis -> message( "unrefused-citation" );  }

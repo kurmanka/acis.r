@@ -256,7 +256,7 @@ input.light {
 
     <h1>No citations</h1>
 
-    <p>We are sorry to tell you that we have no potential
+    <p>We are sorry to tell you that we have no new potential
     citations data for the documents in your <a
     ref='@research/identified' >research profile</a>.</p>
 

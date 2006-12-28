@@ -7,7 +7,6 @@ use Carp;
 use Carp::Assert;
 use Scalar::Util qw( weaken );
 
-#  load_similarity_matrix( psid );
 #  get_most_interesting_document( psid );
 
 use Exporter;
@@ -26,35 +25,63 @@ use ACIS::Citations::Suggestions qw( get_cit_doc_similarity
                  clear_cit_sug
                  add_cit_old_sug
                  clear_cit_old_sug           
+                 get_cit_old_status
                  load_similarity_suggestions
                  load_nonsimilarity_suggestions
                                   );
 use ACIS::Citations::Utils qw( today cid min_useful_similarity 
                                coauthor_suggestion_similarity
-                               preidentified_suggestion_similarity );
+                               preidentified_suggestion_similarity 
+                               build_citations_index
+                            );
 
 sub DEBUG_SIMMATRIX_CONSISTENCY { 1; } ### YYY debug until we are 100% sure
 
 
-sub load_similarity_matrix($$;$) {
-  my $psid      = shift || die;
-  my $dsid_list = shift || die;
-  my $filters   = shift || []; # each item is a hash of long cit ids ("srcdocsid-checksum")
+sub make_identified_n_refused ($) {
+  my $rec = shift || die;
+  my $identified = {};
+  my $refused    = {};
+  my $identified_hl = $rec->{citations}{identified} || {};
+  my $refused_l     = $rec->{citations}{refused}    || [];
+    
+  foreach ( keys %$identified_hl ) {
+    my $list = $identified_hl ->{$_};
+    build_citations_index $list, $identified;
+  }
+  $refused = build_citations_index $refused_l;
+  return( $identified, $refused );
+}
+
+use Data::Dumper;
+sub load_similarity_matrix($) {
+  my $record = shift || die;
+  my $psid = $record->{sid};
 
   debug "load_similarity_matrix() for rec $psid";
-  my $sug1  = load_similarity_suggestions( $psid, $dsid_list );
-  my $sug2  = load_nonsimilarity_suggestions( $psid, $dsid_list );
+  my ($f1, $f2) = make_identified_n_refused($record); # each ($f1,$f2) is a hash of long cit ids ("srcdocsid-checksum")
+
+  my $rp = $record->{contributions}{accepted} ||= [];
+  my $dsid_list = [ grep {defined} map { $_->{sid} } @$rp ];
+#  debug "dsid_list: ", join( ' ', @$dsid_list );
+
+  my $sug1 = load_similarity_suggestions( $psid, $dsid_list );
+  my $sug2 = load_nonsimilarity_suggestions( $psid, $dsid_list );
+  my $coauth = "coauth:$psid";
+  @$sug2 = grep { not $_->{reason} eq $coauth } @$sug2;
+
   my $mat  = { new => {}, old => {}, psid => $psid, citations=>{} };
   bless $mat;
 
   my @sug;
-  foreach my $f ( @$filters ) { 
-    @sug = grep { not exists $f->{ $_->{srcdocsid} . '-' . $_->{checksum} } } @$sug1, @$sug2;
-  }
+  @sug = grep { my $id = $_->{srcdocsid} . '-' . $_->{checksum}; 
+                not exists $f1->{$id} and not exists $f2->{$id} } @$sug1, @$sug2;
 
-  foreach ( @sug ) {
-    $mat -> _add_sug( $_ );
-  }
+  my $before_filter = scalar(@$sug1) + scalar( @$sug2);
+  my $after_filter  = scalar @sug;
+  debug "filtering: before:$before_filter after:$after_filter";
+
+  foreach ( @sug ) {  $mat -> _add_sug( $_ );  }
   
   $mat -> _calculate_totals;
   return $mat;
@@ -62,39 +89,42 @@ sub load_similarity_matrix($$;$) {
 
 
 
-
+use Carp;
 # for internal usage: add a suggestion to the matrix
 sub _add_sug {
   my $self = shift || die;
   my $sug  = shift || die;
+
+  debug "_add_sug()";
+
+  if ( not $sug->{srcdocsid} ) {  Carp::croak "citation without srcdocsid";  }
+  if ( not $sug->{checksum}  ) {  Carp::croak "citation without checksum";  }
   
   my $d      = $sug ->{dsid} || die;
   my $newold = ($sug->{new}) ? 'new' : 'old';
+  debug "$newold for $d";
 
   if ( $sug->{reason} eq 'preidentified' ) {
     $sug->{similar} = preidentified_suggestion_similarity; 
-  } elsif ( $sug->{reason} =~ m!co\-?auth! ) { 
+  } elsif ( $sug->{reason} =~ m!^coauth! ) { 
     $sug->{similar} = coauthor_suggestion_similarity; 
   }
 
+  # clear redundant bits
+  delete $sug->{dsid};
+  delete $sug->{psid};
+  delete $sug->{new};
+
+  my $dlist = $self->{$newold}{$d} ||= [];
+  push @$dlist, $sug;
+
+  # maintain an index
+  my $cid = $sug->{srcdocsid} . '-' . $sug->{checksum};
   my $known = $self->{citations};
-
-  for ( $self->{$newold}{$d} ) {
-    if ( not $_ ) { $_ = []; }
-    push @$_, $sug;
-
-    # maintain an index
-    my $cid = $sug->{srcdocsid} . '-' . $sug->{checksum};
-    my $cindex = $known->{$cid}{$d} ||= [];
-    my $pair = [ $newold, $sug ];
-    weaken( $pair->[1] );
-    push @$cindex, $pair;
-
-    # clear redundant bits
-    delete $sug->{dsid};
-    delete $sug->{psid};
-    delete $sug->{new};
-  }
+  my $cindex = $known->{$cid}{$d} ||= [];
+  my $pair = [ $newold, $sug ];
+  weaken( $pair->[1] );
+  push @$cindex, $pair;
 }
 
 
@@ -166,12 +196,12 @@ sub filter_out_known {
 
   foreach ( @$list ) {
     my $citation = $_;
+    my $clid = $citation->{srcdocsid} . '-' . $citation->{checksum};
     my $found;
     if ( $_->{citid} and $old_citids{$_->{citid}} ) { 
       $found = 1;
 
     } else {
-      my $clid = $citation->{srcdocsid} . '-' . $citation->{checksum};
       if ( not $citindex->{$clid} ) { next; }
       $found = 1; 
     }
@@ -195,10 +225,13 @@ sub testme {
   require ACIS::Web;
   my $acis = ACIS::Web->new;
 
-  my $psid = 'ptestsid0';
-  my $rp   = [ qw( dbar3 dloc11 ddec1 ) ];
-  my $m    = load_similarity_matrix( $psid, $rp ); 
-  print Data::Dumper::Dumper( $m );
+# XXX this won't work anymore, because we now need a record to load a
+#     matrix
+#  my $psid = 'ptestsid0';
+#  my $rplist = [ qw( dbar3 dloc11 ddec1 ) ];
+#  my $m    = load_similarity_matrix( $psid, $rplist ); 
+#  print Data::Dumper::Dumper( $m );
+  
 }
 
 
@@ -269,193 +302,78 @@ sub find_sugg {
 }
 
 
-sub add_sugg {
-  my $self   = shift || die;
-  my $cit    = shift || die;
-  my $dsid   = shift || die;
-  my $reason = shift || die;
-  my $sim    = shift;
-  my $pretend= shift;
-
-  my $psid = $self->{psid} || die;
-  my $l    = $self->{new} {$dsid} ||= [];
-
-  my $sug = { %$cit, reason => $reason, similar => $sim, time => today() };
-  push @$l, $sug;
-  delete $sug->{nstring};
-  delete $sug->{trgdocid};
-
-  if ( $reason eq 'preidentified' ) {
-    store_cit_sug( $cit->{citid}, $dsid, $reason );
-  } elsif ( $reason eq 'similar' ) {
-  }
-
-  # maintain the index
-  my $known = $self->{citations};
-  my $cid   = $sug->{srcdocsid} . '-' . $sug->{checksum};
-  my $cindex = $known->{$cid}{$dsid} ||= [];
-  push @$cindex, [ 'new', $sug ];
-}
-
-
-sub set_similarity_unused {
-  my $self = shift || die;
-  my $cit  = shift || die;
-  my $dsid = shift || die;
-  my $sim  = shift;
-  my $new  = shift;
-
-  my $l = $self->{new} {$dsid} ||= [];
-  if ( not $new ) {
-    $l = $self->{old} {$dsid} ||= [];
-  }
-  
-  my $found;
-  foreach ( @$l ) {
-    if ( $_ ->{srcdocsid} eq $cit->{srcdocsid} 
-         and $_->{checksum} eq $cit->{checksum} ) {
-      $_ ->{similar} = $sim;
-      $found = 1;
-    }
-  }
-
-  if ( not $found ) {
-    die "set_similarity(): suggestion was not found";
-#    my $sug = { %$cit, reason => "similar", similar => $sim };
-#    push @$l, $sug;
-  }
-
-  replace_suggestion( $cit, $self->{psid}, $dsid, "similar", $sim, $new );
-
-#  warn "suggestion was not found" if not $found;
-}
-
-use Data::Dumper;
-sub _docs {
-  my $self = shift || die;
-  my $docs = $self-> {docs};
-  if ( not $docs ) {
-    ### prepare doc objects, as per Similarity assessment function interface
-    $docs = {};
-    my $rp = $rec ->{contributions}{accepted} || [];
-    foreach ( @$rp ) {
-      my $sid = $_->{sid};
-      if ( not $sid ) {
-        warn "accepted contribution: ", Dumper( $_ ), " with no sid";
-        if ( $rec ) { warn "context: $rec->{id}\n"; }
-        next;
-      }
-      my $doc = { %$_ };
-      my $authors = $doc->{authors} || '';
-      $doc->{authors} = [ split / \& /, $authors ];
-      if ( not $doc->{location} ) { }  # YYY - so what? 
-      $docs -> {$sid} = $doc;
-    }
-    $self->{docs} = $docs;
-  }
-  return $docs;
-}
+use ACIS::Citations::CitDocSim;
 
 sub compare_citation_to_documents {
   my $self = shift || die;
   my $cit  = shift || die;
-  my $pretend = shift;
   my $force_comparison = shift;
 
   debug "compare_citation_do_documents()";
 
-  my $docs = $self -> _docs;
+  delete $cit->{autoaddreason};
+  delete $cit->{autoadded};
+
+  my $docs = $self->{_docs} ||= make_docs( $rec );
   debug "documents: ", join ' ', keys %$docs;
+  my $psid = $rec->{sid} || die;
 
-  my $psid = $self->{psid} || die;
-  die if not $acis;
-  my $func = $acis->config( 'citation-document-similarity-func' ) 
-    || 'ACIS::Citations::Utils::cit_document_similarity';
-
-  debug "will use similarity function: $func";
-
-  my $citid = $cit->{citid} || die "citation must have numeric non-zero citid";
-  
-  while ( my( $dsid, $doc ) = each %$docs ) {
-
-    my ($no, $sug) = $self->find_sugg( $cit, $dsid, 'similar' );
-
-    if ( $sug ) {
-      debug "citation is known for $dsid";
-      my $t = $sug->{time};
-
-      if ( ACIS::Citations::Utils::time_to_recompare_cit_doc( $t ) ) {
-        no strict 'refs';
-        my $similarity = sprintf( '%u', &{$func}( $cit, $doc ) * 100 );
-        debug "similarity: $similarity";
-        store_cit_doc_similarity( $citid, $dsid, $similarity )
-          unless $pretend;
-
-        $sug -> {similar} = $similarity;
-        $sug -> {time} = today();
+  my $recalc;
+  my %res = compare_citation_to_docs( $cit, $docs, 'includezero' );
+  foreach ( keys %res ) {
+    my $dsid = $_;
+    my $v = $res{$_};
+    if ( $v ) {
+      debug "for $dsid: $v";
+    }
+    warn "bad compare_citation_to_docs() result" if not $dsid or not defined $v;
+    die if not $dsid or not defined $v;
+    my (undef, $suggestion) = $self-> find_sugg( $cit, $dsid, 'similar' );
+    if ( $suggestion ) {
+      debug "found it in the matrix!";
+      # update the suggestion
+      if ( $suggestion->{similarity} != $v ) {
+        $recalc = 1; # XX if the suggestion is old, this is not necessary
+        $suggestion->{similarity} = $v;
+        $suggestion->{time} = today();
       }
+
+    } elsif ( $v ) {
+      debug "add the suggestion";
+      my $new = not get_cit_old_status( $psid, $dsid, $cit->{citid} );
+      $self->_add_sug( { %$cit, dsid=> $dsid, reason=> 'similar', similar=> $v, new=>$new, time=>today() } );
+      $recalc = 1;
 
     } else {
-      debug "comparing to $dsid (", $doc->{title}, ")";
-      
-      my ($similarity,$t) = get_cit_doc_similarity( $citid, $dsid );
-     
-      if ( ACIS::Citations::Utils::time_to_recompare_cit_doc( $t ) ) {
-        undef $similarity;
-        debug "got from db: $similarity, but it is outdated; recompare";
-      }
-
-      if ( $similarity ) {
-        debug "got from db: $similarity";
-        
-      } else {
-        no strict 'refs';
-        $similarity = sprintf( '%u', &{$func}( $cit, $doc ) * 100 );
-        debug "similarity: $similarity";
-        store_cit_doc_similarity( $citid, $dsid, $similarity )
-          unless $pretend;
-      }
-      $self->add_sugg( $cit, $dsid, "similar", $similarity, $pretend );
-    } 
+      debug "nothing";
+    }
   }
 
+
+  debug "matrix: ", Dumper( $self );
+  $self->_calculate_totals if $recalc;
   return 1;
 }
 
 
-
-sub add_new_citations {
+sub consider_new_citations {
   my $self = shift || die;
   my $list = shift || die;
-  my $dsid    = shift;
-  my $reason  = shift;
-  my $pretend = shift; # do not add suggestions
 
-  my $psid = $self->{psid} || die;
-  
-  if ( $dsid ) {
-    foreach ( @$list ) {
-      $self->add_sugg( $_, $dsid, "preidentified", undef, $pretend );
-    }
-
-  } else {
-    ### run comparisons
-    foreach ( @$list ) {
-      assert( !$_->{gone} );
-      $self->compare_citation_to_documents( $_, $pretend );
-    }
+  ### run comparisons
+  foreach ( @$list ) {
+    assert( !$_->{gone} );
+    $self->compare_citation_to_documents( $_ );
   }
 
   $self -> _calculate_totals;
   $self -> check_consistency
-    if not $pretend and not DEBUG_SIMMATRIX_CONSISTENCY;
-  
+    if DEBUG_SIMMATRIX_CONSISTENCY;
 }
 
 
 sub run_maintenance { 
   my $self = shift || die;
-  my $pretend=shift;
 
   die if not $acis;
   die if not $rec;
@@ -464,25 +382,28 @@ sub run_maintenance {
 
   my $new  = $self->{new};
   my $old  = $self->{old};
+  my $docs = $self->{_docs} || die;
 
   # should we really run maintenance now?  Maybe we did this
   # just recently?
-  my $lasttime = get_sysprof_value( $psid, "last-citations-prof-maint-time" );
-  if ( $lasttime and time - $lasttime < 2 * 24 * 60 * 60 ) {
-    debug "last maintenance was done less then 2 days ago";
+  my $lasttime = get_sysprof_value( $psid, "last-citations-simmatrix-maint-time" );
+  if ( $lasttime and time - $lasttime < 7 * 24 * 60 * 60 ) {
+    debug "last maintenance was done less then 7 days ago";
     return;
   }
  
   # re-run citation/document comparisons
   # for those suggestions which are more then the
-  # time-to-live days old, store them in db
+  # time-to-live days old
   
   # CONDITION: if cit->time is less than now() -
   # citation-document-similarity-ttl days
 
+  # do we need this?
   require Date::Manip; # qw( DateCalc ParseDate Date_Cmp );
   my $ttl = $acis-> config( 'citation-document-similarity-ttl' ) || die;
   my $bell = Date::Manip::DateCalc( "today", "- $ttl days" ) || die;
+  my $recalc;
 
   foreach my $hash ( $new, $old ) {
     while ( my ( $docsid, $list ) = each %$hash ) {
@@ -491,27 +412,23 @@ sub run_maintenance {
         next if $stime eq 'today';
         my $sdate = Date::Manip::ParseDate( $stime );
         if ( Date::Manip::Date_Cmp( $sdate, $bell ) < 0 ) {
-          # too old
-
-          # XXX this looks strange. the following line compares the
-          # citation to all the documents, but does it update {time} of
-          # those suggestions? - can we do without it?
-
-          $self->compare_citation_to_documents( $sug, $pretend );
-          debug "suggestion too old: ", $sug;
+          # too old, outdated
+          debug "suggestion is too old: ", $sug;
+          my $sv = compare_citation_to_doc( $sug, $docs->{$docsid} );
+          $sug->{similar} = $sv;
+          $sug->{time} = today();
+          $recalc = 1;
         }
       }
     }
   }
   
-  # recalculate totals now
-  $self -> _calculate_totals();
+  # recalculate totals (if needed)
+  $self -> _calculate_totals() if $recalc; 
   $self->check_consistency
-    if not $pretend and not DEBUG_SIMMATRIX_CONSISTENCY;
-
+    if DEBUG_SIMMATRIX_CONSISTENCY;
   # record the current date in the sysprof table
-  put_sysprof_value( $psid, "last-citations-prof-maint-time", time )
-    if not $pretend;
+  put_sysprof_value( $psid, "last-citations-simmatrix-maint-time", time );
 }
 
 sub remove_citation { 
@@ -542,7 +459,9 @@ sub remove_citation {
       my $no = $_->[0];
       my $su = $_->[1];
       $su ->{gone} = 1;
+      undef $_;
     }
+    undef $slist;
   }
 
   my $new = $self->{new};
@@ -569,8 +488,6 @@ sub citation_new_make_old {
   my $self = shift || die;
   my $dsid = shift || die;
   my $cit  = shift || die;
-#  my $par  = shift || die;
-#  my $val  = shift || die;
 
   my $cits = $self->{citations};
   my $new  = $self->{new};
@@ -599,7 +516,7 @@ sub citation_new_make_old {
   }
   
   my $psid = $self->{psid} || die;
-  add_cit_old_sug( $psid, $cit->{citid}, $dsid );
+  add_cit_old_sug( $psid, $dsid, $cit->{citid} );
 
   $self->_calculate_totals;
   $self->check_consistency if not DEBUG_SIMMATRIX_CONSISTENCY;
@@ -646,6 +563,7 @@ sub check_consistency {
 
   die if not $acis;
   die if not $rec;
+  
   my $psid = $self->{psid} || die;
   my $sql  = $acis->sql_object() || die;
 
@@ -657,8 +575,9 @@ sub check_consistency {
 
   # reload it from the database and see that it produces the
   # same matrix 
-  my $copy = load_similarity_matrix( $psid );
+  my $copy = load_similarity_matrix( $rec );
 
+  delete $self->{_docs};
   my $str1 = $self->as_string;
   my $str2 = $copy->as_string;
 
@@ -685,7 +604,7 @@ sub check_consistency {
   print $f2 $str2;
   close $f2;
 
-#  print "matrices are different; see " . $f1->filename . " and " . $f2->filename, "\n";
+  debug "matrices are different; see " . $f1->filename . " and " . $f2->filename;
   Carp::cluck "matrices are different; see " . $f1->filename . " and " . $f2->filename;
  
 
@@ -737,7 +656,20 @@ sub make_string ($;$) {
       $class = '';
     }
     my $s = '';
-    if ( UNIVERSAL::isa( $obj, 'HASH' ) ) {
+
+    if ( UNIVERSAL::isa( $obj, 'HASH' ) 
+         and exists $obj->{ostring} ) {
+      # special citation hash treatment
+      $s .= "HASH$class\n";
+      my @ks = sort keys %$obj;
+      foreach ( qw( citid srcdocsid checksum ostring reason similar ) ) {
+        $s .= "$prefix$_: ";
+        $s .= make_string( $obj->{$_}, "$prefix  " );
+        $s .= "\n";
+      }
+      $s .= "${prefix}HASH END\n";
+
+    } elsif ( UNIVERSAL::isa( $obj, 'HASH' ) ) {
       $s .= "HASH$class\n";
       my @ks = sort keys %$obj;
       foreach ( @ks ) {

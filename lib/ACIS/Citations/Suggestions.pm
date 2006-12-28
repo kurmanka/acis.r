@@ -3,6 +3,7 @@ package ACIS::Citations::Suggestions;
 use strict;
 use warnings;
 
+use Web::App::Common;
 use Exporter;
 use base qw( Exporter );
 use vars qw( @EXPORT_OK );
@@ -17,6 +18,7 @@ use vars qw( @EXPORT_OK );
                  get_cit_old_status
                  clear_cit_old_sug          
                  load_similarity_suggestions
+                 load_nonsimilarity_suggestions
               );
 
 
@@ -31,9 +33,9 @@ use vars qw( @EXPORT_OK );
 # - store_cit_sug( citid, docsid, reason )
 # - clear_cit_sug( citid, docsid, [reason] )
 
-# - add_cit_old_sug( psid, citid, dsid )
-# - get_cit_old_status( psid, citid, dsid )
-# - clear_cit_old_sug( psid, citid, [dsid] )
+# - add_cit_old_sug( psid, dsid, citid )
+# - get_cit_old_status( psid, dsid, citid )
+# - clear_cit_old_sug( psid, dsid, citid ) - not to be used
 
 #?:
 # - suggest_citation_to_coauthors( cit, psid, docid );
@@ -41,30 +43,25 @@ use vars qw( @EXPORT_OK );
 my $acis;
 my $sql;
 my $rdbname;
-my $select_suggestions;
 
 sub prepare() {
   $acis = $ACIS::Web::ACIS;
   $sql  = $acis -> sql_object;
   $rdbname = $acis->config( 'metadata-db-name' );
-  $select_suggestions = 
- "SELECT sug.*,citations.ostring,
-   res.id as srcdocid,res.title as srcdoctitle,res.authors as srcdocauthors,res.urlabout as srcdocurlabout
-  FROM cit_suggestions as sug LEFT JOIN citations USING (srcdocsid,checksum)
-  LEFT JOIN $rdbname.resources as res ON citations.srcdocsid=res.sid ";
-  ### Maybe also res.type? - at this time we don't need it
 }
 
 sub sql_select_sug {
   my $what  = shift;
   my $from  = shift;
+  my $joins = shift || '';
   my $where = shift;
   return "SELECT $what,
-citations.ostring,res.id as srcdocid,res.title as srcdoctitle,
+citations.ostring,citations.srcdocsid,citations.checksum,res.id as srcdocid,res.title as srcdoctitle,
 res.authors as srcdocauthors,res.urlabout as srcdocurlabout
 FROM $from 
-  LEFT JOIN citations USING (citid)
-  LEFT JOIN $rdbname.resources as res ON citations.srcdocsid=res.sid 
+  JOIN citations USING (citid)
+  JOIN $rdbname.resources as res ON citations.srcdocsid=res.sid 
+  $joins
 WHERE $where";
 }
 
@@ -176,15 +173,15 @@ sub clear_cit_sug ($$;$) {
 # cit_old_sug
 
 sub add_cit_old_sug ($$$) {
-  my ( $psid, $citid, $dsid ) = @_;
+  my ( $psid, $dsid, $citid ) = @_;
   if ( not $sql ) { prepare; }
   die if not $psid or not $citid or not $dsid;
-  $sql -> prepare_cached( "REPLACE INTO cit_old_sug VALUES (?,?,?)" );
-  $sql -> execute( $psid, $citid, $dsid );
+  $sql -> prepare_cached( "REPLACE INTO cit_old_sug (psid,dsid,citid) VALUES (?,?,?)" );
+  $sql -> execute( $psid, $dsid, $citid );
 }
 
-sub clear_cit_old_sug ($$$) {
-  my ( $psid, $citid, $dsid ) = @_;
+sub clear_cit_old_sug_XXX_NOT_TO_BE_USED ($$$) {
+  my ( $psid, $dsid, $citid ) = @_;
   if ( not $sql ) { prepare; }
   die if not $psid or not $citid or not $dsid;
   
@@ -200,11 +197,11 @@ sub clear_cit_old_sug ($$$) {
 }
 
 sub get_cit_old_status ($$$) {
-  my ( $psid, $citid, $dsid ) = @_;
+  my ( $psid, $dsid, $citid ) = @_;
   if ( not $sql ) { prepare; }
   die if not $citid or not $dsid or not $psid;
 
-  $sql -> prepare_cached( "select citid from cit_old where psid=? and citid=? and dsid=?" );
+  $sql -> prepare_cached( "select citid from cit_old_sug where psid=? and citid=? and dsid=?" );
   my $r = $sql -> execute( $psid, $citid, $dsid );
   return ( $r and $r->{row} );
 }
@@ -288,18 +285,21 @@ sub load_similarity_suggestions ($$) {
   my $dsidlist = shift;
   if ( not $sql ) { prepare; }
   my @slist = ();
+  debug "load_similarity_suggestions($psid,$dsidlist)";
   
   $sql -> prepare_cached( 
     sql_select_sug( "sim.*,old.dsid as oldflag", 
-                    "cit_doc_similarity as sim 
-                     LEFT JOIN cit_old_sug AS old ON (old.psid=? and old.citid=sim.citid and old.dsid=sim.dsid)",
-                    "sim.dsid=?" )
+                    "cit_doc_similarity as sim",
+                    "LEFT JOIN cit_old_sug AS old ON (old.psid=? and old.citid=sim.citid and old.dsid=sim.dsid)",
+                    "sim.dsid=? and sim.similar>0" )
   );
 
   foreach ( @$dsidlist ) {
+    debug "check sugs for $_";
     my $r = $sql -> execute( $psid, $_ );
 
     while ( $r and $r->{row} ) {
+      debug "found item: ", $r->{row}{citid} , ' / ', $r->{row}{similar};
       my $s = { %{ $r->{row} } };  # hash copy
       foreach ( qw( ostring srcdoctitle srcdocauthors ) ) {    
         $s->{$_} = Encode::decode_utf8( $r->{row}{$_} );
@@ -322,8 +322,8 @@ sub load_nonsimilarity_suggestions ($$) {
   
   $sql -> prepare_cached( 
     sql_select_sug( "csug.*,old.dsid as oldflag", 
-                    "cit_sug as csug 
-                     LEFT JOIN cit_old_sug AS old ON (old.psid=? and old.citid=csug.citid and old.dsid=csug.dsid)",
+                    "cit_sug as csug",
+                    "LEFT JOIN cit_old_sug AS old ON (old.psid=? and old.citid=csug.citid and old.dsid=csug.dsid)",
                     "csug.dsid=?" )
   );
 

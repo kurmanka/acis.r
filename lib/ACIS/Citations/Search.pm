@@ -218,6 +218,8 @@ sub personal_search_by_documents {
 
     if ( $autoadd ) {
       foreach ( @$r ) {
+        next if get_cit_old_status( $psid, $dsid, $_->{citid} );
+
         debug "citation: '", $_->{nstring} , "' is to be added to $dsid";
         $_->{autoadded}     = today(); # localtime( time );
         $_->{autoaddreason} = 'preidentified';
@@ -314,7 +316,7 @@ sub personal_search_by_names {
 
     if ( $autoadd 
          and $simity >= $sim_threshold 
-         and not get_cit_old_status( $psid, $citid, $target ) ) {
+         and not get_cit_old_status( $psid, $target, $citid ) ) {
 
       debug "citation: '", $citation->{nstring} , "' should be added to $target";
       $citation->{autoadded}     = today(); 
@@ -394,12 +396,14 @@ sub personal_search_by_coauthors {
     
     if ( $autoadd ) {
       foreach ( @$r ) {
+        next if get_cit_old_status( $psid, $dsid, $_->{citid} );
+
         debug "citation: '", $_->{nstring} , "' is to be added to $dsid";
         $_->{autoadded}     = today(); # localtime( time );
         $_->{autoaddreason} = 'coauthor-sug';
         identify_cit_to_doc( $rec, $dsid, $_ );
         push @added, [ $dsid, $_ ];
-    }
+      }
       
     } else {
       debug "citation: '", $_->{nstring} , "' should be suggested to $dsid";

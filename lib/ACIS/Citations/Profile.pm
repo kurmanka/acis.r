@@ -68,7 +68,7 @@ sub profile_check_and_cleanup () {
       debug "delete citations for $_";
       next;
     }
-    $sql -> prepare_cached( "select srcdocsid from citations where srcdocsid=? and checksum=?" );
+    $sql -> prepare_cached( "select citid,srcdocsid from citations where srcdocsid=? and checksum=?" );
     my $cits = $identified->{$_};
     foreach (@$cits) {
       if ( not $_->{srcdocsid} or not $_->{checksum} ) { 
@@ -77,7 +77,8 @@ sub profile_check_and_cleanup () {
       }
       my $r = $sql->execute( $_->{srcdocsid}, $_->{checksum} );
       if ( $r and $r->{row} and $r->{row}{srcdocsid} ) {
-        # ok
+        # ok; update citid
+        $_->{citid} = $r->{row}{citid};
         
       } elsif ( $r )  {
         undef $_;
