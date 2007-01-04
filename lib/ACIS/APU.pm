@@ -175,7 +175,8 @@ sub run_apu_by_queue {
       ###  4th parameter position
       $res = ACIS::Web::Admin::offline_userdata_service
                         ( $ACIS, $login, 'ACIS::APU::record_apu', $rid, $class ) 
-                          || 'no';
+                          || 'FAIL';
+      if ($@) { $notes = $@; }
     };
     if ( $@ ) {
       $res   = "FAIL"; 

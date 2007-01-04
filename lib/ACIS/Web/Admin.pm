@@ -25,7 +25,7 @@ package ACIS::Web::Admin;   ### -*-perl-*-
 #  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 #
 #  ---
-#  $Id: Admin.pm,v 2.11 2006/08/07 17:41:18 ivan Exp $
+#  $Id: Admin.pm,v 2.12 2007/01/04 10:03:32 ivan Exp $
 #  ---
 
 
@@ -321,6 +321,7 @@ sub offline_userdata_service {
   };
   if ( $@ ) {
     debug "offline service failed: $@";
+    $acis-> errlog( "offline service failed: $@"; )
   }
 
   ###  close session
