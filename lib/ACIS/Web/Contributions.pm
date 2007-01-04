@@ -25,7 +25,7 @@ package ACIS::Web::Contributions;  ### -*-perl-*-
 #  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 #
 #  ---
-#  $Id: Contributions.pm,v 2.25 2006/12/11 11:57:41 ivan Exp $
+#  $Id: Contributions.pm,v 2.26 2007/01/04 10:02:35 ivan Exp $
 #  ---
 
 use strict;
@@ -2006,7 +2006,7 @@ sub search_documents {
 
 
 
-
+use Data::Dumper;
 
 sub process_resources_search_results {
   my $sqlres  = shift;
