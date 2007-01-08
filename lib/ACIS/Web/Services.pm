@@ -28,7 +28,7 @@ package ACIS::Web;   ### -*-perl-*-
 #  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 #
 #  ---
-#  $Id: Services.pm,v 2.17 2006/12/18 13:25:39 ivan Exp $
+#  $Id: Services.pm,v 2.18 2007/01/08 12:08:21 ivan Exp $
 #  ---
 
 use strict;
@@ -213,7 +213,7 @@ sub logoff_session {
 
   $self -> clear_session_cookie;
 
-  undef $self -> request -> {'session-id'};
+  if ( $self->request ) { undef $self -> request -> {'session-id'}; }
   undef $self -> {session};
 }
 

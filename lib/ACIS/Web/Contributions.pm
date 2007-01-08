@@ -25,7 +25,7 @@ package ACIS::Web::Contributions;  ### -*-perl-*-
 #  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 #
 #  ---
-#  $Id: Contributions.pm,v 2.26 2007/01/04 10:02:35 ivan Exp $
+#  $Id: Contributions.pm,v 2.27 2007/01/08 12:08:21 ivan Exp $
 #  ---
 
 use strict;
@@ -2009,7 +2009,7 @@ sub search_documents {
 use Data::Dumper;
 
 sub process_resources_search_results {
-  my $sqlres  = shift;
+  my $sqlres  = shift || die;
   my $context = shift;
 
   my $result  = shift;  ## array ref
@@ -2019,9 +2019,11 @@ sub process_resources_search_results {
 
   my $row;
   while ( $row = $sqlres->{row} ) {
-    my $id  = $row -> {id};
+    # for some reason, the $row is sometimes empty; at least it doesn't
+    # contain any useful data
+    my $id  = $row -> {id} || '';
     
-    if ( $found_hash  ->{$id}++ ) { next; }
+    if ( $id and $found_hash->{$id}++ ) { next; }
 
     if ( $current_hash->{$id} ) {
       $already_there_count++;

@@ -22,7 +22,7 @@ package ACIS::Web::Session;   ### -*-perl-*-
 #  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 #
 #  ---
-#  $Id: Session.pm,v 2.1 2006/10/10 15:05:08 ivan Exp $
+#  $Id: Session.pm,v 2.2 2007/01/08 12:08:21 ivan Exp $
 #  ---
 
 use strict;
@@ -276,7 +276,7 @@ sub object_set {
     $file = $object -> save_to_file;   ### XX UserData interface
   }
 
-  return $self -> SUPER::object_set( $object, $file );
+  return $self -> SUPER::object_set( $object, $file, @_ );
 }
 
 

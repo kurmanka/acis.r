@@ -25,7 +25,7 @@ package ACIS::Web::Admin;   ### -*-perl-*-
 #  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 #
 #  ---
-#  $Id: Admin.pm,v 2.12 2007/01/04 10:03:32 ivan Exp $
+#  $Id: Admin.pm,v 2.13 2007/01/08 12:08:21 ivan Exp $
 #  ---
 
 
@@ -302,7 +302,9 @@ sub offline_userdata_service {
   
   if ( $rec ) {
     if ( not $session -> choose_record( $rec ) ) {
-      $acis -> errlog( "Can't choose record $rec" );
+      debug "No such record $rec";
+      $acis -> errlog( "No such record $rec" );
+      return(undef);
     }
   }
 
@@ -321,11 +323,10 @@ sub offline_userdata_service {
   };
   if ( $@ ) {
     debug "offline service failed: $@";
-    $acis-> errlog( "offline service failed: $@"; )
+    $acis-> errlog( "offline service failed: $@" );
   }
 
   ###  close session
-
   $session -> close( $acis );
   return $resu;
 }
