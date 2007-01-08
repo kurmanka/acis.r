@@ -27,7 +27,7 @@ package ACIS::Web::NewUser; ### -*-perl-*-
 #  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 #
 #  ---
-#  $Id: NewUser.pm,v 2.4 2006/10/10 15:05:08 ivan Exp $
+#  $Id: NewUser.pm,v 2.5 2007/01/08 19:22:01 ivan Exp $
 #  ---
 
 
@@ -404,10 +404,9 @@ sub complete {
   my $filename;
   my $confirmation_id = $session -> {'confirmation-id'};
   
-  while ( not defined $confirmation_id ) {
+  if ( not defined $confirmation_id ) {
     $confirmation_id = generate_id();
-    
-    if ( -f "$path$confirmation_id" ) { next; }
+    if ( -f "$path$confirmation_id" ) { redo; }
   }
   
   $filename = "$path$confirmation_id";

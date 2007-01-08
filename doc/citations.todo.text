@@ -2,10 +2,10 @@
 
 2007-01-08 14:12
 
- - fix "lock file ... present at /home/aras/acis/lib/Web/App/Session.pm line 301" error
+ - check RAS' -error.log for "lock file ... present" details
 
 
-### investigate the failed and "no" items in the RAS' current APU queue
+### check the recent failed and "no" items in the RAS' current APU queue
 
 ### test new citations / suggestions storage 
 

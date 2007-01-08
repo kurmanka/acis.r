@@ -28,7 +28,7 @@ sub fill_the_queue_table {
     FROM records as r
       LEFT JOIN sysprof as s 
         ON s.id = r.shortid AND s.param = 'last-apu-time'
-    WHERE s.data is NULL !,
+    WHERE s.data is NULL and r.shortid<>''!,
 qq!INSERT IGNORE INTO $Qtable (what, position)
   SELECT id as what,(data+1) as position
     FROM sysprof 

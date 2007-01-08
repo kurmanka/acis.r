@@ -26,7 +26,7 @@ package Web::App::Session; ### -*-perl-*-
 #  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 #
 #  ---
-#  $Id: Session.pm,v 2.4 2007/01/08 12:10:10 ivan Exp $
+#  $Id: Session.pm,v 2.5 2007/01/08 19:22:01 ivan Exp $
 #  ---
 
 
@@ -296,14 +296,17 @@ sub object_set {
 
   if ( $file ) {
     my $lock = "$file.lock";
+    Carp::cluck( "about to create lock file $lock\n" );
+    
     my $mode = ">";
     if ( -f $lock ) {
       if ( $expect_lock_to_be_present ) {
         # rewrite the lockfile
       } else {       
         my $cont = `cat $lock`;
-        Carp::cluck( "lock file $lock present: $cont\n" );
-        ### XX I could check if such session exists...
+        my $details = `ls -al $lock`;
+        Carp::cluck( "lock file $lock present: $cont\n$details\n" );
+        ### XX I could check if that session exists...
       }
     }
 
