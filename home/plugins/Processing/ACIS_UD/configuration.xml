@@ -322,8 +322,8 @@
      <create-table-sql> PRIMARY KEY (psid,dsid,citid) </create-table-sql>
   </table>
 
-  
-  <table name='acis:cit_accepted'><!-- ? -->
+  <!--
+  <table name='acis:cit_accepted'>
     <field name='psid'/>
     <field name='citid'/>
     <field name='dsid'/>
@@ -333,5 +333,6 @@
 
   <table name='acis:cit_refused'>
   </table>
+  -->
 
 </configuration>
