@@ -26,7 +26,7 @@ package Web::App::Session; ### -*-perl-*-
 #  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 #
 #  ---
-#  $Id: Session.pm,v 2.3 2006/12/18 13:25:09 ivan Exp $
+#  $Id: Session.pm,v 2.4 2007/01/08 12:10:10 ivan Exp $
 #  ---
 
 
@@ -282,6 +282,7 @@ sub object_set {
   my $self   = shift;
   my $object = shift;
   my $file   = shift;
+  my $expect_lock_to_be_present = shift || 0;
 
   my $inner = $self ->{_};
   $inner ->{object}     = $object;
@@ -297,12 +298,13 @@ sub object_set {
     my $lock = "$file.lock";
     my $mode = ">";
     if ( -f $lock ) {
-      Carp::cluck( "lock file $lock present\n" );
-      $mode = ">>";  ### That's what I could do, but its tricky.  Ideally, I
-                     ### shall check if such session exists...
-
-      $mode = ">";   ### For now I'll rewrite the lock and hope that it will
-                     ### do the right thing most of the time
+      if ( $expect_lock_to_be_present ) {
+        # rewrite the lockfile
+      } else {       
+        my $cont = `cat $lock`;
+        Carp::cluck( "lock file $lock present: $cont\n" );
+        ### XX I could check if such session exists...
+      }
     }
 
     if ( open L, "$mode$lock" ) {
