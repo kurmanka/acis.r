@@ -1,6 +1,9 @@
 # ACIS Citations TO DO List
 
-2007-01-03 11:10
+2007-01-08 14:12
+
+ - fix "lock file ... present at /home/aras/acis/lib/Web/App/Session.pm line 301" error
+
 
 ### investigate the failed and "no" items in the RAS' current APU queue
 
@@ -12,8 +15,6 @@
    selected users can use it, while others don't see it?)
 
  - and fix
-
- - fix "lock file ... present at /home/aras/acis/lib/Web/App/Session.pm line 301" error
 
  - fix the following:
 

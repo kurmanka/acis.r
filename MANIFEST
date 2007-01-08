@@ -95,6 +95,7 @@ home/bin/templates/offline_maintain.pl
 home/bin/templates/recreate_profile_pages.pl
 home/bin/templates/reparse_config.pl
 home/bin/templates/restore_table_backup.pl
+home/bin/templates/rmrec.pl
 home/bin/templates/sanitar.pl
 home/bin/templates/sanitar2.pl
 home/bin/templates/sanitar3.pl
