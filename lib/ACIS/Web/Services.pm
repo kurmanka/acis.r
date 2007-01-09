@@ -28,7 +28,7 @@ package ACIS::Web;   ### -*-perl-*-
 #  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 #
 #  ---
-#  $Id: Services.pm,v 2.19 2007/01/09 13:08:14 ivan Exp $
+#  $Id: Services.pm,v 2.20 2007/01/09 16:59:28 ivan Exp $
 #  ---
 
 use strict;
@@ -103,8 +103,7 @@ sub load_session {
   }
 
   my $IP           = $ENV{'REMOTE_ADDR'};
-  my $override;
-  
+  my $override;  
   my $sessions_dir = "$home/sessions";
   my $sfilename    = "$sessions_dir/$seid";
 
@@ -117,7 +116,6 @@ sub load_session {
     ###  XXX should I delete this bad session then?
     if ( $just_try ) {
       return "bad-session-file";
-
     } else {
       $app -> error( "session-failure" );
       $app -> set_form_action( $app ->config ('base-url') );

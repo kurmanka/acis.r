@@ -4,25 +4,13 @@
 
  - check RAS' -error.log for "lock file ... present" details
 
-
-### check the recent failed and "no" items in the RAS' current APU queue
+### check the recent failed and "no" items in the RAS' apu_queue
 
 ### test new citations / suggestions storage 
 
  - test it on test.acis.openlib.org
 
  - and fix
-
- - fix the following:
-
-       Can't call method "isa" on unblessed reference at /home/aras/acis/lib/ACIS/Web/Services.pm line 132.
-       [Tue Jan  2 03:16:22 2007] [error] [client 141.99.158.212] Premature end of script headers: /home/aras/WWW/cgi/a.cgi
-       Can't call method "current_record" on an undefined value at /home/aras/acis/lib/ACIS/Web/Contributions.pm line 128.
-       [Tue Jan  2 03:16:22 2007] [error] [client 141.99.158.212] Premature end of script headers: /home/aras/WWW/cgi/a.cgi
-       Can't call method "current_record" on an undefined value at /home/aras/acis/lib/ACIS/Web/Contributions.pm line 743.
-       [Tue Jan  2 03:16:23 2007] [error] [client 141.99.158.212] Premature end of script headers: /home/aras/WWW/cgi/a.cgi
-       Can't call method "current_record" on an undefined value at /home/aras/acis/lib/ACIS/Web/Contributions.pm line 266.
-       [Tue Jan  2 03:16:36 2007] [error] [client 141.99.158.212] Premature end of script headers: /home/aras/WWW/cgi/a.cgi
 
  - and, possibly, other error_log problems
 
@@ -31,10 +19,9 @@
  
 ### update citations.html document
 
-
 ### implement data export for Christian's mailings
 
-### discuss and imlement data export to CitEc
+### discuss and implement data export to CitEc
 
 
 
