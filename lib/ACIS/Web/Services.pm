@@ -28,7 +28,7 @@ package ACIS::Web;   ### -*-perl-*-
 #  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 #
 #  ---
-#  $Id: Services.pm,v 2.18 2007/01/08 12:08:21 ivan Exp $
+#  $Id: Services.pm,v 2.19 2007/01/09 13:08:14 ivan Exp $
 #  ---
 
 use strict;
@@ -108,9 +108,10 @@ sub load_session {
   my $sessions_dir = "$home/sessions";
   my $sfilename    = "$sessions_dir/$seid";
 
-#  assert( -f $sfilename );
- 
   my $session = $SESSION_CLASS_MAIN -> load( $app, $sfilename );
+
+  use Scalar::Util qw( blessed );
+  use Data::Dumper;
 
   if ( not $session ) {
     ###  XXX should I delete this bad session then?
@@ -123,13 +124,14 @@ sub load_session {
       $app -> clear_session_cookie;
       $app -> set_presenter( 'login' );
       $app -> clear_process_queue;
-      debug "can't load the session, session expired or load somehow failed";
+      debug "can't load the session, session loading failed: ". Dumper($session);
       return undef;
     }
   }
 
   assert( ref $session );
-  assert( $session -> isa( 'Web::App::Session' ) );
+  assert( blessed($session), "session: " . Dumper($session) );
+  assert( $session -> isa( 'Web::App::Session' ), "session: ". Dumper($session) );
   assert( $session -> owner );
 
   my $sIP = $session -> owner ->{IP};
