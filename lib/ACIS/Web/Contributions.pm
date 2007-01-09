@@ -25,7 +25,7 @@ package ACIS::Web::Contributions;  ### -*-perl-*-
 #  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 #
 #  ---
-#  $Id: Contributions.pm,v 2.27 2007/01/08 12:08:21 ivan Exp $
+#  $Id: Contributions.pm,v 2.28 2007/01/09 00:50:11 ivan Exp $
 #  ---
 
 use strict;
@@ -1675,20 +1675,19 @@ sub query_resources ($$) {
   if ( $table eq 'resources' ) {
     ### by resources from objects
     $q = qq!SELECT catch.id as id,lib.data as data
-FROM $DB.$table as catch
-LEFT JOIN $DB.objects as lib
+FROM $DB.resources as catch
+JOIN $DB.objects as lib
  ON catch.id = lib.id
 WHERE $where
 !;
 
   } else {
     ### by some other table (catch) via resources (lookup) from objects 
-    $q = qq!
-SELECT lib.id as id,lib.data as data,catch.role as role
+    $q = qq!SELECT lookup.id as id,lib.data as data,catch.role as role
 FROM $DB.$table as catch 
-LEFT JOIN $DB.resources as lookup
+JOIN $DB.resources as lookup
  ON catch.sid = lookup.sid
-LEFT JOIN $DB.objects as lib
+JOIN $DB.objects as lib
  ON lookup.id = lib.id
 WHERE $where
 !;
