@@ -26,7 +26,7 @@ package Web::App::Session; ### -*-perl-*-
 #  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 #
 #  ---
-#  $Id: Session.pm,v 2.5 2007/01/08 19:22:01 ivan Exp $
+#  $Id: Session.pm,v 2.6 2007/01/09 00:49:46 ivan Exp $
 #  ---
 
 
@@ -296,7 +296,11 @@ sub object_set {
 
   if ( $file ) {
     my $lock = "$file.lock";
-    Carp::cluck( "about to create lock file $lock\n" );
+
+    # XXX debugging locking problem for new users
+    my $t = scalar localtime;
+    my $m = Carp::longmess( "[$t] creating new user lock $lock" );
+    if ( $m =~ /::NewUser/ ) { warn $m; }
     
     my $mode = ">";
     if ( -f $lock ) {
