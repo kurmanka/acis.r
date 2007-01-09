@@ -40,8 +40,9 @@ sub get_doc_by_sid ($) {
 
 sub prepare() {
   $acis = $ACIS::Web::ACIS;
+
   die "citations not enabled system-wide" 
-    if not $acis->config( 'citations-profile' );
+    if not $acis->config( 'citations-profile' ) and not $acis->session->owner->{type}{citations};
 
   $sql  = $acis -> sql_object;
 

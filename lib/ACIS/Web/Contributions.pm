@@ -25,7 +25,7 @@ package ACIS::Web::Contributions;  ### -*-perl-*-
 #  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 #
 #  ---
-#  $Id: Contributions.pm,v 2.28 2007/01/09 00:50:11 ivan Exp $
+#  $Id: Contributions.pm,v 2.29 2007/01/09 12:17:02 ivan Exp $
 #  ---
 
 use strict;
@@ -203,7 +203,7 @@ sub prepare_identified {
   my $rec = $app -> session -> current_record;
   my $vars = $app-> variables;
   # prepare citations data, if citations are enabled in configuration and if there are some
-  if ( $app -> config( 'citations-profile' ) ) {
+  if ( $app -> config( 'citations-profile' ) or $app->session->owner->{type}{citations} ) {
     require ACIS::Web::Citations;
     ACIS::Web::Citations::prepare();
     ACIS::Web::Citations::prepare_research_identified();
