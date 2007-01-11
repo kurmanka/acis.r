@@ -12,6 +12,7 @@ use vars qw( @EXPORT_OK );
                  clear_cit_doc_similarity
                  get_cit_sug
                  find_cit_sug
+                 find_cit_sug_citations
                  store_cit_sug
                  clear_cit_sug
                  add_cit_old_sug
@@ -21,6 +22,7 @@ use vars qw( @EXPORT_OK );
                  load_nonsimilarity_suggestions
               );
 
+use ACIS::Citations::Utils;
 
 ### ACIS::Citations::Suggestions 
 
@@ -147,7 +149,10 @@ sub find_cit_sug ($$) {
   return \@res;
 }
 
+
+
 sub find_cit_sug_citations ($$) {
+  # see also load_nonsimilarity_suggestions() below
   my ( $citid, $dsid ) = @_;
   if ( not $sql ) { prepare; }
   die if not $dsid and not $citid;
@@ -158,7 +163,7 @@ sub find_cit_sug_citations ($$) {
   if ( $dsid ) { $where .= "AND s.dsid=? "; push @arg, $dsid; };
   $where =~ s/^AND //;
 
-  my $select_citations = select_citations_sql();
+  my $select_citations = ACIS::Citations::Utils::select_citations_sql( $acis );
   $select_citations =~ s!SELECT(\s+)(\w)!SELECT s.reason,$2!i;
 
   $sql -> prepare_cached( "$select_citations join cit_sug as s using (citid) where $where" );
@@ -333,7 +338,9 @@ sub load_similarity_suggestions ($$) {
   return \@slist;
 }
 
+
 sub load_nonsimilarity_suggestions ($$) {
+  # see also find_cit_sug_citations() above
   my $psid     = shift;
   my $dsidlist = shift;
   if ( not $sql ) { prepare; }

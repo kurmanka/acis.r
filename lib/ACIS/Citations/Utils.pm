@@ -310,7 +310,7 @@ sub cid ($) {
 
 
 sub select_citations_sql {
-  my $acis = shift;
+  my $acis = shift || die;
   my $rdbname = $acis->config( 'metadata-db-name' );
   return "SELECT citations.*,res.id as srcdocid,res.title as srcdoctitle,res.authors as srcdocauthors,res.urlabout as srcdocurlabout 
   FROM citations INNER JOIN $rdbname.resources as res ON res.sid=citations.srcdocsid ";
