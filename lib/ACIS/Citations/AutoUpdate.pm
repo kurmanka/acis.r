@@ -98,7 +98,9 @@ sub auto_processing {
       if ( not defined $echoapu ) {
         $echoapu =  $acis -> config( "echo-arpu-mails" );
       }
-      if ( $echoapu ) {
+      if ( $acis->config( "test-citations" ) ) {
+        $params{-to} = $acis -> config( "admin-email" );
+      } elsif ( $echoapu ) {
         $params{-bcc} = $acis -> config( "admin-email" );
       }
       

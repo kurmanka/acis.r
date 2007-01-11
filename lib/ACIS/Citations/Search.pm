@@ -16,7 +16,7 @@ use vars qw( @EXPORT_OK );
 use Web::App::Common;
 
 use ACIS::Citations::Utils;
-use ACIS::Citations::Suggestions qw( get_cit_old_status find_cit_sug );
+use ACIS::Citations::Suggestions qw( get_cit_old_status find_cit_sug_citations );
 
 
 # exportable:
@@ -49,6 +49,23 @@ sub prepare() {
 }
 
 
+
+sub decode_citations_search_results {
+  my $r = shift;
+  my @cl;
+
+  while ( $r and $r->{row} ) {
+    my $c = { %{$r->{row}} };
+    foreach ( qw( ostring nstring srcdoctitle srcdocauthors ) ) {    
+      $c->{$_} = Encode::decode_utf8( $r->{row}{$_} );
+    }
+    debug "found: ", $c->{nstring};
+    push @cl, $c;
+    $r->next;
+  }
+  return \@cl;
+}
+
 sub search_for_document($) {
   my $docid = shift || die;
   if ( not $sql ) { prepare; }
@@ -57,17 +74,9 @@ sub search_for_document($) {
 
   $sql -> prepare_cached( "$select_citations where trgdocid=?" );
   my $r = $sql -> execute( $docid );
-  my @cl = ();
-  while ( $r and $r->{row} ) {
-    my $c = { %{$r->{row}} };
-    foreach ( qw( ostring nstring srcdoctitle srcdocauthors ) ) {    
-      $c->{$_} = Encode::decode_utf8( $r->{row}{$_} );
-    }
-    push @cl, $c;
-    $r->next;
-  }
-  debug "search_for_documents: found ", scalar @cl, " items";
-  return \@cl;
+  my $cl = decode_citations_search_results( $r );
+  debug "search_for_documents: found ", scalar @$cl, " items";
+  return $cl;
 }
 
 
@@ -89,19 +98,9 @@ sub search_for_personal_names($) {
   chop $q;
 
   my $r = $sql -> execute( $q );
-
-  while ( $r and $r->{row} ) {
-    my $c = { %{$r->{row}} };
-    foreach ( qw( ostring nstring srcdoctitle srcdocauthors ) ) {    
-      $c->{$_} = Encode::decode_utf8( $r->{row}{$_} );
-    }
-    debug "found: ", $c->{nstring};
-    push @cl, $c;
-    $r->next;
-  }
-
-  debug "search_for_personal_names: found ", scalar @cl, " citations";
-  return \@cl;
+  my $cl = decode_citations_search_results( $r );
+  debug "search_for_personal_names: found ", scalar @$cl, " citations";
+  return $cl;
 }
 
 sub search_for_personal_names_original($) {
@@ -162,18 +161,11 @@ sub filter_search_results($$) {
 
 my $identified;
 my $refused;
-my $identified_for_sid;
 
 sub make_identified_n_refused ($) {
   my $rec = shift;
 
-  if ( $identified ) {
-    if ( $identified_for_sid eq $rec->{sid} ) { return; }
-    else { undef $identified; }
-  }
-
-  $identified_for_sid = $rec->{sid} || die;
-  $identified ||= {};
+  $identified = {};
   my $identified_hl = $rec->{citations}{identified} || {};
   my $refused_l     = $rec->{citations}{refused}    || [];
     
@@ -386,7 +378,8 @@ sub personal_search_by_coauthors {
     my $did  = $_->{id}  || next;
     my $dsid = $_->{sid} || next;
     
-    my $r = find_cit_sug( undef, $dsid );
+    my $sr = find_cit_sug_citations( undef, $dsid );
+    my $r  = decode_citations_search_results( $sr );
     next if not scalar @$r;
 
     # process results
@@ -400,7 +393,7 @@ sub personal_search_by_coauthors {
 
         debug "citation: '", $_->{nstring} , "' is to be added to $dsid";
         $_->{autoadded}     = today(); # localtime( time );
-        $_->{autoaddreason} = 'coauthor-sug';
+        $_->{autoaddreason} = delete $_->{reason};
         identify_cit_to_doc( $rec, $dsid, $_ );
         push @added, [ $dsid, $_ ];
       }
@@ -424,7 +417,10 @@ sub identify_cit_to_doc {
 }
 
 
-
+sub clear_up {
+  undef $identified;
+  undef $refused;
+}
 
 
 

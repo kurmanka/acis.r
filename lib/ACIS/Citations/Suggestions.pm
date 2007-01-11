@@ -147,6 +147,25 @@ sub find_cit_sug ($$) {
   return \@res;
 }
 
+sub find_cit_sug_citations ($$) {
+  my ( $citid, $dsid ) = @_;
+  if ( not $sql ) { prepare; }
+  die if not $dsid and not $citid;
+
+  my $where = '';
+  my @arg   = ();
+  if ( defined $citid ) { $where .= "s.citid=? "; push @arg, $citid; };
+  if ( $dsid ) { $where .= "AND s.dsid=? "; push @arg, $dsid; };
+  $where =~ s/^AND //;
+
+  my $select_citations = select_citations_sql();
+  $select_citations =~ s!SELECT(\s+)(\w)!SELECT s.reason,$2!i;
+
+  $sql -> prepare_cached( "$select_citations join cit_sug as s using (citid) where $where" );
+  my $r = $sql -> execute( @arg );
+  return $r;
+}
+
 
 sub store_cit_sug ($$$) {
   my ( $citid, $dsid, $reason ) = @_;

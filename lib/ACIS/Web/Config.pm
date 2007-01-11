@@ -28,7 +28,7 @@ package ACIS::Web::Config;   ### -*-perl-*-
 #  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 #
 #  ---
-#  $Id: Config.pm,v 2.9 2006/10/16 17:32:23 ivan Exp $
+#  $Id: Config.pm,v 2.10 2007/01/11 00:21:15 ivan Exp $
 #  ---
 
 
@@ -95,6 +95,7 @@ sub configuration_parameters {
     'citation-document-similarity-ttl',  '100',     
     'citation-document-similarity-useful-threshold', '0.30',
     'citation-document-similarity-preselect-threshold', '0.75',
+    'test-citations'   => 'not-defined',
 
    };
 
