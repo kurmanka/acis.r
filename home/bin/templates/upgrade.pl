@@ -4,8 +4,8 @@ my $name;
 my $verno;
 my $old;
 
-#sub p {}; 
-sub p { print @_, "\n"; }
+sub p {}; 
+#sub p { print @_, "\n"; }
 
 p "$0 debugings:";
 

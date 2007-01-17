@@ -123,9 +123,6 @@ do
 done
 echo ""
 
-if [ -f VERSION.NEW ]; then 
-    $homedir/bin/upgrade && mv VERSION.NEW VERSION
-fi
 
 
 ###  install ACIS CGI script
@@ -196,6 +193,12 @@ perl -e 'print "package ARDB::LocalConfig;\n\$local_path=\"$ENV{homedir}\";\n1;\
 ### finalize ARDB setup
 bin/setup_ardb
 bin/create_tables
+
+
+if [ -f VERSION.NEW ]; then 
+    $homedir/bin/upgrade && mv VERSION.NEW VERSION
+fi
+
 
 ###  write lib/ACIS/LocalConfig.pm
 echo configuring ACIS for home dir
