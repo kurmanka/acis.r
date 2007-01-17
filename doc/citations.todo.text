@@ -1,8 +1,10 @@
 # ACIS Citations TO DO List
 
-2007-01-08 14:12
+2007-01-15 16:27
 
- - check RAS' -error.log for "lock file ... present" details
+### discuss and implement data export to CitEc
+
+### solve the issue of locking the new registration accounts
 
 ### check the recent failed and "no" items in the RAS' apu_queue
 
@@ -21,7 +23,19 @@
 
 ### implement data export for Christian's mailings
 
-### discuss and implement data export to CitEc
+  Similar to ~adrepec/remo/cit/conf/authorscites.txt.  See
+  local dev/acis/local/stage3/authorcites for a format
+  example:
+
+    <personalhandle> <citref1> [<citref2>...]
+
+  where citrefN is a string:
+
+    <trgdocid>||<srcdocid>
+  
+  where trgdocid is id of a document in the personhandle's research profile
+
+  
 
 
 
