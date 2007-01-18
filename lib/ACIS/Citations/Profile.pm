@@ -2,12 +2,10 @@ package ACIS::Citations::Profile;
 
 use strict;
 use warnings;
-
 use Carp;
 use Carp::Assert;
 
 use ACIS::Web::SysProfile;
-
 use ACIS::Citations::Utils qw( today cid load_citation_details );
 
 sub last_cit_search_date($;$) {
@@ -40,7 +38,7 @@ sub last_cit_sug_maintenance_date($;$) {
 use Web::App::Common;
 
 sub profile_check_and_cleanup () {
-
+  
   my $acis   = $ACIS::Web::ACIS;
   return undef
     if not $acis->config( 'citations-profile' );
@@ -48,6 +46,7 @@ sub profile_check_and_cleanup () {
   debug "citations profile_check_and_cleanup()";
 
   my $record = $acis -> session->current_record;
+  my $psid   = $record->{sid} || die;
   my $sql    = $acis -> sql_object;
   my $citations         = $record ->{citations} ||= {};
   my $research_accepted = $record ->{contributions}{accepted} || [];
@@ -103,13 +102,18 @@ sub profile_check_and_cleanup () {
     if ( not scalar @$cits ) { 
       delete $identified->{$_};
     }
-
   }
-  
+
+  # mark in sysprof
+  put_sysprof_value( $psid, 'last-cit-prof-check-date', today );
+  put_sysprof_value( $psid, 'last-cit-prof-check-time', time );
 }
 
 sub potential_check_and_cleanup {
-  # Have we already done that in SimMatrix? No, as far as I see.
+  # 2007-01-18 02:19 this hasn't been updated during a cit_suggestions
+  # reform and thus is now outdated.
+  
+  # Have we already done that in SimMatrix? No.
   my $acis = shift;
 
   # Do a global check and clean-up via SQL join operation?

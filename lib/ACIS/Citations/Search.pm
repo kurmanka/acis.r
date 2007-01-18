@@ -315,9 +315,6 @@ sub personal_search_by_names {
       $citation->{autoaddreason} = 'similar';
       if ( not $pretend ) {
         identify_cit_to_doc( $rec, $target, $citation );
-#        unless ( $acis->config( 'citations-disable-coauthor-auto-suggest' ) ) {
-#          suggest_citation_to_coauthors($_, $psid, $target); ### XXX???
-#        }
       }
       push @added, [ $target, $citation ];
     }

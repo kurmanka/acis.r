@@ -5,7 +5,7 @@
     that is a working ARDB core configuration file.  Produces:
     documents table, collections table, authors table.
 
-    $Id: configuration.xml,v 2.5 2006/12/07 01:58:57 ivan Exp $
+    $Id: configuration.xml,v 2.6 2007/01/18 01:35:21 ivan Exp $
 
 -->
 
@@ -301,6 +301,349 @@
 
 <delete-processing record-type="ReDIF-Archive 1.0">
 </delete-processing>
+
+
+
+
+  <!-- ACIS tables and internal processing -->
+
+
+  <perl-module name='ARDB::Plugin::Processing::ACIS_UD'/>
+
+  <database alias='acis'/>
+
+
+  <!--  ############    R E C O R D S    ##################   -->
+
+ 
+  <table name='acis:records'>
+  
+    <field name='shortid'   sql-type=' char(10) not null primary key '/>
+    <field name='id'        sql-type=' char(130) not null '/>
+    <field name='owner'     sql-type=' char(110) not null '/>
+    <field name='userdata_file'   
+                            sql-type=' char(200) binary not null'/>
+
+    <field name='namelast'  sql-type=' char(70) not null' />
+    <field name='namefull'  sql-type=' char(70) not null'/>
+    <field name='profile_url' 
+                            sql-type='char(100) binary not null default ""'/>
+    <field name='homepage'  sql-type='char(130) binary not null default ""'/>
+
+    <field name='emailmd5'  sql-type='char(16) binary not null default ""'/>
+    
+<create-table-sql>
+ index( id ), 
+ index( namelast ), 
+ index emailmd5_i( emailmd5 )
+</create-table-sql>
+    
+  </table>
+
+  <table name='acis:names'>
+    <field name='shortid'   sql-type=' char(10) not null ' />
+    <field name='name'      sql-type=' char(100) not null ' />
+    <field name='probability' 
+                            sql-type='tinyint unsigned not null' />
+    <create-table-sql>PRIMARY KEY ( shortid, name )</create-table-sql>
+
+  </table>
+
+
+  <put-processing record-type='acis-record-person'>
+
+    <store-to-table table='acis:records'>
+      <field-attribute-mapping>
+        <field-associations
+          shortid='sid'
+          id='id'
+          namelast='ARDB::Plugin::Processing::ACIS_UD::get_name_last'
+          namefull='name/full'
+          homepage='contact/homepage'
+          owner='LOGIN' 
+          userdata_file='FILENAME'
+          profile_url='profile/url'
+          emailmd5='ARDB::Plugin::Processing::ACIS_UD::get_emailmd5'
+          />
+      </field-attribute-mapping>
+    </store-to-table>
+
+
+    <!--  
+
+    There is also additional record processing by the plugin itself.  See
+    ARDB::Plugin::Processing::ACIS_UD::process_record.
+
+    -->
+
+
+    <build-forward-relation 
+      type="affiliated-with" 
+      attributes="affiliations"
+      />
+
+    <build-forward-relation 
+      type="reject" 
+      attributes="contributions/refused/id"
+      />
+
+    <build-forward-relation 
+      type="accept" 
+      attributes="contributions/accepted/id"
+      />
+
+
+  </put-processing>
+
+
+
+  <delete-processing record-type='acis-record-person'>
+
+    <delete-from-table table='acis:records' by='id' />
+    
+    <call-perl-function
+     name='ARDB::Plugin::Processing::ACIS_UD::record_delete_cleanup' />
+    
+    <!--
+      <delete-from-table table='acis:names'   by='id' />
+    -->
+
+  </delete-processing>
+
+
+
+
+  <!--  ############    U S E R S    ##################   -->
+
+
+  <table name='acis:users'>
+  
+    <field name='login'    sql-type=' char(100) not null primary key ' />
+    <field name='name'     sql-type=' char(60)' />
+    <field name='password' sql-type=' char(20) not null '/>
+    <field name='userdata_file'
+                           sql-type=' char(200) not null ' />
+                          
+  </table>
+  
+  <put-processing record-type='acis-user'>
+
+    <store-to-table table='acis:users'>
+      <field-attribute-mapping>
+        <field-associations
+          login='login' 
+          name ='name'
+          password='password'
+          userdata_file='FILENAME'/>
+      </field-attribute-mapping>
+    </store-to-table>
+    
+  </put-processing>
+
+  <delete-processing record-type='acis-user'>
+    <delete-from-table table='acis:users' by='login' />
+  </delete-processing>
+
+
+
+  <!-- #############  SYSTEM'S PROFILES  ################ -->
+
+  <!-- ACIS::Web::SysProf module                          -->
+
+  <table name='acis:sysprof'>
+  
+    <field name='id'       sql-type=' CHAR(100) NOT NULL' />
+    <field name='param'    sql-type=' CHAR(40) NOT NULL' />
+    <field name='data'     sql-type=' BLOB' />
+                          
+    <create-table-sql> PRIMARY KEY ( id, param )</create-table-sql>
+
+  </table>
+
+
+
+  <!--  ########  OTHER SPECIAL ACIS TABLES   ########  -->
+
+
+  <table name='acis:threads'>
+    <field name='psid'      sql-type="CHAR(10) NOT NULL"/>
+    <field name='type'      sql-type="CHAR(15) NOT NULL"/>
+    <field name='started'   sql-type='DATETIME NOT NULL'/>
+    <field name='checkpoint' sql-type='DATETIME'/>
+    
+    <create-table-sql>
+      PRIMARY KEY ( psid, type )
+    </create-table-sql>
+  </table>
+
+
+  <table name="acis:suggestions">
+    <field name="psid"     sql-type="CHAR(10) NOT NULL"/>
+    <field name="osid"     sql-type="CHAR(10) NOT NULL"/>
+    <field name="type"     sql-type="CHAR(15) NOT NULL"/>
+    <field name="role"     sql-type="CHAR(15) NOT NULL"/>
+    <field name="reason"   sql-type="CHAR(30) NOT NULL"/>
+    <field name="target"   sql-type="CHAR(15) NOT NULL"/>
+    <field name='time'     sql-type='DATETIME NOT NULL'/>
+    <field name='data'     sql-type='BLOB NOT NULL'/>
+    
+    <create-table-sql>
+      PRIMARY KEY ( psid, osid )
+    </create-table-sql>
+  </table>
+
+
+  <table name='acis:events'>
+    <field name='date'  sql-type='datetime not null' />
+
+    <field name='type'  sql-type='varchar(10)' />
+           <!-- error, notice, warning -->
+
+    <field name='class' sql-type='varchar(20)' /> 
+           <!-- authenticate, session, contributions, ... -->
+
+    <field name='action' sql-type='varchar(30)'/>         
+    <field name='descr' sql-type='text'/>
+    <field name='data'  sql-type='text'/>
+
+<!--
+    <field name='login' sql-type='varchar(100)' />
+    <field name='url'   sql-type='varchar(200)' />
+    <field name='file'  sql-type='varchar(200)' />
+-->
+    <field name='chain'    sql-type='char(16)'/>
+    <field name='startend' sql-type='tinyint'/>
+
+    <field name='packed'   sql-type='mediumblob'/>
+
+    <create-table-sql line='index( date, chain )'/>
+  </table>    
+
+
+  <!-- APU Queue -->
+  
+  <table name="acis:apu_queue">
+    <field name="what"     sql-type="CHAR(255) PRIMARY KEY"/>
+    <field name='position' sql-type='BIGINT DEFAULT 0'/>
+    <field name="filed"    sql-type="TIMESTAMP NOT NULL DEFAULT NOW()"/>
+                   <!-- this is also default behaviour for the first 
+                        timestamp-type field in a table in MySQL -->
+
+    <field name="status"   sql-type="CHAR(20) DEFAULT ''"/>
+    <field name="class"    sql-type="SMALLINT DEFAULT 0"/>
+                   <!-- maybe we don't really need it
+                        anymore and can use position instead: all
+                        priority items can have lesser position?  On the
+                        other side, class can be used for urgency indicator. -->
+
+    <field name='notes'    sql-type='BLOB'/>
+    <field name="worked"   sql-type="TIMESTAMP"/>
+    
+    <create-table-sql>
+     index( position ), index( class ), index( status )
+    </create-table-sql>
+  </table>
+
+<!-- old:
+  <table name="acis:arpm_queue">
+    <field name="what"     sql-type="CHAR(100) PRIMARY KEY"/>
+    <field name="filed"    sql-type="TIMESTAMP NOT NULL"/>
+    <field name="status"   sql-type="CHAR(20)"/>
+    <field name="class"    sql-type="SMALLINT"/>
+    <field name='notes'    sql-type='BLOB'/>
+    <field name="worked"   sql-type="TIMESTAMP"/>
+    
+    <create-table-sql>
+     index( class ), index( status )
+    </create-table-sql>
+  </table>  -->
+
+
+
+  <!-- Stage C: Citations -->
+
+  <table name='acis:citations'>
+    <field name='citid'           sql-type='SERIAL'/> <!-- BIGINT UNSIGNED NOT NULL AUTO_INCREMENT UNIQUE -->
+    <field name='srcdocsid'       sql-type='CHAR(15) NOT NULL'/>
+    <field name='checksum'        sql-type='CHAR(22) NOT NULL'/>
+    <field name='ostring'         sql-type='TEXT NOT NULL'/>
+    <field name='nstring'         sql-type='VARCHAR(255) NOT NULL'/>
+    <field name='trgdocid'        sql-type='VARCHAR(255)'/>
+
+    <create-table-sql> PRIMARY KEY ( srcdocsid, checksum ),
+    FULLTEXT INDEX (nstring),
+    INDEX (trgdocid)</create-table-sql>
+  </table>
+
+<!-- replaced by cit_doc_similarity, cit_sug and cit_old_sug,
+     see below.
+  <table name='acis:cit_suggestions'>
+    <field name='srcdocsid'      sql-type='CHAR(15) NOT NULL'/>
+    <field name='checksum'       sql-type='CHAR(22) NOT NULL'/>
+    <field name='psid'           sql-type='CHAR(15) NOT NULL'/>
+    <field name='dsid'           sql-type='CHAR(15) NOT NULL'/>
+    <field name='reason'         sql-type='CHAR(20) NOT NULL'/>
+    <field name='similar'        sql-type='TINYINT UNSIGNED'/>
+    <field name='new'            sql-type='BOOL'/>
+    <field name='time'           sql-type='DATE NOT NULL'/>
+    <create-table-sql>
+      PRIMARY KEY (srcdocsid, checksum, psid, dsid, reason),
+      INDEX(psid), INDEX(dsid)
+    </create-table-sql>
+  </table>
+-->
+
+  <!-- history of citations -->
+  <table name='acis:citation_events'>
+    <field name='srcdocsid'      sql-type='CHAR(15) NOT NULL'/>
+    <field name='checksum'       sql-type='CHAR(22) NOT NULL'/>
+    <field name='psid'           sql-type='CHAR(15) NOT NULL'/>
+    <field name='dsid'           sql-type='CHAR(15)'/>
+    <field name='event'          sql-type='CHAR(15) NOT NULL'/>
+    <field name='reason'         sql-type='char(15)'/>
+    <field name='time'           sql-type='DATETIME NOT NULL'/>
+    <field name='note'           sql-type='text'/>
+    <create-table-sql>
+      INDEX(time), INDEX(psid)
+    </create-table-sql>
+  </table>
+
+  <table name='acis:cit_doc_similarity'>
+    <field name='citid'   sql-type='BIGINT UNSIGNED NOT NULL'/>
+    <field name='dsid'    sql-type='CHAR(15) NOT NULL'/>
+    <field name='similar' sql-type='TINYINT NOT NULL'/>
+    <field name='time'    sql-type='DATETIME NOT NULL'/>
+    <create-table-sql>PRIMARY KEY (citid,dsid)</create-table-sql>
+  </table>
+
+  <table name='acis:cit_sug'>
+    <field name='citid'  sql-type='BIGINT UNSIGNED NOT NULL'/>
+    <field name='dsid'   sql-type='CHAR(15) NOT NULL'/>
+    <field name='reason' sql-type='CHAR(20) NOT NULL'/>
+    <field name='time'   sql-type='DATETIME NOT NULL'/>
+    <create-table-sql> PRIMARY KEY (citid,dsid,reason) </create-table-sql>
+  </table>
+
+  <table name='acis:cit_old_sug'>
+     <field name='psid'  sql-type='CHAR(15) NOT NULL'/>
+     <field name='dsid'  sql-type='CHAR(15) NOT NULL'/>
+     <field name='citid' sql-type='BIGINT UNSIGNED NOT NULL'/>
+     <create-table-sql> PRIMARY KEY (psid,dsid,citid) </create-table-sql>
+  </table>
+
+  <!--
+  <table name='acis:cit_accepted'>
+    <field name='psid'/>
+    <field name='citid'/>
+    <field name='dsid'/>
+    <field name='time'/>
+    <field name='auto'/>
+  </table>
+
+  <table name='acis:cit_refused'>
+  </table>
+  -->
+
 
 
 </configuration>

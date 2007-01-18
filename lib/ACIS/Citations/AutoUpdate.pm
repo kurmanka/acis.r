@@ -11,6 +11,7 @@ use ACIS::Citations::Utils;
 use ACIS::Citations::Search qw( personal_search_by_names 
                                 personal_search_by_documents 
                                 personal_search_by_coauthors );
+use ACIS::Citations::Profile;
 use Web::App::Email;
 use ACIS::Web::SysProfile;
 
@@ -31,7 +32,18 @@ sub auto_processing {
 
   debug "id: ", $rec->{id};
 
-  logit "citations search for ", $rec->{sid};
+  logit "citations auto processing for ", $rec->{sid};
+
+  my $now = time;
+  {
+    # profile check and cleanup, i.e. maintentance
+    my $last = get_sysprof_value( $rec->{sid}, 'last-cit-prof-check-time' );
+    if ( not $last 
+         or ($last < $now - 60*60*24*3) ) {  # three days or more ago?
+      logit "profile check and cleanup";
+      ACIS::Citations::Profile::profile_check_and_cleanup();
+    }
+  }
 
   my $add_by_doc    = personal_search_by_documents( $rec ) || [];
   my $add_by_names  = personal_search_by_names(     $rec ) || [];
@@ -117,6 +129,7 @@ sub auto_processing {
   }
 
   put_sysprof_value( $sid, "last-auto-citations-time", time );
+  put_sysprof_value( $sid, "last-auto-citations-date", today );
 }
 
 

@@ -311,10 +311,12 @@ citations.
 
 
 
-On the Refused Citations screen users will deal with citations, for which user
-has pressed the "Not my work" button in the past. Those are the citations to
-works that the user has told us she is not an author of. She can remove
-citations, which then become available and new to all documents.
+On the Refused Citations screen users will deal with
+citations, for which user has pressed the "Not my work" button
+in the past. Those are the citations to works that the user
+has told us she is not an author of. She can remove citations,
+which then may be suggested to the same or other documents,
+depending on similarity found.
 
 
 
@@ -717,7 +719,7 @@ similarity assessment algorithm</a>.</p>
 threshold, won't even be suggested for user's consideration as
 potential.</p>
 
-<p>Default value: 0.30</p></dd>
+<p>Default value: 0.65</p></dd>
 
 
 <dt><C>citation-document-similarity-preselect-threshold</C></dt>
@@ -726,7 +728,7 @@ potential.</p>
 than this threshold, will be offered as pre-selected by default
 (for a specific document).</p>
 
-<p>Default value: 0.75</p></dd>
+<p>Default value: 0.85</p></dd>
 
 
 
@@ -777,8 +779,6 @@ disappeared citations.
 
  - remove disappeared
 
-(Initially, for simplicity we may simply save all citations and that's it.  Or
-delete all the citations from this doc and then put all the fresh back.)
 
 
 
@@ -786,17 +786,18 @@ delete all the citations from this doc and then put all the fresh back.)
 
 The fields:
 
+- unique numeric citation id: <co>citid SERIAL</co>
 - citing document short id: <co>srcdocsid CHAR(15) NOT NULL</co>  
-- full original citation string: <co>ostring TEXT NOT NULL</co>
-- normalized searchable citation string: <co>nstring CHAR(255) NOT NULL</co>
-- refers to document, id: <co>trgdocid CHAR(255)</co>
 - MD5 checksum of the original citation string in base64 encoding:
   <co>checksum CHAR(22) NOT NULL</co>
+- full original citation string: <co>ostring TEXT NOT NULL</co>
+- normalized searchable citation string: <co>nstring VARCHAR(255) NOT NULL</co>
+- refers to document, id: <co>trgdocid VARCHAR(255)</co>
 
 <p><code>PRIMARY KEY ( srcdocsid, checksum )</code></p>
 
 
-<!-- XXX *TODO:* add this table to the <a
+<!-- XX *TODO:* maybe add this table to the <a
 href='db.html'>Database tables</a> document. -->
 
 
@@ -826,25 +827,30 @@ should do the trick.
 
 ### Search for citations and ACPU
 
-Via ARPU. ACIS::Citations::AutoUpd -> ACIS::Citations::Search
+Via APU. ACIS::APU -> ACIS::Citations::AutoUpdate -> ACIS::Citations::Search
 
-The search is not only search.  
+
 
 #### Automatic citations profile update
 
-ARPU will be extended to cover ACPU and they will be
-jointly called APU: automatic profile update.
+Former ARPU has been extended to cover citations and they now
+jointly known as APU: automatic profile update.
 
-APU will have two configuration parameters:
-<C>minimum-apu-period-days</C> minimum APU period
-(default: 3 weeks or 21 day(?)) and maximum APU period (default:
-twice the minimum, i.e. 6 weeks).
+APU has a number of configuration parameters:
+
+<C>minimum-apu-period-days</C> minimum APU period (default: 3
+weeks or 21 day(?)).
+
+<C>echo-apu-mails</C>, boolean -- whether to send a copy of
+the APU mails to the admin or not.
+
+<C>disable-citation-mails</C>, boolean -- whether to send
+citation mails at all.
 
 ACPU itself includes 3 things:
 
-1. search
-2. matrix maintenance  (clean-up)
-3. profile maintenance (clean-up)
+1. profile maintenance (clean-up)
+2. search
 
 Every time ACPU is done, a timestamp is added to the sysprof
 table for that record ('last-auto-citations-time').
@@ -853,62 +859,13 @@ When APU is about to run, it chooses those records, which have
 their ACPU or ARPU timestamps oldest, just as it is now done
 for ARPU only.  
 
-Then, we run one of ARPU, ACPU for the profile.  Then we
-check, how long ago did we run the other of these two.  If it
-was longer than X time ago, we run it also.  Here X is the
-minimum APU period divided by 2.
-
-
-##### Questions
-
-* How do we initialize sysprof ACPU values for the new
-  records?  Should we do this at account creation or at APU
-  itself?  
-
-  - For upgraded systems (RAS) I need some way to initialize
-    it for existing records anyway.
-
-    - APU self-maintenance would be desirable.  It could
-      estimate progress and adjust so-called APU chunk-size,
-      then initialize ACPU values for acis.records
- 
-    - before searching sysprof, search for acis.records
-      records, which don't have a corresponding sysprof
-      record.
-
-* On the other hand, matrix maintenance and profile
-  maintenance will be done online, if the user logs in.  Should
-  we separate it from citations search?
-
-  - we could ignore these steps in APU if it was done less
-    then X time ago.
-
-  - or we could do it anyway; it may be a waste, but it won't
-    hurt (presumably; unless citations data is volatile...)
-
-    (REMEMBER: BEWARE PREMATURE OPTIMIZATION)
-
-* APRU handles specially the case of multi-record user
-  accounts, does it not?  How should this logic be adapted to
-  ACPU?
-
-  - I think this is a mistake.  They are not handled specially.
-
-
-* other automatic tasks that we need to run every once in a
-  while: session clean-up; updareq for the collections;
-  consistency checking: sanitize ... sanitize4, et cetera;
-  bin/events_archiving, but they are not per-record or
-  per-profile, they are system-global.
-
-
 
 
 
 
 #### ACIS::Citations::Search
 
-Search is complicated, really.  
+Search isn't very simple.  Or is it?
 
 
 For each research profile item of the user:
@@ -917,20 +874,22 @@ For each research profile item of the user:
 
 For each name variation of the user:
 
-    select * from citations where nstring REGEXP '[[:<:]]JOHN MAKLORVICH[[:>:]]';
+    select * from citations where MATCH (nstring) AGAINST
+    ('JOHN MALKOVICH' IN BOOLEAN MODE)
+
+Then we exclude (from among the found) already known:
+identified and refused citations.
+
+Then we exclude citations already suggested.
+
+Then those that are left we compare to the <abbr
+title='research profile'>RP</abbr> documents and look at what
+came out of it.  If anything interesting came out -- we add
+those.  But we do not add a citation if it has already been
+suggested in the past, i.e. if it is old.
 
 
-Then do citation-to-document matching and dump the results to the
-cit\_suggestions table, from which the online part will pick
-it up.  So on the exit of this process we have a set of
-citation suggestions to save to the cit\_suggestions table.
-
-Here is how it will work.  When we search for a person, we
-do two distinct things for her.  1: search.  2: maintenance
-of the similarity matrix consistency, completeness and
-currentness.  
-
-1: search
+SEARCH WORKFLOW
 
  - by the person's research profile documents:
 
@@ -940,14 +899,11 @@ currentness.
 
     - filter out refused citations
 
-    - filter out already existing suggestions
+    - filter out old, suggested in the past items (cit_old_sug table)
 
     - then, for the rest of citations:
 
-      - auto add them (ACPU), based on preferences
-
-      - or save them to the cit_suggestions table
-        accordingly (SimMatrix)
+      - auto add them, if preferences allow
 
 
  - the person's name:
@@ -958,64 +914,68 @@ currentness.
 
     - filter out refused citations
 
-    - load existing suggestions, i.e. similarity matrix
-
-    - filter out already existing suggestions
+    - filter out old, suggested in the past items (cit_old_sug table)
 
     - then, for the rest of citations:
 
-      - add them to the similarity matrix
+      - compare them to the person's documents 
+
+        - comparison results would be written to
+          the cit_doc_similarity table 
 
     - then, if auto-add is enabled for this profile
 
       - find which of the new citations have high similarity
-        measure to a document (but to only one document)
+        measure to a document (and which have the highest, if
+        there's several of them)
 
-      - auto add them (ACPU), based on preferences
+      - auto add them, if preferences allow
 
-      - remove them from the similarity matrix
+
+
+### Citation suggestions
+
+#### Citation to document similarity table: cit_doc_similarity
+
+Table cit_doc_similarity fields:
+
+- citation id: <co>citid BIGINT UNSIGNED NOT NULL</co>
+- document short id: <co>dsid CHAR(15) NOT NULL</co>
+- similarity measure 0..100: <co>similar TINYINT NOT NULL</co>
+- when compared: <co>time DATETIME NOT NULL</co>
+
+<p><co>PRIMARY KEY (citid,dsid)</co></p>
+
+
+#### other citation suggestions table: cit_sug
+
+Table cit_sug fields:
+
+- citation id: <co>citid BIGINT UNSIGNED NOT NULL</co>
+- document short id: <co>dsid CHAR(15) NOT NULL</co>
+- reason: <co>reason CHAR(20) NOT NULL</co>
+- when suggested: <co>time DATETIME NOT NULL</co>
+
+<p><co>PRIMARY KEY (citid,dsid,reason)</co></p>
+
+
+#### Old suggestions table: cit_old_sug
+
+Table cit_old_sug fields:
+
+- short id of the person to whom we suggested it: <co>psid CHAR(15) NOT NULL</co> 
+- document short id: <co>dsid CHAR(15) NOT NULL</co>
+- citation id: <co>citid BIGINT UNSIGNED NOT NULL</co>
+
+<p><co>PRIMARY KEY (psid,dsid,citid)</co></p>
+
+***** stopped here *****
+
 
 
 
 
 ### Similarity matrix
-
-
-#### Table cit_suggestions
-
-Fields:
-
-- citation origin doc sid: <co>srcdocsid CHAR(15) NOT
-  NULL</co> 
-- citation checksum: <co>checksum CHAR(22) NOT NULL</co>
-- personal sid, short: <co>psid CHAR(15) NOT NULL</co>
-- document sid, short: <co>dsid CHAR(15) NOT NULL</co>
-- reason: 'similar' | 'preidentified', 'coauth:pau432': <co>reason
-  CHAR(20) NOT NULL</co>
-- similarity: <co>similar TINYINT UNSIGNED</co> - a number
-  from 0 to 100 inclusive
-- new: yes | no <co>new BOOL</co>
-- suggestion's creation/update date: <co>time DATE NOT NULL</co>
-
-<pre><code>PRIMARY KEY (srcdocsid, checksum, psid, dsid, reason),
-INDEX( psid ), INDEX( dsid )</code></pre>
-
-
-The table may contain several rows for a single
-citation/document pair, because a citation may be offered
-based on different reasons. 
-
-
-Basic operations with the table
-
-- citation found (and compared to documents) -> suggestions need to be saved
-
-- citation identified -> clear all suggestions for this citation to that
-  person, copy it with the 'co-author:...' reason to the co-authors' matrices
-
-- citation refused -> clear all suggestions for this citation to that person
-
-- citation not accepted, became old 
 
 
 #### Data structure
@@ -1497,7 +1457,7 @@ So, a general dump & restore mechanism is highly desirable.
 
 
 <id>
-$Id: citations.text,v 2.51 2006/10/04 22:38:31 ivan Exp $
+$Id: citations.text,v 2.52 2007/01/18 01:35:21 ivan Exp $
 </id>
 
 

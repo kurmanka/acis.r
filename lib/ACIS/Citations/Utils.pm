@@ -176,7 +176,7 @@ sub cit_document_similarity {
     debug "the title's begining was not found in the nstring";
     
     if ( amatch( "$ntitle ", $nstring ) ) {
-      return 0.85;
+      return 0.85;  # XXX Magic number: similarity of the aproximate match amatch()
     }
   }
 
@@ -285,15 +285,14 @@ sub get_author_sid ($) {
 
 sub min_useful_similarity() {
   if ( not $ACIS::Web::ACIS ) {
-    warn "no acis object, can't access the configuration\n";
-    return 0.30 * 100;
+    die "no acis object, can't access the configuration\n";
   } else {
     my $useful = $ACIS::Web::ACIS->config( 'citation-document-similarity-useful-threshold' ) || die;
     return ( $useful * 100 );
   }
 }
 
-sub coauthor_suggestion_similarity { 85; }  # XXX should be configurable?
+sub coauthor_suggestion_similarity { 85; }       # XXX should be configurable?
 sub preidentified_suggestion_similarity { 85; }  # XXX should be configurable?
 
 

@@ -1,8 +1,9 @@
 # ACIS Citations TO DO List
 
-2007-01-15 16:27
+2007-01-18 02:41
 
-### discuss and implement data export to CitEc
+
+### update citations.html document
 
 ### solve the issue of locking the new registration accounts
 
@@ -10,32 +11,11 @@
 
 ### test new citations / suggestions storage 
 
- - test it on test.acis.openlib.org
-
- - and fix
-
- - and, possibly, other error_log problems
-
  - fix and clear the XXX marks
 
- 
-### update citations.html document
 
-### implement data export for Christian's mailings
+### discuss and implement data export to CitEc
 
-  Similar to ~adrepec/remo/cit/conf/authorscites.txt.  See
-  local dev/acis/local/stage3/authorcites for a format
-  example:
-
-    <personalhandle> <citref1> [<citref2>...]
-
-  where citrefN is a string:
-
-    <trgdocid>||<srcdocid>
-  
-  where trgdocid is id of a document in the personhandle's research profile
-
-  
 
 
 
