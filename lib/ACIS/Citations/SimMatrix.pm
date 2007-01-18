@@ -372,65 +372,6 @@ sub consider_new_citations {
 }
 
 
-sub run_maintenance { 
-  my $self = shift || die;
-
-  die if not $acis;
-  die if not $rec;
-  my $psid = $self->{psid} || die;
-  my $sql  = $acis->sql_object() || die;
-
-  my $new  = $self->{new};
-  my $old  = $self->{old};
-  my $docs = $self->{_docs} || die;
-
-  # should we really run maintenance now?  Maybe we did this
-  # just recently?
-  my $lasttime = get_sysprof_value( $psid, "last-citations-simmatrix-maint-time" );
-  if ( $lasttime and time - $lasttime < 7 * 24 * 60 * 60 ) {
-    debug "last maintenance was done less then 7 days ago";
-    return;
-  }
- 
-  # re-run citation/document comparisons
-  # for those suggestions which are more then the
-  # time-to-live days old
-  
-  # CONDITION: if cit->time is less than now() -
-  # citation-document-similarity-ttl days
-
-  # do we need this?
-  require Date::Manip; # qw( DateCalc ParseDate Date_Cmp );
-  my $ttl = $acis-> config( 'citation-document-similarity-ttl' ) || die;
-  my $bell = Date::Manip::DateCalc( "today", "- $ttl days" ) || die;
-  my $recalc;
-
-  foreach my $hash ( $new, $old ) {
-    while ( my ( $docsid, $list ) = each %$hash ) {
-      foreach my $sug ( @$list ) {
-        my $stime = $sug ->{time} || die;
-        next if $stime eq 'today';
-        my $sdate = Date::Manip::ParseDate( $stime );
-        if ( Date::Manip::Date_Cmp( $sdate, $bell ) < 0 ) {
-          # too old, outdated
-          debug "suggestion is too old: ", $sug;
-          my $sv = compare_citation_to_doc( $sug, $docs->{$docsid} );
-          $sug->{similar} = $sv;
-          $sug->{time} = today();
-          $recalc = 1;
-        }
-      }
-    }
-  }
-  
-  # recalculate totals (if needed)
-  $self -> _calculate_totals() if $recalc; 
-  $self->check_consistency
-    if DEBUG_SIMMATRIX_CONSISTENCY;
-  # record the current date in the sysprof table
-  put_sysprof_value( $psid, "last-citations-simmatrix-maint-time", time );
-}
-
 sub remove_citation { 
   my $self = shift || die;
   my $cit  = shift || die; 
