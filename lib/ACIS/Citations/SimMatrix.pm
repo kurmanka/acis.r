@@ -54,6 +54,8 @@ sub make_identified_n_refused ($) {
 }
 
 use Data::Dumper;
+use Web::App::Common;
+
 sub load_similarity_matrix($) {
   my $record = shift || die;
   my $psid = $record->{sid};
@@ -65,16 +67,19 @@ sub load_similarity_matrix($) {
   my $dsid_list = [ grep {defined} map { $_->{sid} } @$rp ];
 #  debug "dsid_list: ", join( ' ', @$dsid_list );
 
+  # these cause leak
   my $sug1 = load_similarity_suggestions( $psid, $dsid_list );
   my $sug2 = load_nonsimilarity_suggestions( $psid, $dsid_list );
+
   my $coauth = "coauth:$psid";
   @$sug2 = grep { not $_->{reason} eq $coauth } @$sug2;
+#  foreach ( @$sug2 ) { undef $_ if $_->{reason} eq $coauth; } 
+#  clear_undefined $sug2;
 
   my $mat  = { new => {}, old => {}, psid => $psid, citations=>{} };
   bless $mat;
 
-  my @sug;
-  @sug = grep { my $id = $_->{srcdocsid} . '-' . $_->{checksum}; 
+  my @sug = grep { my $id = $_->{srcdocsid} . '-' . $_->{checksum}; 
                 not exists $f1->{$id} and not exists $f2->{$id} } @$sug1, @$sug2;
 
   my $before_filter = scalar(@$sug1) + scalar( @$sug2);
@@ -82,8 +87,17 @@ sub load_similarity_matrix($) {
   debug "filtering: before:$before_filter after:$after_filter";
 
   foreach ( @sug ) {  $mat -> _add_sug( $_ );  }
+
+  # this helps leak-wise:
+  @sug = ();
+  @$sug1 = ();
+#  @$sug2 = ();
   
   $mat -> _calculate_totals;
+
+#  use ACIS::Debug::MLeakDetect;
+#  print my_vars_report;
+
   return $mat;
 }
 
@@ -123,8 +137,19 @@ sub _add_sug {
   my $known = $self->{citations};
   my $cindex = $known->{$cid}{$d} ||= [];
   my $pair = [ $newold, $sug ];
-  weaken( $pair->[1] );
   push @$cindex, $pair;
+}
+
+sub DESTROY {
+  my $self = shift;
+  my $i = $self->{citations};
+  foreach ( %$i ) {
+    my $cl = $i->{$_};
+    foreach ( @$cl ) {
+      undef $_->[1];
+    }
+    delete $i->{$_};
+  }
 }
 
 
@@ -263,6 +288,7 @@ sub upgrade {
 
   $acis = $_acis;
   $rec  = $_rec;
+ 
 }
 
 sub find_cit {
@@ -504,7 +530,7 @@ sub check_consistency {
 
   die if not $acis;
   die if not $rec;
-  
+
   my $psid = $self->{psid} || die;
   my $sql  = $acis->sql_object() || die;
 

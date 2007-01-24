@@ -25,7 +25,7 @@ package Web::App;   ### -*-perl-*-
 #  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 #
 #  ---
-#  $Id: App.pm,v 2.17 2006/11/28 16:04:38 ivan Exp $
+#  $Id: App.pm,v 2.18 2007/01/24 18:07:12 ivan Exp $
 #  ---
 
 
@@ -65,7 +65,9 @@ BEGIN {
     }
 
   } else {
-    eval "use Carp qw( verbose );";
+    require Carp;
+    import  Carp 'verbose';
+#    eval "use Carp qw( verbose );";
   }
 }
 
@@ -695,11 +697,16 @@ sub find_right_screen {
 }
 
 
+#use Data::Dumper;
+
 sub clear_after_request {
   my $self = shift;
 
   debug "clearing";
 
+#  use Devel::DumpSizes qw/dump_sizes/;
+#  dump_sizes("/tmp/acis_var_dump");
+  #debug Dumper( $self );
   foreach ( qw( request response username session
                 http_headers content_type
                 presenter
@@ -722,9 +729,12 @@ sub clear_after_request {
   }
 
   CGI::Minimal::reset_globals();
+
+  $self->_debug_leaks_after_clearing;
 }
 
-
+sub _debug_leaks_after_clearing{}
+sub _debug_leaks_after_processing{}
 
 
 #######################################################
@@ -955,6 +965,8 @@ sub handle_request {
     debug "processors finished";
   }
 
+  $self-> _debug_leaks_after_processing;
+
   $self -> time_checkpoint( 'processors' );
 
   {
@@ -1012,7 +1024,6 @@ sub handle_request {
     $/=undef;
     print STDOUT $self -> {response}{body};
   }
-
 
   $self -> post_scriptum;
 }
@@ -1117,11 +1128,9 @@ sub post_scriptum {
     if ( open DLOG, '>>:utf8', $logfn ) { 
       print DLOG "\n* ", date_now(), " [$$]\n", $Web::App::Common::LOGCONTENTS;
       close DLOG;
-      $Web::App::Common::LOGCONTENTS = '';
     }
   }
-
-
+  $Web::App::Common::LOGCONTENTS = '';
 }
 
 

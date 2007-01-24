@@ -25,7 +25,7 @@ package ACIS::Web::Admin;   ### -*-perl-*-
 #  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 #
 #  ---
-#  $Id: Admin.pm,v 2.13 2007/01/08 12:08:21 ivan Exp $
+#  $Id: Admin.pm,v 2.14 2007/01/24 18:07:12 ivan Exp $
 #  ---
 
 
@@ -313,7 +313,8 @@ sub offline_userdata_service {
     use ACIS::Web::Person;
     my $record = $session -> current_record;
     if ( $record ->{type} eq 'person' ) {
-      ACIS::Web::Person::bring_up_to_date( $acis, $record );
+#XXXXXXXXXXXX
+#      ACIS::Web::Person::bring_up_to_date( $acis, $record );
     }
   }
   

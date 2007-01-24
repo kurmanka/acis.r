@@ -25,7 +25,7 @@ package ACIS::Web;   ### -*-perl-*-
 #  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 #
 #  ---
-#  $Id: Web.pm,v 2.9 2006/12/18 13:25:42 ivan Exp $
+#  $Id: Web.pm,v 2.10 2007/01/24 18:07:12 ivan Exp $
 #  ---
 
 
@@ -677,7 +677,54 @@ sub send_mail {
 }
 
 
+#use Devel::LeakTrace;
+require Devel::Symdump;
+sub _debug_leaks_after_processing {
+  my $self = shift;
+  
+  use ACIS::Debug::MLeakDetect;
+  $self->log( my_vars_report );
+ 
+  use Data::Dump::Streamer;
+  $self->log( Dump($self)->Out );
+#  print "<p>", Dump( $r )->Out(), "</p>";
 
+  return;
+
+
+  my $dsd = Devel::Symdump->rnew(  );
+  my @packages = $dsd->packages;
+  my @scalars  = $dsd->scalars;
+
+  print "Symbol dump:\n";
+
+#  print "<p>Packages: ";
+#  foreach (@packages) {
+#    print "$_ ";
+#  }
+#  print "</p>";
+
+  print "<p>Scalars: ";
+
+  foreach (@scalars) {
+    my $d;
+    my $r;
+    my $l = 0;
+    eval qq! \$d = defined \$$_; \$r = ref \$$_; \$l = length( \$$_ );!;
+    if ( $d ) {
+      print $_, "($r,$l) ";
+    }
+  }
+  print "</p>";
+
+  use Data::Structure::Util qw( has_circular_ref );
+
+  my $r = has_circular_ref( $self );
+  if ( $r ) {
+  }
+
+
+}
 
 
  

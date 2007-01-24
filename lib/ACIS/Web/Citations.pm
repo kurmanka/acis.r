@@ -58,21 +58,28 @@ sub prepare() {
   $research_accepted = $record ->{contributions}{accepted} || [];
   if ( scalar @$research_accepted == 0 ) { $vars->{'empty-research-profile'} = 1; }
 
-#  $mat = $session ->{simmatrix} ||= load_similarity_matrix( $record ); 
-  $mat = $session ->{simmatrix}   = load_similarity_matrix( $record ); 
-  $mat -> upgrade( $acis, $record );
+#  $mat = $session ->{simmatrix} ||= load_similarity_matrix( $record ); # XXX
+#  $mat = $session ->{simmatrix}   = load_similarity_matrix( $record ); 
+  $mat && $mat -> upgrade( $acis, $record );
 
   $dsid = $params->{dsid} || $acis->{request}{subscreen};
   if ( $dsid ) {
     $document = get_doc_by_sid $dsid;
   }
 
-  if ( not $session -> {$id} {'citations-checked-and-cleaned'} ) {
+  # the following if causes ~2k leak per execution (on ik@ahinea.com account)
+  if (0 and not $session -> {$id} {'citations-checked-and-cleaned'} ) {
     require ACIS::Citations::Profile;
     ACIS::Citations::Profile::profile_check_and_cleanup();
     $session -> {$id} {'citations-checked-and-cleaned'} = 1;
   }
 
+#  delete $mat ->{new};
+#  delete $mat ->{old};
+#  delete $mat ->{citations};
+#XXXXX
+#  use ACIS::Debug::MLeakDetect;
+#  print my_vars_report;
 }
 
 

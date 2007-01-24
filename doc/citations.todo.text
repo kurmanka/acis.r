@@ -3,6 +3,8 @@
 2007-01-18 02:41
 
 
+- transfer here things to do from the 2007-01-17 report
+
 ### update citations.html document
 
 ### solve the issue of locking the new registration accounts
@@ -30,6 +32,14 @@
 
   - implement auto-throttling?
 
+### /adm screens: authorization fix
+
+Christian writes:
+
+> when I go to http://authors.repec.org/adm/events/decode?hours=1 and need
+> to enter the password, I get a log for the full 24 hours instead of 1.
+> This put undue strain on the machine. Especially when I use this to check
+> a performance issue.
 
 
 ---------

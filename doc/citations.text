@@ -863,33 +863,33 @@ for ARPU only.
 
 
 
-#### ACIS::Citations::Search
+#### Search workflow
 
-Search isn't very simple.  Or is it?
-
-
-For each research profile item of the user:
+For each research profile item of the user, we do something like:
 
     select * from citations where trgdocid = 'repec:fdd:fodooo:555';
 
-For each name variation of the user:
+and it finds us citations which where pre-identified as pointing to
+that document.  Pre-identified means identified by the citations data
+provider.
+
+For each name variation of the user we do:
 
     select * from citations where MATCH (nstring) AGAINST
     ('JOHN MALKOVICH' IN BOOLEAN MODE)
 
-Then we exclude (from among the found) already known:
-identified and refused citations.
+(this is a simplified variation of the actual query.)
 
-Then we exclude citations already suggested.
+Then we exclude (from what's found) the already known: identified and
+refused citations.  Then we exclude citations already suggested.
 
 Then those that are left we compare to the <abbr
 title='research profile'>RP</abbr> documents and look at what
 came out of it.  If anything interesting came out -- we add
 those.  But we do not add a citation if it has already been
-suggested in the past, i.e. if it is old.
+suggested in the past, i.e. if it is old.  Ok, let's look closer at it.
 
-
-SEARCH WORKFLOW
+THE WORKFLOW
 
  - by the person's research profile documents:
 
@@ -899,7 +899,7 @@ SEARCH WORKFLOW
 
     - filter out refused citations
 
-    - filter out old, suggested in the past items (cit_old_sug table)
+    - filter out old, suggested in the past items (cit\_old_sug table)
 
     - then, for the rest of citations:
 
@@ -914,14 +914,14 @@ SEARCH WORKFLOW
 
     - filter out refused citations
 
-    - filter out old, suggested in the past items (cit_old_sug table)
+    - filter out old, suggested in the past items (cit\_old_sug table)
 
     - then, for the rest of citations:
 
       - compare them to the person's documents 
 
         - comparison results would be written to
-          the cit_doc_similarity table 
+          the cit\_doc_similarity table 
 
     - then, if auto-add is enabled for this profile
 
@@ -933,141 +933,8 @@ SEARCH WORKFLOW
 
 
 
-### Citation suggestions
 
-#### Citation to document similarity table: cit_doc_similarity
-
-Table cit_doc_similarity fields:
-
-- citation id: <co>citid BIGINT UNSIGNED NOT NULL</co>
-- document short id: <co>dsid CHAR(15) NOT NULL</co>
-- similarity measure 0..100: <co>similar TINYINT NOT NULL</co>
-- when compared: <co>time DATETIME NOT NULL</co>
-
-<p><co>PRIMARY KEY (citid,dsid)</co></p>
-
-
-#### other citation suggestions table: cit_sug
-
-Table cit_sug fields:
-
-- citation id: <co>citid BIGINT UNSIGNED NOT NULL</co>
-- document short id: <co>dsid CHAR(15) NOT NULL</co>
-- reason: <co>reason CHAR(20) NOT NULL</co>
-- when suggested: <co>time DATETIME NOT NULL</co>
-
-<p><co>PRIMARY KEY (citid,dsid,reason)</co></p>
-
-
-#### Old suggestions table: cit_old_sug
-
-Table cit_old_sug fields:
-
-- short id of the person to whom we suggested it: <co>psid CHAR(15) NOT NULL</co> 
-- document short id: <co>dsid CHAR(15) NOT NULL</co>
-- citation id: <co>citid BIGINT UNSIGNED NOT NULL</co>
-
-<p><co>PRIMARY KEY (psid,dsid,citid)</co></p>
-
-***** stopped here *****
-
-
-
-
-
-### Similarity matrix
-
-
-#### Data structure
-
-matrix:
-
-  - new (hash):
-
-     - document sid1 | citations list (each with reason & similarity)
-
-  - old (hash):
-
-     - document sid1 | citations list (each with reason & similarity)
-
-  - totals_new (hash):
-  
-     - document sid1 | total similarity of the new
-       citations, a real positive value
-
-  - doclist (list): list of document sids in the order of
-    decreasing similarity (based on totals_new)
-
-  - citations (hash):
-
-     - citation id | hash:
-         - docsid | list of [ 'new', $suggestion ] or
-     ['old', $suggestion ]
-
-  - psid: personal record short id
-
-
-"dxx44"                     -- research profile item's sid
-
-$matrix -> {new} {dxx44}[0] -- the first of the new citations
-                               suggested for research profile
-                               item dxx44
-
-$matrix -> {new} {dxx44}[1]->{similar} -- similarity of the
-                            second citation's to dxx44 document
-
-$matrix -> {citations} {'dcen4-n6Ci5dmzFdBAtQx4K+mEjg'}
-{dxx44} -- array of where this citation is suggested.
-
-$matrix -> {citations} {'dcen4-n6Ci5dmzFdBAtQx4K+mEjg'}
-{dxx44}[0][0] -- 'new' or 'old'
-
-$matrix -> {citations} {'dcen4-n6Ci5dmzFdBAtQx4K+mEjg'}
-{dxx44}[0][1] -- reference to the particular suggestion hash
-
-
-Similarity values in the matrix and in the cit_suggestions
-table are all in percent scale.  It is produced by
-multiplying the similarity value calculated by the
-cit-to-document comparison function by 100.
-
-
-#### matrix operations
-
-basic:
-
-- load the matrix
-
-- calculate totals
-
-
-advanced:
-
-- add new citations
-
-- remove citation
-
-- citation status change new to old
-
-
-- matrix maintenance
-
-  - expire old citation suggestions (based on the time field
-    and time-to-live config param)
-
-  - remove the suggestions for documents, which are no longer
-    in the research profile
-
-  - run citation-to-document matching for the expired
-    similarity values, if any
-
-  - run citation-to-document matching for the new research
-    profile documents, if any
-
- 
-
-
-### Citation to research items similarity 
+### Citation to document similarity 
 
 
 <h4 id='cit-doc-similarity-pi'>Similarity assessment function interface</h4>
@@ -1187,6 +1054,121 @@ Get the comparison result as a number between 0 and 1.
 
 
 
+
+### Citation suggestions
+
+#### Citation to document similarity table: cit\_doc_similarity
+
+Table cit\_doc_similarity fields:
+
+- citation id: <co>citid BIGINT UNSIGNED NOT NULL</co>
+- document short id: <co>dsid CHAR(15) NOT NULL</co>
+- similarity measure 0...100: <co>similar TINYINT NOT NULL</co>
+- when compared: <co>time DATETIME NOT NULL</co>
+
+<p><co>PRIMARY KEY (citid,dsid)</co></p>
+
+
+#### other citation suggestions table: cit_sug
+
+Table cit_sug fields:
+
+- citation id: <co>citid BIGINT UNSIGNED NOT NULL</co>
+- document short id: <co>dsid CHAR(15) NOT NULL</co>
+- reason: <co>reason CHAR(20) NOT NULL</co>
+- when suggested: <co>time DATETIME NOT NULL</co>
+
+<p><co>PRIMARY KEY (citid,dsid,reason)</co></p>
+
+
+#### Old suggestions table: cit\_old_sug
+
+Table cit\_old_sug fields:
+
+- short id of the person to whom we suggested it: <co>psid CHAR(15) NOT NULL</co> 
+- document short id: <co>dsid CHAR(15) NOT NULL</co>
+- citation id: <co>citid BIGINT UNSIGNED NOT NULL</co>
+
+<p><co>PRIMARY KEY (psid,dsid,citid)</co></p>
+
+
+
+
+### Similarity matrix
+
+
+#### Data structure
+
+matrix:
+
+  - new (hash):
+
+     - document sid1 | citations list (each with reason & similarity)
+
+  - old (hash):
+
+     - document sid1 | citations list (each with reason & similarity)
+
+  - totals_new (hash):
+  
+     - document sid1 | total similarity of the new
+       citations, a real positive value
+
+  - doclist (list): list of document sids in the order of
+    decreasing similarity (based on totals_new)
+
+  - citations (hash):
+
+     - citation id | hash:
+         - docsid | list of [ 'new', $suggestion ] or
+     ['old', $suggestion ]
+
+  - psid: personal record short id
+
+
+"dxx44"                     -- research profile item's sid
+
+$matrix -> {new} {dxx44}[0] -- the first of the new citations
+                               suggested for research profile
+                               item dxx44
+
+$matrix -> {new} {dxx44}[1]->{similar} -- similarity of the
+                            second citation's to dxx44 document
+
+$matrix -> {citations} {'dcen4-n6Ci5dmzFdBAtQx4K+mEjg'}
+{dxx44} -- array of where this citation is suggested.
+
+$matrix -> {citations} {'dcen4-n6Ci5dmzFdBAtQx4K+mEjg'}
+{dxx44}[0][0] -- 'new' or 'old'
+
+$matrix -> {citations} {'dcen4-n6Ci5dmzFdBAtQx4K+mEjg'}
+{dxx44}[0][1] -- reference to the particular suggestion hash
+
+
+Similarity values in the matrix and in the cit\_doc_similarity
+table are all in the percent scale.  They are produced by
+multiplying the similarity values (calculated by the
+cit-to-document comparison function) by 100.
+
+
+#### main matrix operations
+
+- load the matrix
+
+- calculate totals
+
+- get most interesting document (dsid)
+
+- consider new citations
+
+- remove citation
+
+- citation status change new to old
+
+ 
+
+
+
 ### Userdata structure
 
 The **<co>citations</co>** branch of the userdata structure:
@@ -1227,32 +1209,15 @@ Citations will be stored as:
 
 1. citation table records
 
-2. cit_suggestions table records
+2. in-memory suggestions
 
 3. userdata items (see <a href='#userdata-citation-item'>above</a>)
 
-Basically, the citations will go from 1 to 2 and from 2 to 3 and not the other
-way around.  At each step, some hash keys may be added to a citation or may be
-removed.
+Basically, the citations will go from 1 to 2 and from 2 to 3.  At each
+step, some hash keys may be added to a citation or may be removed.  
 
-
-As for the session, it will have a <co>citations</co> item,
-which, in its turn will contain:
-
- - <co>matrix</co> -- similarity matrix
-
- - <co>identified</co> -- as in userdata
-
- - <co>refused</co> -- as in userdata
-
- - <co>meta</co>
-
- - <co>research_index</co> -- indices of the RP by sid and
-   by id and as a list?
-
-
-
-
+But sometimes a citation is removed from userdata and then it may be
+re-considered as a suggestion (3->2). 
 
 
 ### Modules
@@ -1272,6 +1237,8 @@ which, in its turn will contain:
 - cit_document\_similarity( cit, doc ) -- <a
   href='#similarity-default-func'>default cit-doc similarity func</a>
 
+and other useful stuff
+
 #### ACIS::Citations::Input
 
 use ACIS::Citations::Utils;
@@ -1282,6 +1249,17 @@ use ACIS::Citations::Utils;
 
 - check_citation( cit ) - reload citation from the citations table or return
   undef otherwise
+
+
+
+STOPPED HERE.  
+STOPPED HERE.  
+STOPPED HERE.  
+STOPPED HERE.  
+STOPPED HERE.  
+STOPPED HERE.  
+STOPPED HERE.  
+STOPPED HERE.  2007-01-18 04:37
 
 
 #### ACIS::Citations::Suggestions
@@ -1457,7 +1435,7 @@ So, a general dump & restore mechanism is highly desirable.
 
 
 <id>
-$Id: citations.text,v 2.52 2007/01/18 01:35:21 ivan Exp $
+$Id: citations.text,v 2.53 2007/01/24 18:07:12 ivan Exp $
 </id>
 
 

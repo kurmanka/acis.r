@@ -26,7 +26,7 @@ package Web::App::Session; ### -*-perl-*-
 #  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 #
 #  ---
-#  $Id: Session.pm,v 2.7 2007/01/11 01:55:40 ivan Exp $
+#  $Id: Session.pm,v 2.8 2007/01/24 18:07:12 ivan Exp $
 #  ---
 
 
@@ -88,6 +88,11 @@ sub new {
                  -startend => 1 );
 
   return $self;
+}
+
+sub DESTROY {
+  my $self = shift;
+  undef $self->{'.app'};
 }
 
 

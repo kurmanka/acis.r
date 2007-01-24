@@ -51,12 +51,17 @@ if test "$cgi_pperl_binary"; then
 
    echo
    echo 'BEGIN { $acis = new ACIS::Web( ); }'
+#   echo 'use Devel::LeakTrace;'
+#   echo '$acis = new ACIS::Web( );'
    echo
    echo '$acis -> handle_request;'
    echo '$acis -> clear_after_request;'
+#   echo 'use Devel::DumpSizes qw/dump_sizes/;'
+#   echo 'dump_sizes("/tmp/pperl_var_dump");'
 else
    echo '$acis = new ACIS::Web( );'
    echo 
    echo '$acis -> handle_request;'
+   echo '$acis -> clear_after_request;'
 fi
 echo
