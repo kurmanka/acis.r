@@ -136,7 +136,16 @@ sub run_xslt_presenter {
     
   if ( $@ or $XML::LibXSLT::error 
        or not $result_object or not $result ) {
-    my $err = $@ || $XML::LibXSLT::error;
+    my $err = $@;
+    if ( not $@ ) {
+      if ( $XML::LibXSLT::error ) {
+        $err = "XML::LibXSLT::error: $XML::LibXSLT::error";
+      } elsif ( not $result_object ) {
+        $err = 'no $result_object';
+      } elsif ( not $result ) {
+        $err = 'no $result';
+      }
+    }
     $self -> errlog( "xslt transformation error, stylesheet: $file ($@)" );
 
     $self -> sevent ( @event,

@@ -9,8 +9,8 @@ my $sql = $ACIS -> sql_object;
 
 my @q = (
 
-q!alter cit_doc_similarity add INDEX docind (dsid)!,
-q!alter cit_sug            add INDEX docind (dsid)! 
+q!alter table cit_doc_similarity add INDEX docind (dsid)!,
+q!alter table cit_sug            add INDEX docind (dsid)! 
 
 );
 

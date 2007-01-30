@@ -299,6 +299,7 @@ sub process_identified {
 
 
 sub prepare_doclist {
+  debug "prepare doclist";
 
   my $sort = $acis -> {request}{subscreen} || 'by-new';
 
@@ -375,6 +376,7 @@ sub process_autosug {
 }
 
 sub prepare_overview {
+  debug "prepare citations overview";
 
   # redirect to autosug on the first visit, if there are interesting docs to see
   if ( not $session ->{citations_first_screen} ) {

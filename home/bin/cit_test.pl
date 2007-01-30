@@ -66,6 +66,14 @@ sub cit_overview {
 
   ACIS::Web::Citations::prepare();
   ACIS::Web::Contributions::prepare( $acis );
+  ACIS::Web::Citations::prepare_overview();
+  $acis -> set_presenter( 'citations' ); # citations overview screen
+  $acis -> prepare_presenter_data;
+  $acis -> {'presenter-data'}{request}{session}{type} = 'user';
+  my $content = $acis -> run_presenter( $acis->{presenter} );
+
+  substr( $content, 300 ) = '...';
+  print "page: $content\n---\n";
 
   my $m = $session->{simmatrix};
   my $c = $session->{simmatrix}{citations};

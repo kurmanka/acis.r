@@ -25,7 +25,7 @@ package Web::App;   ### -*-perl-*-
 #  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 #
 #  ---
-#  $Id: App.pm,v 2.19 2007/01/30 14:07:00 ivan Exp $
+#  $Id: App.pm,v 2.20 2007/01/30 21:03:03 ivan Exp $
 #  ---
 
 
@@ -1083,7 +1083,7 @@ _DEBUG_INCLUDE
     my $debug_mark = '<!-- debuggings go here -->';
     if ( $$out =~ /$debug_mark/ ) {
       my $mark = $debug_mark;
-      $$out =~ s/$mark/$mark$debuggings/;
+      $$out =~ s/$mark/$mark$debuggings/; ### XXX could be replaced with index()... & substr() = ...
     } else { 
       $$out .= $debuggings; 
     }
