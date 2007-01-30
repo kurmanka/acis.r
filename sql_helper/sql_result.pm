@@ -21,15 +21,24 @@ sub new {
     if ( $statement 
          and not $statement ->errstr
          and $statement -> {Active} ) {
-
       $self->{data} = $statement ->fetchall_arrayref( {} );
       $self->{i} = -1;
-
-        $self-> next;
+      $self-> next;
     }
     return $self;
 }
 
+require Encode;
+sub decode_utf8 {
+  my ( $self, @f ) = shift;
+  my $d = $self->{data} || die;
+  foreach my $r ( @$d ) {
+    foreach ( @f ) {
+      $r->{$_} = Encode::decode_utf8( $r->{$_} );
+    }
+  }
+  return 1;
+}
 
 sub rows {
   my $self = shift;

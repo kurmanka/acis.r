@@ -5,7 +5,6 @@ use warnings;
 
 use Carp;
 use Carp::Assert;
-use Scalar::Util qw( weaken );
 
 #  get_most_interesting_document( psid );
 
@@ -73,8 +72,6 @@ sub load_similarity_matrix($) {
 
   my $coauth = "coauth:$psid";
   @$sug2 = grep { not $_->{reason} eq $coauth } @$sug2;
-#  foreach ( @$sug2 ) { undef $_ if $_->{reason} eq $coauth; } 
-#  clear_undefined $sug2;
 
   my $mat  = { new => {}, old => {}, psid => $psid, citations=>{} };
   bless $mat;
@@ -86,19 +83,15 @@ sub load_similarity_matrix($) {
   my $after_filter  = scalar @sug;
   debug "filtering: before:$before_filter after:$after_filter";
   $mat ->{sugs} = $after_filter;
-  #  print "filtering: before:$before_filter after:$after_filter\n";
 
   $mat -> _add_sugs( \@sug );
   $mat -> _calculate_totals;
-#  use ACIS::Debug::MLeakDetect;
-#  print my_vars_report;
   return $mat;
 }
 
 
 
-use Carp;
-# for internal usage: add a suggestion to the matrix
+# for internal usage: add the suggestions to the matrix
 sub _add_sugs {
   my ( $self, $sugs ) = @_;
   debug "_add_sugs()";
@@ -141,17 +134,11 @@ sub _add_sugs {
     
     $i ++;
   }
-
   debug "added $i suggestions";
 }
 
 sub DESTROY {
   my $self = shift;
-#  foreach ( $self->{new}, $self->{old} ) {
-#    foreach ( values %$_ ) {
-#      @$_ = ();
-#    }
-#  }
   delete $self->{new};
   delete $self->{old};
   delete $self->{citations};
@@ -374,14 +361,13 @@ sub compare_citation_to_documents {
     } elsif ( $v ) {
       debug "add the suggestion";
       my $new = not get_cit_old_status( $psid, $dsid, $cit->{citid} );
-      $self->_add_sug( { %$cit, dsid=> $dsid, reason=> 'similar', similar=> $v, new=>$new, time=>today() } );
+      $self->_add_sug( [{ %$cit, dsid=> $dsid, reason=> 'similar', similar=> $v, new=>$new, time=>today() }] );
       $recalc = 1;
 
     } else {
       debug "nothing";
     }
   }
-
 
   debug "matrix: ", Dumper( $self );
   $self->_calculate_totals if $recalc;

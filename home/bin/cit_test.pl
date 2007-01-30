@@ -26,7 +26,7 @@ if ( not $login or scalar @ARGV ) {
 BEGIN { $acis = ACIS::Web -> new( home => $homedir ); }
 
 use ACIS::Web::Admin;
-my $res= ACIS::Web::Admin::offline_userdata_service( $acis, $login, 'ACIS::cit_overview', $rec, $rec );
+my $res= ACIS::Web::Admin::offline_userdata_service( $acis, $login, 'ACIS::cit_overview', $rec, $rec, {complain => 1} );
 #if ( not $res ) { print "  RESULT: $res\n"; }
 $acis->clear_after_request();
 
@@ -40,7 +40,7 @@ use ACIS::Web::Citations;
 use ACIS::Citations::Utils;
 use ACIS::Citations::Suggestions;
 use ACIS::Citations::SimMatrix;
-
+use ACIS::Web::Contributions;
 
 sub p (@) { print @_, "\n"; }
 
@@ -65,6 +65,7 @@ sub cit_overview {
 #  $s .= '.'x5000000;
 
   ACIS::Web::Citations::prepare();
+  ACIS::Web::Contributions::prepare( $acis );
 
   my $m = $session->{simmatrix};
   my $c = $session->{simmatrix}{citations};

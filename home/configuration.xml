@@ -5,7 +5,7 @@
     that is a working ARDB core configuration file.  Produces:
     documents table, collections table, authors table.
 
-    $Id: configuration.xml,v 2.7 2007/01/30 14:07:00 ivan Exp $
+    $Id: configuration.xml,v 2.8 2007/01/30 17:02:18 ivan Exp $
 
 -->
 
@@ -452,8 +452,8 @@
 
   <table name='acis:sysprof'>
   
-    <field name='id'       sql-type=' CHAR(100) NOT NULL' />
-    <field name='param'    sql-type=' CHAR(40) NOT NULL' />
+    <field name='id'       sql-type=' VARCHAR(255) NOT NULL' />
+    <field name='param'    sql-type=' VARCHAR(255) NOT NULL' />
     <field name='data'     sql-type=' BLOB' />
                           
     <create-table-sql> PRIMARY KEY ( id, param )</create-table-sql>

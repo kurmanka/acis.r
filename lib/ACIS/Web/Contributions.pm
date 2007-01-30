@@ -25,37 +25,29 @@ package ACIS::Web::Contributions;  ### -*-perl-*-
 #  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 #
 #  ---
-#  $Id: Contributions.pm,v 2.29 2007/01/09 12:17:02 ivan Exp $
+#  $Id: Contributions.pm,v 2.30 2007/01/30 17:02:18 ivan Exp $
 #  ---
 
 use strict;
-
 use Carp qw( cluck );
 use Carp::Assert;
-
 use Web::App::Common;
-
 use ACIS::Data::DumpXML::Parser;
 
 
-
 my $already_there_count;
-
 my $Conf;
 
 use vars qw( $DB $SQL );
 
 ###########################################################################
 ###   s u b   g e t   c o n f i g u r a t i o n
-###
 sub get_configuration {
   my $app = shift;
-
   if ( $Conf ) { return $Conf; }
 
   my $file = $app -> home;
   $file .= '/contributions.conf.xml';
-
   $Conf = ACIS::Data::DumpXML::Parser -> new -> parsefile ( $file );
 
   if ( not $Conf ) {
@@ -111,8 +103,6 @@ sub get_configuration {
 }
 
 
-
-
 use vars qw( $acis );
 *acis = *ACIS::Web::ACIS;
 
@@ -136,7 +126,6 @@ sub prepare {
   $record -> {contributions} {accepted}  = $accepted;
   $record -> {contributions} {refused}   = $refused;
   
-
   $SQL = $app -> sql_object;
   $DB  = $app -> config( 'metadata-db-name' );
 
@@ -146,13 +135,10 @@ sub prepare {
     }
   }
 
-
-
   ###  make a hash of already accepted contributions and store it into
   ###  'already-accepted' in the session
 
   my $already_accepted = {}; 
-
   foreach ( @$accepted ) {
     my $id   = $_ ->{id};
     my $type = $_ ->{type};
@@ -1051,21 +1037,14 @@ sub process_refused {
   my $record  = $session -> current_record;
   my $id      = $record -> {id};
   my $psid    = $record -> {sid};
-
   assert( $contributions );
-  
-  my $input = $app -> form_input;
-
   assert( $refused  );
-
+  my $input = $app -> form_input;
   my $already_refused  = $contributions -> {'already-refused' }; 
-
   my $statistics = {};
   my $processed  = 0;
 
-
   ###  process contribution refusals
-
   foreach ( keys %$input  ) {
     my $val = $input -> {$_};
 
@@ -1142,11 +1121,8 @@ sub process_refused_xml {
   my $psid    = $record -> {sid};
 
   assert( $contributions );
-  
-  my $input = $app -> form_input;
-
   assert( $refused  );
-
+  my $input = $app -> form_input;
   my $already_refused  = $contributions -> {'already-refused' }; 
   my $cleared = [];
 
@@ -1431,25 +1407,35 @@ sub search {
 ###   s u b    r e l o a d   a c c e p t e d   c o n t r i b u t i o n s   #
 ############################################################################
 
+use ACIS::Web::SysProfile;
+
+sub passed_since {
+  my ($period,$start) = @_;
+  my $now = time;
+  return ( $start+$period < $now );
+}
+
+# do not reload it twice in a same min period
+my $reload_min_period = 60*60*24*6; # six days
+# grace period for a disappeared document record
 my $grace_period = 60*60*24*7*2; # two weeks
- 
+
 sub reload_accepted_contributions {
   my $app = shift;
-
   my $session = $app -> session;
   my $record  = $session -> current_record;
   my $id      = $record -> {id};
-
   my $metadata_db = $app -> config( 'metadata-db-name' );
 
-  if ( $session ->{$id}{contributions}{reloaded} ) { return 1; }
-  $session ->{$id}{contributions}{reloaded} = 1;
+  # check if we did this already recently
+  my $last_reload = get_sysprof_value( $record->{sid}, "last-reload-accepted-contrib" ) || 0;
+  if ( not passed_since( $reload_min_period, $last_reload ) ) { return 0; }
 
+  # check the flag to avoid double work
+  if ( $session ->{$id}{contributions}{reloaded} ) { return 1; }
 
   my $accepted = $record ->{contributions}{accepted};
-
   my $accepted_size_before = scalar @$accepted;
-
   foreach ( @$accepted ) {
     my $item = $_;
     my $id   = $_ ->{id};
@@ -1487,26 +1473,25 @@ sub reload_accepted_contributions {
            (exists $item->{editors}) ? ( -editors  => $item -> {editors} ) : (),
                         );
         }
-
       } else {
         $_ -> {frozen} = $today;
       }
-      
     }
   }
-  
   clear_undefined $accepted;
 
   my $accepted_size_after = scalar @$accepted;
   if ( $accepted_size_after < $accepted_size_before ) {
     debug "some lost items removed";
   }
-
   if ( scalar @$accepted ) {
     debug "the contributions accepted are reloaded from the database.";
   }
   
-  $session -> {$id} {'reloaded-accepted-contributions'} = 1;
+  # remember the current time and set the flags to avoid repeating this again
+  put_sysprof_value( $record->{sid}, "last-reload-accepted-contrib", time );
+  $session ->{$id}{contributions}{reloaded} = 1;
+  $session ->{$id}{'reloaded-accepted-contributions'} = 1;
 }
 
 
@@ -1517,7 +1502,6 @@ sub reload_refused_contributions {
   my $session = $app -> session;
   my $record  = $session -> current_record;
   my $id      = $record -> {id};
-
   my $metadata_db = $app -> config( 'metadata-db-name' );
 
   if ( $session ->{$id}{contributions}{refused_reloaded} ) { return 1; }
@@ -1529,22 +1513,17 @@ sub reload_refused_contributions {
   foreach ( @$list ) {
     my $item = $_;
     my $id   = $_ ->{id};
-    
     my $new  = reload_contribution( $app, $id, $metadata_db );
     if ( $new ) {
       $_ = $new;
     } else {
       debug "refused item $id is not in the database";
     }
-
   }
-  
   clear_undefined $list;
-
   if ( $list_size_before ) {
     debug "refused contributions have been reloaded from the database";
   }
-  
   $session -> {$id} {'reloaded-refused-contributions'} = 1;
 }
 
@@ -1561,8 +1540,6 @@ use vars qw( $select_what );
 
 $select_what = "select id,sid,data ";
 my $SELECT_WHAT = $select_what;
-
-
 
 sub make_resource_item_from_db_row {
   my $row = shift;
