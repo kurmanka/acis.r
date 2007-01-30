@@ -25,7 +25,7 @@ package ACIS::Web::Admin;   ### -*-perl-*-
 #  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 #
 #  ---
-#  $Id: Admin.pm,v 2.14 2007/01/24 18:07:12 ivan Exp $
+#  $Id: Admin.pm,v 2.15 2007/01/30 14:07:00 ivan Exp $
 #  ---
 
 
@@ -309,13 +309,10 @@ sub offline_userdata_service {
   }
 
   ### now do some compatibility checks/upgrades for the record
-  {
-    use ACIS::Web::Person;
-    my $record = $session -> current_record;
-    if ( $record ->{type} eq 'person' ) {
-#XXXXXXXXXXXX
-#      ACIS::Web::Person::bring_up_to_date( $acis, $record );
-    }
+  require ACIS::Web::Person;
+  my $record = $session -> current_record;
+  if ( $record ->{type} eq 'person' ) {
+    ACIS::Web::Person::bring_up_to_date( $acis, $record );
   }
   
   eval {

@@ -72,6 +72,7 @@ EPrints/prototype-menutable.html
 EPrints/prototype-page.html
 EPrints/README
 home/ardb.conf
+home/bin/cit_test.pl
 home/bin/conf.pl
 home/bin/rid
 home/bin/setup
@@ -115,6 +116,7 @@ home/bin/templates/upgrade_to_1.4.111.pl
 home/bin/templates/upgrade_to_1.4.61.pl
 home/bin/templates/upgrade_to_1.4.90.pl
 home/bin/templates/upgrade_to_1.4.95.pl
+home/bin/templates/upgrade_to_1.5.13.pl
 home/bin/templates/upgrade_to_1.5.3.pl
 home/bin/templates/upgrade_to_1.5.4.pl
 home/bin/templates/upgrade_to_1.5.7.pl
@@ -240,6 +242,7 @@ lib/ACIS/Citations/Suggestions.pm
 lib/ACIS/Citations/Utils.pm
 lib/ACIS/Data/DumpXML.pm
 lib/ACIS/Data/DumpXML/Parser.pm
+lib/ACIS/Debug/MLeakDetect.pm
 lib/ACIS/MetaUpdate/Request.pm
 lib/ACIS/Misc.pm
 lib/ACIS/ShortIDs.pm

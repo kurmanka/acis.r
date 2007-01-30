@@ -310,6 +310,107 @@ sub load_similarity_suggestions ($$) {
   if ( not $sql ) { prepare; }
   my @slist = ();
   debug "load_similarity_suggestions($psid,$dsidlist)";
+
+  my $cond = join ' or ', map { "sim.dsid='$_'" } @$dsidlist;
+  $sql -> prepare( 
+    sql_select_sug( "sim.*,old.dsid as oldflag", 
+                    "cit_doc_similarity as sim",
+                    "LEFT JOIN cit_old_sug AS old ON (old.psid=? and old.citid=sim.citid and old.dsid=sim.dsid)",
+                    "sim.similar>0 and ($cond)" )
+  );
+
+  my $sth = $sql->{last_sth};
+  $sth->execute($psid);
+  my $res = $sth->fetchall_arrayref( {} );
+  $sth -> finish;
+
+  foreach ( @$res ) {
+    my $s = $_;
+    foreach ( qw( ostring srcdoctitle srcdocauthors ) ) {    
+      $s->{$_} = Encode::decode_utf8( $s->{$_} );
+    }
+    if ( delete $_->{oldflag} ) { $_->{new} = 0; } 
+    else { $_->{new} = 1; }
+    $_->{reason} = 'similar';
+  }
+
+  return $res; 
+}
+
+sub load_similarity_suggestions_all_lowtec ($$) {
+  my $psid     = shift;
+  my $dsidlist = shift;
+  if ( not $sql ) { prepare; }
+  my @slist = ();
+  debug "load_similarity_suggestions($psid,$dsidlist)";
+
+  my $cond = join ' or ', map { "sim.dsid='$_'" } @$dsidlist;
+  $sql -> prepare( 
+    sql_select_sug( "sim.*,old.dsid as oldflag", 
+                    "cit_doc_similarity as sim",
+                    "LEFT JOIN cit_old_sug AS old ON (old.psid=? and old.citid=sim.citid and old.dsid=sim.dsid)",
+                    "sim.similar>0 and ($cond)" )
+  );
+
+  my $r = $sql -> execute( $psid );
+
+  while ( $r and $r->{row} ) {
+    debug "found item: ", $r->{row}{citid} , ' / ', $r->{row}{similar};
+    my $s = $r->{row};  # hash copy
+    foreach ( qw( ostring srcdoctitle srcdocauthors ) ) {    
+      $s->{$_} = Encode::decode_utf8( $r->{row}{$_} );
+    }
+    if ( delete $s->{oldflag} ) { $s->{new} = 0; } 
+    else { $s->{new} = 1; }
+    $s->{reason} = 'similar';
+    push @slist, $s; 
+    $r-> next;
+  }
+  return \@slist;
+}
+
+sub load_similarity_suggestions_one_by_one_lowtec ($$) {
+  my $psid     = shift;
+  my $dsidlist = shift;
+  if ( not $sql ) { prepare; }
+  my @slist = ();
+  debug "load_similarity_suggestions($psid,$dsidlist)";
+
+  $sql -> prepare_cached( 
+    sql_select_sug( "sim.*,old.dsid as oldflag", 
+                    "cit_doc_similarity as sim",
+                    "LEFT JOIN cit_old_sug AS old ON (old.psid=? and old.citid=sim.citid and old.dsid=sim.dsid)",
+                    "sim.dsid=? and sim.similar>0" )
+  );
+
+  my $sth = $sql->{last_sth};
+  foreach ( @$dsidlist ) {
+    $sth->execute($psid, $_);
+    my $res = $sth->fetchall_arrayref( {} );
+
+    foreach ( @$res ) {
+      my $s = $_;
+      foreach ( qw( ostring srcdoctitle srcdocauthors ) ) {    
+        $s->{$_} = Encode::decode_utf8( $s->{$_} );
+      }
+      if ( delete $_->{oldflag} ) { $_->{new} = 0; } 
+      else { $_->{new} = 1; }
+      $_->{reason} = 'similar';
+    }
+    push @slist, @$res;
+  }
+  $sth -> finish;
+
+  return \@slist; 
+}
+
+#sub load_similarity_suggestions ($$) {
+sub load_similarity_suggestions_one_by_one ($$) { # not used now
+  my $psid     = shift;
+  my $dsidlist = shift;
+  if ( not $sql ) { prepare; }
+  my @slist = ();
+  debug "load_similarity_suggestions($psid,$dsidlist)";
   
   $sql -> prepare_cached( 
     sql_select_sug( "sim.*,old.dsid as oldflag", 
@@ -324,16 +425,17 @@ sub load_similarity_suggestions ($$) {
 
     while ( $r and $r->{row} ) {
       debug "found item: ", $r->{row}{citid} , ' / ', $r->{row}{similar};
-      my $s = { %{ $r->{row} } };  # hash copy
+      my $s = $r->{row};  # hash copy
       foreach ( qw( ostring srcdoctitle srcdocauthors ) ) {    
         $s->{$_} = Encode::decode_utf8( $r->{row}{$_} );
       }
       if ( delete $s->{oldflag} ) { $s->{new} = 0; } 
       else { $s->{new} = 1; }
       $s->{reason} = 'similar';
-      push @slist, $s;
+      push @slist, $s; 
       $r-> next;
     }
+    undef $r;
   }
   return \@slist;
 }
@@ -343,9 +445,10 @@ sub load_nonsimilarity_suggestions ($$) {
   # see also find_cit_sug_citations() above
   my $psid     = shift;
   my $dsidlist = shift;
+  
   if ( not $sql ) { prepare; }
   my @slist = ();
-  
+
   $sql -> prepare_cached( 
     sql_select_sug( "csug.*,old.dsid as oldflag", 
                     "cit_sug as csug",
@@ -357,7 +460,7 @@ sub load_nonsimilarity_suggestions ($$) {
     my $r = $sql -> execute( $psid, $_ );
 
     while ( $r and $r->{row} ) {
-      my $s = { %{ $r->{row} } };  # hash copy
+      my $s = $r->{row};
       foreach ( qw( ostring srcdoctitle srcdocauthors ) ) {    
         $s->{$_} = Encode::decode_utf8( $r->{row}{$_} );
       }

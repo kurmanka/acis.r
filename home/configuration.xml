@@ -5,7 +5,7 @@
     that is a working ARDB core configuration file.  Produces:
     documents table, collections table, authors table.
 
-    $Id: configuration.xml,v 2.6 2007/01/18 01:35:21 ivan Exp $
+    $Id: configuration.xml,v 2.7 2007/01/30 14:07:00 ivan Exp $
 
 -->
 
@@ -613,7 +613,7 @@
     <field name='dsid'    sql-type='CHAR(15) NOT NULL'/>
     <field name='similar' sql-type='TINYINT NOT NULL'/>
     <field name='time'    sql-type='DATETIME NOT NULL'/>
-    <create-table-sql>PRIMARY KEY (citid,dsid)</create-table-sql>
+    <create-table-sql>PRIMARY KEY (citid,dsid), INDEX docind (dsid)</create-table-sql>
   </table>
 
   <table name='acis:cit_sug'>
@@ -621,7 +621,7 @@
     <field name='dsid'   sql-type='CHAR(15) NOT NULL'/>
     <field name='reason' sql-type='CHAR(20) NOT NULL'/>
     <field name='time'   sql-type='DATETIME NOT NULL'/>
-    <create-table-sql> PRIMARY KEY (citid,dsid,reason) </create-table-sql>
+    <create-table-sql> PRIMARY KEY (citid,dsid,reason), INDEX docind (dsid)</create-table-sql>
   </table>
 
   <table name='acis:cit_old_sug'>

@@ -25,7 +25,7 @@ package Web::App;   ### -*-perl-*-
 #  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 #
 #  ---
-#  $Id: App.pm,v 2.18 2007/01/24 18:07:12 ivan Exp $
+#  $Id: App.pm,v 2.19 2007/01/30 14:07:00 ivan Exp $
 #  ---
 
 
@@ -730,6 +730,7 @@ sub clear_after_request {
 
   CGI::Minimal::reset_globals();
 
+  $Web::App::Common::LOGCONTENTS = '';
   $self->_debug_leaks_after_clearing;
 }
 

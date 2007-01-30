@@ -67,7 +67,7 @@ sub load_similarity_matrix($) {
   my $dsid_list = [ grep {defined} map { $_->{sid} } @$rp ];
 #  debug "dsid_list: ", join( ' ', @$dsid_list );
 
-  # these cause leak
+  # these caused leak
   my $sug1 = load_similarity_suggestions( $psid, $dsid_list );
   my $sug2 = load_nonsimilarity_suggestions( $psid, $dsid_list );
 
@@ -80,24 +80,18 @@ sub load_similarity_matrix($) {
   bless $mat;
 
   my @sug = grep { my $id = $_->{srcdocsid} . '-' . $_->{checksum}; 
-                not exists $f1->{$id} and not exists $f2->{$id} } @$sug1, @$sug2;
+                   not exists $f1->{$id} and not exists $f2->{$id} } @$sug1, @$sug2;
 
   my $before_filter = scalar(@$sug1) + scalar( @$sug2);
   my $after_filter  = scalar @sug;
   debug "filtering: before:$before_filter after:$after_filter";
+  $mat ->{sugs} = $after_filter;
+  #  print "filtering: before:$before_filter after:$after_filter\n";
 
-  foreach ( @sug ) {  $mat -> _add_sug( $_ );  }
-
-  # this helps leak-wise:
-  @sug = ();
-  @$sug1 = ();
-#  @$sug2 = ();
-  
+  $mat -> _add_sugs( \@sug );
   $mat -> _calculate_totals;
-
 #  use ACIS::Debug::MLeakDetect;
 #  print my_vars_report;
-
   return $mat;
 }
 
@@ -105,51 +99,64 @@ sub load_similarity_matrix($) {
 
 use Carp;
 # for internal usage: add a suggestion to the matrix
-sub _add_sug {
-  my $self = shift || die;
-  my $sug  = shift || die;
+sub _add_sugs {
+  my ( $self, $sugs ) = @_;
+  debug "_add_sugs()";
+  die if not $self;
+  die if not $sugs;
 
-  debug "_add_sug()";
+  my $preid_sim = preidentified_suggestion_similarity; 
+  my $coau_sim  = coauthor_suggestion_similarity; 
+  my $known = $self->{citations};
+  my $i = 0;
 
-  if ( not $sug->{srcdocsid} ) {  Carp::croak "citation without srcdocsid";  }
-  if ( not $sug->{checksum}  ) {  Carp::croak "citation without checksum";  }
+  foreach (@$sugs) {
+    if ( not $_->{srcdocsid} ) {  Carp::croak "citation without srcdocsid";  }
+    if ( not $_->{checksum}  ) {  Carp::croak "citation without checksum";  }
   
-  my $d      = $sug ->{dsid} || die;
-  my $newold = ($sug->{new}) ? 'new' : 'old';
-  debug "$newold for $d";
+    my $d      = $_->{dsid} || die;
+    my $newold = ($_->{new}) ? 'new' : 'old';
+    my $reason = $_->{reason};
 
-  if ( $sug->{reason} eq 'preidentified' ) {
-    $sug->{similar} = preidentified_suggestion_similarity; 
-  } elsif ( $sug->{reason} =~ m!^coauth! ) { 
-    $sug->{similar} = coauthor_suggestion_similarity; 
+    if ( $reason eq 'preidentified' ) {
+      $_->{similar} = $preid_sim; 
+    } elsif ( $reason eq 'similar' ) {
+    } elsif ( $reason =~ m!^coauth! ) { 
+      $_->{similar} = $coau_sim;
+    }
+    
+    # clear redundant bits
+    delete $_->{dsid};
+    delete $_->{psid};
+    delete $_->{new};
+    
+    my $dlist = $self->{$newold}{$d} ||= [];
+    push @$dlist, $_;
+    
+    # maintain an index
+    my $cid = $_->{srcdocsid} . '-' . $_->{checksum};
+    my $cindex = $known->{$cid}{$d} ||= [];
+    my $pair = [ $newold, $_ ];
+    push @$cindex, $pair;
+    
+    $i ++;
   }
 
-  # clear redundant bits
-  delete $sug->{dsid};
-  delete $sug->{psid};
-  delete $sug->{new};
-
-  my $dlist = $self->{$newold}{$d} ||= [];
-  push @$dlist, $sug;
-
-  # maintain an index
-  my $cid = $sug->{srcdocsid} . '-' . $sug->{checksum};
-  my $known = $self->{citations};
-  my $cindex = $known->{$cid}{$d} ||= [];
-  my $pair = [ $newold, $sug ];
-  push @$cindex, $pair;
+  debug "added $i suggestions";
 }
 
 sub DESTROY {
   my $self = shift;
-  my $i = $self->{citations};
-  foreach ( %$i ) {
-    my $cl = $i->{$_};
-    foreach ( @$cl ) {
-      undef $_->[1];
-    }
-    delete $i->{$_};
-  }
+#  foreach ( $self->{new}, $self->{old} ) {
+#    foreach ( values %$_ ) {
+#      @$_ = ();
+#    }
+#  }
+  delete $self->{new};
+  delete $self->{old};
+  delete $self->{citations};
+  delete $self->{doclist};
+  delete $self->{totals_new};
 }
 
 

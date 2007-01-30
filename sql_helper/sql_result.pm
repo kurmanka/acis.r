@@ -15,12 +15,16 @@ sub new {
         rows  => $statement -> rows  ,
 #       encoding => $encoding,
     };
-
     bless $self, $class;
+
 
     if ( $statement 
          and not $statement ->errstr
          and $statement -> {Active} ) {
+
+      $self->{data} = $statement ->fetchall_arrayref( {} );
+      $self->{i} = -1;
+
         $self-> next;
     }
     return $self;
@@ -39,7 +43,32 @@ sub row {
   return $self->{row};
 }
 
+sub data { 
+  my $self = shift;
+  return $self->{data};
+}
+
 sub next {
+  my $self = shift;
+  my $st = $self->{sth} || die;
+  my $d  = $self->{data};
+  my $i  = ++$self->{i};
+  
+  undef $self->{row};
+  if ( not $d ) { return undef; }
+
+  if ( $#$d == $i ) {
+    delete $self->{data};
+    undef $self->{i};
+  }
+  if ( $#$d >= $i ) {
+    return $self->{row} = $d->[$i];
+  } else {
+    return undef;
+  }
+}
+
+sub next_old {
     my $self = shift;
     my $st = $self->{sth};
     my $row;
@@ -90,11 +119,15 @@ sub finish {
 }
 
 sub DESTROY {
- my $s = shift;
- if ( $s->{sth} ) {
-   $s->{sth} -> finish;
-   undef $s->{sth};
- }
+  my $s = shift;
+  delete $s->{row};
+  delete $s->{error};
+  delete $s->{rows};
+  delete $s->{data};
+  if ( $s->{sth} ) {
+    $s->{sth} -> finish;
+    undef $s->{sth};
+  }
 }
 
 1;

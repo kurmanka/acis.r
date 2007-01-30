@@ -27,7 +27,7 @@ package ACIS::Web::Person;  ### -*-perl-*-
 #  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 #
 #  ---
-#  $Id: Person.pm,v 2.4 2006/12/17 19:43:07 ivan Exp $
+#  $Id: Person.pm,v 2.5 2007/01/30 14:07:00 ivan Exp $
 #  ---
 
 use strict;
@@ -161,10 +161,8 @@ sub bring_up_to_date {
   }
   delete $record->{handle};
 
-  {
-    my $id = lc $record -> {id};
-    $record ->{id} = $id;
-  }
+  
+  $record ->{id} = lc $record -> {id};
 
 
   ### short id
