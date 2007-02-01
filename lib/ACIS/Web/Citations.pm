@@ -27,6 +27,23 @@ my $citations;
 my $research_accepted;
 my $mat;
 
+sub cleanup {
+  $mat && $mat ->DESTROY;
+#  undef $vars->{doclist};
+
+#  undef $vars->{document};
+#  undef $vars->{identified};
+
+  undef $mat;
+  undef $session;
+  undef $vars;
+  undef $acis;
+  undef $sql;
+  undef $record;
+  undef $citations;
+  undef $research_accepted;
+}
+
 sub get_doc_by_sid ($) {
   my $dsid = $_[0] || return undef;
   foreach ( @{ $research_accepted } ) {
@@ -313,7 +330,7 @@ sub prepare_doclist {
     my $old = prepare_citations_list $mat->{old}{$_};
     my $id  = $citations->{identified}{$_} || [];
     my $simtotal = $mat->{totals_new}{$_};
-    
+    debug "doclist item: $_ ($d->{id})";
     push @$doclist, { doc => $d, 
                       new => scalar @$new, 
                       old => scalar @$old, 

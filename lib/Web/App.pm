@@ -25,7 +25,7 @@ package Web::App;   ### -*-perl-*-
 #  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 #
 #  ---
-#  $Id: App.pm,v 2.20 2007/01/30 21:03:03 ivan Exp $
+#  $Id: App.pm,v 2.21 2007/02/01 07:07:50 ivan Exp $
 #  ---
 
 
@@ -257,46 +257,32 @@ sub configuration_parameters {
 
 sub init_presenter_data {
   my $self = shift;
-
   my $config = $self -> config;
 
   my $data = $self -> {'presenter-data'} =  {
-
     system => {
-      config => {
-        debug        => $Web::App::DEBUG,
+      config => { 
+        debug => $Web::App::DEBUG,
       },
     },
-
     request => {
     },
-
     response => {
-      data    => $self -> {variables},
+      data => $self->{variables},
     },
   };
 
-
   ###  copy some of the configuration parameters into
   ###  $presenter-data/system/config
-  {
-    my @config_params_copy =
-      qw( base-url site-name site-name-long 
-          admin-email 
-          system-email 
-          static-base-url home-url );
+  my $pconf = $data -> {system} {config};
 
-    my $data_conf = $data -> {system} {config};
-
-    foreach ( @config_params_copy ) {
-      if ( $config -> {$_} ) {
-        $data_conf -> {$_} = $config -> {$_};
-      }
+  foreach ( qw( base-url site-name site-name-long admin-email 
+                system-email static-base-url home-url )) {
+    if ( $config -> {$_} ) {
+      $pconf -> {$_} = $config -> {$_};
     }
-
-    $data_conf-> {home} = $self -> {home};
   }
-
+  $pconf->{home} = $self->{home};
 }
 
 
@@ -706,19 +692,15 @@ sub clear_after_request {
 
 #  use Devel::DumpSizes qw/dump_sizes/;
 #  dump_sizes("/tmp/acis_var_dump");
-  #debug Dumper( $self );
-  foreach ( qw( request response username session
-                http_headers content_type
-                presenter
-                presenter_data_string
+  foreach ( qw( request response username session http_headers content_type 
+                presenter presenter_data_string
               ) ) {
-    $self -> {$_}   = undef;
+    undef $self -> {$_};
   }
 
   ###  presenter-data
   $self -> {variables} = {};
   $self -> init_presenter_data; 
-
   
   my $paths = $self -> {paths};
   

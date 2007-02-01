@@ -361,7 +361,7 @@ sub compare_citation_to_documents {
     } elsif ( $v ) {
       debug "add the suggestion";
       my $new = not get_cit_old_status( $psid, $dsid, $cit->{citid} );
-      $self->_add_sug( [{ %$cit, dsid=> $dsid, reason=> 'similar', similar=> $v, new=>$new, time=>today() }] );
+      $self->_add_sugs( [{ %$cit, dsid=> $dsid, reason=> 'similar', similar=> $v, new=>$new, time=>today() }] );
       $recalc = 1;
 
     } else {
@@ -504,11 +504,11 @@ sub number_of_new_potential {
         if ( $_->[0] eq 'new' ) {
           if ( $_->[1] ->{similar} >= $sim_threshold 
                or $_->[1] ->{reason} ne 'similar' ) {
-            debug "a new useful potential citation ($dsid): " , cid( $_->[1] );
+            #debug "a new useful potential citation ($dsid): " , cid( $_->[1] );
             $pot_new_num++;
             next CIT;
           } else {
-            debug "new, but not good enough ($dsid): ", cid( $_->[1] );
+            #debug "new, but not good enough ($dsid): ", cid( $_->[1] );
           }
         }
       }

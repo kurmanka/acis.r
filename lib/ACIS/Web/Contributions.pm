@@ -25,7 +25,7 @@ package ACIS::Web::Contributions;  ### -*-perl-*-
 #  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 #
 #  ---
-#  $Id: Contributions.pm,v 2.30 2007/01/30 17:02:18 ivan Exp $
+#  $Id: Contributions.pm,v 2.31 2007/02/01 07:07:50 ivan Exp $
 #  ---
 
 use strict;
@@ -35,7 +35,6 @@ use Web::App::Common;
 use ACIS::Data::DumpXML::Parser;
 
 
-my $already_there_count;
 my $Conf;
 
 use vars qw( $DB $SQL );
@@ -109,6 +108,13 @@ use vars qw( $acis );
 my $accepted;
 my $refused;
 my $contributions;
+
+sub cleanup {
+  undef $contributions;
+  undef $accepted;
+  undef $refused;
+}
+
 
 sub prepare {
   my $app = shift;
@@ -1539,7 +1545,6 @@ use Storable qw( freeze thaw );
 use vars qw( $select_what );
 
 $select_what = "select id,sid,data ";
-my $SELECT_WHAT = $select_what;
 
 sub make_resource_item_from_db_row {
   my $row = shift;
@@ -1609,18 +1614,13 @@ sub reload_contribution {
 sub load_resources_by_ids {
   my $app  = shift;
   my $ids  = shift;
-
   assert( $ids and ref $ids );
-  
   my @list;
 
-    
-#  $SQL -> prepare_cached ( "$SELECT_WHAT FROM ${DB}.resources WHERE id=?" );
   $SQL -> prepare_cached ( "SELECT data FROM ${DB}.objects WHERE id=?" );
-
   foreach ( @$ids ) {
 
-    my $res = $SQL -> execute ( $_ );
+    my $res = $SQL -> execute( $_ );
     if ( $SQL ->error ) { 
       warn "SQL: " . $SQL-> error ;
       ###  XX  go next?
@@ -1709,15 +1709,13 @@ sub search_resources_by_creator_email {
   my $sql     = shift;
   my $context = shift;
   my $email   = shift;
-
   my $result  = [];
-
 
   ###  the query
   $sql -> prepare_cached( 
      query_resources 'res_creators_separate', 'catch.email = ?'  
                         );
-  
+ 
 #  warn "SQL: " . $sql->error if $sql->error;
   my $res = $sql->execute ( lc $email );
 #  warn "SQL: " . $sql->error if $sql->error;
@@ -1998,13 +1996,9 @@ sub process_resources_search_results {
     # for some reason, the $row is sometimes empty; at least it doesn't
     # contain any useful data
     my $id  = $row -> {id} || '';
-    
+  
     if ( $id and $found_hash->{$id}++ ) { next; }
-
-    if ( $current_hash->{$id} ) {
-      $already_there_count++;
-      next;
-    }
+    if ( $current_hash->{$id} ) { next; }
     
     my $item = make_resource_item_from_db_row( $row );
 

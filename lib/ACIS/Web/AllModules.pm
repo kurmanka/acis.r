@@ -29,6 +29,7 @@ require ACIS::Web::Admin::EventsArchiving;
 require ACIS::Web::Affiliations;
 #require ACIS::Web::ARPM;
 require ACIS::Web::Background; # ?
+require ACIS::Web::Citations;
 require ACIS::Web::Contributions;
 require ACIS::Web::Contributions::Back;
 require ACIS::Web::Export;

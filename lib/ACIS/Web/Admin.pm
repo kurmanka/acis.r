@@ -25,7 +25,7 @@ package ACIS::Web::Admin;   ### -*-perl-*-
 #  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 #
 #  ---
-#  $Id: Admin.pm,v 2.16 2007/01/30 17:02:18 ivan Exp $
+#  $Id: Admin.pm,v 2.17 2007/02/01 07:07:50 ivan Exp $
 #  ---
 
 
@@ -40,16 +40,6 @@ use Storable qw( &retrieve );
 use Web::App::Common;
 
 use ACIS::Data::DumpXML qw(dump_xml);
-
-
-my $current_time = time;
-
-
-sub show_current_time {
-  my $acis = shift;
-  $acis -> variables -> {'current-time'} = $current_time;
-}
-
 
 
 sub check_access {
@@ -103,43 +93,32 @@ sub check_access {
 
 sub show_sessions {
   my $acis = shift;
-
+  my $current_time = time;
   my $home = $acis ->{paths} ->{home};
   my $sessions_dir = "$home/sessions";
-  
   opendir SES, $sessions_dir;
   my @sessions = readdir SES;
   closedir SES;
-
   my @sl;
-  
   foreach ( @sessions ) {
     my $id = $_;
     my $filename = "$sessions_dir/$_";
     next if not -f $filename or not -r _;
-    
     my @filestat = stat $filename;
-
     my $mtime = $filestat[9];
-
     my $difference = $current_time - $mtime;  # in seconds
-
-
     my $about = {
                  id => $id,
                  filename => $filename,
                  diff => $difference,
                  };
-
     my $loaded;
     eval {
       $loaded = retrieve ($filename);
     };
     if ( not $@ and defined $loaded ) {
-
       my $name;
       my $login;
-
       if ( $loaded -> owner ->{name} ) {
         $name  = $loaded -> owner -> {name};
         $login = $loaded -> owner -> {login};
@@ -147,20 +126,13 @@ sub show_sessions {
         $name  = $loaded -> {'user-data'} {name};
         $login = $loaded -> {'user-data'} {login};
       }
-
       $about->{owner} = $name;
       $about->{login} = $login;
       $about->{type}  = $loaded -> type;
-
       push @sl, $about;
     }
-    
   }
-
-
-
   $acis->variables->{'session-list'} = \@sl;
-
 }
 
 
@@ -169,6 +141,7 @@ sub show_sessions {
 sub session_act {
   my $acis = shift;
 
+  my $current_time = time;
   my $home = $acis ->{paths} ->{home};
   my $sessions_dir = "$home/sessions";
 
@@ -191,13 +164,9 @@ sub session_act {
   die "No session file: $filename" if not -f $filename or not -r _;
 
   if ( $action eq "view" ) {
-  
     my @filestat = stat $filename;
-    
     my $mtime = $filestat[9];
-    
     my $difference = $current_time - $mtime;  # in seconds
-    
     my $about = {
                  id => $id,
                  filename => $filename,
