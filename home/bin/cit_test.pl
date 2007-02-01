@@ -55,44 +55,36 @@ sub cit_overview {
   my $udata = $session ->object;
   my $records = $udata->{records};
   my $sql = $acis->sql_object();
-
   die if $session ->{simmatrix};
 
-#  $session ->{lump} = 'x' x 10000;
-
-#  my $r = { t => 'x'x102400, r => {} };
-#  $r->{r} {g} = \$r;
-#  $s .= '.'x5000000;
-
+  $acis->{request}{subscreen} = 'dmen127';
   ACIS::Web::Citations::prepare();
-  ACIS::Web::Contributions::prepare( $acis );
+#  ACIS::Web::Contributions::prepare( $acis );
+  $session->{citations_first_screen} = 1;
   ACIS::Web::Citations::prepare_overview();
-  $acis -> set_presenter( 'citations' ); # citations overview screen
+  ACIS::Web::Citations::prepare_identified();
+
+  if ( not $acis->variables ->{'identified-number'} ) {
+    use Data::Dumper;
+    die "no identified-number in variables: ". Dumper( $acis->variables );
+  }
+
+  $acis -> set_presenter( 'citations/identified' ); # citations overview screen
   $acis -> prepare_presenter_data;
   $acis -> {'presenter-data'}{request}{session}{type} = 'user';
   my $content = $acis -> run_presenter( $acis->{presenter} );
-
-  substr( $content, 300 ) = '...';
-  print "page: $content\n---\n";
+  my $page = $content;
+  $page =~ s!\s*\n\s*\n!\n!g;
+  substr( $page, 300 ) = '...';
+  print "--- page: ---\n$page\n------\n";
 
   my $m = $session->{simmatrix};
   my $c = $session->{simmatrix}{citations};
 
-  #  p "  record: ", $crec->{sid};
+  p "  record: ", $crec->{sid};
   p "  research profile items: ", $#{ $crec ->{contributions}{accepted} }+1;
-  #  p "  research profile items: ", scalar @{ $crec ->{contributions}{accepted} };
   p "  unique citations suggested: ", scalar keys %$c;
   p "  citation/document pairs: ", $m->{sugs};
-
-  undef $m;
-
-  undef $crec;
-  undef $udata;
-  undef $records;
-  undef $sql;
-  undef $session;
-  undef $paths;
-  undef $acis;
 
   1;
 }
