@@ -32,16 +32,17 @@
         </td>
 
         <td class='numb'>
-          <xsl:choose><xsl:when test='position() = last()'>
-            <span id='ncLast'><xsl:value-of select='position()'/>.</span>
-          </xsl:when>
-          <xsl:otherwise>
-            <xsl:value-of select='position()'/>.<xsl:text/>
-          </xsl:otherwise>
+          <xsl:choose xml:space='default'>
+            <xsl:when test='position() = last()'>
+              <span id='ncLast'><xsl:value-of select='position()'/>.</span>
+            </xsl:when>
+            <xsl:otherwise>
+              <xsl:value-of select='position()'/>.<xsl:text/>
+            </xsl:otherwise>
           </xsl:choose>
         </td>
 
-<xsl:choose>
+<xsl:choose xml:space='default'>
   <xsl:when test='title'>
         <td class='title' ><a href='{url-about}' title='{normalize-space(title/text())}'><xsl:value-of select='title' /></a></td>
   </xsl:when>
