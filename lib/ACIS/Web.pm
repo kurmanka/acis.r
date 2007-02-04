@@ -23,7 +23,7 @@ package ACIS::Web;   ### -*-perl-*-
 #  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 #
 #  ---
-#  $Id: Web.pm,v 2.11 2007/02/01 07:06:23 ivan Exp $
+#  $Id: Web.pm,v 2.12 2007/02/04 03:25:02 ivan Exp $
 #  ---
 
 use strict;
@@ -325,7 +325,6 @@ sub update_paths_for_login {
   my $login = shift || die;
 
   ### update paths
-
   my $paths = $self ->{paths} = 
     $self ->make_paths_for_login( $login, $self ->{paths} );
   return $paths;
