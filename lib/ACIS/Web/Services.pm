@@ -28,7 +28,7 @@ package ACIS::Web;   ### -*-perl-*-
 #  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 #
 #  ---
-#  $Id: Services.pm,v 2.20 2007/01/09 16:59:28 ivan Exp $
+#  $Id: Services.pm,v 2.21 2007/02/04 02:42:23 ivan Exp $
 #  ---
 
 use strict;
@@ -128,8 +128,8 @@ sub load_session {
   }
 
   assert( ref $session );
-  assert( blessed($session), "session: " . Dumper($session) );
-  assert( $session -> isa( 'Web::App::Session' ), "session: ". Dumper($session) );
+  assert( blessed($session) );
+  assert( $session -> isa( 'Web::App::Session' ) );
   assert( $session -> owner );
 
   my $sIP = $session -> owner ->{IP};

@@ -25,7 +25,7 @@ package Web::App;   ### -*-perl-*-
 #  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 #
 #  ---
-#  $Id: App.pm,v 2.21 2007/02/01 07:07:50 ivan Exp $
+#  $Id: App.pm,v 2.22 2007/02/04 02:42:23 ivan Exp $
 #  ---
 
 
@@ -1035,15 +1035,12 @@ sub post_process_content {
   my $self = shift;
   my $out  = shift;
 
-  
   ### add debuggings to the content
 
   my $vars_xml_dumped = $self -> {presenter_data_string};
-
   if ( $self ->{config} {'debug-info-visible'} ) {
 
     my $log =  $Web::App::Common::LOGCONTENTS;
-    
     my $debuggings = <<_DEBUG_INCLUDE;
 
    <p>&nbsp;</p>
@@ -1063,9 +1060,9 @@ sub post_process_content {
 _DEBUG_INCLUDE
 
     my $debug_mark = '<!-- debuggings go here -->';
-    if ( $$out =~ /$debug_mark/ ) {
-      my $mark = $debug_mark;
-      $$out =~ s/$mark/$mark$debuggings/; ### XXX could be replaced with index()... & substr() = ...
+    my $index = index( $$out, $debug_mark );
+    if ( $index > -1 ) {
+      substr( $$out, $index+length($mark), 0, $debuggings);
     } else { 
       $$out .= $debuggings; 
     }
@@ -1078,19 +1075,14 @@ _DEBUG_INCLUDE
 
 sub post_scriptum {
   my $self = shift;
-
   my $response = $self ->{response};
   my $content  = $response ->{body} || '';
-
   my $vars_xml_dumped = $self -> {presenter_data_string} || '';
-
   my $vars_len = length( $vars_xml_dumped ) / 1000;
   my $page_len = length( $content ) / 1000;
 
   if ( $self ->{SHOW_PROFILING} and $response -> {HTML} ) {
-
     my $rep = $self -> report_timed_checkpoints || '';
-
     print 
       "\n<p>&nbsp;</p>",
       "\n<small>",
@@ -1107,7 +1099,6 @@ sub post_scriptum {
 
   if ( $self ->config('debug-log') ) {
     my $logfn = $self ->config('debug-log');
-
     if ( open DLOG, '>>:utf8', $logfn ) { 
       print DLOG "\n* ", date_now(), " [$$]\n", $Web::App::Common::LOGCONTENTS;
       close DLOG;
@@ -1121,24 +1112,18 @@ sub post_scriptum {
 sub response_status {
   my $self = shift;
   my $status = shift;
-
   my $response = $self -> {response};
   my $headers  = $response -> {headers};
-
   push @$headers, "Status: $status";
 }  
   
 
 sub print_http_response_headers {
   my $self = shift;
-
   my $response = $self -> {response};
   
-  if ( $response -> {headers_printed} ) {
-    return;
-  } else {
-    $response -> {headers_printed} = 1;
-  }
+  if ( $response -> {headers_printed} ) { return; } 
+  else { $response -> {headers_printed} = 1; }
 
   my $headers  = $response -> {headers};
 
@@ -1149,7 +1134,6 @@ sub print_http_response_headers {
 
   foreach ( @$headers ) {
     print $_, "\n";
-#    debug "http header: $_";
   }
 
   if ( $self -> {http_headers} ) {
@@ -1157,19 +1141,15 @@ sub print_http_response_headers {
     print $http_add;
   }
 
-
   my $location = $response ->{'redirect-to'};
-
   if ( $location ) {
     debug "Location: $location";
-    $Web::App::DEBUGIMMEDIATELY
-                 ? print "Location: <a href='$location'>$location</a>\n\n" 
-                 : print "Location: $location\n\n";
-
+    print "Location: ", $Web::App::DEBUGIMMEDIATELY
+                           ? "<a href='$location'>$location</a>\n\n" 
+                           : "$location\n\n";
     undef $self -> {presenter};
     return;
   }
-
 
   if ( $self ->{'no-response'} ) {
     print "content-type: text/plain\n\nnothing to say\n";
@@ -1177,13 +1157,10 @@ sub print_http_response_headers {
     return;
   }
 
-  
   if ( not $response -> {'content-type-printed'} ) {
     my $charset = $response -> {charset};
     print "Content-Type: text/html; charset=$charset\n";
   }
-  
-
   print "\n";
 
 }
@@ -1215,9 +1192,7 @@ sub prepare_presenter_data {
       $presenter_request ->{$_} = $v;
     }
   }
-
   ###  XX move request/session and request/user stuff here? 
-
 }
 
 
@@ -1228,9 +1203,7 @@ sub parse_request_url {
 
   my $base_url  = $self -> config( 'base-url' );
 
-
   my ( $the_request ) = ( $url =~ /^$base_url\/?(.*?)(?:\?|$)/ );
-  
   if ( not defined $the_request ) {
     $the_request = '';
   }
@@ -1239,7 +1212,6 @@ sub parse_request_url {
   debug "processing url, full: $url, relative: $the_request";
   
   my ( $screen_name, $session_id ) = split '!', $the_request;
-
 
   $self -> {request} {url}          = $the_request;
   $self -> {request} {screen}       = $screen_name;
@@ -1258,7 +1230,6 @@ sub add_to_process_queue {
   debug "add '$screen_id' screen to processor queue";
 
   my $processors = [];
-
   my $cgi    = $self -> request -> {CGI};
   my $params = $self -> request -> {params};
   my $screen = $self -> get_screen( $screen_id );
@@ -1275,32 +1246,24 @@ sub add_to_process_queue {
          and scalar keys %$params ) {
       $process = 1;
     }
-
   } elsif ( scalar keys %$params ) {
     $process = 1;
   }
 
   if ( $process ) {
     $processors = $screen -> {'process-calls'};
-
   } else {
     $processors = $screen -> {'init-calls'};
   }
 
-#  assert ref $processors eq 'ARRAY', 'expected an array of processors';
-
-
   push @{ $self -> {processors} }, @$processors;
 
-  
   ###  load screen's modules
-
   my @modules = @{ $screen -> {'use-modules'} };
   foreach ( @modules ) {
     eval "use $_;";
     die "loaded module $_, got: $@" if $@;
   }
-
 }
 
 
@@ -1324,9 +1287,7 @@ sub set_presenter {
 
 sub clear_process_queue {
   my $self = shift;
-  
-  debug 'requested for clearing processor queue, processed';
-  
+  debug 'clear processors queue';
   $self -> {processors} = [];
 }
 
@@ -1334,7 +1295,6 @@ sub clear_process_queue {
 sub next_processor {
   my $self = shift;
   my $next = shift @{ $self -> {processors} };
-#  debug "next processor: $next";
   return $next;
 }
 

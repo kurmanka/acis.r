@@ -27,7 +27,7 @@ package ACIS::UserData::Data::Record;    ### -*-perl-*-
 #  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 #
 #  ---
-#  $Id: Record.pm,v 2.0 2005/12/27 19:47:39 ivan Exp $
+#  $Id: Record.pm,v 2.1 2007/02/04 02:42:23 ivan Exp $
 #  ---
 
 
@@ -73,22 +73,16 @@ sub get_value {
               and not exists $data ->{$_} ) 
        ) {
       return ();
-    } ### XXX is this enough? 
+    } 
 
     if ( UNIVERSAL::isa( $data, 'ARRAY' ) ) {
-
       my $further = join '/', $step, @steps2;
       my @r;
       foreach ( @$data ) {
         push @r, get_value( $_, $further );
       }
       return @r;
-
     }
-
-    assert( ref $data );
-    assert( UNIVERSAL::isa( $data, 'HASH' ) );
-    assert( (exists $data -> {$_} ), $data );
 
     $data = $data -> {$_};
   }

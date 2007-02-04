@@ -60,6 +60,14 @@ my $modules =  {
                      'String::Approx' => '0',
                      'String::Similarity' => '1',
                      'Date::Manip'  => '0',
+# debugging modules: (the list may be incomplete)
+#  Debug::FaultAutoBT (Debug::DumpCore)
+#  Devel::Size
+#  Devel::Arena
+#  Devel::Symdump
+#  Data::Structure::Util
+#  Data::Dump::Streamer
+#  
                     };
 
 print "Checking required modules...\n";

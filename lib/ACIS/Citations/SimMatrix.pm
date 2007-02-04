@@ -369,7 +369,6 @@ sub compare_citation_to_documents {
     }
   }
 
-  debug "matrix: ", Dumper( $self );
   $self->_calculate_totals if $recalc;
   return 1;
 }
