@@ -25,7 +25,7 @@ package Web::App;   ### -*-perl-*-
 #  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 #
 #  ---
-#  $Id: App.pm,v 2.22 2007/02/04 02:42:23 ivan Exp $
+#  $Id: App.pm,v 2.23 2007/02/04 02:50:42 ivan Exp $
 #  ---
 
 
@@ -1059,16 +1059,14 @@ sub post_process_content {
 
 _DEBUG_INCLUDE
 
-    my $debug_mark = '<!-- debuggings go here -->';
-    my $index = index( $$out, $debug_mark );
+    my $mark = '<!-- debuggings go here -->';
+    my $index = index( $$out, $mark );
     if ( $index > -1 ) {
       substr( $$out, $index+length($mark), 0, $debuggings);
     } else { 
       $$out .= $debuggings; 
     }
-
   }
-
 }
 
 
