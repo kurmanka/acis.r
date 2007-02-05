@@ -25,7 +25,7 @@ package Web::App;   ### -*-perl-*-
 #  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 #
 #  ---
-#  $Id: App.pm,v 2.23 2007/02/04 02:50:42 ivan Exp $
+#  $Id: App.pm,v 2.24 2007/02/05 16:03:18 ivan Exp $
 #  ---
 
 
@@ -976,26 +976,23 @@ sub handle_request {
 
   ###  first send the headers
   $self -> print_http_response_headers;
+  my $response = $self->{response};
 
   if ( $self -> {presenter} ) {
-
     ###  prepare presenter-data 
     $self -> prepare_presenter_data;
 
-    $self -> {response}{body} = 
-      my $content = 
-        $self -> run_presenter( $self->{presenter} );
+    my $content = $response->{body} = $self -> run_presenter( $self->{presenter} );
+    
 
     print "</pre>\n"
       if $Web::App::DEBUGIMMEDIATELY;
 
     $self -> time_checkpoint( 'presenter' );
-
-    $self -> post_process_content( \$content );
-
+    $self -> post_process_content( $content );
   }
 
-  if ( $self -> {response}{body} ) {
+  if ( $response ->{body} ) {
     $charset = $self->{response}{charset};
 
     ###  now go, print the resulting page
@@ -1005,7 +1002,10 @@ sub handle_request {
       binmode STDOUT, ":utf8"; 
     }
     $/=undef;
-    print STDOUT $self -> {response}{body};
+    print STDOUT ${$response->{body}} 
+      if ref $response->{body};
+    print STDOUT $response->{body}
+      if not ref $response->{body};
   }
 
   $self -> post_scriptum;
@@ -1020,8 +1020,8 @@ sub run_presenter {
   my $params    = $self->{'presentation-params'} || [];
   
   my $presentation_builder_func = $self->{'presentation-builder-func'};
-
   if ( $presentation_builder_func ) {
+    # the presentation_builder_func should return a string or a string reference
     return &$presentation_builder_func( $self, $presenter, 
                                         @_, @$params );
   } 
@@ -1035,8 +1035,10 @@ sub post_process_content {
   my $self = shift;
   my $out  = shift;
 
-  ### add debuggings to the content
+  # assume $out is a string reference; even if not, make it so
+  if ( not ref $out ) { $out = \$out; }
 
+  ### add debuggings to the content
   my $vars_xml_dumped = $self -> {presenter_data_string};
   if ( $self ->{config} {'debug-info-visible'} ) {
 
@@ -1074,10 +1076,11 @@ _DEBUG_INCLUDE
 sub post_scriptum {
   my $self = shift;
   my $response = $self ->{response};
-  my $content  = $response ->{body} || '';
+  my $bodyref  = $response ->{body} || '';
+  if ( not ref $bodyref ) { $bodyref = \$bodyref; }
+  my $page_len = length( $$bodyref ) / 1000;
   my $vars_xml_dumped = $self -> {presenter_data_string} || '';
   my $vars_len = length( $vars_xml_dumped ) / 1000;
-  my $page_len = length( $content ) / 1000;
 
   if ( $self ->{SHOW_PROFILING} and $response -> {HTML} ) {
     my $rep = $self -> report_timed_checkpoints || '';

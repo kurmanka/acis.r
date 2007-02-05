@@ -57,23 +57,18 @@ sub run_xslt_presenter {
   my $data        = $self ->{'presenter-data'};
 
   my $data_string = $self -> serialize_presenter_data;
-
-#  $data_string =~ s/>\n\s+</></g;
-
   if ( $feed_data_string ) { 
     &$feed_data_string( $data_string );
   }
   if ( $self -> config( "debug-transformations" ) ) {
-    dump_data_file( "$homedir/presenter_data.xml", $data_string );
+    dump_data_file( "$homedir/presenter_data.xml", \$data_string );
   }
-  assert( $data_string );
+  #assert( $data_string );
 
   $self -> time_checkpoint( 'serializer' );
 
-
   my $file = $presenters_dir . "/" . $presenterfile;
   my $result;
-  
   my $error = '';
   my $msg   = '';
   
@@ -87,7 +82,6 @@ sub run_xslt_presenter {
   if ( not -f $file ) {
     debug "we can't find stylesheet file '$file'";
     $error = 'found';
-
     $self -> sevent ( 
                      @event,
                      -type  => 'error',
@@ -104,7 +98,6 @@ sub run_xslt_presenter {
   $parser -> validation(0);
   $parser -> keep_blanks(0);
    
- 
   my $stylesheet;
   
   # parsing the stylesheet
@@ -147,20 +140,18 @@ sub run_xslt_presenter {
       }
     }
     $self -> errlog( "xslt transformation error, stylesheet: $file ($@)" );
-
     $self -> sevent ( @event,
                       -type  => 'error',
                       -descr => "stylesheet transformation problem",
                     );
 
-    dump_data_file( "$homedir/bad_presenter_data.xml", $data_string );
+    dump_data_file( "$homedir/bad_presenter_data.xml", \$data_string );
 
     die "Can't transform data with stylesheet: $file\n" .
       "Problem: $err";
   }
 
   $result = Encode::decode_utf8( $result );
-
 
   if ( not $error 
       and  ( 
@@ -178,8 +169,8 @@ sub run_xslt_presenter {
                       -descr => "transformation result is empty",
                     );
 
-    dump_data_file( "$homedir/bad_trans_presenter_data.xml", $data_string );
-    dump_data_file( "$homedir/bad_trans_presenter_result.xml", $result );
+    dump_data_file( "$homedir/bad_trans_presenter_data.xml", \$data_string );
+    dump_data_file( "$homedir/bad_trans_presenter_result.xml", \$result );
   }
 
 
@@ -188,20 +179,20 @@ sub run_xslt_presenter {
   }
 
   if ( $self -> config( "debug-transformations" ) ) {
-    dump_data_file( "$homedir/presenter_result.xml", $result );
+    dump_data_file( "$homedir/presenter_result.xml", \$result );
   }
 
-  return $result;
+  return \$result;
 }
 
 
 
 sub dump_data_file {
   my $filename = shift;
-  my $data     = shift;
+  my $dataref  = shift;
 
   if ( open FILE, ">$filename" ) {
-    print FILE $data;
+    print FILE $$dataref;
     close FILE;
     
   } else {

@@ -23,7 +23,7 @@ package ACIS::Web;   ### -*-perl-*-
 #  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 #
 #  ---
-#  $Id: Web.pm,v 2.12 2007/02/04 03:25:02 ivan Exp $
+#  $Id: Web.pm,v 2.13 2007/02/05 16:03:18 ivan Exp $
 #  ---
 
 use strict;
@@ -396,7 +396,7 @@ sub update_paths {
 
 sub clear_after_request {
   my $self = shift;
-  if ( $ACIS::Web::Citations::{cleanup} ) { ACIS::Web::Citations::cleanup(); }
+  if ( $ACIS::Web::Citations::{cleanup} ) { eval {ACIS::Web::Citations::cleanup();} }
   if ( $ACIS::Web::Contributions::{cleanup} ) { ACIS::Web::Contributions::cleanup(); }
   $self-> SUPER::clear_after_request();
 }
@@ -499,9 +499,24 @@ sub send_mail {
   
   debug "sending email with template '$stylesheet'";
   my $config = $self -> config;
-  my $message = $self -> run_presenter( $stylesheet );
 
-  my ($header, $body) = ($message =~ /^(.*?)\s*\n\n+(.*)$/s);
+  my $header;
+  my $body;
+  { 
+    my $messageref = $self -> run_presenter( $stylesheet );
+    if (not ref $messageref) { $messageref = \$messageref; }
+  
+    # split on header and body
+    my $splitspot = index( $$messageref, "\n\n" );
+    if ( $splitspot > 0 ) {
+      $header = substr( $$messageref, 0, $splitspot );
+      $body   = substr( $$messageref, $splitspot+2 );
+      $body  =~ s/^\n+//;
+    }
+  }
+  die if not $header or not $body;
+
+#  my ($header, $body) = ($$messageref =~ /^(.*?)\s*\n\n+(.*)$/s);
   my @headers = split /\s*\n/, $header;
 #  debug "Headers: $header\n";
   $header = '';
@@ -513,7 +528,7 @@ sub send_mail {
     my $val = encode( 'MIME-Q', $value );
  #   $self -> log( "$name: $val" );
 
-    ### XXX a nasty hack to fix Encode's "feature":
+    ### XXX a nasty hack to fix Encode's header folding "feature":
     $val =~ s!\"\n\s+!\"!;  
     $header .= "$name: $val\n";
   }

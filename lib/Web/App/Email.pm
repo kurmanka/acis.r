@@ -35,7 +35,6 @@ sub send_mail {
   my $body;
 
   {
-
     my @presenteropt = ();
 
     if ( $app -> config( 'debug-email-data-log' ) ) {
@@ -57,7 +56,7 @@ sub send_mail {
              
     my $text = $app -> run_presenter( $stylesheet,
                                       @presenteropt );
-                                      
+    if ( ref $text ) { $text = $$text; }
 
     ###  Presenter can generate email headers.  Here they are:
 
@@ -88,18 +87,14 @@ sub send_mail {
       debug "from presenter: $k=($v)";
     }
 
-
     ###  Email body has to be formatted before sending though.
-    
     require Web::App::EmailFormat;
     $body = Web::App::EmailFormat::format_email( "$pbody\n" );
-
   }
 
 
   ###  Now the user-supplied header parameters override the default and the
   ###  presenter's ones.
-
   foreach ( keys %para ) {
     if ( m/^\-(\w.+)/ ) {
       my $k = ucfirst $1;
