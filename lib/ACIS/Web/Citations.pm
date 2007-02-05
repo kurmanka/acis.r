@@ -300,7 +300,7 @@ sub process_identified {
     assert( $cit->{ostring} );
     $cit->{nstring} = make_citation_nstring $cit->{ostring};
     assert( $cit->{nstring} );
-    assert( $cit->{srcdocsid} );
+    assert( $cit->{srcdocsid} ); #QQQQQ
     add_cit_old_sug( $sid, $dsid, $cit->{citid} );
     if ( $cit ) {
       warn("gone!"), delete $cit->{gone} if $cit->{gone};
@@ -441,18 +441,17 @@ sub process_refused {
   foreach ( @delete ) {
     my $cid = $cids{$_};
     my $cit = unrefuse_citation_by_cid( $record, $cid );
-
     assert( $cit->{ostring} );
+    # XX see below. nstring is not needed if we don't want to compare it
     $cit->{nstring} = make_citation_nstring $cit->{ostring}
       if not $cit->{nstring};
-    assert( $cit->{nstring} );
-    assert( $cit->{srcdocsid} );
+    assert( $cit->{srcdocsid} ); #QQQQQ
     if ( $cit ) {
       warn("gone!"), delete $cit->{gone} if $cit->{gone};
       push @citations, $cit;
     }
   }
-  $mat -> consider_new_citations( \@citations );
+  $mat -> consider_new_citations( \@citations );  ### XXXX Should not be done for huge matrices or big number of citations
 
   if ( scalar @citations > 1 )  {    $acis -> message( "unrefused-citations" ); }
   elsif ( scalar @citations == 1 ) { $acis -> message( "unrefused-citation" );  }

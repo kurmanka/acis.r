@@ -76,7 +76,7 @@ sub load_similarity_matrix($) {
   my $mat  = { new => {}, old => {}, psid => $psid, citations=>{} };
   bless $mat;
 
-  my @sug = grep { my $id = $_->{srcdocsid} . '-' . $_->{checksum}; 
+  my @sug = grep { my $id = $_->{srcdocsid} . '-' . $_->{checksum};  # QQQQQ
                    not exists $f1->{$id} and not exists $f2->{$id} } @$sug1, @$sug2;
 
   my $before_filter = scalar(@$sug1) + scalar( @$sug2);
@@ -104,8 +104,8 @@ sub _add_sugs {
   my $i = 0;
 
   foreach (@$sugs) {
-    if ( not $_->{srcdocsid} ) {  Carp::croak "citation without srcdocsid";  }
-    if ( not $_->{checksum}  ) {  Carp::croak "citation without checksum";  }
+    if ( not $_->{srcdocsid} ) {  Carp::croak "citation without srcdocsid"; } #QQQQQ
+    if ( not $_->{checksum}  ) {  Carp::croak "citation without checksum";  } #QQQQQ
   
     my $d      = $_->{dsid} || die;
     my $newold = ($_->{new}) ? 'new' : 'old';
@@ -127,7 +127,7 @@ sub _add_sugs {
     push @$dlist, $_;
     
     # maintain an index
-    my $cid = $_->{srcdocsid} . '-' . $_->{checksum};
+    my $cid = $_->{srcdocsid} . '-' . $_->{checksum};  #QQQQQ
     my $cindex = $known->{$cid}{$d} ||= [];
     my $pair = [ $newold, $_ ];
     push @$cindex, $pair;
@@ -187,57 +187,6 @@ sub most_interesting_doc {
 }
 
 
-# given a list of citations, which of them are not yet present in the
-# matrix?  (remove those which are present and return the list of the
-# removed items)
-
-sub filter_out_known {
-  my $self   = shift || die;
-  my $list   = shift || die;
-
-  debug "filter_out_known()";
-
-  my $known = [];
-  my $citindex = $self->{citations};
-
-  my $acis = $ACIS::Web::ACIS;
-  my $sql  = $acis -> sql_object;
-
-  my @old = ();
-  $sql->prepare( "select citid from cit_old_sug where psid=? group by citid" );
-  my $r = $sql->execute( $self->{psid} );
-  while( $r and $r->{row} ) {
-    push @old, $r->{row}{citid};
-    $r->next;
-  }
-  
-  my %old_citids = map { $_=>1 } @old; # make a hash of old citids
-
-  foreach ( @$list ) {
-    my $citation = $_;
-    my $clid = $citation->{srcdocsid} . '-' . $citation->{checksum};
-    my $found;
-    if ( $_->{citid} and $old_citids{$_->{citid}} ) { 
-      $found = 1;
-
-    } else {
-      if ( not $citindex->{$clid} ) { next; }
-      $found = 1; 
-    }
-
-    if ( $found ) {
-      debug "citation known: $clid";
-      push @$known, $_;
-      undef $_;
-    }
-  }
-
-  clear_undefined $list;
-  return $known;
-}  
-
-
-
 
 sub testme {
   require Data::Dumper;
@@ -288,12 +237,9 @@ sub upgrade {
 sub find_cit {
   my $self   = shift || die;
   my $cit    = shift || die;
-
   my $known = $self->{citations};
-  
   # check the index
-  my $cid = $cit->{srcdocsid} . '-' . $cit->{checksum};
-
+  my $cid = $cit->{srcdocsid} . '-' . $cit->{checksum};  #QQQQQ
   return $known->{$cid};
 }
 
@@ -306,7 +252,7 @@ sub find_sugg {
   my $known = $self->{citations};
   
   # check the index
-  my $cid = $cit->{srcdocsid} . '-' . $cit->{checksum};
+  my $cid = $cit->{srcdocsid} . '-' . $cit->{checksum}; #QQQQQ
 
   my $l = $known->{$cid}{$dsid};
   foreach ( @$l ) {
@@ -400,7 +346,7 @@ sub remove_citation {
   my $psid = $self->{psid} || die;
   my $sql  = $acis->sql_object() || die;
   
-  my $cid  = $cit->{srcdocsid} . '-' . $cit->{checksum};
+  my $cid  = $cit->{srcdocsid} . '-' . $cit->{checksum}; #QQQQQ
   my $dhash = $self->{citations}{$cid};
   $self->{citations}{$cid} = 5;    # XXXX for debugging
   delete $self->{citations}{$cid}; ## to make sure
@@ -452,14 +398,14 @@ sub citation_new_make_old {
   my $new  = $self->{new};
   my $old  = $self->{old};
   
-  my $src = $cit->{srcdocsid};
-  my $chk = $cit->{checksum};
+  my $src = $cit->{srcdocsid};  #QQQQQ
+  my $chk = $cit->{checksum};   #QQQQQ
 
   my $list = $new->{$dsid} || die;
 
   foreach ( @$list ) {
-    if ( $_->{srcdocsid} eq $src
-         and $_->{checksum} eq $chk ) { 
+    if ( $_->{srcdocsid} eq $src         #QQQQQ replace with one lcid comparison
+         and $_->{checksum} eq $chk ) {  #QQQQQ
       my $s = $_;
       undef $_; 
       push @{ $old->{$dsid} }, $s;
@@ -468,7 +414,7 @@ sub citation_new_make_old {
   clear_undefined $list;
   if ( not scalar @$list ) { delete $new->{$dsid}; }
 
-  my $dh = $cits->{"$src-$chk"};
+  my $dh = $cits->{"$src-$chk"};         #QQQQQ
   $list = $dh->{$dsid};
   foreach ( @$list ) {
     $_->[0] = 'old';
@@ -647,18 +593,18 @@ sub make_string ($;$) {
       if ( not defined $first ) {
         $s .= "${prefix}unsorted\n"; 
 
-      } elsif ( ref $first eq 'HASH' and defined $first->{checksum} ) {
-        my @l = sort {    $a->{checksum}  cmp $b->{checksum}
+      } elsif ( ref $first eq 'HASH' and defined $first->{checksum} ) { #QQQQQ
+        my @l = sort {    $a->{checksum}  cmp $b->{checksum}            #QQQQQ
                        or $a->{reason}    cmp $b->{reason} 
-                       or $a->{srcdocsid} cmp $b->{srcdocsid} 
+                       or $a->{srcdocsid} cmp $b->{srcdocsid}           #QQQQQ
                      } @$obj;
         $l = \@l;
 
       } elsif ( ref $first eq 'ARRAY' and defined $first->[1] and $first->[1]{reason} ) {
         my @l = sort {    $a->[0]            cmp $b->[0]
-                       or $a->[1]{checksum}  cmp $b->[1]{checksum} 
+                       or $a->[1]{checksum}  cmp $b->[1]{checksum}      #QQQQQ
                        or $a->[1]{reason}    cmp $b->[1]{reason} 
-                       or $a->[1]{srcdocsid} cmp $b->[1]{srcdocsid} 
+                       or $a->[1]{srcdocsid} cmp $b->[1]{srcdocsid}     #QQQQQ
                      } @$obj;
         $l = \@l;
 
@@ -682,7 +628,6 @@ sub make_string ($;$) {
 }
 
 
-require Storable;
 
 
 1;

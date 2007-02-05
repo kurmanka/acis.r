@@ -62,6 +62,7 @@ sub build_citations_index($;$) {
   $index ||= {};
   
   foreach (@$citlist) {
+    #QQQQQ use ->{lcid} if available
     if ( not $_->{srcdocsid}
          or not $_->{checksum} ) {
       cluck "no srcdocsid or checksum!";
@@ -304,7 +305,7 @@ sub today() {
 
 sub cid ($) {
   my $citation = $_[0] || die;
-  return $citation->{srcdocsid} . '-' . $citation->{checksum};
+  return $citation->{srcdocsid} . '-' . $citation->{checksum};     #QQQQQ 
 }
 
 
@@ -328,6 +329,7 @@ sub load_citation_details {
   if ( $r and $r->{row} ) {
     foreach ( qw( ostring srcdocid srcdoctitle srcdocauthors srcdocurlabout ) ) {    
       $cit->{$_} = Encode::decode_utf8( $r->{row}{$_} );
+      #QQQQQ convert ->{checksum} and ->{srcdocsid} into ->{lcid}
     }
     return 1;
   }
@@ -344,15 +346,15 @@ sub identify_citation_to_doc($$$) {
   my $cidentified = $citations->{identified} ||= {};
   my $doclist     = $cidentified->{$dsid}    ||= [];
 
-  warn "no srcdocsid!" if not $citation->{srcdocsid};
-  warn "no checksum!"  if not $citation->{checksum};
-  return if not $citation->{srcdocsid} or not $citation->{checksum};
+  warn "no srcdocsid!" if not $citation->{srcdocsid}; #QQQQQ
+  warn "no checksum!"  if not $citation->{checksum}; #QQQQQ
+  return if not $citation->{srcdocsid} or not $citation->{checksum};#QQQQQ
 
-  my $cid = $citation->{srcdocsid} . '-' . $citation->{checksum};
+  my $cid = $citation->{srcdocsid} . '-' . $citation->{checksum}; #QQQQQ
 
   ### be careful not to add an already identified citation
   foreach ( @$doclist ) {
-    my $_cid = $_->{srcdocsid} . '-' . $_->{checksum};
+    my $_cid = $_->{srcdocsid} . '-' . $_->{checksum};#QQQQQ
     if ( $_cid eq $cid ) {
       # citation is already identified; overwrite it
       warn "citation $cid is already identified for $dsid";
@@ -374,6 +376,7 @@ sub identify_citation_to_doc($$$) {
     $maybeauto = 'auto';
 #    $note = 'autoaddreason: $citation->{autoaddreason}';
   }
+  #QQQQQ:
   cit_event( $citation->{srcdocsid}, $citation->{checksum}, $rec->{sid}, $dsid, "${maybeauto}added", $citation->{autoaddreason}, $note );
 }
 
@@ -399,7 +402,7 @@ sub unidentify_citation_from_doc_by_cid($$$) {
   if ( not scalar @$clist ) {
     delete $cidentified->{$dsid};
   }
-
+  #QQQQQ:
   cit_event( $cit->{srcdocsid}, $cit->{checksum}, $rec->{sid}, $dsid, "unidentified" );
   return $cit;
 }
@@ -411,7 +414,7 @@ sub refuse_citation($$) {
   delete $citation->{reason};
   delete $citation->{time};
 
-  my $cid = $citation->{srcdocsid} . '-' . $citation->{checksum};
+  my $cid = $citation->{srcdocsid} . '-' . $citation->{checksum};#QQQQQ
 
   my $citations = $rec->{citations}     ||= {};
   my $refused   = $citations->{refused} ||= [];
@@ -419,6 +422,7 @@ sub refuse_citation($$) {
   push @$refused, $citation;
 
   debug "refused citation $cid";
+    #QQQQQ:
   cit_event( $citation->{srcdocsid}, $citation->{checksum}, $rec->{sid}, undef, "refused" );
 }
 
@@ -438,6 +442,7 @@ sub unrefuse_citation_by_cid($$) {
 
   if ( $citation ) {
     debug "unrefused citation $cid";
+    #QQQQQ
     cit_event( $citation->{srcdocsid}, $citation->{checksum}, $rec->{sid}, undef, "unrefused" );
   }
 
@@ -446,7 +451,7 @@ sub unrefuse_citation_by_cid($$) {
 
 
 my $bell;  # YYY potentially a problem for long-running persistent environments
-sub time_to_recompare_cit_doc($) {
+sub time_to_recompare_cit_doc($) {  # XXX Optimize it? A possible bottleneck.
   my ($lts) = shift; # last time string
 
   require Date::Manip;

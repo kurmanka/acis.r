@@ -331,7 +331,9 @@ sub load_similarity_suggestions ($$) {
     }
     if ( delete $_->{oldflag} ) { $_->{new} = 0; } 
     else { $_->{new} = 1; }
+    
     $_->{reason} = 'similar';
+    #QQQQQ convert ->{checksum} and ->{srcdocsid} into ->{lcid}
   }
 
   return $res; 
@@ -468,6 +470,7 @@ sub load_nonsimilarity_suggestions ($$) {
       else { $s->{new} = 1; }
       push @slist, $s;
       $r-> next;
+      #QQQQQ convert ->{checksum} and ->{srcdocsid} into ->{lcid}
     }
   }
   return \@slist;
