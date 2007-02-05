@@ -6,19 +6,15 @@ use warnings;
 use Carp;
 use Carp::Assert;
 use Web::App::Common;
+require Web::App::Email;
 
 use ACIS::Citations::Utils;
 use ACIS::Citations::Search qw( personal_search_by_names 
                                 personal_search_by_documents 
                                 personal_search_by_coauthors );
 use ACIS::Citations::Profile;
-use Web::App::Email;
 use ACIS::Web::SysProfile;
-
-
 use ACIS::APU qw(&logit);
-
-
 
 sub auto_processing {
   my $acis = shift || die;

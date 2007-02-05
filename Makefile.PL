@@ -60,6 +60,9 @@ my $modules =  {
                      'String::Approx' => '0',
                      'String::Similarity' => '1',
                      'Date::Manip'  => '0',
+                'Scalar::Util' => 0,
+                'Data::Dumper' => 0,
+
 # debugging modules: (the list may be incomplete)
 #  Debug::FaultAutoBT (Debug::DumpCore)
 #  Devel::Size
@@ -67,7 +70,9 @@ my $modules =  {
 #  Devel::Symdump
 #  Data::Structure::Util
 #  Data::Dump::Streamer
-#  
+#  Proc::ProcessTable
+
+
                     };
 
 print "Checking required modules...\n";
