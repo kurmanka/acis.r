@@ -193,8 +193,8 @@ sub process_potential {
 
     $mat -> remove_citation( $cit );
     identify_citation_to_doc($record, $dsid, $cit);
-    store_cit_sug( $cit->{citid}, $dsid, "coauth:$sid" );
-    add_cit_old_sug( $sid, $dsid, $cit->{citid} );
+    store_cit_sug( $cit->{cnid}, $dsid, "coauth:$sid" );
+    add_cit_old_sug( $sid, $dsid, $cit->{cnid} );
     $added ++;
   }
 
@@ -249,7 +249,7 @@ sub process_refuse {
 
     $mat -> remove_citation( $cit );
     refuse_citation($record, $cit);
-    add_cit_old_sug($sid, $dsid, $cit->{citid});
+    add_cit_old_sug($sid, $dsid, $cit->{cnid});
     $counter ++;
   }
 
@@ -301,7 +301,7 @@ sub process_identified {
     $cit->{nstring} = make_citation_nstring $cit->{ostring};
     assert( $cit->{nstring} );
     assert( $cit->{srcdocsid} ); #QQQQQ
-    add_cit_old_sug( $sid, $dsid, $cit->{citid} );
+    add_cit_old_sug( $sid, $dsid, $cit->{cnid} );
     if ( $cit ) {
       warn("gone!"), delete $cit->{gone} if $cit->{gone};
       push @citations, $cit;

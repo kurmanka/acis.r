@@ -306,7 +306,7 @@ sub compare_citation_to_documents {
 
     } elsif ( $v ) {
       debug "add the suggestion";
-      my $new = not get_cit_old_status( $psid, $dsid, $cit->{citid} );
+      my $new = not get_cit_old_status( $psid, $dsid, $cit->{cnid} );
       $self->_add_sugs( [{ %$cit, dsid=> $dsid, reason=> 'similar', similar=> $v, new=>$new, time=>today() }] );
       $recalc = 1;
 
@@ -421,7 +421,7 @@ sub citation_new_make_old {
   }
   
   my $psid = $self->{psid} || die;
-  add_cit_old_sug( $psid, $dsid, $cit->{citid} );
+  add_cit_old_sug( $psid, $dsid, $cit->{cnid} );
 
   $self->_calculate_totals;
   $self->check_consistency if not DEBUG_SIMMATRIX_CONSISTENCY;
@@ -567,7 +567,7 @@ sub make_string ($;$) {
       # special citation hash treatment
       $s .= "HASH$class\n";
       my @ks = sort keys %$obj;
-      foreach ( qw( citid srcdocsid checksum ostring reason similar ) ) {
+      foreach ( qw( cnid srcdocsid checksum ostring reason similar ) ) {
         $s .= "$prefix$_: ";
         $s .= make_string( $obj->{$_}, "$prefix  " );
         $s .= "\n";

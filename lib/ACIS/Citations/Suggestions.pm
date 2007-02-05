@@ -27,17 +27,17 @@ use ACIS::Citations::Utils;
 ### ACIS::Citations::Suggestions 
 
 # low level:                      
-# - get_cit_doc_similarity( citid, docsid )
-# - store_cit_doc_similarity( citid, docsid, similarity )
-# - clear_cit_doc_similarity( citid, dsid )
+# - get_cit_doc_similarity( cnid, docsid )
+# - store_cit_doc_similarity( cnid, docsid, similarity )
+# - clear_cit_doc_similarity( cnid, dsid )
 
-# - get_cit_sug( citid, docsid )
-# - store_cit_sug( citid, docsid, reason )
-# - clear_cit_sug( citid, docsid, [reason] )
+# - get_cit_sug( cnid, docsid )
+# - store_cit_sug( cnid, docsid, reason )
+# - clear_cit_sug( cnid, docsid, [reason] )
 
-# - add_cit_old_sug( psid, dsid, citid )
-# - get_cit_old_status( psid, dsid, citid )
-# - clear_cit_old_sug( psid, dsid, citid ) - not to be used
+# - add_cit_old_sug( psid, dsid, cnid )
+# - get_cit_old_status( psid, dsid, cnid )
+# - clear_cit_old_sug( psid, dsid, cnid ) - not to be used
 
 #?:
 # - suggest_citation_to_coauthors( cit, psid, docid );
@@ -61,7 +61,7 @@ sub sql_select_sug {
 citations.ostring,citations.srcdocsid,citations.checksum,res.id as srcdocid,res.title as srcdoctitle,
 res.authors as srcdocauthors,res.urlabout as srcdocurlabout
 FROM $from 
-  JOIN citations USING (citid)
+  JOIN citations USING (cnid)
   JOIN $rdbname.resources as res ON citations.srcdocsid=res.sid 
   $joins
 WHERE $where";
@@ -69,13 +69,13 @@ WHERE $where";
 
 
 sub get_cit_doc_similarity ($$) {
-  my ( $citid, $dsid ) = @_;
+  my ( $cnid, $dsid ) = @_;
   if ( not $sql ) { prepare; }
-  die if not $citid or not $dsid;
+  die if not $cnid or not $dsid;
 
   $sql -> prepare_cached( 
-     "select similar,time from cit_doc_similarity where citid=? and dsid=?" );
-  my $r = $sql -> execute( $citid, $dsid );
+     "select similar,time from cit_doc_similarity where cnid=? and dsid=?" );
+  my $r = $sql -> execute( $cnid, $dsid );
 
   if ( $r and $r->{row} ) {
     my $row = $r->{row};
@@ -85,20 +85,20 @@ sub get_cit_doc_similarity ($$) {
 }
 
 sub store_cit_doc_similarity ($$$) {
-  my ( $citid, $dsid, $value ) = @_;
+  my ( $cnid, $dsid, $value ) = @_;
   if ( not $sql ) { prepare; }
-  die if not $citid or not $dsid or not defined $value;
+  die if not $cnid or not $dsid or not defined $value;
   $sql -> prepare_cached( "REPLACE INTO cit_doc_similarity VALUES (?,?,?,NOW())" );
-  $sql -> execute( $citid, $dsid, $value );
+  $sql -> execute( $cnid, $dsid, $value );
 }
 
 sub clear_cit_doc_similarity ($$) {
-  my ( $citid, $dsid ) = @_;
+  my ( $cnid, $dsid ) = @_;
   if ( not $sql ) { prepare; }
-  die if not $citid and not $dsid;
+  die if not $cnid and not $dsid;
   my $where = '';
   my @arg   = ();
-  if ( defined $citid ) { $where .= " citid=? "; push @arg, $citid; };
+  if ( defined $cnid ) { $where .= " citid=? "; push @arg, $citid; };
   if ( $dsid ) { $where .= "AND dsid=? "; push @arg, $dsid; };
   $where =~ s/^AND //;
   $sql -> prepare_cached( "DELETE FROM cit_doc_similarity WHERE $where" );
@@ -109,12 +109,12 @@ sub clear_cit_doc_similarity ($$) {
 ### cit_sug table
 
 sub get_cit_sug ($$) {
-  my ( $citid, $dsid ) = @_;
+  my ( $cnid, $dsid ) = @_;
   if ( not $sql ) { prepare; }
-  die if not $dsid or not $citid;
+  die if not $dsid or not $cnid;
 
-  $sql -> prepare_cached( "select reason,time from cit_sug where citid=? and dsid=?" );
-  my $r = $sql -> execute( $citid, $dsid );
+  $sql -> prepare_cached( "select reason,time from cit_sug where cnid=? and dsid=?" );
+  my $r = $sql -> execute( $cnid, $dsid );
 
   my @res = ();
   while ( $r and $r->{row} ) {
@@ -127,13 +127,13 @@ sub get_cit_sug ($$) {
 
 
 sub find_cit_sug ($$) {
-  my ( $citid, $dsid ) = @_;
+  my ( $cnid, $dsid ) = @_;
   if ( not $sql ) { prepare; }
-  die if not $dsid and not $citid;
+  die if not $dsid and not $cnid;
 
   my $where = '';
   my @arg   = ();
-  if ( defined $citid ) { $where .= "citid=? "; push @arg, $citid; };
+  if ( defined $cnid ) { $where .= "citid=? "; push @arg, $citid; };
   if ( $dsid ) { $where .= "AND dsid=? "; push @arg, $dsid; };
   $where =~ s/^AND //;
 
@@ -153,40 +153,40 @@ sub find_cit_sug ($$) {
 
 sub find_cit_sug_citations ($$) {
   # see also load_nonsimilarity_suggestions() below
-  my ( $citid, $dsid ) = @_;
+  my ( $cnid, $dsid ) = @_;
   if ( not $sql ) { prepare; }
-  die if not $dsid and not $citid;
+  die if not $dsid and not $cnid;
 
   my $where = '';
   my @arg   = ();
-  if ( defined $citid ) { $where .= "s.citid=? "; push @arg, $citid; };
+  if ( defined $cnid ) { $where .= "s.citid=? "; push @arg, $citid; };
   if ( $dsid ) { $where .= "AND s.dsid=? "; push @arg, $dsid; };
   $where =~ s/^AND //;
 
   my $select_citations = ACIS::Citations::Utils::select_citations_sql( $acis );
   $select_citations =~ s!SELECT(\s+)(\w)!SELECT s.reason,$2!i;
 
-  $sql -> prepare_cached( "$select_citations join cit_sug as s using (citid) where $where" );
+  $sql -> prepare_cached( "$select_citations join cit_sug as s using (cnid) where $where" );
   my $r = $sql -> execute( @arg );
   return $r;
 }
 
 
 sub store_cit_sug ($$$) {
-  my ( $citid, $dsid, $reason ) = @_;
+  my ( $cnid, $dsid, $reason ) = @_;
   if ( not $sql ) { prepare; }
-  die if not $citid or not $dsid or not $reason;
+  die if not $cnid or not $dsid or not $reason;
   $sql -> prepare_cached( "REPLACE INTO cit_sug VALUES (?,?,?,NOW())" );
-  $sql -> execute( $citid, $dsid, $reason );
+  $sql -> execute( $cnid, $dsid, $reason );
 }
 
 sub clear_cit_sug ($$;$) {
-  my ( $citid, $dsid, $reason ) = @_;
+  my ( $cnid, $dsid, $reason ) = @_;
   if ( not $sql ) { prepare; }
-  die if not $citid and not $dsid;
+  die if not $cnid and not $dsid;
   my $where = '';
   my @arg   = ();
-  if ( defined $citid ) { $where .= " citid=? "; push @arg, $citid; };
+  if ( defined $cnid ) { $where .= " citid=? "; push @arg, $citid; };
   if ( $dsid )   { $where .= "AND dsid=? ";      push @arg, $dsid; };
   if ( $reason ) { $where .= "AND reason=? ";    push @arg, $reason; } 
   $where =~ s/^AND //;
@@ -197,22 +197,22 @@ sub clear_cit_sug ($$;$) {
 # cit_old_sug
 
 sub add_cit_old_sug ($$$) {
-  my ( $psid, $dsid, $citid ) = @_;
+  my ( $psid, $dsid, $cnid ) = @_;
   if ( not $sql ) { prepare; }
-  die if not $psid or not $citid or not $dsid;
-  $sql -> prepare_cached( "REPLACE INTO cit_old_sug (psid,dsid,citid) VALUES (?,?,?)" );
-  $sql -> execute( $psid, $dsid, $citid );
+  die if not $psid or not $cnid or not $dsid;
+  $sql -> prepare_cached( "REPLACE INTO cit_old_sug (psid,dsid,cnid) VALUES (?,?,?)" );
+  $sql -> execute( $psid, $dsid, $cnid );
 }
 
 sub clear_cit_old_sug_XXX_NOT_TO_BE_USED ($$$) {
-  my ( $psid, $dsid, $citid ) = @_;
+  my ( $psid, $dsid, $cnid ) = @_;
   if ( not $sql ) { prepare; }
-  die if not $psid or not $citid or not $dsid;
+  die if not $psid or not $cnid or not $dsid;
   
   my $where = '';
   my @arg   = ();
   if ( $psid )   { $where .= "psid=? ";             push @arg, $psid; }  
-  if ( defined $citid ) { $where .= "AND citid=? "; push @arg, $citid; };
+  if ( defined $cnid ) { $where .= "AND citid=? "; push @arg, $citid; };
   if ( $dsid )   { $where .= "AND dsid=? ";         push @arg, $dsid; };
   $where =~ s/^AND //;
 
@@ -221,12 +221,12 @@ sub clear_cit_old_sug_XXX_NOT_TO_BE_USED ($$$) {
 }
 
 sub get_cit_old_status ($$$) {
-  my ( $psid, $dsid, $citid ) = @_;
+  my ( $psid, $dsid, $cnid ) = @_;
   if ( not $sql ) { prepare; }
-  die if not $citid or not $dsid or not $psid;
+  die if not $cnid or not $dsid or not $psid;
 
-  $sql -> prepare_cached( "select citid from cit_old_sug where psid=? and citid=? and dsid=?" );
-  my $r = $sql -> execute( $psid, $citid, $dsid );
+  $sql -> prepare_cached( "select cnid from cit_old_sug where psid=? and citid=? and dsid=?" );
+  my $r = $sql -> execute( $psid, $cnid, $dsid );
   return ( $r and $r->{row} );
 }
 
@@ -255,13 +255,13 @@ sub testme_tablelevel() {
     }
   }
 
-  $r = store_cit_doc_similarity $cl[0]->{citid}, 'dtestsid0', 70;
+  $r = store_cit_doc_similarity $cl[0]->{cnid}, 'dtestsid0', 70;
   print "Added a suggestion: $r\n";
-  $r = store_cit_doc_similarity $cl[0]->{citid}, 'dtestsid1', 40;
+  $r = store_cit_doc_similarity $cl[0]->{cnid}, 'dtestsid1', 40;
   print "added a suggestion: $r\n";
-  $r = store_cit_doc_similarity $cl[0]->{citid}, 'dtestsid2', 10;
+  $r = store_cit_doc_similarity $cl[0]->{cnid}, 'dtestsid2', 10;
   print "added a suggestion: $r\n";
-  $r = store_cit_doc_similarity $cl[0]->{citid}, 'dtestsid3', 10;
+  $r = store_cit_doc_similarity $cl[0]->{cnid}, 'dtestsid3', 10;
   print "added a suggestion: $r\n";
 
   if (0) {
@@ -315,7 +315,7 @@ sub load_similarity_suggestions ($$) {
   $sql -> prepare( 
     sql_select_sug( "sim.*,old.dsid as oldflag", 
                     "cit_doc_similarity as sim",
-                    "LEFT JOIN cit_old_sug AS old ON (old.psid=? and old.citid=sim.citid and old.dsid=sim.dsid)",
+                    "LEFT JOIN cit_old_sug AS old ON (old.psid=? and old.cnid=sim.citid and old.dsid=sim.dsid)",
                     "sim.similar>0 and ($cond)" )
   );
 
@@ -350,14 +350,14 @@ sub load_similarity_suggestions_all_lowtec ($$) {
   $sql -> prepare( 
     sql_select_sug( "sim.*,old.dsid as oldflag", 
                     "cit_doc_similarity as sim",
-                    "LEFT JOIN cit_old_sug AS old ON (old.psid=? and old.citid=sim.citid and old.dsid=sim.dsid)",
+                    "LEFT JOIN cit_old_sug AS old ON (old.psid=? and old.cnid=sim.citid and old.dsid=sim.dsid)",
                     "sim.similar>0 and ($cond)" )
   );
 
   my $r = $sql -> execute( $psid );
 
   while ( $r and $r->{row} ) {
-    debug "found item: ", $r->{row}{citid} , ' / ', $r->{row}{similar};
+    debug "found item: ", $r->{row}{cnid} , ' / ', $r->{row}{similar};
     my $s = $r->{row};  # hash copy
     foreach ( qw( ostring srcdoctitle srcdocauthors ) ) {    
       $s->{$_} = Encode::decode_utf8( $r->{row}{$_} );
@@ -381,7 +381,7 @@ sub load_similarity_suggestions_one_by_one_lowtec ($$) {
   $sql -> prepare_cached( 
     sql_select_sug( "sim.*,old.dsid as oldflag", 
                     "cit_doc_similarity as sim",
-                    "LEFT JOIN cit_old_sug AS old ON (old.psid=? and old.citid=sim.citid and old.dsid=sim.dsid)",
+                    "LEFT JOIN cit_old_sug AS old ON (old.psid=? and old.cnid=sim.citid and old.dsid=sim.dsid)",
                     "sim.dsid=? and sim.similar>0" )
   );
 
@@ -417,7 +417,7 @@ sub load_similarity_suggestions_one_by_one ($$) { # not used now
   $sql -> prepare_cached( 
     sql_select_sug( "sim.*,old.dsid as oldflag", 
                     "cit_doc_similarity as sim",
-                    "LEFT JOIN cit_old_sug AS old ON (old.psid=? and old.citid=sim.citid and old.dsid=sim.dsid)",
+                    "LEFT JOIN cit_old_sug AS old ON (old.psid=? and old.cnid=sim.citid and old.dsid=sim.dsid)",
                     "sim.dsid=? and sim.similar>0" )
   );
 
@@ -426,7 +426,7 @@ sub load_similarity_suggestions_one_by_one ($$) { # not used now
     my $r = $sql -> execute( $psid, $_ );
 
     while ( $r and $r->{row} ) {
-      debug "found item: ", $r->{row}{citid} , ' / ', $r->{row}{similar};
+      debug "found item: ", $r->{row}{cnid} , ' / ', $r->{row}{similar};
       my $s = $r->{row};  # hash copy
       foreach ( qw( ostring srcdoctitle srcdocauthors ) ) {    
         $s->{$_} = Encode::decode_utf8( $r->{row}{$_} );
@@ -454,7 +454,7 @@ sub load_nonsimilarity_suggestions ($$) {
   $sql -> prepare_cached( 
     sql_select_sug( "csug.*,old.dsid as oldflag", 
                     "cit_sug as csug",
-                    "LEFT JOIN cit_old_sug AS old ON (old.psid=? and old.citid=csug.citid and old.dsid=csug.dsid)",
+                    "LEFT JOIN cit_old_sug AS old ON (old.psid=? and old.cnid=csug.citid and old.dsid=csug.dsid)",
                     "csug.dsid=?" )
   );
 

@@ -181,7 +181,7 @@ sub personal_search_by_documents {
 
     if ( $autoadd ) {
       foreach ( @$r ) {
-        next if get_cit_old_status( $psid, $dsid, $_->{citid} );
+        next if get_cit_old_status( $psid, $dsid, $_->{cnid} );
 
         debug "citation: '", $_->{nstring} , "' is to be added to $dsid";
         $_->{autoadded}     = today(); # localtime( time );
@@ -266,7 +266,7 @@ sub personal_search_by_names {
   foreach ( @$r ) {
     my $citation = $_;
     my $cid = $_->{srcdocsid} . '-' . $_->{checksum}; #QQQQQ
-    my $citid = $_->{citid} || die;
+    my $cnid = $_->{citid} || die;
 
     # compare to documents!    
     my @comp = compare_citation_to_docs( $_, $docs );
@@ -279,7 +279,7 @@ sub personal_search_by_names {
 
     if ( $autoadd 
          and $simity >= $sim_threshold 
-         and not get_cit_old_status( $psid, $target, $citid ) ) {
+         and not get_cit_old_status( $psid, $target, $cnid ) ) {
 
       debug "citation: '", $citation->{nstring} , "' should be added to $target";
       $citation->{autoadded}     = today(); 
@@ -357,7 +357,7 @@ sub personal_search_by_coauthors {
     
     if ( $autoadd ) {
       foreach ( @$r ) {
-        next if get_cit_old_status( $psid, $dsid, $_->{citid} );
+        next if get_cit_old_status( $psid, $dsid, $_->{cnid} );
 
         debug "citation: '", $_->{nstring} , "' is to be added to $dsid";
         $_->{autoadded}     = today(); # localtime( time );

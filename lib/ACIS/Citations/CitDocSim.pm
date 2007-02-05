@@ -52,12 +52,12 @@ sub compare_citation_to_docs {
 
   debug "will use similarity function: $func";
 
-  my $citid = $cit->{citid} || die "citation must have numeric non-zero citid";
+  my $cnid = $cit->{citid} || die "citation must have numeric non-zero citid";
 
   my $sims = {};
   while ( my( $dsid, $doc ) = each %$docs ) {
     debug "comparing to $dsid (", $doc->{title}, ")";
-    my ($similarity,$t) = get_cit_doc_similarity( $citid, $dsid );
+    my ($similarity,$t) = get_cit_doc_similarity( $cnid, $dsid );
     
     if ( $t 
          and ACIS::Citations::Utils::time_to_recompare_cit_doc( $t ) ) {
@@ -72,7 +72,7 @@ sub compare_citation_to_docs {
       no strict 'refs';
       $similarity = sprintf( '%u', &{$func}( $cit, $doc ) * 100 );
       debug "similarity computed: $similarity";
-      store_cit_doc_similarity( $citid, $dsid, $similarity );
+      store_cit_doc_similarity( $cnid, $dsid, $similarity );
     }
     $sims->{$dsid} = $similarity;    
   }
@@ -104,7 +104,7 @@ sub compare_citation_to_doc($$) {
     $similarity = sprintf( '%u', &{$func}( $cit, $doc ) * 100 );
   }
   debug "similarity computed: $similarity";
-  store_cit_doc_similarity( $cit->{citid}, $dsid, $similarity );
+  store_cit_doc_similarity( $cit->{cnid}, $dsid, $similarity );
   return $similarity;
 }
 
