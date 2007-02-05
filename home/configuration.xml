@@ -5,7 +5,7 @@
     that is a working ARDB core configuration file.  Produces:
     documents table, collections table, authors table.
 
-    $Id: configuration.xml,v 2.8 2007/01/30 17:02:18 ivan Exp $
+    $Id: configuration.xml,v 2.9 2007/02/05 17:34:03 ivan Exp $
 
 -->
 
@@ -563,7 +563,7 @@
   <!-- Stage C: Citations -->
 
   <table name='acis:citations'>
-    <field name='citid'           sql-type='SERIAL'/> <!-- BIGINT UNSIGNED NOT NULL AUTO_INCREMENT UNIQUE -->
+    <field name='cnid'            sql-type='SERIAL'/> <!-- BIGINT UNSIGNED NOT NULL AUTO_INCREMENT UNIQUE -->
     <field name='srcdocsid'       sql-type='CHAR(15) NOT NULL'/>
     <field name='checksum'        sql-type='CHAR(22) NOT NULL'/>
     <field name='ostring'         sql-type='TEXT NOT NULL'/>
@@ -609,40 +609,28 @@
   </table>
 
   <table name='acis:cit_doc_similarity'>
-    <field name='citid'   sql-type='BIGINT UNSIGNED NOT NULL'/>
+    <field name='cnid'   sql-type='BIGINT UNSIGNED NOT NULL'/>
     <field name='dsid'    sql-type='CHAR(15) NOT NULL'/>
     <field name='similar' sql-type='TINYINT NOT NULL'/>
     <field name='time'    sql-type='DATETIME NOT NULL'/>
-    <create-table-sql>PRIMARY KEY (citid,dsid), INDEX docind (dsid)</create-table-sql>
+    <create-table-sql>PRIMARY KEY (cnid,dsid), INDEX docind (dsid)</create-table-sql>
   </table>
 
   <table name='acis:cit_sug'>
-    <field name='citid'  sql-type='BIGINT UNSIGNED NOT NULL'/>
+    <field name='cnid'   sql-type='BIGINT UNSIGNED NOT NULL'/>
     <field name='dsid'   sql-type='CHAR(15) NOT NULL'/>
     <field name='reason' sql-type='CHAR(20) NOT NULL'/>
     <field name='time'   sql-type='DATETIME NOT NULL'/>
-    <create-table-sql> PRIMARY KEY (citid,dsid,reason), INDEX docind (dsid)</create-table-sql>
+    <create-table-sql> PRIMARY KEY (cnid,dsid,reason), INDEX docind (dsid)</create-table-sql>
   </table>
 
   <table name='acis:cit_old_sug'>
      <field name='psid'  sql-type='CHAR(15) NOT NULL'/>
      <field name='dsid'  sql-type='CHAR(15) NOT NULL'/>
-     <field name='citid' sql-type='BIGINT UNSIGNED NOT NULL'/>
-     <create-table-sql> PRIMARY KEY (psid,dsid,citid) </create-table-sql>
+     <field name='cnid' sql-type='BIGINT UNSIGNED NOT NULL'/>
+     <create-table-sql> PRIMARY KEY (psid,dsid,cnid) </create-table-sql>
   </table>
 
-  <!--
-  <table name='acis:cit_accepted'>
-    <field name='psid'/>
-    <field name='citid'/>
-    <field name='dsid'/>
-    <field name='time'/>
-    <field name='auto'/>
-  </table>
-
-  <table name='acis:cit_refused'>
-  </table>
-  -->
 
 
 
