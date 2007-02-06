@@ -15,6 +15,9 @@ sub normalize_personal_names {
   my $etal;
   ###  normalize each author name
   foreach ( @$list ) {
+    next if not $_;
+    next if /^\s+$/;
+
     if( $_ =~ /et al(li)?/ ) {
       $_ =~ s/(?:(?:,|;)?\s*)?\bet al(li)?\b//;
       $etal = 1;
@@ -137,7 +140,7 @@ sub short_lc_record_type {
 ###                U R L    A B O U T 
 ###############################################################################
 
-sub make_url_about_resource {
+sub make_url_about_resource {   # XX RePEc-specific
   my $record = shift;
   
   my $id   = $record ->id;
@@ -402,9 +405,11 @@ sub process_resource {
     my @aus = $record -> get_value( 'author' );
 
     foreach ( @aus ) {
+      my $name = $_->{name}[0] || next;
+      next if $name =~ /^\s*$/;
       my $em = $_ ->{email}[0] || '';
       push @au_emails, $em;
-      push @authors,   $_ ->{name}[0];
+      push @authors,   $name;
     }
     $authors = normalize_personal_names ( \@authors );
 
@@ -425,6 +430,8 @@ sub process_resource {
     my @eds = $record -> get_value( 'editor' );
 
     foreach ( @eds ) {
+      my $name = $_->{name}[0] || next;
+      next if $name =~ /^\s*$/;
       my $em = $_ ->{email}[0];
       push @ed_emails, $em;
       push @editors  , $_ ->{name} [0];
@@ -517,12 +524,10 @@ sub process_resource {
   
   my $role = 'author';
   foreach ( @authors, '', @editors ) {
-    
     if ( $_ eq '' ) { 
       $role = 'editor';
       next;
     }
-    
     $res -> {role}  = $role;
     $res -> {name}  = lc $_;
     $res -> {email} = lc shift @emails;

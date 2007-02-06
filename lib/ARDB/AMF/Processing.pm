@@ -22,7 +22,6 @@ sub prepare {
   $ardb = shift;
   $rec  = shift;
   $relations = shift;
-
   generate_short_id();
 }
 
@@ -31,7 +30,7 @@ sub get ($);
 
 use vars qw( $acis );
 
-*acis = *ARDB::ReDIF::Processing::acis;
+*acis = *ACIS::Web::ACIS;
 
 
 my $item;
@@ -272,9 +271,12 @@ sub process_authors {
     my @aus = $rec -> get_value( 'hasauthor' );
 
     foreach ( @aus ) {
+      my $name = $_->{name}[0] || next;
+      $name =~ s/(^\s+|\s+$)//g;
+      next if not $name;
       my $em = $_ ->{email}[0][0] || '';
       push @au_emails, $em;
-      push @authors,   $_ ->{name}[0][0];
+      push @authors,   $name;
     }
     $authors = ARDB::ReDIF::Processing::normalize_personal_names ( \@authors );
 
@@ -296,9 +298,12 @@ sub process_editors {
     my @eds = $rec-> get_value( 'editor' );
 
     foreach ( @eds ) {
+      my $name = $_->{name}[0] || next;
+      $name =~ s/(^\s+|\s+$)//g;
+      next if not $name;
       my $em = $_ ->{email}[0][0] || '';
       push @ed_emails, $em;
-      push @editors  , $_ ->{name} [0][0];
+      push @editors  , $name;
     }
     $editors = ARDB::ReDIF::Processing::normalize_personal_names ( \@editors );
     
