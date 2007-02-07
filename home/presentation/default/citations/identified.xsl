@@ -17,7 +17,6 @@
     
     <xsl:for-each select='$list/list-item'>
       <xsl:variable name='i'   select='concat(position(),$group)'/>
-      <xsl:variable name='cid' select='concat(srcdocsid/text(), "-", checksum/text())'/>
       <tr class='citation'>
         <td valign='top' align='left' class='citcheckbox'>
           <input type='checkbox' name='del{$i}' id='del{$i}' value=''/>
@@ -27,7 +26,7 @@
             <xsl:with-param name='label' select='concat( "del", $i )'/>
           </xsl:call-template>
 
-          <input type='hidden' name='cid{$i}' value='{$cid}'/>
+          <input type='hidden' name='cid{$i}' value='{cnid/text()}'/>
         </td>
       </tr>
       

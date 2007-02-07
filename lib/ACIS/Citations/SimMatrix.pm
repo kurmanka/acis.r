@@ -28,7 +28,7 @@ use ACIS::Citations::Suggestions qw( get_cit_doc_similarity
                  load_similarity_suggestions
                  load_nonsimilarity_suggestions
                                   );
-use ACIS::Citations::Utils qw( today cid min_useful_similarity 
+use ACIS::Citations::Utils qw( today min_useful_similarity 
                                coauthor_suggestion_similarity
                                preidentified_suggestion_similarity 
                                build_citations_index
@@ -60,7 +60,7 @@ sub load_similarity_matrix($) {
   my $psid = $record->{sid};
 
   debug "load_similarity_matrix() for rec $psid";
-  my ($f1, $f2) = make_identified_n_refused($record); # each ($f1,$f2) is a hash of long cit ids ("srcdocsid-checksum")
+  my ($f1, $f2) = make_identified_n_refused($record); # each ($f1,$f2) is a hash of numeric cit ids (cnid)
 
   my $rp = $record->{contributions}{accepted} ||= [];
   my $dsid_list = [ grep {defined} map { $_->{sid} } @$rp ];
@@ -76,8 +76,8 @@ sub load_similarity_matrix($) {
   my $mat  = { new => {}, old => {}, psid => $psid, citations=>{} };
   bless $mat;
 
-  my @sug = grep { my $id = $_->{srcdocsid} . '-' . $_->{checksum};  # QQQQQ
-                   not exists $f1->{$id} and not exists $f2->{$id} } @$sug1, @$sug2;
+  my @sug = grep { my $id = $_->{cnid}; 
+                   $id and (not exists $f1->{$id}) and (not exists $f2->{$id}) } @$sug1, @$sug2;
 
   my $before_filter = scalar(@$sug1) + scalar( @$sug2);
   my $after_filter  = scalar @sug;
@@ -104,9 +104,8 @@ sub _add_sugs {
   my $i = 0;
 
   foreach (@$sugs) {
-    if ( not $_->{srcdocsid} ) {  Carp::croak "citation without srcdocsid"; } #QQQQQ
-    if ( not $_->{checksum}  ) {  Carp::croak "citation without checksum";  } #QQQQQ
-  
+    if ( not $_->{cnid} ) {  Carp::croak "citation without cnid"; }
+
     my $d      = $_->{dsid} || die;
     my $newold = ($_->{new}) ? 'new' : 'old';
     my $reason = $_->{reason};
@@ -122,13 +121,14 @@ sub _add_sugs {
     delete $_->{dsid};
     delete $_->{psid};
     delete $_->{new};
+    delete $_->{nstring};
     
     my $dlist = $self->{$newold}{$d} ||= [];
     push @$dlist, $_;
     
     # maintain an index
-    my $cid = $_->{srcdocsid} . '-' . $_->{checksum};  #QQQQQ
-    my $cindex = $known->{$cid}{$d} ||= [];
+    my $cnid = $_->{cnid}; 
+    my $cindex = $known->{$cnid}{$d} ||= [];
     my $pair = [ $newold, $_ ];
     push @$cindex, $pair;
     
@@ -239,8 +239,7 @@ sub find_cit {
   my $cit    = shift || die;
   my $known = $self->{citations};
   # check the index
-  my $cid = $cit->{srcdocsid} . '-' . $cit->{checksum};  #QQQQQ
-  return $known->{$cid};
+  return $known->{ $cit->{cnid} };
 }
 
 sub find_sugg {
@@ -252,9 +251,9 @@ sub find_sugg {
   my $known = $self->{citations};
   
   # check the index
-  my $cid = $cit->{srcdocsid} . '-' . $cit->{checksum}; #QQQQQ
+  my $cnid = $cit->{cnid}; 
 
-  my $l = $known->{$cid}{$dsid};
+  my $l = $known->{$cnid}{$dsid};
   foreach ( @$l ) {
     # $_->[0] new / old
     # $_->[1] suggestion itself
@@ -270,6 +269,7 @@ sub find_sugg {
 
 use ACIS::Citations::CitDocSim;
 
+# used by consider_new_citations() method below
 sub compare_citation_to_documents {
   my $self = shift || die;
   my $cit  = shift || die;
@@ -284,11 +284,14 @@ sub compare_citation_to_documents {
   debug "documents: ", join ' ', keys %$docs;
   my $psid = $rec->{sid} || die;
 
+  die if not $cit->{cnid};
+  die if not $cit->{ostring};
+
   my $recalc;
-  my %res = compare_citation_to_docs( $cit, $docs, 'includezero' );
-  foreach ( keys %res ) {
+  my $res = compare_citation_to_docs( $cit, $docs, 'includezero' );
+  foreach ( keys %$res ) {
     my $dsid = $_;
-    my $v = $res{$_};
+    my $v = $res->{$_};
     if ( $v ) {
       debug "for $dsid: $v";
     }
@@ -340,18 +343,14 @@ sub remove_citation {
   my $self = shift || die;
   my $cit  = shift || die; 
 
-  # 
   die if not $acis;
   die if not $rec;
   my $psid = $self->{psid} || die;
   my $sql  = $acis->sql_object() || die;
   
-  my $cid  = $cit->{srcdocsid} . '-' . $cit->{checksum}; #QQQQQ
-  my $dhash = $self->{citations}{$cid};
-  $self->{citations}{$cid} = 5;    # XXXX for debugging
-  delete $self->{citations}{$cid}; ## to make sure
+  my $cnid = $cit->{cnid};
+  my $dhash = delete $self->{citations}{$cnid};
   return if not $dhash;
-  warn if $self->{citations}{$cid}; # XXXX for debugging
 
   while ( my($dsid,$slist) = each %$dhash ) {
     die if not $dsid;
@@ -382,7 +381,6 @@ sub remove_citation {
       if ( not scalar @$list ) {  delete $hash->{$docsid};  }
     }
   }
-
   
   $self->_calculate_totals;
   $self->check_consistency if not DEBUG_SIMMATRIX_CONSISTENCY;
@@ -398,14 +396,11 @@ sub citation_new_make_old {
   my $new  = $self->{new};
   my $old  = $self->{old};
   
-  my $src = $cit->{srcdocsid};  #QQQQQ
-  my $chk = $cit->{checksum};   #QQQQQ
-
+  my $cnid = $cit->{cnid};
   my $list = $new->{$dsid} || die;
 
   foreach ( @$list ) {
-    if ( $_->{srcdocsid} eq $src         #QQQQQ replace with one lcid comparison
-         and $_->{checksum} eq $chk ) {  #QQQQQ
+    if ( $_->{cnid} eq $cnid ) {
       my $s = $_;
       undef $_; 
       push @{ $old->{$dsid} }, $s;
@@ -414,14 +409,13 @@ sub citation_new_make_old {
   clear_undefined $list;
   if ( not scalar @$list ) { delete $new->{$dsid}; }
 
-  my $dh = $cits->{"$src-$chk"};         #QQQQQ
-  $list = $dh->{$dsid};
+  $list = $cits->{$cnid} {$dsid};
   foreach ( @$list ) {
     $_->[0] = 'old';
   }
   
   my $psid = $self->{psid} || die;
-  add_cit_old_sug( $psid, $dsid, $cit->{cnid} );
+  add_cit_old_sug( $psid, $dsid, $cnid );
 
   $self->_calculate_totals;
   $self->check_consistency if not DEBUG_SIMMATRIX_CONSISTENCY;
@@ -437,8 +431,8 @@ sub number_of_new_potential {
   my $pot_new_num = 0;
  CIT: 
   foreach ( keys %$known ) {
-    my $cid = $_;
-    my $dsidh = $known->{$cid};
+    my $cnid = $_;
+    my $dsidh = $known->{$cnid};
     
   CITDOC: 
     foreach my $dsid ( keys %$dsidh ) {
@@ -449,11 +443,11 @@ sub number_of_new_potential {
         if ( $_->[0] eq 'new' ) {
           if ( $_->[1] ->{similar} >= $sim_threshold 
                or $_->[1] ->{reason} ne 'similar' ) {
-            #debug "a new useful potential citation ($dsid): " , cid( $_->[1] );
+            #debug "a new useful potential citation ($dsid): " , $_->[1]{cnid};
             $pot_new_num++;
             next CIT;
           } else {
-            #debug "new, but not good enough ($dsid): ", cid( $_->[1] );
+            #debug "new, but not good enough ($dsid): ", $_->[1]{cnid};
           }
         }
       }
@@ -567,7 +561,7 @@ sub make_string ($;$) {
       # special citation hash treatment
       $s .= "HASH$class\n";
       my @ks = sort keys %$obj;
-      foreach ( qw( cnid srcdocsid checksum ostring reason similar ) ) {
+      foreach ( qw( cnid ostring reason similar ) ) {
         $s .= "$prefix$_: ";
         $s .= make_string( $obj->{$_}, "$prefix  " );
         $s .= "\n";
@@ -593,18 +587,16 @@ sub make_string ($;$) {
       if ( not defined $first ) {
         $s .= "${prefix}unsorted\n"; 
 
-      } elsif ( ref $first eq 'HASH' and defined $first->{checksum} ) { #QQQQQ
-        my @l = sort {    $a->{checksum}  cmp $b->{checksum}            #QQQQQ
+      } elsif ( ref $first eq 'HASH' and defined $first->{cnid} ) { 
+        my @l = sort {    $a->{cnid}      cmp $b->{cnid} 
                        or $a->{reason}    cmp $b->{reason} 
-                       or $a->{srcdocsid} cmp $b->{srcdocsid}           #QQQQQ
                      } @$obj;
         $l = \@l;
 
       } elsif ( ref $first eq 'ARRAY' and defined $first->[1] and $first->[1]{reason} ) {
         my @l = sort {    $a->[0]            cmp $b->[0]
-                       or $a->[1]{checksum}  cmp $b->[1]{checksum}      #QQQQQ
+                       or $a->[1]{cnid}      cmp $b->[1]{cnid}
                        or $a->[1]{reason}    cmp $b->[1]{reason} 
-                       or $a->[1]{srcdocsid} cmp $b->[1]{srcdocsid}     #QQQQQ
                      } @$obj;
         $l = \@l;
 
@@ -612,7 +604,6 @@ sub make_string ($;$) {
         $s .= "${prefix}unsorted\n"; 
       }
         
-      
       foreach ( @$l ) {
         $s .= "${prefix}$n: ";
         $s .= make_string( $_, "$prefix  " );

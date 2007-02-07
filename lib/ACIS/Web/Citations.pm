@@ -30,10 +30,8 @@ my $mat;
 sub cleanup {
   $mat && $mat ->DESTROY;
 #  undef $vars->{doclist};
-
 #  undef $vars->{document};
 #  undef $vars->{identified};
-
   undef $mat;
   undef $session;
   undef $vars;
@@ -75,8 +73,13 @@ sub prepare() {
   $research_accepted = $record ->{contributions}{accepted} || [];
   if ( scalar @$research_accepted == 0 ) { $vars->{'empty-research-profile'} = 1; }
 
+  if (not $session -> {$id} {'citations-checked-and-cleaned'} ) {
+    require ACIS::Citations::Profile;
+    ACIS::Citations::Profile::profile_check_and_cleanup();
+    $session -> {$id} {'citations-checked-and-cleaned'} = 1;
+  }
+
   $mat = $session ->{simmatrix} ||= load_similarity_matrix( $record ); 
-#  $mat = $session ->{simmatrix}   = load_similarity_matrix( $record ); 
   $mat && $mat -> upgrade( $acis, $record ); 
 
   $dsid = $params->{dsid} || $acis->{request}{subscreen};
@@ -84,17 +87,6 @@ sub prepare() {
     $document = get_doc_by_sid $dsid;
   }
 
-  # the following if causes ~2k leak per execution (on ik@ahinea.com account)
-  # XXXXXXXX
-  if (not $session -> {$id} {'citations-checked-and-cleaned'} ) {
-    require ACIS::Citations::Profile;
-    ACIS::Citations::Profile::profile_check_and_cleanup();
-    $session -> {$id} {'citations-checked-and-cleaned'} = 1;
-  }
-
-#ZZZZZ
-#  use ACIS::Debug::MLeakDetect;
-#  print my_vars_report;
 }
 
 
@@ -107,13 +99,13 @@ sub prepare_citations_list($) {
   foreach ( @$srclist ) {
     if ( $_ ->{reason} eq 'similar'      # this condition may be unnecessary
          and $_->{similar} < $minsim ) { next; }
-    my $cid = cid $_;
-    if ( $index->{$cid} ) {
-      $index->{$cid}{similar} += $_->{similar};
+    my $cnid = $_->{cnid};
+    if ( $index->{$cnid} ) {
+      $index->{$cnid}{similar} += $_->{similar};
     } else {
       my $cit = { %$_ };
       push @$list, $cit;
-      $index->{$cid} = $cit;
+      $index->{$cnid} = $cit;
     }
   }
   @$list = sort { $b->{similar} <=> $a->{similar} } @$list;
@@ -128,9 +120,9 @@ sub count_significant_potential ($) {
   foreach ( @$list ) {
     if ( $_ ->{reason} eq 'similar'      # this condition may be unnecessary
          and $_->{similar} < $minsim ) { next; }
-    my $cid = cid $_;
-    next if $index->{$cid};
-    $index ->{$cid} = 1;
+    my $cnid = $_->{cnid};
+    next if $index->{$cnid};
+    $index ->{$cnid} = 1;
     $count++;
   }
   return $count;
@@ -182,13 +174,13 @@ sub process_potential {
   }
 
   my $added = 0;
-  foreach ( @adds ) {
-    my $cid = $cids{$_};
-    debug "add citation $cid to $dsid";
-    if ( not $cid ) { debug "no cid in form data; ignoring citation add: $_"; next; }
+  foreach ( @adds ) { 
+    my $cnid = $cids{$_};  ### here we could forget %cids and get cnid directly from the $_
+    debug "add citation $cnid to $dsid";
+    if ( not $cnid ) { debug "no cnid in form data; ignoring citation add: $_"; next; }
 
     # identify a citation
-    my $list = ($mat->{citations}{$cid}) ? $mat -> {citations}{$cid}{$dsid} : next;
+    my $list = ($mat->{citations}{$cnid}) ? $mat -> {citations}{$cnid}{$dsid} : next;
     my $cit  = ($list and $list->[0]) ? $list->[0][1] : next; 
 
     $mat -> remove_citation( $cit );
@@ -209,15 +201,14 @@ sub process_potential {
     # citation.  unless the user used a stale webform
     if ( # m/\d+$/ and 
          not defined $params->{"add$_"} ) {
-      my $cid = $cids{$_};
+      my $cnid = $cids{$_}; # see above
       my $cit; 
-      foreach (@$nlist) { my $id = cid $_; if ($id eq $cid) {$cit = $_;last;} }
+      foreach (@$nlist) { my $id = $_->{cnid}; if ($id eq $cnid) {$cit = $_;last;} }
       if ( $cit ) {
         $mat -> citation_new_make_old( $dsid, $cit );
       }
     }
   }
-
 
   my $autosug = $acis->{request}{screen} eq 'citations/autosug';
   if ( $params->{moveon} ) {
@@ -239,12 +230,12 @@ sub process_refuse {
 
   my $counter = 0;
   foreach( @$refuse ) {
-    my $cid = $cids->{$_};
-    debug "refuse citation $cid (for $dsid)";
-    if ( not $cid ) { debug "no cid in form data; ignoring citation refuse: $_"; next; }
+    my $cnid = $cids->{$_};
+    debug "refuse citation $cnid (for $dsid)";
+    if ( not $cnid ) { debug "no cnid in form data; ignoring citation refuse: $_"; next; }
 
     # identify a citation
-    my $list = ($mat->{citations}{$cid}) ? $mat -> {citations}{$cid}{$dsid} : next;
+    my $list = ($mat->{citations}{$cnid}) ? $mat -> {citations}{$cnid}{$dsid} : next;
     my $cit  = ($list and $list->[0]) ? $list->[0][1] : next; 
 
     $mat -> remove_citation( $cit );
@@ -260,7 +251,7 @@ sub process_refuse {
   foreach( keys %$cids ) {
     if ( defined $params->{"add$_"} ) {
       my $cid = $cids->{$_};
-      push @$preselect, $cid;
+      push @$preselect, $cnid;
     }
   }
   $vars->{'preselect-citations'} = $preselect; 
@@ -294,13 +285,13 @@ sub process_identified {
 
   my @citations;
   foreach ( @delete ) {
-    my $cid = $cids{$_};
-    my $cit = unidentify_citation_from_doc_by_cid( $record, $dsid, $cid );
+    my $cnid = $cids{$_}; 
+    my $cit = unidentify_citation_from_doc_by_cnid( $record, $dsid, $cnid );
 
     assert( $cit->{ostring} );
     $cit->{nstring} = make_citation_nstring $cit->{ostring};
     assert( $cit->{nstring} );
-    assert( $cit->{srcdocsid} ); #QQQQQ
+    assert( $cit->{cnid} );
     add_cit_old_sug( $sid, $dsid, $cit->{cnid} );
     if ( $cit ) {
       warn("gone!"), delete $cit->{gone} if $cit->{gone};
@@ -439,13 +430,10 @@ sub process_refused {
 
   my @citations;
   foreach ( @delete ) {
-    my $cid = $cids{$_};
-    my $cit = unrefuse_citation_by_cid( $record, $cid );
+    my $cnid = $cids{$_};
+    my $cit = unrefuse_citation_by_cnid( $record, $cnid );
     assert( $cit->{ostring} );
-    # XX see below. nstring is not needed if we don't want to compare it
-    $cit->{nstring} = make_citation_nstring $cit->{ostring}
-      if not $cit->{nstring};
-    assert( $cit->{srcdocsid} ); #QQQQQ
+    assert( $cit->{cnid} ); 
     if ( $cit ) {
       warn("gone!"), delete $cit->{gone} if $cit->{gone};
       push @citations, $cit;

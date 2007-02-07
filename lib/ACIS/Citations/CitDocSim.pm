@@ -39,7 +39,7 @@ sub compare_citation_to_docs {
   my $docs = shift || die;
   my $flag = shift || '';  # can be: 'includezero'
   
-  my @res;
+  my %res;
   debug "compare_citation_do_docs()";
   debug "documents: ", join ' ', keys %$docs;
 
@@ -52,7 +52,7 @@ sub compare_citation_to_docs {
 
   debug "will use similarity function: $func";
 
-  my $cnid = $cit->{citid} || die "citation must have numeric non-zero citid";
+  my $cnid = $cit->{cnid} || die "citation must have numeric non-zero cnid";
 
   my $sims = {};
   while ( my( $dsid, $doc ) = each %$docs ) {
@@ -69,12 +69,14 @@ sub compare_citation_to_docs {
       debug "similarity from db: $similarity";
       
     } else {
+      # compare, run similarity function
+      if ( not $cit->{nstring} ) { $cit->{nstring} = make_citation_nstring( $cit->{ostring} ); }
       no strict 'refs';
       $similarity = sprintf( '%u', &{$func}( $cit, $doc ) * 100 );
       debug "similarity computed: $similarity";
       store_cit_doc_similarity( $cnid, $dsid, $similarity );
     }
-    $sims->{$dsid} = $similarity;    
+    $sims->{$dsid} = $similarity;
   }
 
   my @d = keys %$sims;
@@ -82,9 +84,9 @@ sub compare_citation_to_docs {
   if ( $flag ne 'includezero' ) {
     @d = grep { $sims->{$_} } @d;
   }
-  @res = map { $_, $sims->{$_} } @d;
+  %res = map { $_ => $sims->{$_} } @d;
 
-  return @res;
+  return \%res;
 }
 
 

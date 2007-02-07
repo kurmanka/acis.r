@@ -52,17 +52,18 @@ sub prepare() {
   $rdbname = $acis->config( 'metadata-db-name' );
 }
 
+
 sub sql_select_sug {
   my $what  = shift;
   my $from  = shift;
   my $joins = shift || '';
   my $where = shift;
   return "SELECT $what,
-citations.ostring,citations.srcdocsid,citations.checksum,res.id as srcdocid,res.title as srcdoctitle,
+citations.ostring,citations.cnid,res.id as srcdocid,res.title as srcdoctitle,
 res.authors as srcdocauthors,res.urlabout as srcdocurlabout
 FROM $from 
   JOIN citations USING (cnid)
-  JOIN $rdbname.resources as res ON citations.srcdocsid=res.sid 
+  JOIN $rdbname.resources as res ON (res.sid = substring_index(citations.clid,'-',1))
   $joins
 WHERE $where";
 }
@@ -98,7 +99,7 @@ sub clear_cit_doc_similarity ($$) {
   die if not $cnid and not $dsid;
   my $where = '';
   my @arg   = ();
-  if ( defined $cnid ) { $where .= " citid=? "; push @arg, $citid; };
+  if ( defined $cnid ) { $where .= " cnid=? "; push @arg, $cnid; };
   if ( $dsid ) { $where .= "AND dsid=? "; push @arg, $dsid; };
   $where =~ s/^AND //;
   $sql -> prepare_cached( "DELETE FROM cit_doc_similarity WHERE $where" );
@@ -133,7 +134,7 @@ sub find_cit_sug ($$) {
 
   my $where = '';
   my @arg   = ();
-  if ( defined $cnid ) { $where .= "citid=? "; push @arg, $citid; };
+  if ( defined $cnid ) { $where .= "cnid=? "; push @arg, $cnid; };
   if ( $dsid ) { $where .= "AND dsid=? "; push @arg, $dsid; };
   $where =~ s/^AND //;
 
@@ -159,7 +160,7 @@ sub find_cit_sug_citations ($$) {
 
   my $where = '';
   my @arg   = ();
-  if ( defined $cnid ) { $where .= "s.citid=? "; push @arg, $citid; };
+  if ( defined $cnid ) { $where .= "s.cnid=? "; push @arg, $cnid; };
   if ( $dsid ) { $where .= "AND s.dsid=? "; push @arg, $dsid; };
   $where =~ s/^AND //;
 
@@ -186,7 +187,7 @@ sub clear_cit_sug ($$;$) {
   die if not $cnid and not $dsid;
   my $where = '';
   my @arg   = ();
-  if ( defined $cnid ) { $where .= " citid=? "; push @arg, $citid; };
+  if ( defined $cnid ) { $where .= " cnid=? "; push @arg, $cnid; };
   if ( $dsid )   { $where .= "AND dsid=? ";      push @arg, $dsid; };
   if ( $reason ) { $where .= "AND reason=? ";    push @arg, $reason; } 
   $where =~ s/^AND //;
@@ -212,7 +213,7 @@ sub clear_cit_old_sug_XXX_NOT_TO_BE_USED ($$$) {
   my $where = '';
   my @arg   = ();
   if ( $psid )   { $where .= "psid=? ";             push @arg, $psid; }  
-  if ( defined $cnid ) { $where .= "AND citid=? "; push @arg, $citid; };
+  if ( defined $cnid ) { $where .= "AND cnid=? "; push @arg, $cnid; };
   if ( $dsid )   { $where .= "AND dsid=? ";         push @arg, $dsid; };
   $where =~ s/^AND //;
 
@@ -225,7 +226,7 @@ sub get_cit_old_status ($$$) {
   if ( not $sql ) { prepare; }
   die if not $cnid or not $dsid or not $psid;
 
-  $sql -> prepare_cached( "select cnid from cit_old_sug where psid=? and citid=? and dsid=?" );
+  $sql -> prepare_cached( "select cnid from cit_old_sug where psid=? and cnid=? and dsid=?" );
   my $r = $sql -> execute( $psid, $cnid, $dsid );
   return ( $r and $r->{row} );
 }
@@ -315,7 +316,7 @@ sub load_similarity_suggestions ($$) {
   $sql -> prepare( 
     sql_select_sug( "sim.*,old.dsid as oldflag", 
                     "cit_doc_similarity as sim",
-                    "LEFT JOIN cit_old_sug AS old ON (old.psid=? and old.cnid=sim.citid and old.dsid=sim.dsid)",
+                    "LEFT JOIN cit_old_sug AS old ON (old.psid=? and old.cnid=sim.cnid and old.dsid=sim.dsid)",
                     "sim.similar>0 and ($cond)" )
   );
 
@@ -331,9 +332,7 @@ sub load_similarity_suggestions ($$) {
     }
     if ( delete $_->{oldflag} ) { $_->{new} = 0; } 
     else { $_->{new} = 1; }
-    
     $_->{reason} = 'similar';
-    #QQQQQ convert ->{checksum} and ->{srcdocsid} into ->{lcid}
   }
 
   return $res; 
@@ -350,7 +349,7 @@ sub load_similarity_suggestions_all_lowtec ($$) {
   $sql -> prepare( 
     sql_select_sug( "sim.*,old.dsid as oldflag", 
                     "cit_doc_similarity as sim",
-                    "LEFT JOIN cit_old_sug AS old ON (old.psid=? and old.cnid=sim.citid and old.dsid=sim.dsid)",
+                    "LEFT JOIN cit_old_sug AS old ON (old.psid=? and old.cnid=sim.cnid and old.dsid=sim.dsid)",
                     "sim.similar>0 and ($cond)" )
   );
 
@@ -381,7 +380,7 @@ sub load_similarity_suggestions_one_by_one_lowtec ($$) {
   $sql -> prepare_cached( 
     sql_select_sug( "sim.*,old.dsid as oldflag", 
                     "cit_doc_similarity as sim",
-                    "LEFT JOIN cit_old_sug AS old ON (old.psid=? and old.cnid=sim.citid and old.dsid=sim.dsid)",
+                    "LEFT JOIN cit_old_sug AS old ON (old.psid=? and old.cnid=sim.cnid and old.dsid=sim.dsid)",
                     "sim.dsid=? and sim.similar>0" )
   );
 
@@ -417,7 +416,7 @@ sub load_similarity_suggestions_one_by_one ($$) { # not used now
   $sql -> prepare_cached( 
     sql_select_sug( "sim.*,old.dsid as oldflag", 
                     "cit_doc_similarity as sim",
-                    "LEFT JOIN cit_old_sug AS old ON (old.psid=? and old.cnid=sim.citid and old.dsid=sim.dsid)",
+                    "LEFT JOIN cit_old_sug AS old ON (old.psid=? and old.cnid=sim.cnid and old.dsid=sim.dsid)",
                     "sim.dsid=? and sim.similar>0" )
   );
 
@@ -454,7 +453,7 @@ sub load_nonsimilarity_suggestions ($$) {
   $sql -> prepare_cached( 
     sql_select_sug( "csug.*,old.dsid as oldflag", 
                     "cit_sug as csug",
-                    "LEFT JOIN cit_old_sug AS old ON (old.psid=? and old.cnid=csug.citid and old.dsid=csug.dsid)",
+                    "LEFT JOIN cit_old_sug AS old ON (old.psid=? and old.cnid=csug.cnid and old.dsid=csug.dsid)",
                     "csug.dsid=?" )
   );
 
@@ -470,7 +469,6 @@ sub load_nonsimilarity_suggestions ($$) {
       else { $s->{new} = 1; }
       push @slist, $s;
       $r-> next;
-      #QQQQQ convert ->{checksum} and ->{srcdocsid} into ->{lcid}
     }
   }
   return \@slist;
@@ -479,156 +477,3 @@ sub load_nonsimilarity_suggestions ($$) {
  
 
 1;
-
-__END__
-
-
-sub load_coauthor_suggestions_new($) {
-  my $psid = shift || die;
-  if ( not $sql ) { prepare; }
-#  debug "load_coauthor_suggestions: $psid";
-
-  $sql -> prepare_cached( "$select_suggestions where reason like 'coauth:%' and psid=? and new=TRUE" );
-  my $r = $sql -> execute( $psid );
-  my @cl = ();
-  while ( $r and $r->{row} ) {
-    my $s = { %{$r->{row}} };
-    foreach ( qw( ostring srcdoctitle srcdocauthors ) ) {    
-      $s->{$_} = Encode::decode_utf8( $r->{row}{$_} );
-    }
-    push @cl, $s;
-    $r->next;
-  }
-#  debug "load_coauthor_suggestions: found ", scalar @cl, " items";
-  return \@cl;
-}
-
-
-
-sub store_similarity ($$$$) {
-  my ( $cit, $psid, $dsid, $value, $new ) = @_;
-  my $reason = 'similar';
-  
-  replace_suggestion $cit, $psid, $dsid, $reason, $value, $new;  
-}
-
-sub make_suggestion_old($) {
-  my ( $sug ) = @_;
-  $sug->{new} = 0;
-  store_update_suggestion( $sug );
-}
-
-
-use Web::App::Common;
-use ACIS::Citations::Utils qw( get_document_authors get_author_sid coauthor_suggestion_similarity );
-
-sub suggest_citation_to_coauthors($$$) {
-  my ( $cit, $psid, $dsid ) = @_;
-  
-  my @authors = get_document_authors $dsid;
-  foreach ( @authors ) {
-    debug "suggest to author: $_?";
-    my $sid = get_author_sid $_;
-    next if not $sid;
-    next if $sid eq $psid;
-    my $sug = check_suggestions( $cit, $sid, $dsid, "coauth:$psid" ); 
-    if ( $sug ) {
-      # do nothing, already suggested
-    } else {
-      add_suggestion $cit, $sid, $dsid, "coauth:$psid", coauthor_suggestion_similarity;
-    }
-  }
-}
-
-sub clear_multiple_from_cit_suggestions($$) {
-  my ( $citlist, $psid ) = @_;
-  foreach ( @$citlist ) {
-    clear_cit_from_suggestions( $_, $psid );
-  }
-}
-
-
-
-
-sub testme_lowlevel() {
-  require ACIS::Web;
-  # home=> '/home/ivan/proj/acis.zet'
-  my $acis = ACIS::Web->new(  );
-  my $sql = $acis-> sql_object;
-  $sql ->prepare( "select * from citations where nstring REGEXP ?" );
-  my $r = $sql ->execute(   "[[:<:]]KATZ HARRY[[:>:]]" );
-  my @cl;
-  while( $r and $r->{row} ) {
-    my $c = { %{$r->{row}} };
-    push @cl, $c;
-    $r->next;
-  }
-
-  foreach ( @cl ) {
-    print "citation: \n";
-    my $c = $_;
-    foreach ( keys %$c ) {
-      print "\t$_: ", 
-        ( defined $c->{$_} ) ? $c->{$_} : ''
-        , "\n";
-    }
-  }
-  
-  my $psid = 'ptestsid0';
-  $r = add_suggestion $cl[0], $psid, 'dtestsid0', 'similar', 70;
-  $r |= 0;
-  print "Added a suggestion: $r\n";
-  $r = add_suggestion $cl[0], $psid, 'dtestsid1', 'similar', 40; 
-  $r = add_suggestion $cl[0], $psid, 'dtestsid2', 'similar', 10; 
-
-
-  $r = add_suggestion $cl[1], $psid, 'dtestsid0', 'similar', 40; 
-  $r = add_suggestion $cl[1], $psid, 'dtestsid1', 'similar', 30; $r |= 0;
-  print "Added another suggestion: $r\n";
-  $r = add_suggestion $cl[1], $psid, 'dtestsid2', 'similar', 15; 
-
-
-  $r = add_suggestion $cl[2], $psid, 'dtestsid2', 'similar', 40; $r |= 0;
-  print "Added another suggestion: $r\n";
-
-  $r = add_suggestion $cl[2], $psid, 'dtestsid0', 'similar', 40; $r |= 0;
-
-
-  my $set1 = load_suggestions $psid;
-  print "loaded: ", scalar @$set1, "\n";
-
-  print "before update: similarity:", $set1->[1]{similar}, 
-    " new:", $set1->[1]{new}, "\n\n";  
-
-  if ( $set1->[1]->{similar} == 75 ) {
-    $set1->[1]->{similar} = 40;
-  } else {
-    $set1->[1]->{similar} = 75;
-  }
-  $set1->[1]->{new} = 0;
-  print "updated: ", store_update_suggestion $set1->[1], "\n";
-
-  my $set2 = load_suggestions $psid;
-  print "loaded: ", scalar @$set2, "\n";
-
-  print "after update: similarity:", $set2->[1]{similar}, 
-    " new:", $set2->[1]{new}, "\n\n";  
-
-#  print "cleared: ", clear_cit_from_suggestions $cl[0], $psid;
-#  print "\n";
-
-  $set2 = load_suggestions $psid;
-  print "loaded: ", scalar @$set2, " items\n";
-
-}
-
-
-
-
-
-
-
-
-
-1;
-

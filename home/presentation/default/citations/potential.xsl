@@ -33,8 +33,8 @@
     
     <xsl:for-each select='$list/list-item'>
       <xsl:variable name='i'   select='concat(position(),$group)'/>
-      <xsl:variable name='cid' select='concat(srcdocsid/text(), "-", checksum/text())'/>
-      <xsl:variable name='selected' select='$preselect/list-item[text()=$cid] or 
+      <xsl:variable name='cnid' select='cnid/text()'/>
+      <xsl:variable name='selected' select='$preselect/list-item[text()=$cnid] or 
                                             (similar &gt; number(//citation-document-similarity-preselect-threshold))'/>
       <tr>
         <td valign='top' align='left' class='citcheckbox'>
@@ -50,7 +50,7 @@
             <xsl:with-param name='label' select='concat("add", $i)'/>
           </xsl:call-template>
 
-          <input type='hidden' name='cid{$i}' value='{$cid}'/>
+          <input type='hidden' name='cid{$i}' value='{$cnid}'/>
           <input type='submit' name='refuse{$i}'  class='light' 
                  title='press this if it is not your work that is cited'
                  value='not my work' 

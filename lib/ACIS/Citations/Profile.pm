@@ -6,7 +6,7 @@ use Carp;
 use Carp::Assert;
 
 use ACIS::Web::SysProfile;
-use ACIS::Citations::Utils qw( today cid load_citation_details );
+use ACIS::Citations::Utils qw( today load_citation_details );
 
 sub last_cit_search_date($;$) {
   my ( $psid, $update ) = @_;
@@ -38,19 +38,20 @@ sub last_cit_sug_maintenance_date($;$) {
 use Web::App::Common;
 
 sub profile_check_and_cleanup () {
-  
   my $acis   = $ACIS::Web::ACIS;
-  return undef
-    if not $acis->config( 'citations-profile' );
+
+  my $record = $acis -> session->current_record;
+  if ( not $record->{citations} ) { return undef; }
+       
+#  return undef if not $acis->config( 'citations-profile' );
   
   debug "citations profile_check_and_cleanup()";
 
-  my $record = $acis -> session->current_record;
   my $psid   = $record->{sid} || die;
   my $sql    = $acis -> sql_object;
-  my $citations         = $record ->{citations} ||= {};
+  my $citations         = $record ->{citations};
   my $research_accepted = $record ->{contributions}{accepted} || [];
-  my $identified = $citations ->{identified};
+  my $identified = $citations ->{identified} || {};
 
   my $dsids = {};
   foreach ( @$research_accepted ) {
@@ -67,100 +68,149 @@ sub profile_check_and_cleanup () {
       debug "delete citations for $_";
       next;
     }
-    $sql -> prepare_cached( "select cnid,srcdocsid from citations where srcdocsid=? and checksum=?" );
+
+    my $a_cit = $identified->{$_}->[0];
+    my $q; 
+    # XXX this is a backwards-compatible upgrade code; should be
+    # removed after a while
+    # XXX this assumes that all citations here have the same
+    # identification in them and thus it reuses the prepared SQL
+    # statement
+    if ( $a_cit ->{citid} or $a_cit->{cnid} ) {
+      $q = 'select cnid from citations where cnid=?';
+    } elsif ( $a_cit->{clid} ) {
+      $q = 'select cnid from citations where clid=?';
+    } elsif ( $a_cit->{srcdocsid} and $a_cit->{checksum} ) {
+      $q = 'select cnid from citations where clid=?';
+    } else {
+      die "how do I upgrade this citations: " . Dumper( $a_cit ) . "?";
+    }
+    $sql -> prepare_cached( $q );
+
     my $cits = $identified->{$_};
     foreach (@$cits) {
-      if ( not $_->{srcdocsid} or not $_->{checksum} ) { 
-        debug "remove incomplete citation record (no scrdocsid or checksum)";
-        undef $_; 
-      }
-      my $r = $sql->execute( $_->{srcdocsid}, $_->{checksum} );
-      if ( $r and $r->{row} and $r->{row}{srcdocsid} ) {
+      my $id;
+      # XXX this is a backwards-compatible upgrade code; should be
+      # removed after a while
+      if ( $_ ->{citid} or $_->{cnid} ) {
+        $id = $_->{citid} || $_->{cnid};
+      } elsif ( $_->{clid} ) {
+        $id = $_->{clid};
+      } elsif ( $_->{srcdocsid} and $_->{checksum} ) {
+        $id = $_->{srcdocsid}. '-'. $_->{checksum};
+      } 
+      my $r = $sql->execute( $id );
+  
+      if ( $r and $r->{row} and $r->{row}{cnid} ) {
         # ok; update cnid
-        $_->{cnid} = $r->{row}{citid};
-        
+        $_->{cnid} = $r->{row}{cnid};
       } elsif ( $r )  {
         undef $_;
-        debug "delete citation $_->{srcdocsid}-$_->{checksum} (citation gone)";
+        debug "delete citation $id (it is gone)";
+        next;
       } else {
-        debug "can't check a citation: no result from execute()";
+        die "can't check a citation: no result from execute() (q:$q)";
       }
+
+      if ( not $_->{srcdoctitle} or not $_->{srcdocid} ) {
+        if ( not load_citation_details( $_ ) ) {
+          undef $_;
+          debug "delete citation $id (can't find source doc details)";
+          next;
+        }
+      }
+
+      delete $_->{srcdocsid};
+      delete $_->{checksum};
+      delete $_->{nstring};
+      delete $_->{similar};
+      delete $_->{reason};
+      delete $_->{new};
+      delete $_->{citid};
+      delete $_->{clid};
+      delete $_->{trgdocid} if not defined $_->{trgdocid};
     }
     clear_undefined $cits;
 
-    foreach (@$cits) {
-      if ( not $_->{srcdoctitle} or not $_->{srcdocid} ) {
-        load_citation_details( $_ );
-      }
-      if ( not $_->{srcdoctitle} or not $_->{srcdocid} ) {
-        undef $_;
-        debug "delete citation $_->{srcdocsid}-$_->{checksum} (no source doc details)";
-      }
-    }
-
-    clear_undefined $cits;
     if ( not scalar @$cits ) { 
       delete $identified->{$_};
     }
   }
+
+  update_refused();
 
   # mark in sysprof
   put_sysprof_value( $psid, 'last-cit-prof-check-date', today );
   put_sysprof_value( $psid, 'last-cit-prof-check-time', time );
 }
 
-sub potential_check_and_cleanup {
-  # 2007-01-18 02:19 this hasn't been updated during a cit_suggestions
-  # reform and thus is now outdated.
-  
-  # Have we already done that in SimMatrix? No.
-  my $acis = shift;
 
-  # Do a global check and clean-up via SQL join operation?
-  # We can use join to find which rows in cit_suggestions
-  # don't have a corresponding record in the citations table.
-
-  # And the citations table will be kept clean by the
-  # Citations::Input module.
-
-  my $sql = $acis->sql_object;
-
-  $sql -> prepare( "select sug.srcdocsid,sug.checksum from cit_suggestions as sug left join citations as src using (srcdocsid,checksum) where src.srcdocsid is null group by sug.srcdocsid, sug.checksum" );
-  my $r = $sql->execute();
-
-  my $first = 1;
-  my $repeat = 0;
-  my $deleted = 0;
-  while ( $first or $repeat ) {
-    
-    $first = 0;
-    $repeat = 0;
-    my $count = 0;
-    
-    my @list;
-    while ( $r and $r->{row} ) {
-      my $srcdocsid = $r->{row}{srcdocsid};
-      my $checksum  = $r->{row}{checksum} ;
+sub update_refused {
+  my $acis   = $ACIS::Web::ACIS;
+  my $record = $acis -> session->current_record;
+  if ( not $record->{citations} ) { return undef; }
       
-      push @list, [ $srcdocsid, $checksum ];
-      $count ++;
-      if ( $count > 10000 ) {
-        $repeat = 1;
-        last;
-      }
-      $r->next;
-    }
-    $r->finish;
-    
-    $sql -> prepare_cached( "delete from cit_suggestions where srcdocsid=? and checksum=?" );
-    foreach ( @list ) {
-      $sql -> execute( $_->[0], $_->[1] );
-      $deleted ++;
-    }
-  }
+  debug "citations profile_check_and_cleanup()";
 
-  return $deleted;
+  my $psid   = $record->{sid} || die;
+  my $sql    = $acis -> sql_object;
+  my $citations         = $record ->{citations};
+  my $research_accepted = $record ->{contributions}{accepted} || [];
+  my $refused = $citations ->{refused} || [];
+
+  foreach (@$refused) {
+    # XXX this is a backwards-compatible citation upgrade code; should
+    # be simplified after it is ran for every existing profile; then
+    # only cnid should be expected and used.
+    my $id;
+    my $q;
+    if ( $_ ->{citid} or $_->{cnid} ) {
+      $id = $_->{citid} || $_->{cnid};
+      $q = 'select cnid from citations where cnid=?';
+    } elsif ( $_->{clid} ) {
+      $id = $_->{clid};
+      $q = 'select cnid from citations where clid=?';
+    } elsif ( $_->{srcdocsid} and $_->{checksum} ) {
+      $id = $_->{srcdocsid}. '-'. $_->{checksum};
+      $q = 'select cnid from citations where clid=?';
+    } 
+    
+    $sql -> prepare_cached( $q );
+    my $r = $sql->execute( $id );        
+    
+    if ( $r and $r->{row} and $r->{row}{cnid} ) {
+      # ok; update cnid
+      $_->{cnid} = $r->{row}{cnid};
+    } elsif ( $r )  {
+      undef $_;
+      debug "delete citation $id (it is gone)";
+      next;
+    } else {
+      die "can't check a citation: no result from execute() (q:$q)";
+    }
+    
+    if ( not $_->{srcdoctitle} or not $_->{srcdocid} ) {
+      if ( not load_citation_details( $_ ) ) {
+        undef $_;
+        debug "delete citation $id (can't find source doc details)";
+        next;
+      }
+    }
+
+    delete $_->{srcdocsid};
+    delete $_->{checksum};
+    delete $_->{nstring};
+    delete $_->{similar};
+    delete $_->{reason};
+    delete $_->{new};
+    delete $_->{citid};
+    delete $_->{clid};
+    delete $_->{trgdocid} if not defined $_->{trgdocid};
+  }
+  clear_undefined $refused;
 }
+
+
 
 1;
 

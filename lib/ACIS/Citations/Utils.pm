@@ -15,10 +15,9 @@ use vars qw( @EXPORT );
               min_useful_similarity
               today 
               identify_citation_to_doc
-              unidentify_citation_from_doc_by_cid
+              unidentify_citation_from_doc_by_cnid
               refuse_citation
-              unrefuse_citation_by_cid
-              cid
+              unrefuse_citation_by_cnid
               load_citation_details
               select_citations_sql
               coauthor_suggestion_similarity
@@ -29,6 +28,12 @@ use vars qw( @EXPORT );
 use Unicode::Normalize;
 use Web::App::Common;
 use ACIS::Citations::Events;
+
+use Carp qw( cluck );
+use Data::Dumper;
+use String::Approx qw( amatch );
+use String::Similarity;
+
 
 
 sub normalize_string($) {
@@ -54,32 +59,24 @@ sub make_citation_nstring {
   return normalize_string( $nst );
 }
 
-use Carp qw( cluck );
-use Data::Dumper;
 
 sub build_citations_index($;$) {
   my ( $citlist, $index ) = @_;
   $index ||= {};
   
   foreach (@$citlist) {
-    #QQQQQ use ->{lcid} if available
-    if ( not $_->{srcdocsid}
-         or not $_->{checksum} ) {
-      cluck "no srcdocsid or checksum!";
+    if ( not $_->{cnid} ) {
+      cluck "no cnid";
       debug "empty citation: " . Dumper($_);
       undef $_;
       next;
     } 
-    my $key = $_->{srcdocsid} . '-' . $_->{checksum};
-    $index ->{$key} = $_;
+    $index ->{ $_->{cnid} } = $_;
   }
   clear_undefined $citlist;
   return $index;
 }
 
-
-use String::Approx qw( amatch );
-use String::Similarity;
 
 
 
@@ -218,9 +215,6 @@ sub test_cit_document_similarity() {
 
 
 
-
-
-
 sub get_document_authors($) {
   my $docsid = shift;
 
@@ -302,36 +296,72 @@ sub today() {
   strftime '%F', localtime( time );
 }
 
-
-sub cid ($) {
-  my $citation = $_[0] || die;
-  return $citation->{srcdocsid} . '-' . $citation->{checksum};     #QQQQQ 
-}
-
-
 sub select_citations_sql {
-  my $acis = shift || die;
+  die if not $ACIS::Web::ACIS;
+  my $acis = $ACIS::Web::ACIS;
   my $rdbname = $acis->config( 'metadata-db-name' );
-  return "SELECT citations.*,res.id as srcdocid,res.title as srcdoctitle,res.authors as srcdocauthors,res.urlabout as srcdocurlabout 
-  FROM citations INNER JOIN $rdbname.resources as res ON res.sid=citations.srcdocsid ";
+  return "SELECT citations.cnid,citations.ostring,citations.nstring,citations.trgdocid,
+    res.id as srcdocid,res.title as srcdoctitle,res.authors as srcdocauthors,res.urlabout as srcdocurlabout 
+  FROM citations INNER JOIN $rdbname.resources as res ON (res.sid = substring_index(citations.clid,'-',1)) ";
 }  
 
 
 sub load_citation_details {
   my $cit = shift || die;
-
   die if not $ACIS::Web::ACIS;
   my $app = $ACIS::Web::ACIS;
   my $sql = $app -> sql_object() || die;
   my $select_citations = select_citations_sql( $app );
-  $sql -> prepare( "$select_citations where srcdocsid=? and checksum=?" );
-  my $r = $sql -> execute( $cit->{srcdocsid}, $cit->{checksum} );
+  
+  my $id = $cit->{cnid} || $cit->{clid} || die;
+  my $idfield = $cit->{cnid} ? 'cnid' : 'clid';
+
+  $sql -> prepare( "$select_citations where $idfield=?" );  
+  my $r = $sql -> execute( $id );   
   if ( $r and $r->{row} ) {
-    foreach ( qw( ostring srcdocid srcdoctitle srcdocauthors srcdocurlabout ) ) {    
+    foreach ( qw( ostring srcdoctitle srcdocauthors ) ) {    
       $cit->{$_} = Encode::decode_utf8( $r->{row}{$_} );
-      #QQQQQ convert ->{checksum} and ->{srcdocsid} into ->{lcid}
-    }
-    return 1;
+    } 
+    foreach ( qw( srcdocid srcdocurlabout ) ) {    
+      $cit->{$_} = $r->{row}{$_};
+    } 
+    return $cit->{cnid} = $r->{row}{cnid};
+  }
+  return undef;
+}
+
+sub load_citation_details_backwcompatible {
+  my $cit = shift || die;
+  die if not $ACIS::Web::ACIS;
+  my $app = $ACIS::Web::ACIS;
+  my $sql = $app -> sql_object() || die;
+  my $select_citations = select_citations_sql( $app );
+
+  my $qe; my @id;
+  if ( $cit->{cnid} ) {
+    $qe = 'cnid=?';
+    @id = ($cit->{cnid});
+  } elsif ( $cit->{clid} ) {
+    $qe = 'clid=?';
+    @id = ($cit->{clid}); 
+  } elsif ( $cit->{srcdocsid} and $cit->{checksum} ) {
+    $qe = 'clid=?';
+    @id = ($cit->{srcdocsid}. '-'. $cit->{checksum});
+  } elsif ( $cit->{citid} ) {
+    $qe = 'cnid=?';
+    @id = ($cit->{citid});
+  } else { die; }
+      
+  $sql -> prepare( "$select_citations where $qe" ); 
+  my $r = $sql -> execute( @id );   
+  if ( $r and $r->{row} ) {
+    foreach ( qw( ostring srcdoctitle srcdocauthors ) ) {    
+      $cit->{$_} = Encode::decode_utf8( $r->{row}{$_} );
+    } 
+    foreach ( qw( srcdocid srcdocurlabout ) ) {    
+      $cit->{$_} = $r->{row}{$_};
+    } 
+    return $cit->{cnid} = $r->{row}{cnid};
   }
   return undef;
 }
@@ -346,18 +376,16 @@ sub identify_citation_to_doc($$$) {
   my $cidentified = $citations->{identified} ||= {};
   my $doclist     = $cidentified->{$dsid}    ||= [];
 
-  warn "no srcdocsid!" if not $citation->{srcdocsid}; #QQQQQ
-  warn "no checksum!"  if not $citation->{checksum}; #QQQQQ
-  return if not $citation->{srcdocsid} or not $citation->{checksum};#QQQQQ
-
-  my $cid = $citation->{srcdocsid} . '-' . $citation->{checksum}; #QQQQQ
+  my $cnid = $citation->{cnid};
+  warn "no citation cnid!" if not $cnid;
+  return if not $cnid;
 
   ### be careful not to add an already identified citation
   foreach ( @$doclist ) {
-    my $_cid = $_->{srcdocsid} . '-' . $_->{checksum};#QQQQQ
-    if ( $_cid eq $cid ) {
+    my $_cnid = $_->{cnid};
+    if ( $_cnid eq $cnid ) {
       # citation is already identified; overwrite it
-      warn "citation $cid is already identified for $dsid";
+      warn "citation $cnid is already identified for $dsid";
       $_ = $citation;
       return;
     }
@@ -369,21 +397,20 @@ sub identify_citation_to_doc($$$) {
   }
 
   push @$doclist, $citation;
-  debug "added citation $cid to identified for $dsid";
+  debug "added citation $cnid to identified for $dsid";
   my $note;
   my $maybeauto = '';
   if ( exists $citation->{autoaddreason} ) {
     $maybeauto = 'auto';
 #    $note = 'autoaddreason: $citation->{autoaddreason}';
   }
-  #QQQQQ:
-  cit_event( $citation->{srcdocsid}, $citation->{checksum}, $rec->{sid}, $dsid, "${maybeauto}added", $citation->{autoaddreason}, $note );
+  cit_event( $cnid, $rec->{sid}, $dsid, "${maybeauto}added", $citation->{autoaddreason}, $note );
 }
 
 
 
-sub unidentify_citation_from_doc_by_cid($$$) {
-  my ( $rec, $dsid, $cid ) = @_;
+sub unidentify_citation_from_doc_by_cnid($$$) {
+  my ( $rec, $dsid, $cnid ) = @_;
   
   my $citations   = $rec->{citations}    ||= {};
   my $cidentified = $citations->{identified} ||= {};
@@ -391,7 +418,7 @@ sub unidentify_citation_from_doc_by_cid($$$) {
 
   my $cit;
   for ( @$clist ) {
-    if ( cid $_ eq $cid ) {
+    if ( $_->{cnid} eq $cnid ) {
       $cit = $_;
       undef $_;
       last;
@@ -399,11 +426,8 @@ sub unidentify_citation_from_doc_by_cid($$$) {
   }
   
   clear_undefined $clist;
-  if ( not scalar @$clist ) {
-    delete $cidentified->{$dsid};
-  }
-  #QQQQQ:
-  cit_event( $cit->{srcdocsid}, $cit->{checksum}, $rec->{sid}, $dsid, "unidentified" );
+  if ( not scalar @$clist ) { delete $cidentified->{$dsid};  }
+  cit_event( $cnid, $rec->{sid}, $dsid, "unidentified" );
   return $cit;
 }
 
@@ -414,26 +438,24 @@ sub refuse_citation($$) {
   delete $citation->{reason};
   delete $citation->{time};
 
-  my $cid = $citation->{srcdocsid} . '-' . $citation->{checksum};#QQQQQ
-
+  my $cnid = $citation->{cnid};
   my $citations = $rec->{citations}     ||= {};
   my $refused   = $citations->{refused} ||= [];
   ### TODO: be careful not to add an already refused citation
   push @$refused, $citation;
 
-  debug "refused citation $cid";
-    #QQQQQ:
-  cit_event( $citation->{srcdocsid}, $citation->{checksum}, $rec->{sid}, undef, "refused" );
+  debug "refused citation $ncid";
+  cit_event( $cnid, $rec->{sid}, undef, "refused" );
 }
 
 
-sub unrefuse_citation_by_cid($$) {
-  my ( $rec, $cid ) = @_;
+sub unrefuse_citation_by_cnid($$) {
+  my ( $rec, $cnid ) = @_;
   my $citation;
 
   my $ref = $rec->{citations}{refused} ||= [];
   foreach ( @$ref ) {
-    if ( $cid eq cid $_ ) {
+    if ( $cnid eq $_->{cnid} ) {
       $citation = $_;
       undef $_;
     }
@@ -441,9 +463,8 @@ sub unrefuse_citation_by_cid($$) {
   clear_undefined $ref;
 
   if ( $citation ) {
-    debug "unrefused citation $cid";
-    #QQQQQ
-    cit_event( $citation->{srcdocsid}, $citation->{checksum}, $rec->{sid}, undef, "unrefused" );
+    debug "unrefused citation $cnid";
+    cit_event( $cnid, $rec->{sid}, undef, "unrefused" );
   }
 
   return $citation;

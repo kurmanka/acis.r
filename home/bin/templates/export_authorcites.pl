@@ -68,8 +68,9 @@ if ( $month eq 'this' ) {
 
 my @q = (
 qq!select res.id as docid,rec.id as pid,citedres.id as citeddocid from citation_events as ce
+   join citations as c using (cnid)
    join records as rec ON rec.shortid=ce.psid
-   join ${mdb}.resources as res ON res.sid=ce.srcdocsid
+   join ${mdb}.resources as res ON res.sid=substring_index(c.clid,'-',1)
    join ${mdb}.resources as citedres ON citedres.sid=ce.dsid
    $where
    order by pid,ce.time asc!,

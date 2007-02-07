@@ -11,9 +11,9 @@ my $sql;
 my $adb;
 
 use Digest::MD5;
-use ACIS::Citations::Utils qw( normalize_string make_citation_nstring );
+use ACIS::Citations::Utils qw( make_citation_nstring );
+sub DEBUG() { 0 }
 
-use Storable;
 
 sub prepare() {
   if ( not $ardb ) { 
@@ -43,14 +43,11 @@ sub find_doc_details($) {
 }
 
 
-sub DEBUG { 0; }
 sub process_record {
   shift;
-
   my $id     = shift;
   my $type   = shift;
   my $record = shift;
-  
   my $srcdocid = $record -> id;
   print "src doc id: $srcdocid\n"
     if DEBUG;
@@ -61,35 +58,43 @@ sub process_record {
   
   # find srcdocsid and URL
   my $srcdocsid = find_doc_details( $srcdocid );
-
   if ( $srcdocsid ) {
-    print "srcdocsid: $srcdocsid\n"
-      if DEBUG;
+    print "srcdocsid: $srcdocsid\n" if DEBUG;
   } else {
-    print "srcdocsid:no\n"
-      if DEBUG;
+    print "srcdocsid:no\n"   if DEBUG;
+    return undef;
   }
 
-  if ( not $srcdocsid ) { return undef; }
-
-  my $cit = { srcdocsid => $srcdocsid, };
-
+  my $cit = {};  
   my $table  = $config -> table( 'acis:citations' );
 
-  # build index of already known citations (originating from
-  # this doc)
+  # build index of already known citations (originating from this doc)
   my $index = {};
   {
-    $sql -> prepare_cached( "select checksum from $adb.citations where srcdocsid=?" );
-    my $res = $sql -> execute( $srcdocsid );
+    $sql -> prepare_cached( "select clid from $adb.citations where clid like ?" ); 
+    my $res = $sql -> execute( "$srcdocsid-\%" );
     while ( $res and $res->{row} ) {
-      my $s = $res->{row}{checksum};
+      my $s = $res->{row}{clid}; 
       $index ->{$s} = 1;
-    } continue { 
       $res->next;
     }
   }
-  print "citations already known: ", scalar keys %$index, "\n"
+
+  # build index of previously known, but then deleted citations,
+  # originating from this doc
+  my $delindex = {};
+  {
+    $sql -> prepare_cached( "select cnid,clid from $adb.citations_deleted where clid like ?" ); 
+    my $res = $sql -> execute( "$srcdocsid-\%" );
+    while ( $res and $res->{row} ) {
+      my $l = $res->{row}{clid}; 
+      my $n = $res->{row}{cnid}; 
+      $delindex ->{$l} = $n;
+      $res->next;
+    }
+  }
+
+  print "citations already known: ", scalar keys %$index, ' (', scalar keys %$delindex, ")\n"
     if DEBUG;
   print "citations now: ", scalar( @$record )-1, "\n"
     if DEBUG;
@@ -97,28 +102,28 @@ sub process_record {
   # process and save citations
   foreach ( @$record ) {
     next if not ref $_;
-
-    my $trg = $_->{trgdocid};
     my $ost = $_->{ostring};
-    
-    my $nst = make_citation_nstring $ost;
     my $md5 = Digest::MD5::md5_base64( $ost );
-
-    delete $index->{$md5};
-
+    my $clid = "$srcdocsid-$md5";
+    delete $index->{$clid};
+    $cit -> {clid}     = $clid;
     $cit -> {ostring}  = $ost;
-    $cit -> {trgdocid} = $trg;
-    $cit -> {nstring}  = $nst;
-    $cit -> {checksum} = $md5;
+    $cit -> {trgdocid} = $_->{trgdocid};
+    $cit -> {nstring}  = make_citation_nstring $ost;
+    $cit -> {cnid} = (exists $delindex->{$clid}) ? $delindex->{$clid} : undef;
     
     $table -> store_record ( $cit, $sql );
   }
 
   # delete the records that were in this doc before, but not
   # anymore (i.e. which disappeared)
-  $sql -> prepare_cached( "delete from $adb.citations where srcdocsid=? and checksum=?" );
+  $sql -> prepare_cached( "replace into $adb.citations_deleted select cnid,clid from $adb.citations where clid=?" ); 
   foreach ( keys %$index ) {
-    $sql -> execute( $srcdocsid, $_ );
+    $sql -> execute( $_ );
+  }
+  $sql -> prepare_cached( "delete from $adb.citations where clid=?" ); 
+  foreach ( keys %$index ) {
+    $sql -> execute( $_ );
   }
   print "citations disappeared: ", scalar keys %$index, "\n"
     if DEBUG;
@@ -128,23 +133,18 @@ sub process_record {
 
 
 
-
 sub delete_record {
   shift;
   my $id = shift;
-
   prepare;
-  assert( $ardb );
-
   $id =~ s/#citations$//g;
-  my ( $sid ) = find_doc_details( $id );
-  
-  $sql -> prepare_cached( "delete from $adb.citations where srcdocsid=?" );
-  $sql -> execute( $sid );
+  my $sid  = find_doc_details( $id );
+  my $mask = "$sid-%";
+  $sql -> prepare_cached( "replace into $adb.citations_deleted select cnid,clid from $adb.citations where clid like ?" ); 
+  $sql -> execute( $mask );
+  $sql -> prepare_cached( "delete from $adb.citations where clid like ?" ); 
+  $sql -> execute( $mask );
 }
 
 
-
-
 1;
-

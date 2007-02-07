@@ -73,7 +73,7 @@ sub auto_processing {
       my $dsid = $_->[0] || die;
       my $cita = $_->[1] || die;
 
-      debug "about to add to doc $dsid citation ". cid $cita;
+      debug "about to add to doc $dsid citation ". $cita->{cnid};
       
       my $dhash = $dsids->{$dsid};
       my $dcl;
