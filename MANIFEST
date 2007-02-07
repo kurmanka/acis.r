@@ -117,6 +117,7 @@ home/bin/templates/upgrade_to_1.4.61.pl
 home/bin/templates/upgrade_to_1.4.90.pl
 home/bin/templates/upgrade_to_1.4.95.pl
 home/bin/templates/upgrade_to_1.5.13.pl
+home/bin/templates/upgrade_to_1.5.27.pl
 home/bin/templates/upgrade_to_1.5.3.pl
 home/bin/templates/upgrade_to_1.5.4.pl
 home/bin/templates/upgrade_to_1.5.7.pl
