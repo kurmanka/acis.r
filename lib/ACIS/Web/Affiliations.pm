@@ -25,7 +25,7 @@ package ACIS::Web::Affiliations;   ### -*-perl-*-
 #  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 #
 #  ---
-#  $Id: Affiliations.pm,v 2.2 2006/04/25 18:10:51 ivan Exp $
+#  $Id: Affiliations.pm,v 2.3 2007/02/07 20:35:25 ivan Exp $
 #  ---
 
 
@@ -46,31 +46,23 @@ sub load_institution {
 
   my $sql = $app -> sql_object;
   my $metadata_db = $app -> config( 'metadata-db-name' );
-
-  my $statement   = "select * from $metadata_db.institutions where id=?";
+  my $statement   = "select data from $metadata_db.institutions where id=?";
   
   $sql -> prepare ( $statement );
-  my $sql_res = $sql -> execute ( $id );
-  
-  if ( not $sql_res ) {
+  my $r = $sql -> execute ( $id );
+  if ( not $r ) {
     $app -> errlog( "database error in Affiliations::load_institution: no result of execute" );
     $app -> error ( 'db-error' );
-    # debug "error while processing request: " . $sql -> error;
     debug "database query error";
     return undef;
   }
   
-  my $search_results = $sql_res -> {rows};
-  
-  debug "found $search_results";
-  
-  if ( $search_results ) {  
-    my $data = $sql_res -> {row}{data};
-    my $inst = thaw $data;
-    
+  debug "found $r->{rows}";
+  if ( $r and $r -> {rows} ) {  
+    my $inst = thaw $r->{row}{data};
     return $inst;
   }
-  return 0;
+  return undef;
 }
 
 
@@ -78,47 +70,42 @@ sub load_institution {
 sub prepare {   ### XXX here is a great place for optimization in
                 ### terms of unloading the server, and making the
                 ### service work quicker
-
   my $app = shift;
-  
-  debug "preparing affiliations - copying unfolded and resolving handles into institutions";
 
-  
+  debug "preparing affiliations - copying unfolded and resolving handles into institutions";
   my $config  = $app -> config;
   my $session = $app -> session;
   my $record  = $session -> current_record();
   my $id      = $record -> {id};
   
   my $affiliations = $record -> {affiliations};
-  my @handles = ();
-
-
   my $unfolded = [];
   
   return
    unless defined $affiliations and scalar @$affiliations;
-   
-  foreach ( @$affiliations ) {
 
+  if ( $session->{$id}{affiliations} ) {
+    # already prepared
+    # just put it into variables for the presenter and quit
+    $app -> variables->{affiliations} = $session->{$id}{affiliations};
+    return;
+  }
+
+  foreach ( @$affiliations ) {
     if ( ref $_ eq 'HASH' ) {
       push @$unfolded, $_;
-
     } else {
-      my $institution =  &load_institution( $app, $_ );
+      my $institution = load_institution( $app, $_ );
       if ( $institution ) {
         push @$unfolded, $institution;
       } else { 
         undef $_;
       }
-      
     }
   }
 
   clear_undefined( $affiliations );
-  
- 
-  $app -> variables -> {affiliations} =
-    $session -> {$id} {affiliations} = $unfolded;
+  $app -> variables->{affiliations} = $session->{$id}{affiliations} = $unfolded;
 }
 
 
@@ -128,43 +115,25 @@ sub prepare {   ### XXX here is a great place for optimization in
 
 sub add {
   my $app = shift;
-  
   my $config      = $app -> config;
   my $metadata_db = $config->{'metadata-db-name'};
-
   my $instid      = $app -> get_form_value( 'id' );
   my $form_input  = $app -> form_input;
-  
-  debug 'try to add an affiliation';
-  
   my $session = $app -> session;
   my $record  = $session -> current_record;
   my $id      = $record -> {id};
 
   my $search_rec   = $session -> {$id} {'institution-search'} ;
   my $search_items = $search_rec -> {items};
-
-
-
-  $record -> {affiliations} = []
-   unless defined $record -> {affiliations};
+  my $affiliations = $record ->{affiliations}   ||= [];
+  my $unfolded = $session ->{$id}{affiliations} ||= [];
   
-  my $affiliations = $record  ->{affiliations};
-  
-  $session -> {$id} {affiliations} = []
-   if not defined $session -> {$id} {affiliations};
-  
-  my $unfolded     = $session ->{$id} {affiliations};
-  
-
-
   # xslt uses handles
   if ( $form_input ->{add} ) {
     debug 'adding institution: $instid';
     $app -> userlog( "affil: add an item, id: $instid" );
     
     foreach ( @$unfolded ) {
-
       if ( defined $_ -> {id}
            and $_ -> {id} eq $instid ) {
         return;
@@ -172,10 +141,8 @@ sub add {
     }
     
     my $institution;
-  
     my $counter = 0;
     foreach ( @$search_items ) {
-
       if ( $_ -> {id} eq $instid ) {
         $institution = 'found';
         last;
@@ -201,15 +168,9 @@ sub add {
        ( $instid ) ? ( -id  => $instid ) : (),
                    );
 
-
-  } else {
-    debug "should not be here, because..." 
-
   } ### if not just the institution handle
 
-
   $app -> variables ->{processed} = 1;
-
 }
 
 
