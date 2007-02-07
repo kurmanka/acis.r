@@ -444,7 +444,7 @@ sub refuse_citation($$) {
   ### TODO: be careful not to add an already refused citation
   push @$refused, $citation;
 
-  debug "refused citation $ncid";
+  debug "refused citation $cnid";
   cit_event( $cnid, $rec->{sid}, undef, "refused" );
 }
 

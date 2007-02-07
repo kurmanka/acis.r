@@ -250,7 +250,7 @@ sub process_refuse {
   my $preselect = [];
   foreach( keys %$cids ) {
     if ( defined $params->{"add$_"} ) {
-      my $cid = $cids->{$_};
+      my $cnid = $cids->{$_};
       push @$preselect, $cnid;
     }
   }
