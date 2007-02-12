@@ -56,8 +56,7 @@
 
   <xsl:template name='name-variations-display'>
     <p>List of names we searched
-    (based on your <a ref='@name?back=research#variations'>name
-    variations</a>):</p>
+    (based on your full name and <a ref='@name?back=research#variations'>variations</a>):</p>
     <pre class='pad'><a ref='@name?back=research#variations'
     class='hidden' 
     title='edit it'>
