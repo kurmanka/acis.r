@@ -25,7 +25,7 @@ package ACIS::Web::Contributions;  ### -*-perl-*-
 #  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 #
 #  ---
-#  $Id: Contributions.pm,v 2.31 2007/02/01 07:07:50 ivan Exp $
+#  $Id: Contributions.pm,v 2.32 2007/02/12 20:31:58 ivan Exp $
 #  ---
 
 use strict;
@@ -412,10 +412,15 @@ sub prepare_for_auto_search {
     my $variations = $record -> {name}{variations};
     assert( $variations );
     assert( ref $variations eq 'ARRAY' );
-    @namelist = @$variations;
-    @namelist = grep { length( $_ ) > 1 } @namelist;
     # strip all non-letter chars and filter
-    @namelist = grep { my $l = $_; $l =~ s/\W//g; length( $l ) > 1 } @namelist;
+    @namelist = grep { 
+                       s/,\s*/, /g; 
+                       s/\.\s*/. /g;
+                       s/\. ([-,])/.$1/g;
+                       s/(\b[A-Z]\b)([^'\w\.]|$)/$1.$2/g;
+                       s/(^\s+|\s+$)//g;
+                       s/\s+/ /g;
+                       length( $_ ) > 1 } @$variations;
     @namelist = sort { length( $b ) <=> length( $a ) } @namelist;
   }
 

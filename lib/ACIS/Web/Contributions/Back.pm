@@ -101,7 +101,6 @@ sub prepare_search_context {
     $sql -> execute;
   }
 
-
   my $session = $app -> session;
   my $vars    = $app -> variables;
   my $record  = $session -> current_record;
