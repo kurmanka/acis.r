@@ -12,7 +12,7 @@ sub cit_event {
   my ($cnid,$psid,$dsid,$event,$reason,$note) = @_;
   my $sql = $ACIS::Web::ACIS->sql_object;
 
-  $sql -> prepare_cached( "insert into citation_events (cnid,psid,dsid,event,reason,note,time) VALUES (?,?,?,?,?,?,?,NOW())" );
+  $sql -> prepare_cached( "insert into citation_events (cnid,psid,dsid,event,reason,note,time) VALUES (?,?,?,?,?,?,NOW())" );
   $sql -> execute($cnid,$psid,$dsid,$event,$reason,$note);
 }
 
