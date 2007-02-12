@@ -25,7 +25,7 @@ package ACIS::Web::Admin;   ### -*-perl-*-
 #  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 #
 #  ---
-#  $Id: Admin.pm,v 2.17 2007/02/01 07:07:50 ivan Exp $
+#  $Id: Admin.pm,v 2.18 2007/02/12 22:29:49 ivan Exp $
 #  ---
 
 
@@ -1107,13 +1107,9 @@ sub adm_get {
 
 
   my $var = $app ->variables;
-  my $op  = $input -> {op};
+  my $op  = $input -> {op} || 'hist';
   my $id  = $input -> {id};
   my $col = $input -> {col};
-
-  if ( not $op ) {
-    $op = 'hist';
-  }
 
   if ( not $id or not $col ) {
     return;

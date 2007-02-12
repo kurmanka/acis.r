@@ -156,7 +156,6 @@
         <xsl:text> </xsl:text>
 
         <form class='xxx-wide'>
-          
           <h2>Find a record</h2>
           
           <p>
@@ -166,6 +165,13 @@
             
             <label for='id'>id: </label>
             <input type='text' id='id' name='id' value='{$form-input/id}' size='60'/>
+            <br/>
+
+            <select name='op' size='1'>
+              <option>record</option>
+              <option selected=''>history</option>
+              <option value='ardb'>ARDB</option>
+            </select>
             
             <xsl:text> </xsl:text>
 
