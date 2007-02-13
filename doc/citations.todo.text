@@ -2,8 +2,16 @@
 
 2007-02-13 16:24
 
+things to do:
 
-- transfer here things to do from the 2007-01-17 report
+ - fastcgi support
+
+ - user login history db table
+
+ - check APU queue building: does it really sort by time?
+
+ - service-wide announcements and easy down-time switches for upgrades, etc.
+
 
 ### update citations.html document
 
@@ -12,8 +20,6 @@
 ### test new citations / suggestions storage 
 
  - fix and clear the XXX marks
-
-
 
 
 

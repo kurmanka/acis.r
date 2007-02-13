@@ -25,7 +25,7 @@ package Web::App;   ### -*-perl-*-
 #  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 #
 #  ---
-#  $Id: App.pm,v 2.24 2007/02/05 16:03:18 ivan Exp $
+#  $Id: App.pm,v 2.25 2007/02/13 15:17:02 ivan Exp $
 #  ---
 
 
@@ -744,7 +744,6 @@ sub handle_request {
 
   ###  primary request analysis
   debug "fetch request data";
-
   my $unescaped_url = $ENV{REQUEST_URI} || '';
 
   ### this needs to be fixed to take care of non-ascii chars (in an encoding)
@@ -763,7 +762,6 @@ sub handle_request {
     querystring => $ENV{QUERY_STRING},
     ip      => $ENV{REMOTE_ADDR},                                     
   };
-
   debug "REQUEST_METHOD: ", $request->{method} || '';
 
 
@@ -847,8 +845,6 @@ sub handle_request {
 
 
   ###  process form input parameters
-
-
   my $space_norm = $config -> {'input-space-normalize'};
   my @par_names  = $query -> param;
 
@@ -867,7 +863,6 @@ sub handle_request {
 
     if ( scalar( @val ) == 1 ) {
       $form_input ->{$_} = $val[0];
-
     } else {
       $form_input ->{$_} = \@val;
     }
@@ -888,7 +883,6 @@ sub handle_request {
     ###  something else can be here, something more general
 
     my $try = $self -> find_right_screen( $screen_name );
-
     if ( not $try ) {
  
       my $ref = $request -> {referer};
@@ -960,10 +954,8 @@ sub handle_request {
                      -action => 'handled' );
   }
 
-  my $session = $self -> session;
-  
-  if ( $session ) {
-    $session -> save;
+  if ( $self -> session ) {
+    $self -> session -> save;
     debug "session saved";
   }
 
@@ -1341,7 +1333,6 @@ sub redirect_to_screen {
 sub redirect {
   my $self = shift;
   my $url  = shift;
-
   $self -> response_status( "303 See Other" );
   $self -> {response} {'redirect-to'} = $url;
 }
