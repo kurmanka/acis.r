@@ -12,7 +12,7 @@ my $adb;
 
 use Digest::MD5;
 use ACIS::Citations::Utils qw( make_citation_nstring );
-sub DEBUG() { 0 }
+sub DEBUG() { 1 }
 
 
 sub prepare() {
