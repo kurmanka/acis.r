@@ -22,7 +22,7 @@ package ACIS::Web::Session;   ### -*-perl-*-
 #  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 #
 #  ---
-#  $Id: Session.pm,v 2.2 2007/01/08 12:08:21 ivan Exp $
+#  $Id: Session.pm,v 2.3 2007/02/13 14:24:37 ivan Exp $
 #  ---
 
 use strict;
@@ -192,12 +192,10 @@ sub has_userdata_changed {
 
 
   ### compare the copy of userdata in session and in file
-
   if ( -f $udata_file ) {
 
     if ( open USERDATA, "<:utf8", $udata_file ) {  ### XX PERL5.8 dependency
       # load the userdata file
-      
       my $irs = $/; undef $/;
       $udata_string = <USERDATA>;
       close USERDATA;
@@ -236,14 +234,12 @@ sub has_userdata_changed {
   }
 
   for ( $ses_udata_string, $udata_string ) {
-    $_ =~ s/\n\s+<last\-login\-date.+//;
-    $_ =~ s/\n\s+<last\-change\-date.+//;
+    $_ =~ s/(\n\s+)?<last\-login\-date.+//;
+    $_ =~ s/(\n\s+)?<last\-change\-date.+//;
   }
-
   if ( $udata_string =~ m/last\-login\-date(.+)/ ) {
     debug "udata_string still has the login date: $1";
   }
-
   if ( $ses_udata_string =~ m/last\-login\-date(.+)/ ) {
     debug "ses_udata_string still has the login date: $1";
   }

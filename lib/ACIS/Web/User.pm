@@ -26,7 +26,7 @@ package ACIS::Web::User; ### -*-perl-*-
 #  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 #
 #  ---
-#  $Id: User.pm,v 2.6 2006/12/18 13:26:29 ivan Exp $
+#  $Id: User.pm,v 2.7 2007/02/13 14:24:37 ivan Exp $
 #  ---
 
 
@@ -295,19 +295,16 @@ sub remove_account {
 
   if ( not $session -> owner -> {type} {advanced} ) {
     ###  SHALL NOT BE HERE, THEN.  XXX
-
     ###  But, at the same time, this function very well can be used for
     ###  advanced users as well.
   }
 
   $app -> userlog( "removing the account, per user request" );
-  
   $app -> sevent ( -class  => 'account', 
                    -action => 'delete request' );
   
   my $userdata = $paths -> {'user-data'};
   my $deleted_userdata = $paths -> {'user-data-deleted'};
-  
   
   while ( -e $deleted_userdata ) {
     debug "backup file $deleted_userdata already exists";
@@ -323,7 +320,6 @@ sub remove_account {
     return;
   }
 
-
   ###  request RI update
   require RePEc::Index::UpdateClient;
   my $udatadir = $app -> userdata_dir;
@@ -331,20 +327,14 @@ sub remove_account {
   $app -> log( "requesting RI update for $relative" );
   RePEc::Index::UpdateClient::send_update_request( 'ACIS', $relative );
   
-  
-  
   ### delete the profile pages
-  
   my $udata = $session -> object;
-  
   foreach ( @{ $udata-> {records} } ) {
     my $file = $_ -> {profile} {file};
-    
     if ( $file and -f $file ) {
       unlink $file;
       $app-> userlog( "removed profile file at $file" );
     }
-    
     my $exp = $_ -> {profile} {export};
     if ( $exp ) {
       foreach ( values %$exp ) {
@@ -352,27 +342,21 @@ sub remove_account {
         $app-> userlog( "removed exported profile data: $_" );
       }
     }
-
   }
     
   $session -> object_set( undef );
-
   $app -> send_mail( 'email/account-deleted.xsl' );
 
   $app -> sevent ( -class  => 'account', 
                    -action => 'deleted',
                    -file   => $deleted_userdata );
-    
   $app -> userlog( "deleted account; backup stored in $deleted_userdata" );
-    
   debug "close the session";
 
   $app -> logoff_session;
-  
   $app -> message( 'account-deleted' );
   $app -> success( 1 );
   $app -> set_presenter( "account-deleted" );
-  
 }
 
 

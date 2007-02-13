@@ -62,6 +62,7 @@ sub process_record {
     print "srcdocsid: $srcdocsid\n" if DEBUG;
   } else {
     print "srcdocsid:no\n"   if DEBUG;
+    # so, if a document disappears from rdb.resources, it's citations would stick around. XXX
     return undef;
   }
 

@@ -27,7 +27,7 @@ package ACIS::Web::NewUser; ### -*-perl-*-
 #  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 #
 #  ---
-#  $Id: NewUser.pm,v 2.5 2007/01/08 19:22:01 ivan Exp $
+#  $Id: NewUser.pm,v 2.6 2007/02/13 14:24:37 ivan Exp $
 #  ---
 
 
@@ -447,17 +447,13 @@ sub confirm {
   
   debug "running new user confirmation screen";
   my $confirmation_id = $app -> request -> {'session-id'} || '';
-
   my $session;
 
   if ( $confirmation_id ) {
-
     my $path = $app -> {home} . '/unconfirmed/';
-    
     my $filename = "$path$confirmation_id";
-    
-    debug "received '$confirmation_id', try load unconfirmed session $filename";
 
+    debug "received '$confirmation_id', try load unconfirmed session $filename";
     if ( -e $filename ) {
       $session = ACIS::Web::Session -> load( $app, $filename );
     }
@@ -471,7 +467,6 @@ sub confirm {
   }
 
   assert( $session -> type() eq 'new-user' );
-
   my $userdata_file = $session -> object_file_save_to;
   if ( -e $userdata_file ) {
     $app -> errlog ( "$userdata_file exists" );
@@ -481,20 +476,15 @@ sub confirm {
   }
 
   $app -> session( $session );
-
   my $udata = $session -> object;
   my $login = $session -> owner ->{login};
-
   my $records = $udata  ->{records};
 
   ### the following assumes that initially there is only one record in the
   ### userdata, and that record is of type 'person'
-
   my $record  = $udata  ->{records} ->[0];
-
   my $old_sid = $session -> id;
   my $new_sid = make_short_id ( $app, $record );
-
   $record -> {'about-owner'} = 'yes';
 
   if ( $new_sid ) {
@@ -503,13 +493,11 @@ sub confirm {
     $app -> logoff_session;
 
   } else { 
-
     ###  "Your registration cannot be finalized now.  You did everything
     ###  correctly, but an internal technical problem happened.  Administrator
     ###  will have to clear the issue.  We logged details of the problem and
     ###  your email address.  Administrator will contact you as soon as the
     ###  issue is resolved."
-
     $app -> errlog( "[$login] registration obstructed" );
     $app -> error( "confirmation-obstructed" ); 
     $app -> clear_process_queue;
@@ -518,7 +506,6 @@ sub confirm {
     Web::App::Email::send_mail( $app,
                                 "email/notify-admin-problem.xsl",
                               );
-    
   }
 }
 
