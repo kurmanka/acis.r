@@ -2,7 +2,7 @@
 
 2007-02-13 16:24
 
-things to do:
+things would be nice to do:
 
  - fastcgi support
 
@@ -17,7 +17,7 @@ things to do:
 
 ### check the recent failed and "no" items in the RAS' apu_queue
 
-### test new citations / suggestions storage 
+### citations
 
  - fix and clear the XXX marks
 
@@ -33,18 +33,6 @@ things to do:
 ### APU
 
   - implement auto-throttling?
-
-### /adm screens: authorization fix
-
-Christian writes:
-
-> when I go to http://authors.repec.org/adm/events/decode?hours=1 and need
-> to enter the password, I get a log for the full 24 hours instead of 1.
-> This put undue strain on the machine. Especially when I use this to check
-> a performance issue.
-
-
----------
 
 
 ###  ACIS community building 
