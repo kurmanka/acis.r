@@ -26,7 +26,7 @@ package Web::App::Session; ### -*-perl-*-
 #  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 #
 #  ---
-#  $Id: Session.pm,v 2.9 2007/02/14 17:40:49 ivan Exp $
+#  $Id: Session.pm,v 2.10 2007/02/14 23:01:33 ivan Exp $
 #  ---
 
 
@@ -302,29 +302,11 @@ sub object_set {
   if ( defined $file ) {
     $inner ->{objectfilereadfrom} = $file;
     $inner ->{objectfilesaveto}   = $file;
-#  } else {
-#    $file = $object -> save_to_file;
   }
 
   if ( $file ) {
     my $lock = "$file.lock";
-
-    # XXX debugging locking problem for new users
-    my $t = scalar localtime;
-    my $m = Carp::longmess( "[$t] creating new user lock $lock" );
-    if ( $m =~ /::NewUser/ ) { warn $m; }
-    
     my $mode = ">";
-    if ( -f $lock ) {
-      if ( $expect_lock_to_be_present ) {
-        # rewrite the lockfile
-      } else {       
-        my $cont = `cat $lock`;
-        my $details = `ls -al $lock`;
-        Carp::cluck( "lock file $lock present: $cont\n$details" );
-        ### XX I could check if that session exists...
-      }
-    }
 
     if ( open L, "$mode$lock" ) {
       print L $self->id;
