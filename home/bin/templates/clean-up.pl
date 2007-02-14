@@ -4,6 +4,8 @@ use warnings;
 
 print "starting ", scalar localtime, "\n";
 
+use Scalar::Util qw( blessed );
+
 use ACIS::Web;
 use ACIS::Web::Session;
 
@@ -36,13 +38,17 @@ foreach ( @list ) {
     next;
   }
 
+  if ( not blessed $session ) {
+    print "   bad session file, not a blessed ref: $session\n";
+    next;
+  }
+
   if ( not $session -> expired() ) {
     print "   not yet expired\n";
     next; 
   }
 
   if ( $session -> type() eq 'user' ) {
-
     print "   user type\n";
     $acis -> log( "cleanup: going to log off session $_" );
 

@@ -26,7 +26,7 @@ package Web::App::Session; ### -*-perl-*-
 #  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 #
 #  ---
-#  $Id: Session.pm,v 2.8 2007/01/24 18:07:12 ivan Exp $
+#  $Id: Session.pm,v 2.9 2007/02/14 17:40:49 ivan Exp $
 #  ---
 
 
@@ -111,7 +111,14 @@ sub load {
   eval { $self = retrieve ($filename); };
   if ( $@ ) {
     debug "loading a session failed: $@";
+    $app -> errlog( "fail to load a session: $filename ($@)" );
     return undef;
+  }
+
+  if (not defined $self) { 
+    debug "loading a session failed with no error message";
+    $app -> errlog( "fail to load a session: $filename" );
+    return undef; 
   }
 
   $self -> {'.filename'} = $filename;
