@@ -76,11 +76,11 @@ sub profile_check_and_cleanup () {
     # XXX this assumes that all citations here have the same
     # identification in them and thus it reuses the prepared SQL
     # statement
-    if ( $a_cit ->{citid} or $a_cit->{cnid} ) {
+    if ( $a_cit->{srcdocsid} and $a_cit->{checksum} ) {
+      $q = 'select cnid from citations where clid=?';
+    } elsif ( $a_cit ->{citid} or $a_cit->{cnid} ) {
       $q = 'select cnid from citations where cnid=?';
     } elsif ( $a_cit->{clid} ) {
-      $q = 'select cnid from citations where clid=?';
-    } elsif ( $a_cit->{srcdocsid} and $a_cit->{checksum} ) {
       $q = 'select cnid from citations where clid=?';
     } else {
       die "how do I upgrade this citations: " . Dumper( $a_cit ) . "?";
@@ -92,12 +92,12 @@ sub profile_check_and_cleanup () {
       my $id;
       # XXX this is a backwards-compatible upgrade code; should be
       # removed after a while
-      if ( $_ ->{citid} or $_->{cnid} ) {
+      if ( $_->{srcdocsid} and $_->{checksum} ) {
+        $id = $_->{srcdocsid}. '-'. $_->{checksum};
+      } elsif ( $_ ->{citid} or $_->{cnid} ) {
         $id = $_->{citid} || $_->{cnid};
       } elsif ( $_->{clid} ) {
         $id = $_->{clid};
-      } elsif ( $_->{srcdocsid} and $_->{checksum} ) {
-        $id = $_->{srcdocsid}. '-'. $_->{checksum};
       } 
       my $r = $sql->execute( $id );
   
@@ -164,14 +164,14 @@ sub update_refused {
     # only cnid should be expected and used.
     my $id;
     my $q;
-    if ( $_ ->{citid} or $_->{cnid} ) {
+    if ( $_->{srcdocsid} and $_->{checksum} ) {
+      $id = $_->{srcdocsid}. '-'. $_->{checksum};
+      $q = 'select cnid from citations where clid=?';
+    } elsif ( $_ ->{citid} or $_->{cnid} ) {
       $id = $_->{citid} || $_->{cnid};
       $q = 'select cnid from citations where cnid=?';
     } elsif ( $_->{clid} ) {
       $id = $_->{clid};
-      $q = 'select cnid from citations where clid=?';
-    } elsif ( $_->{srcdocsid} and $_->{checksum} ) {
-      $id = $_->{srcdocsid}. '-'. $_->{checksum};
       $q = 'select cnid from citations where clid=?';
     } 
     

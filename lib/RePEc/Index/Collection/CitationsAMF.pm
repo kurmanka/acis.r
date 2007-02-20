@@ -75,9 +75,7 @@ sub extract_citations ($) {
   my $text = shift;
   
   @cits = ();
-
   my $id = $text -> get_value( 'REF' );
-
   push @cits, $id;
 
   my $string;
@@ -110,6 +108,7 @@ sub extract_citations ($) {
 
     } elsif ( $_->[0] eq 'http://acis.openlib.org/ referencestring' ) {
       $string = $_->[2][0];
+    } else {
     }
   }
   
