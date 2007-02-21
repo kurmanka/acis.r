@@ -23,7 +23,7 @@ package ACIS::Web;   ### -*-perl-*-
 #  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 #
 #  ---
-#  $Id: Web.pm,v 2.13 2007/02/05 16:03:18 ivan Exp $
+#  $Id: Web.pm,v 2.14 2007/02/21 07:56:29 ivan Exp $
 #  ---
 
 use strict;
@@ -396,7 +396,7 @@ sub update_paths {
 
 sub clear_after_request {
   my $self = shift;
-  if ( $ACIS::Web::Citations::{cleanup} ) { eval {ACIS::Web::Citations::cleanup();} }
+  if ( $ACIS::Web::Citations::{cleanup} ) { eval {ACIS::Web::Citations::cleanup();}; undef $@; }
   if ( $ACIS::Web::Contributions::{cleanup} ) { ACIS::Web::Contributions::cleanup(); }
   $self-> SUPER::clear_after_request();
 }

@@ -191,9 +191,6 @@ sub run_apu_by_queue {
     set_item_processing_result( $sql, $rid, $res, $notes );
     if ( $res ne 'SKIP' ) { $number--; }
     
-
-  } continue {
-    $ACIS -> clear_after_request();
   }
 }
 
@@ -229,9 +226,16 @@ sub record_apu {
   my $apu_too_recent_days  = $ACIS->config( 'minimum-apu-period-days' ) || 21;
   my $apu_too_recent_seconds = $apu_too_recent_days * 24 * 60 * 60;
 
+  debug "record_apu()";
+  debug "minimum-apu-period-days: $apu_too_recent_days";
+  debug "last apu: $last_apu";
+  debug "last research: $last_research";
+  debug "last citations: $last_citations";
+
   if ( $last_apu 
        and $now - $last_apu < $apu_too_recent_seconds 
        and not $class ) {
+    debug "apu was done recently!";
     return "SKIP";
   }
 
