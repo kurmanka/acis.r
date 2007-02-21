@@ -54,25 +54,21 @@ sub send_mail {
       @presenteropt = ( -feeddatastring => $feeddatastring );
     }
              
-    my $text = $app -> run_presenter( $stylesheet,
-                                      @presenteropt );
-    if ( ref $text ) { $text = $$text; }
+    my $textref = $app -> run_presenter( $stylesheet, @presenteropt );
+    # run_presenter() may return a string or a reference to a string:
+    if (not ref $textref) { my $t = $textref; $textref = \$t; }
+    debug "presenter generated: '''$$textref'''";
 
     ###  Presenter can generate email headers.  Here they are:
-
-    debug "presenter generated: '''$text'''";
-    
     my ( $pheaders, $pbody );
-    if ( $text =~ m/^(.+?)\n\n+(.+)$/s ) {
+    if ( $$textref =~ m/^(.+?)\n\n+(.+)$/s ) {
       $pheaders = $1;
       $pbody    = $2;
-
     } else {
-      die "presenter's text doesn't match: $text";
+      die "presenter's text doesn't match: $$textref";
     }
 
 #    debug "header part: '''$pheaders'''";
-
     foreach ( split /\n/, $pheaders ) {
       my ( $k, $v ) = $_ =~ /^([^:\s]+):\s+(.+)$/;
       

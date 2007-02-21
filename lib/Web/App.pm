@@ -25,7 +25,7 @@ package Web::App;   ### -*-perl-*-
 #  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 #
 #  ---
-#  $Id: App.pm,v 2.25 2007/02/13 15:17:02 ivan Exp $
+#  $Id: App.pm,v 2.26 2007/02/21 21:51:06 ivan Exp $
 #  ---
 
 
@@ -975,7 +975,6 @@ sub handle_request {
     $self -> prepare_presenter_data;
 
     my $content = $response->{body} = $self -> run_presenter( $self->{presenter} );
-    
 
     print "</pre>\n"
       if $Web::App::DEBUGIMMEDIATELY;

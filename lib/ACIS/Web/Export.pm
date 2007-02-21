@@ -23,7 +23,7 @@ package ACIS::Web::Export; ### -*-perl-*-
 #  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 #
 #  ---
-#  $Id: Export.pm,v 2.1 2006/07/04 08:38:41 ivan Exp $
+#  $Id: Export.pm,v 2.2 2007/02/21 21:51:05 ivan Exp $
 #  ---
 
 use strict;
@@ -87,23 +87,18 @@ sub make_redif_template {
   my $rec  = shift;
 
   my $stylesheet = "export/redif.xsl";
-
   my $variables  = $acis ->variables;
-
   $variables ->{record} = $rec;
 
   ###  prepare contributions 
   require ACIS::Web::Contributions;
-
   ACIS::Web::Contributions::prepare_the_role_list( $acis );
   delete $variables ->{contributions};
 
-  
   my $page = $acis -> run_presenter( $stylesheet, -hideemails => 1 );   
 
-
   delete $variables ->{record};
-  
+  if ( ref $page ) { return $$page; }
   return $page;
 }
 
@@ -182,7 +177,7 @@ sub make_amf_record {
   my $page = $acis -> run_presenter( $stylesheet, -hideemails => 1 );   
 
   delete $variables ->{record};
-  
+  if (ref $page) {return $$page;}
   return $page;
 }
 

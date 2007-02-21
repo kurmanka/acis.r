@@ -23,7 +23,7 @@ package ACIS::Web::SaveProfile;   ### -*-perl-*-
 #  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 #
 #  ---
-#  $Id: SaveProfile.pm,v 2.1 2006/03/24 08:06:17 ivan Exp $
+#  $Id: SaveProfile.pm,v 2.2 2007/02/21 21:51:06 ivan Exp $
 #  ---
 
 use strict;
@@ -152,7 +152,6 @@ sub write_outside_personal_profile {
 
       my $profile_file = "${file}.html";
       my $profile_url;
-
       if ( $url =~ m(/$) ) {
         $profile_url = $url;
       } else {
@@ -161,22 +160,20 @@ sub write_outside_personal_profile {
 
       $record -> {profile}{url}  = $profile_url;
       $record -> {profile}{file} = $profile_file;
-      
       $variables ->{permalink}   = $profile_url;
-      
       debug "profile file: $profile_file";
       debug "profile url : $profile_url";
       
       
       ### generate the page
-   
-      my $template = 'person/profile-static.xsl';
-      my $page = $app -> run_presenter( $template, -hideemails => 1 );
+      my $pageref = $app -> run_presenter( 'person/profile-static.xsl',
+                                           -hideemails => 1 ); 
+      # run_presenter() returns a string or a reference to a string:     
+      if ( not ref $pageref ) { my $p = $pageref; $pageref = \$p; }
       
       if ( open HTML, '>:utf8 ', $profile_file ) {
-        print HTML $page;
+        print HTML $$pageref;
         close HTML;
-        
         $app -> userlog ( "log off: wrote $profile_file" );
         $app -> sevent (
                         -class  => 'profile',
@@ -199,7 +196,7 @@ sub write_outside_personal_profile {
         $second_try = 1;
       }
 
-      debug "profile page contains ". length( $page ) . " chars";
+      debug "profile page contains ". length( $$pageref ) . " chars";
     }
   }
   

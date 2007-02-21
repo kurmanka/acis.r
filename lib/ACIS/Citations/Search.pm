@@ -267,7 +267,7 @@ sub personal_search_by_names {
     if ( not scalar @$comp ) { next; }
 
     my $target = shift @$comp;
-    my $simity = shift @$comp;
+    my $simity = shift @$comp || die;
 
     if ( $autoadd 
          and $simity >= $sim_threshold 
