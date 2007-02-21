@@ -261,13 +261,13 @@ sub personal_search_by_names {
     my $cnid = $_->{cnid} || die;
 
     # compare to documents!    
-    my @comp = compare_citation_to_docs( $_, $docs );
+    my $comp = compare_citation_to_docs( $_, $docs );
 
     # if no matching document were found
-    if ( not scalar @comp ) { next; }
+    if ( not scalar @$comp ) { next; }
 
-    my $target = $comp[0];
-    my $simity = $comp[1];
+    my $target = shift @$comp;
+    my $simity = shift @$comp;
 
     if ( $autoadd 
          and $simity >= $sim_threshold 

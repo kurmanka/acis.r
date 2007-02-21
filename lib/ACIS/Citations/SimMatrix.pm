@@ -289,9 +289,9 @@ sub compare_citation_to_documents {
 
   my $recalc;
   my $res = compare_citation_to_docs( $cit, $docs, 'includezero' );
-  foreach ( keys %$res ) {
-    my $dsid = $_;
-    my $v = $res->{$_};
+  while ( $res and scalar @$res ) {
+    my $dsid = shift @$res;
+    my $v    = shift @$res;
     if ( $v ) {
       debug "for $dsid: $v";
     }

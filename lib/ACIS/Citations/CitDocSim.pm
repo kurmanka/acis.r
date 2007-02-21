@@ -39,7 +39,7 @@ sub compare_citation_to_docs {
   my $docs = shift || die;
   my $flag = shift || '';  # can be: 'includezero'
   
-  my %res;
+  my @res;
   debug "compare_citation_do_docs()";
   debug "documents: ", join ' ', keys %$docs;
 
@@ -84,9 +84,9 @@ sub compare_citation_to_docs {
   if ( $flag ne 'includezero' ) {
     @d = grep { $sims->{$_} } @d;
   }
-  %res = map { $_ => $sims->{$_} } @d;
+  @res = map { $_ => $sims->{$_} } @d;
 
-  return \%res;
+  return \@res; ### ref to a list ( dsid, simnumber, dsid, simnumber, ... )
 }
 
 
