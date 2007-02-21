@@ -2,8 +2,6 @@
 Citations in ACIS
 =================
 
-Document status: implemented specification.
-
 <p><a
 href='http://acis.openlib.org/software/doc/citations.text'>document
 source</a> in Markdown format
@@ -786,19 +784,16 @@ disappeared citations.
 
 The fields:
 
-- unique numeric citation id: <co>citid SERIAL</co>
-- citing document short id: <co>srcdocsid CHAR(15) NOT NULL</co>  
-- MD5 checksum of the original citation string in base64 encoding:
-  <co>checksum CHAR(22) NOT NULL</co>
+- unique numeric citation id: <co>cnid SERIAL</co>
+- long citation id: <co>clid CHAR(38) NOT NULL PRIMARY KEY</co>:
+  srcdocsid + '-' + checksum (MD5 checksum of the original citation
+  string in base64 encoding - 22 chars)
 - full original citation string: <co>ostring TEXT NOT NULL</co>
 - normalized searchable citation string: <co>nstring VARCHAR(255) NOT NULL</co>
 - refers to document, id: <co>trgdocid VARCHAR(255)</co>
 
-<p><code>PRIMARY KEY ( srcdocsid, checksum )</code></p>
+<p><code>FULLTEXT INDEX (nstring), INDEX (trgdocid)</code></p>
 
-
-<!-- XX *TODO:* maybe add this table to the <a
-href='db.html'>Database tables</a> document. -->
 
 
 #### Citation string normalization:
@@ -821,7 +816,6 @@ The regular expression:
     s/\b((I|i)n\W.+?\Wed\..*)$//
 
 should do the trick.
-
 
 
 
@@ -1061,24 +1055,24 @@ Get the comparison result as a number between 0 and 1.
 
 Table cit\_doc_similarity fields:
 
-- citation id: <co>citid BIGINT UNSIGNED NOT NULL</co>
+- citation id: <co>cnid BIGINT UNSIGNED NOT NULL</co>
 - document short id: <co>dsid CHAR(15) NOT NULL</co>
 - similarity measure 0...100: <co>similar TINYINT NOT NULL</co>
 - when compared: <co>time DATETIME NOT NULL</co>
 
-<p><co>PRIMARY KEY (citid,dsid)</co></p>
+<p><co>PRIMARY KEY (cnid,dsid)</co></p>
 
 
 #### other citation suggestions table: cit_sug
 
 Table cit_sug fields:
 
-- citation id: <co>citid BIGINT UNSIGNED NOT NULL</co>
+- citation id: <co>cnid BIGINT UNSIGNED NOT NULL</co>
 - document short id: <co>dsid CHAR(15) NOT NULL</co>
 - reason: <co>reason CHAR(20) NOT NULL</co>
 - when suggested: <co>time DATETIME NOT NULL</co>
 
-<p><co>PRIMARY KEY (citid,dsid,reason)</co></p>
+<p><co>PRIMARY KEY (cnid,dsid,reason)</co></p>
 
 
 #### Old suggestions table: cit\_old_sug
@@ -1087,9 +1081,9 @@ Table cit\_old_sug fields:
 
 - short id of the person to whom we suggested it: <co>psid CHAR(15) NOT NULL</co> 
 - document short id: <co>dsid CHAR(15) NOT NULL</co>
-- citation id: <co>citid BIGINT UNSIGNED NOT NULL</co>
+- citation id: <co>cnid BIGINT UNSIGNED NOT NULL</co>
 
-<p><co>PRIMARY KEY (psid,dsid,citid)</co></p>
+<p><co>PRIMARY KEY (psid,dsid,cnid)</co></p>
 
 
 
@@ -1119,7 +1113,7 @@ matrix:
 
   - citations (hash):
 
-     - citation id | hash:
+     - citation cnid | hash:
          - docsid | list of [ 'new', $suggestion ] or
      ['old', $suggestion ]
 
@@ -1188,18 +1182,23 @@ The **<co>citations</co>** branch of the userdata structure:
      - <co>auto-add-similarity-threshold</co>: a number
      - <co>last-searched-nameset-date</co>: date of the last searched name variations set
 
-
  - potential new & old citations we will store in the
-   cit_suggestions table (and, in the similarity matrix)
+   cit_doc_similarity, cit_sug and cit_old_sug tables
 
 
 <p id='userdata-citation-item'>Each citation item in the userdata is a hash
-with this contents:</p>
+with these items:</p>
 
- - srcdocsid
+ - cnid
  - ostring 
- - checksum
- - srcdocdetails
+ - srcdocid
+ - srcdoctitle
+ - srcdocauthors
+ - srcdocurlabout
+ - reason (if manually added)
+ - autoaddreason (if automatically added)
+ - autoadded (if automatically added)
+ 
 
 
 
@@ -1230,7 +1229,7 @@ re-considered as a suggestion (3->2).
 - normalize_string( string )
 
 - build_citations\_index( citlist, [index] ); - build a hash
-  of [ "srcdocsid-checksum": citation ] pairs ???
+  of [ cnid: citation ] pairs ???
 
 - get_document\_authors();  - for co-authors' claims
 
@@ -1252,41 +1251,7 @@ use ACIS::Citations::Utils;
 
 
 
-STOPPED HERE.  
-STOPPED HERE.  
-STOPPED HERE.  
-STOPPED HERE.  
-STOPPED HERE.  
-STOPPED HERE.  
-STOPPED HERE.  
-STOPPED HERE.  2007-01-18 04:37
-
-
 #### ACIS::Citations::Suggestions
-
-use ACIS::Citations::Utils;
-
-low level (internal):
-
-- add_suggestion( cit, psid, docsid, reason, similarity )
-
-- replace_suggestion( cit, psid, docsid, reason, similarity )
-
-- store_update\_suggestion( suggestion\_record )
-
-- clear_cit\_from\_suggestions( cit, psid );
-
-high level (exported):
-
-- store_similarity( cit, psid, docsid, value )
-
-- make_suggestion\_old( cit, psid, docsid )
-
-- load_suggestions( psid );
-
-- suggest_citation\_to\_authors( cit, psid, docsid );
-
-- clear_multiple\_from\_cit\_suggestions( citlist, psid );
 
 
 
@@ -1294,24 +1259,23 @@ high level (exported):
 
 use ACIS::Citations::Suggestions;
 
-internal:
-
-- calculate_totals( $matrix );       [20 min]
-
 exported:
 
-- load_similarity\_matrix( psid ); - returns matrix structure
-  as specified above     [45 min]
+- load_similarity\_matrix( record ); - returns matrix structure as
+  specified above
 
-- get_most\_interesting\_document( psid ); [10 min]
+object methods:
 
-advanced:
+- most\_interesting\_doc( ); 
 
-- remove_citation( $matrix, $cit );   [20 min]
+- remove_citation( $matrix, $cit );   
 
-- make_citation\_old( $matrix, $cit ); [20 min]
+...
 
-- recalculate_totals( $matrix );       [1 min]
+internal:
+
+- _calculate_totals( $matrix );
+
 
 
 #### ACIS::Citations::Search
@@ -1334,25 +1298,6 @@ exportable:
 
 use ACIS::Citations::Input;
 use ACIS::Web::SysProfile;
-
-- get\_last\_cit\_search\_date()   [15 min]
-
-- update\_last\_cit\_search\_date( ) [15 min]
-
-
-- get\_research\_profile\_identified() - get the list of the documents of the
-  research profile  [15 min]
-
-- get\_identified\_citations( docid ) - [15 min]
-
-- get\_refused\_citations() - [15 min]
-
-- get\_potential\_citations( docid ) - new and old [45 min]
-
-
-- check\_citations\_profile(); - [60 min]
-
-- check_citations\_preferences() - [15 min]
 
 
 #### ACIS::Web::Citations
@@ -1381,12 +1326,9 @@ use ACIS::Web::SysProfile;
 - prepare_doclist()    [30 min]
 
 
-???
 
+#### ACIS::Citations::AutoUpdate
 
-#### ACIS::Citations::AutoUpd  
-
-- citations_auto\_search() - called from ACIS::Web::ARPU  [90 min]
 
 
 
@@ -1396,46 +1338,37 @@ use ACIS::Web::SysProfile;
 
 #### SysProf table profile parameters
 
-- last profile check date:   <co>last-citations-cleanup-date</co>
-- last citation search date: <co>last-citations-search-date</co>
+- last profile check time (seconds since the epoch):
+  <co>last-cit-prof-check-time</co> 
+
+- last citation search date/time (seconds):
+  <co>last-auto-citations-time</co>
 
 
 
 #### Consistency maintentance
 
-Every once in a while we need to check that every citation that is mentioned
-in the personal profile is still present in the citations table, and clear it,
-if it isn't there.
+Every once in a while we check that every citation that is mentioned in
+the personal profile is still present in the citations table, and clear
+it, if it isn't there.
 
-We will remember the date of last cleaning run and at each user login (real or
-in ARPU) we will see if the profile needs cleaning already.
-(<co>last-citations-cleanup-date</co> in sysprof).
+We will remember the date of last cleaning run and at each user login
+(real or in APU) we will see if the profile needs cleaning already.
+(<co>last-cit-prof-check-time</co> in sysprof).
 
-Also, we will need to check cit_suggestions for the same: that every suggested
-item is still present in the citations table.
-
-In a similar way, we need to ensure that every document for which we have the
-identified citations is still present in the database.  And that
-cit_suggestions for this user doesn't contain any items for the documents,
-which are no longer in the persons' research profile.
+In a similar way, we ensure that every document for which we have the
+identified citations is still present in the database.
 
 
 ####  Database maintenance
 
-It would be highly desirable to backup the cit_suggestions table regularly.
-Because of old potential citations information, it is important for users.
-
-Also, sysprof table deserves similar treatment.  And suggestions, if we at it.
-
-So, a general dump & restore mechanism is highly desirable.
-
-
-
-
+It would be highly desirable to backup the citations, citations_deleted
+and other related tables regularly.  It is important for consistency of
+the data and stability of the user profiles.
 
 
 <id>
-$Id: citations.text,v 2.53 2007/01/24 18:07:12 ivan Exp $
+$Id: citations.text,v 2.54 2007/02/21 07:56:54 ivan Exp $
 </id>
 
 
