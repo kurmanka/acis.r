@@ -30,7 +30,7 @@ this would be a successful and positive match.
 
 
 
-### configuration parameters
+### configuration
 
 - fuzzy-name-search -- on or off
 
@@ -70,8 +70,6 @@ mysql> select name,count(name) from names group by name;
 
 <h2 id='fturls'>Full-text file recognition</h2>
 
-
-### notions
 
 ### input
 
@@ -123,7 +121,7 @@ such choices, but does not resolve them.
 
 
 
-### configuration parameters
+### configuration 
 
 - full-text-urls-recognition -- on or off
 
@@ -183,6 +181,8 @@ ft_urls\_choices table.  It would scan the table and if for the same
 person/document/url there are several decisions, it would delete the
 old ones, and only leave the most recent one.
 
+(it could also move the old ones to a separate archive table,
+optionally.)
 
 
 <h2 id='d2d'>Document to document links</h2>
@@ -198,7 +198,28 @@ name; some link types have no reverse.
 
 - document-document-links-profile -- yes / no
 
-- document-document-links-types -- ?
+- document-document-links-types -- ?  (or this can be done similar to
+  contributions config, i.e. via a separate xml file)
 
-### 
+### data structure
+
+userdata record -> {doclinks}
+
+
+
+### components
+
+1. get configuration
+
+2. get existing links (by a user)
+
+3. create a link, drop a link
+
+4. screen
+
+
+### screen design
+
+
+
 
