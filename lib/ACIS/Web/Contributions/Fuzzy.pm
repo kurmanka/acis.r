@@ -11,6 +11,7 @@ use ACIS::Web::Contributions::Back qw(save_suggestions);
 use ACIS::Web::Background qw( logit );
 
 my $rdb;
+my $name_search_table;
 
 sub run_fuzzy_searches {
   my $app     = shift;
@@ -22,6 +23,8 @@ sub run_fuzzy_searches {
   my $autosearch  = $contributions -> {autosearch};
   my $namelist    = $autosearch -> {'names-list'};
   $rdb = $app -> config( 'metadata-db-name' );
+
+  $name_search_table = $app->sysflag('research.search.fuzzy.rare.names.table') || "$rdb.res_creators_separate";
 
   logit "search_for_resources_fuzzy: enter";
 
@@ -56,7 +59,7 @@ sub search_resources_for_name_fuzzy {
   my $dsid_list = [];
 
   ###  the query
-  $sql -> prepare_cached( "select * from $rdb.res_creators_separate where name like ?" );
+  $sql -> prepare_cached( "select name,sid from $name_search_table where name like ?" );
   warn "SQL: " . $sql->error if $sql->error;
   my $res = $sql->execute ( $prefix . '%' );
   warn "SQL: " . $sql->error if $sql->error;
@@ -71,11 +74,11 @@ sub search_resources_for_name_fuzzy {
         # exact match, not our domain
       } else {
         if ( scalar amatch( $name, $distance_level_ref, $dname ) ) {
-          logit "match: '$dname' ($dsid) ~ $name";
+          logit "fuzzy match: '$dname' ($dsid) ~ $name";
           # suggest $dsid
           push @$dsid_list, $dsid;
         } else {
-          logit "no match: '$dname' ($dsid) ~ $name";
+#          logit "no match: '$dname' ($dsid) ~ $name";
         }
       }
     }
