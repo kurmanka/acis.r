@@ -22,7 +22,7 @@ sub sysvar {
   if ( not -r "$d$name" ) { return undef; }
   if ( open V, "<:utf8", "$d$name" ) {
     # extract first line of the file
-    my $v = <V>;
+    my ($v) = <V>;
     close V;
     return $v
   } else {
