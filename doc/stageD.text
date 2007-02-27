@@ -39,12 +39,13 @@ so, this would be a successful and positive match.
 - fuzzy-name-search-max-name-occurr-in-doc-names -- The maximum number
   of occurrences of a name expression in the document author names
   table before it is considered for fuzzy matching. The default is 1.
-  If this parameter is set to 0, no maximum is checked.
+  If this parameter is set to 0 or is not set, no maximum is checked.
 
 - fuzzy-name-search-max-name-occurr-in-name-variations -- The maximum
   number of occurrences of a name expression in the name variations
-  table before it is considered for fuzzy matching. The default is 1. 
-  If this parameter is set to 0, no maximum is checked.
+  table before it is considered for fuzzy matching. By default, maximum
+  is 0, ie. a name expression should not be present among name
+  variations.  Set is to -1 to disable this limit.
 
 <!-- these two parameters are so similar... -->
 
