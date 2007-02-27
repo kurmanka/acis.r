@@ -5,7 +5,7 @@
     that is a working ARDB core configuration file.  Produces:
     documents table, collections table, authors table.
 
-    $Id: configuration.xml,v 2.11 2007/02/27 00:01:33 ivan Exp $
+    $Id: configuration.xml,v 2.12 2007/02/27 21:26:20 ivan Exp $
 
 -->
 
@@ -179,7 +179,7 @@
  <table name='res_creators_bulk'>
    <field name='sid'    sql-type="CHAR(12) NOT NULL" />
    <field name='role'   sql-type='char(15) NOT NULL' />
-   <field name='names'  sql-type='VARCHAR(250) NOT NULL'/>
+   <field name='names'  sql-type='VARCHAR(255) NOT NULL'/>
 
    <create-table-sql>
      PRIMARY KEY ( sid, role ),
@@ -191,8 +191,8 @@
  <table name='res_creators_separate'>
    <field name='sid'   sql-type="CHAR(12) NOT NULL" />
    <field name='role'  sql-type="char(15) NOT NULL" />
-   <field name='name'  sql-type="CHAR(100) NOT NULL" />   
-   <field name='email' sql-type="CHAR(100) " />
+   <field name='name'  sql-type="VARCHAR(255) NOT NULL" />   
+   <field name='email' sql-type="VARCHAR(100) " />
 
    <create-table-sql>
      PRIMARY KEY ( sid, role, name ),
@@ -343,7 +343,7 @@
 
   <table name='acis:names'>
     <field name='shortid'   sql-type=' char(10) not null ' />
-    <field name='name'      sql-type=' char(100) not null ' />
+    <field name='name'      sql-type=' char(255) not null ' />
     <field name='probability' 
                             sql-type='tinyint unsigned not null' />
     <create-table-sql>PRIMARY KEY (shortid, name),
@@ -420,8 +420,8 @@
 
   <table name='acis:users'>
   
-    <field name='login'    sql-type=' char(100) not null primary key ' />
-    <field name='name'     sql-type=' char(60)' />
+    <field name='login'    sql-type=' varchar(255) not null primary key ' />
+    <field name='name'     sql-type=' varchar(255)' />
     <field name='password' sql-type=' char(20) not null '/>
     <field name='userdata_file'
                            sql-type=' char(200) not null ' />
