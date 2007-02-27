@@ -121,6 +121,7 @@ home/bin/templates/upgrade_to_1.4.95.pl
 home/bin/templates/upgrade_to_1.5.13.pl
 home/bin/templates/upgrade_to_1.5.27.pl
 home/bin/templates/upgrade_to_1.5.3.pl
+home/bin/templates/upgrade_to_1.5.34.pl
 home/bin/templates/upgrade_to_1.5.4.pl
 home/bin/templates/upgrade_to_1.5.7.pl
 home/configuration.xml
@@ -269,6 +270,7 @@ lib/ACIS/Web/Citations.pm
 lib/ACIS/Web/Config.pm
 lib/ACIS/Web/Contributions.pm
 lib/ACIS/Web/Contributions/Back.pm
+lib/ACIS/Web/Contributions/Fuzzy.pm
 lib/ACIS/Web/Contributions/Glimpse.pm
 lib/ACIS/Web/Events.pm
 lib/ACIS/Web/Export.pm

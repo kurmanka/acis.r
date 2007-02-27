@@ -1,22 +1,20 @@
 package ACIS::Web::Contributions::Back;
 
 use strict;
-
 ###################################################################
 #########   sub search for resources (initial)    #################
 ###################################################################
+use Exporter;
+use base qw( Exporter );
 
-use Web::App::Common;
-
-use vars qw( $back_table );
-
+use vars qw( @EXPORT_OK $back_table );
+@EXPORT_OK = qw( save_suggestions );
 $back_table = 'suggestions';
 
-
+use Web::App::Common;
 use ACIS::Web::Background qw( logit );
 
-
-
+require ACIS::Web::Contributions::Fuzzy;
 
 
 sub start_auto_search {
@@ -81,7 +79,8 @@ sub auto_search {
   my $search  = search_for_resources_exact( $app, $context );
 
   if ( $app -> config( "research-additional-searches" ) ) {
-    my $add     = additional_searches( $app, $context );
+#    my $add     = additional_searches( $app, $context ); # XXXXXXXXX
+    my $search  = ACIS::Web::Contributions::Fuzzy::run_fuzzy_searches( $app, $context );
   }
 }
 

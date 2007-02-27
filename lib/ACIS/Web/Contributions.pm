@@ -25,7 +25,7 @@ package ACIS::Web::Contributions;  ### -*-perl-*-
 #  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 #
 #  ---
-#  $Id: Contributions.pm,v 2.33 2007/02/12 21:11:16 ivan Exp $
+#  $Id: Contributions.pm,v 2.34 2007/02/27 00:01:33 ivan Exp $
 #  ---
 
 use strict;
@@ -1990,7 +1990,6 @@ use Data::Dumper;
 sub process_resources_search_results {
   my $sqlres  = shift || die;
   my $context = shift;
-
   my $result  = shift;  ## array ref
 
   my $found_hash     = $context ->{found};

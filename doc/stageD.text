@@ -14,19 +14,13 @@ Thomas in Moscow last year.  Let's try to wrap my head around it.
 
 ### notions
 
-name expressions reduced 1 -- the name expressions that only appear
-once in the data.
-
-name expressions reduced 2 -- the name expressions that do not exactly
-match an existing name variation.
-
-istance level = Levenshtein distance / string length of the name variation
+distance level = Levenshtein distance / string length of the name variation
 
 The default critical distance level of distance is 1/m, i.e. 1/7 
 
-i.e. if the Levenshtein distance is 2 and the name variation's length
-is 20, the distance level is 2/20 = 0.1 ; O.1 is less then 1/7, so,
-this would be a successful and positive match.
+e.g. if the Levenshtein distance is 2 edits and the name variation's
+length is 20, the distance level is 2/20 = 0.1 ; O.1 is less then 1/7,
+so, this would be a successful and positive match.
 
 
 
@@ -42,16 +36,17 @@ this would be a successful and positive match.
   characters m that a name variation would have to have in order to
   qualify for being fuzzy matched. The default is 7.
 
-- fuzzy-name-search-max-name-occurr -- The maximum number of
-  occurrences of a name expression in the name expression table before
-  it is considered for fuzzy matching. The default is 1. If this
-  parameter is set to 0, no maximum is checked.
+- fuzzy-name-search-max-name-occurr-in-doc-names -- The maximum number
+  of occurrences of a name expression in the document author names
+  table before it is considered for fuzzy matching. The default is
+  1. If this parameter is set to 0, no maximum is checked.
 
-- fuzzy-name-search-name-set-width -- The fuzzy search can be on full
-  dataset of the name expressions 0, the reduced name expression 1, the
-  reduced name expressions 2, or the reduced name expressions 3,
-  i.e. 1+2. The default is 3.
+- fuzzy-name-search-max-name-occurr-in-name-variations -- The maximum
+  number of occurrences of a name expression in the name variations
+  table before it is considered for fuzzy matching. The default is
+  1. If this parameter is set to 0, no maximum is checked.
 
+<!-- these two parameters are so similar... -->
 
 ### implementation components
 
@@ -66,6 +61,9 @@ mysql> select name,count(name) from testrdb.res_creators\_separate group by name
 mysql> select name,count(name) from names group by name;
 
 
+### tools
+
+String::Approx
 
 
 <h2 id='fturls'>Full-text file recognition</h2>

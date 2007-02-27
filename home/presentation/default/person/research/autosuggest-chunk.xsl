@@ -86,17 +86,17 @@
              preceding::list-item[parent::list and
              ancestor::suggest and ancestor::contributions] )'/>
 
-	     <comment> already-shown= <xsl:value-of
-	     select='$already-shown'/> </comment>
+             <comment> already-shown= <xsl:value-of
+             select='$already-shown'/> </comment>
 
         <xsl:if test='$already-shown &lt; $chunk-size'>
 
           <xsl:variable name='this-list-chunk-limit' 
                         select='$chunk-size - $already-shown'/>
           
-	  <comment> this-list-chunk-limit= <xsl:value-of
-	  select='$this-list-chunk-limit'/>
-	  <xsl:text> </xsl:text></comment>
+          <comment> this-list-chunk-limit= <xsl:value-of
+          select='$this-list-chunk-limit'/>
+          <xsl:text> </xsl:text></comment>
 
           <tr class='explanation'>
             <td colspan='2' 
@@ -111,10 +111,10 @@
           </xsl:text>
           
           <xsl:for-each select='list/list-item'>
-	    <comment>@pos=<xsl:value-of select='@pos'/></comment>
+            <comment>@pos=<xsl:value-of select='@pos'/></comment>
             <xsl:if test='number(@pos) &lt; $this-list-chunk-limit'>
               <xsl:call-template name='suggest-item-row'/>
-	      <comment>/item</comment>   
+              <comment>/item</comment>   
             </xsl:if>
           </xsl:for-each>
 
@@ -568,6 +568,13 @@
         
         <xsl:text>The documents in whose description we found your
         surname:</xsl:text>
+
+      </xsl:when>
+      <xsl:when test='reason = "fuzzy-name-variation-match"'>
+
+        <xsl:text>Found by approximate matching your name and its
+        variations to document authors names.  Should have caught most
+        misspelled occurrences:</xsl:text>
 
       </xsl:when>
       <xsl:otherwise>
