@@ -23,7 +23,7 @@ package ACIS::Web;   ### -*-perl-*-
 #  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 #
 #  ---
-#  $Id: Web.pm,v 2.16 2007/02/22 11:23:17 ivan Exp $
+#  $Id: Web.pm,v 2.17 2007/02/27 08:32:17 ivan Exp $
 #  ---
 
 use strict;
@@ -60,6 +60,7 @@ $SESSION_CLASS_MAIN = "ACIS::Web::Session";
 require ACIS::Web::UserData;
 require ACIS::Web::Services;
 
+use ACIS::Web::SysVars;
 
 sub basename { 'acis' };
 
