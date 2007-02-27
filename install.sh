@@ -58,6 +58,7 @@ test -d bin           || mkdir bin
 test -d bin/templates || mkdir bin/templates
 test -d lib           || mkdir lib
 test -d userdata      || mkdir userdata
+test -d state         || mkdir state
 test -d sessions      || mkdir sessions
 test -d unconfirmed   || mkdir unconfirmed
 test -d deleted-userdata || mkdir deleted-userdata
