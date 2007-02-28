@@ -23,7 +23,7 @@ package ACIS::Web;   ### -*-perl-*-
 #  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 #
 #  ---
-#  $Id: Web.pm,v 2.17 2007/02/27 08:32:17 ivan Exp $
+#  $Id: Web.pm,v 2.18 2007/02/28 21:45:06 ivan Exp $
 #  ---
 
 use strict;
@@ -101,6 +101,7 @@ sub new {
 
 sub dump_xml_serializer {
   my $data = shift;
+  $ACIS::Data::DumpXML::INDENT = ' ';
   my $ret = ACIS::Data::DumpXML::dump_wo_refs( $data );
   for ( $ret ) {
     ### an optional UTF8 validity check  XX 

@@ -26,7 +26,7 @@ package ACIS::Web::UserData;   ### -*-perl-*-
 #  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 #
 #  ---
-#  $Id: UserData.pm,v 2.0 2005/12/27 19:47:40 ivan Exp $
+#  $Id: UserData.pm,v 2.1 2007/02/28 21:45:06 ivan Exp $
 #  ---
 
 
@@ -103,15 +103,15 @@ sub changed {
 
 sub dump_xml {
   my $self = shift;
-
   my $inner = $self -> {_};
   delete $self -> {'internal-variables'};
   delete $self -> {_};
-  
-  my $xml = ACIS::Data::DumpXML::dump_xml ($self);
+
+  local $ACIS::Data::DumpXML::INDENT = ' '; # for lighter userdata files
+  local $ACIS::Data::DumpXML::LIST_ITEM_POS_ATTRIBUTE = 0;
+  my $xml = ACIS::Data::DumpXML::dump_xml($self);
 
   $self -> {_} = $inner;
-
   return $xml;
 }
  
