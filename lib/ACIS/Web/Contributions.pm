@@ -25,7 +25,7 @@ package ACIS::Web::Contributions;  ### -*-perl-*-
 #  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 #
 #  ---
-#  $Id: Contributions.pm,v 2.35 2007/02/28 11:08:43 ivan Exp $
+#  $Id: Contributions.pm,v 2.36 2007/02/28 18:24:50 ivan Exp $
 #  ---
 
 use strict;
@@ -380,8 +380,7 @@ sub main_screen {
 
 sub prepare_for_auto_search {
   my $app     = shift;
-
-  debug "prepared for autosearch: enter";
+  debug "prepare for autosearch: enter";
 
   my $session = $app -> session;
   my $vars    = $app -> variables;
@@ -391,10 +390,8 @@ sub prepare_for_auto_search {
 
   assert( $record );
   assert( $id );
-
   assert( $contributions );
 #  my $contributions = $session ->{$id} {contributions} ;
-
   my $autosearch    = $contributions -> {autosearch};
   { 
     if ( not exists $contributions -> {autosearch} 
