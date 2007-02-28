@@ -93,6 +93,7 @@ home/bin/templates/dump_email_handle_table.pl
 home/bin/templates/events_archiving.pl
 home/bin/templates/export_authorcites.pl
 home/bin/templates/export_name_variations.pl
+home/bin/templates/fuzzy_search_table.pl
 home/bin/templates/mvrec.pl
 home/bin/templates/offline_maintain.pl
 home/bin/templates/recreate_profile_pages.pl
@@ -274,6 +275,7 @@ lib/ACIS/Web/Contributions/Fuzzy.pm
 lib/ACIS/Web/Contributions/Glimpse.pm
 lib/ACIS/Web/Events.pm
 lib/ACIS/Web/Export.pm
+lib/ACIS/Web/HumanNames.pm
 lib/ACIS/Web/Import.pm
 lib/ACIS/Web/MetaUpdate.pm
 lib/ACIS/Web/NewUser.pm
@@ -286,6 +288,7 @@ lib/ACIS/Web/Session/SNewUser.pm
 lib/ACIS/Web/Session/SOldUser.pm
 lib/ACIS/Web/Site.pm
 lib/ACIS/Web/SysProfile.pm
+lib/ACIS/Web/SysVars.pm
 lib/ACIS/Web/User.pm
 lib/ACIS/Web/UserData.pm
 lib/ARDB.pm
