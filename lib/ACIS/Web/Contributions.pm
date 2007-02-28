@@ -25,7 +25,7 @@ package ACIS::Web::Contributions;  ### -*-perl-*-
 #  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 #
 #  ---
-#  $Id: Contributions.pm,v 2.34 2007/02/27 00:01:33 ivan Exp $
+#  $Id: Contributions.pm,v 2.35 2007/02/28 11:08:43 ivan Exp $
 #  ---
 
 use strict;
@@ -404,27 +404,16 @@ sub prepare_for_auto_search {
     $record -> {contributions} {autosearch} = $autosearch;
   }
 
+  my $name = $record->{name};
+  my $variations = $name->{variations};
+  $autosearch -> {'names-list'} = $variations || [];
 
-  debug "preparing namelist";
-  my @namelist;
-
-  {
-    my $variations = $record -> {name}{variations};
-    assert( $variations );
-    assert( ref $variations eq 'ARRAY' );
-    # strip all non-letter chars and filter
-    @namelist = grep { # this changes $variations -- dirty XXX
-                       s/,\s*/, /g; 
-                       s/\.\s*/. /g;
-                       s/\. ([-,])/.$1/g;
-                       s/(\b[A-Z]\b)([^'\w\.]|$)/$1.$2/g;
-                       s/(^\s+|\s+$)//g;
-                       s/\s+/ /g;
-                       length( $_ ) > 1 } @$variations;
-    @namelist = sort { length( $b ) <=> length( $a ) } @namelist;
-  }
-
-  $autosearch -> {'names-list'} = \@namelist;
+  my $nicelist = [];
+  push @$nicelist, @{ $name ->{'additional-variations'} };
+  push @$nicelist, $name ->{full};
+  push @$nicelist, $name ->{latin}
+    if $name->{latin};
+  $autosearch -> {'names-list-nice'} = $nicelist;
 
   debug "prepare for auto search: exit";
 }

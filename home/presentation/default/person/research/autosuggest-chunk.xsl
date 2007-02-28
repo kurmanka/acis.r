@@ -590,76 +590,6 @@
 
 
 
-
-
-  <xsl:variable name='name-variations' xml:space='preserve'>
-<ul class='names nameVariations' id='nameVariationsList'>
-<xsl:for-each select='//autosearch/names-list/list-item'
-><li class='name'><xsl:value-of select='text()'/></li>
-</xsl:for-each>
-</ul>
-  </xsl:variable>
-
-  <xsl:variable name='name-variations-linked' xml:space='preserve'>
-<ul style='margin-bottom: 0;' class='names nameVariations' id='nameVariationsList'>
-<xsl:for-each select='//autosearch/names-list/list-item'
-><li class='name'><a class='hidden'
-   ref='@name?back={$request-screen}#variations' 
-   ><xsl:value-of select='text()'/></a></li>
-</xsl:for-each>
-</ul>
-  </xsl:variable>
-
-
-  <!--  (template)  NAME VARIATIONS LINK   -->
-
-  <xsl:template name='edit-name-variations-link'>
-    <a ref='@name?back={$request-screen}#variations' >Edit name
-    variations.</a>
-  </xsl:template>
-
-
-  <xsl:template name='your-name-variations-are'>
-
-    <p>Your name variations are:</p>
-
-    <xsl:copy-of select='$name-variations-linked'/>
-    
-    <p style='margin-top: .4em;'
-       ><xsl:call-template name='edit-name-variations-link'/></p>
-
-  </xsl:template>  
-
-
-  <xsl:template name='name-variations-list'>
-
-    <p>The automatic search uses name variations list to find your
-    works.</p>
-
-    <xsl:call-template name='your-name-variations-are'/>
-
-    <xsl:if test='$back-search-finished or $back-search-not-needed'>
-        <xsl:text> </xsl:text>
-
-        <p>
-          <small
->If you change your
-name variations and
-return here, we will
-automatically search
-for your works again.</small>
-        </p>
-    </xsl:if>
-    
-</xsl:template>
-
-
-
-
-
-
-
-
   <xsl:template name='the-contributions'>
 
     <h1>Automatic search</h1>
@@ -743,8 +673,6 @@ for your works again.</small>
 </xsl:choose>
 
   </xsl:template>
-
-
 
 
   <xsl:template name='name-variations-display-with-heading'>

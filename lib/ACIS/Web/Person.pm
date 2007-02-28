@@ -27,7 +27,7 @@ package ACIS::Web::Person;  ### -*-perl-*-
 #  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 #
 #  ---
-#  $Id: Person.pm,v 2.5 2007/01/30 14:07:00 ivan Exp $
+#  $Id: Person.pm,v 2.6 2007/02/28 11:08:43 ivan Exp $
 #  ---
 
 use strict;
@@ -35,13 +35,13 @@ use strict;
 use Carp::Assert;
 
 use Web::App::Common qw( &date_now &clear_undefined debug );
+use ACIS::Web::HumanNames qw(normalize_and_filter_names);
 
 sub compile_name_variations {
   my $app    = shift;
   my $record = shift;
 
   my $session = $app -> session;
-
   if ( not $record ) {
     $record = $session -> current_record; 
   }
@@ -56,76 +56,23 @@ sub compile_name_variations {
     $old_names_string = join "\n", @o;
   }
 
-
   my $list = [];
-
-  
   push @$list, @{ $name ->{'additional-variations'} };
   push @$list, $name ->{full};
   push @$list, $name ->{latin};
 
-  
-  require ACIS::Misc;
-
-  my $hash = {};
-  foreach ( @$list ) {
-    # exclude empty 
-    if ( not $_ ) { undef $_; next; }
-
-    # normalize
-    s/\s+/ /g;
-    s/\b(\p{Lu})(\s|$)/$1.$2/g;  # initials
-    s/([\.,])(\w)/$1 $2/g;       # initials
-
-    # exclude repeated items
-    if ( $hash->{$_} ) { undef $_; next; }
-
-    # remember the item
-    $hash ->{$_} = 1;
-
-    # if accent-translation is possible, add it too
-    if ( ACIS::Misc::contains_non_ascii( $_ ) ) {
-      my $trans = ACIS::Misc::transliterate_safe( $_ );
-      if ( $trans and not $hash->{$trans} ) {
-        push @$list, $trans;
-      }
-    }
-  }
-
-  clear_undefined $list;
+  normalize_and_filter_names( $list );
   $name ->{variations} = $list;
-
 
   ### now sort by length: longer items come first
   my @sl = sort { length( $b ) <=> length( $a ) } @$list;
   my $names_string = join "\n", @sl;
-
 
   ### compare to notice substantial change
   if ( $names_string ne $old_names_string ) {
     $name -> {'last-change-date'} = time;
     $app -> userlog( "name data changed: variations" );
   }
-}
-
-
-sub auto_fix_name_variations {
-  my $app = shift;
-  my $rec = shift;
-
-  my $name = $rec ->{name};
-  my $first = $name->{first};
-
-  if ( $rec -> {imported} ) { 
-    if ( not $name->{middle} ) {
-      if ( $first =~ /^(\w+)\s(\w.+)/ ) {
-        $name->{first}  = $1;
-        $name->{middle} = $2;
-      }
-    }
-  }
-
-  $name -> {'additional-variations'} = generate_name_variations( $rec );
 }
 
 
@@ -141,11 +88,11 @@ sub bring_up_to_date {
 
   ###  name branch
   my $name = $record -> {name};
-  if ( not $name->{'variations-fixed'} ) {
-    auto_fix_name_variations( $app, $record );
+  if ( not $name->{'variations-fixed'} or $name->{'variations-fixed'} < 2 ) {
     compile_name_variations( $app, $record );
-    $record ->{name}{'variations-fixed'} = 1;
+    $name->{'variations-fixed'} = 2; # 2007-02-28 13:07
   }
+
   if ( not $name->{latin} ) {
     if ( $name->{full} =~ /([^a-zA-Z\.,\-\s\'\(\)])/ ) {
       my $sid = $record->{sid};
@@ -153,17 +100,11 @@ sub bring_up_to_date {
       $app -> errlog( "[$sid] latin name is missing!" );
     }
   }
-  delete $record ->{'full-name'};
-  delete $record ->{'name-variations'};
 
   if ( not exists $record -> {id} ) {
     $record ->{id} = $record ->{handle};
   }
   delete $record->{handle};
-
-  
-  $record ->{id} = lc $record -> {id};
-
 
   ### short id
   if ( not exists $record -> {sid} ) {
@@ -201,7 +142,6 @@ sub bring_up_to_date {
       require ACIS::Web::User;
       ACIS::Web::User::rebuild_profile_url( $app, $record );
       $app -> success(0);
-
     } else {
       die "can't go on without a good sid";
     }
@@ -209,9 +149,7 @@ sub bring_up_to_date {
  
 
   ###  contact branch
-
   if ( not exists $record ->{contact} ) {
-
     my $contact = {
        email => $record ->{email},
        'email-pub' => $record ->{'mail-pub'},
@@ -232,15 +170,6 @@ sub bring_up_to_date {
   }
 
 
-  ###  photo branch
-  if ( exists $record ->{'photo-url'} ) {
-    $record -> {photo} {url} = $record ->{'photo-url'};
-    delete $record ->{'photo-url'};
-  }
-
-  delete $record ->{'profile-url'};
-  delete $record ->{'profile-file'};
-
   if ( $record->{temporarysid} ) {
     my $tsid = $record->{temporarysid};
     require ACIS::Web::Background;
@@ -252,7 +181,6 @@ sub bring_up_to_date {
       delete $record->{temporarysid};
     }
   }
-
 }
 
 
@@ -262,14 +190,11 @@ sub generate_name_variations {
   my $rec = shift;
   
   my $name         = $rec  -> {name}; 
-
   my $first_name   = $name -> {first};
   my $middle       = $name -> {middle} || '';
   my $last_name    = $name -> {last};
   my $suffix       = $name -> {suffix};
-
   my $var          = $name -> {'additional-variations'};
-  
 
   my ( $first_i, $mid_i );
   

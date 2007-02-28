@@ -8,51 +8,50 @@ use ACIS::ShortIDs;
 #require ARDB::Record::Simple;
 
 use Storable qw( freeze );
+use ACIS::Web::HumanNames qw(normalize_name);
 
 sub normalize_personal_names {
   my $list = shift;
 
   my $etal;
+  my $sep = "\x1";
+  my $res = '';
   ###  normalize each author name
   foreach ( @$list ) {
     next if not $_;
     next if /^\s+$/;
 
-    if( $_ =~ /et al(li)?/ ) {
+    if ( $_ =~ /et al(li)?/ ) {
       $_ =~ s/(?:(?:,|;)?\s*)?\bet al(li)?\b//;
       $etal = 1;
     }
-
     if ( $_ =~ m!et\. al\.! ) {
       $_ =~ s/(?:(?:,|;)?\s*)?\bet. al.\b//;
       $etal = 1;
     }
 
     $_ =~ s/[\p{C}\p{S}]//g;  ### XX remove control characters and symbols, if any
-
          ###  Should this not be checked at ReDIF-perl level?  I think it
          ###  should.  But here it may also be useful.
-
     $_ =~ s/,\s*/, /g;
     $_ =~ s/\.\s*/. /g;
     $_ =~ s/\. ([-,])/.$1/g;
     $_ =~ s/(\b[A-Z]\b)([^'\w\.]|$)/$1.$2/g;
     $_ =~ s/(^\s+|\s+$)//g;
-    $_ =~ s/\s+/ /g
+    $_ =~ s/\s+/ /g;
+
+    if ( $_ and length( $_ ) > 1 ) {
+      $res .= $sep;
+      $res .= $_;
+    }
+    normalize_name();
+    if ( not $_ ) { $_ = 'InvalidName'; }
   }
+  
+  if ( $etal ) { $res .= "${sep}et al"; }
+  if ( $res )  { $res .= $sep; }
 
-  if ( $etal ) {
-    push @$list, "et al";
-  }
-
-  my $sep = "\x1";
-
-  if ( scalar @$list ) {
-    return join $sep, '', @$list, '';
-
-  } else {
-    return '';
-  }
+  return $res;
 }
 
 
@@ -412,14 +411,12 @@ sub process_resource {
       push @authors,   $name;
     }
     $authors = normalize_personal_names ( \@authors );
-
     if ( $authors ) {
       my $au = $authors;
       $au =~ s/(?:^\x{1}|\x{1}$)//g;
       $au =~ s/\x{1}/ & /g;
       $item -> {authors} = $au;
     }
-
   }
 
   my $editors;
@@ -436,13 +433,15 @@ sub process_resource {
       push @ed_emails, $em;
       push @editors  , $_ ->{name} [0];
     }
-    $editors = normalize_personal_names ( \@editors );
-    
-    if ( $editors ) {
-      my $ed = $editors;
-      $ed =~ s/(?:^\x{1}|\x{1}$)//g;
-      $ed =~ s/\x1/ & /g;
-      $item -> {editors} = $ed;
+
+    if ( scalar @editors ) {
+      $editors = normalize_personal_names ( \@editors );
+      if ( $editors ) {
+        my $ed = $editors;
+        $ed =~ s/(?:^\x{1}|\x{1}$)//g;
+        $ed =~ s/\x1/ & /g;
+        $item -> {editors} = $ed;
+      }
     }
   }
 

@@ -47,7 +47,7 @@
 
 
   <xsl:template name='name-variations-new-lined'>
-    <xsl:for-each select='//autosearch/names-list/list-item'
+    <xsl:for-each select='//autosearch/names-list-nice/list-item'
                   ><xsl:value-of select='text()'/><xsl:text>
 </xsl:text>
     </xsl:for-each>
@@ -229,7 +229,7 @@ function search_clear_and_focus() {
 
   <xsl:variable name='name-variations' xml:space='preserve'>
 <ul class='names nameVariations' id='nameVariationsList'>
-<xsl:for-each select='//autosearch/names-list/list-item'
+<xsl:for-each select='//autosearch/names-list-nice/list-item'
 ><li class='name'><xsl:value-of select='text()'/></li>
 </xsl:for-each>
 </ul>
@@ -237,7 +237,7 @@ function search_clear_and_focus() {
 
   <xsl:variable name='name-variations-linked' xml:space='preserve'>
 <ul style='margin-bottom: 0;' class='names nameVariations' id='nameVariationsList'>
-<xsl:for-each select='//autosearch/names-list/list-item'
+<xsl:for-each select='//autosearch/names-list-nice/list-item'
 ><li class='name'><a class='hidden'
    ref='@name?back={$request-screen}#variations' 
    ><xsl:value-of select='text()'/></a></li>
