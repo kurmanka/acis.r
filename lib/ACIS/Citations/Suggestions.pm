@@ -167,7 +167,7 @@ sub find_cit_sug_citations ($$) {
   my $select_citations = ACIS::Citations::Utils::select_citations_sql( $acis );
   $select_citations =~ s!SELECT(\s+)(\w)!SELECT s.reason,$2!i;
 
-  $sql -> prepare_cached( "$select_citations join cit_sug as s using (cnid) where $where" );
+  $sql -> prepare_cached( "$select_citations join cit_sug as s on (s.cnid=citations.cnid) where $where" );
   my $r = $sql -> execute( @arg );
   return $r;
 }
