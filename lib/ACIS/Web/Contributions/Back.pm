@@ -79,8 +79,10 @@ sub auto_search {
   my $search  = search_for_resources_exact( $app, $context );
 
   if ( $app -> config( "research-additional-searches" ) ) {
-#    my $add     = additional_searches( $app, $context ); # XXXXXXXXX
-    my $search  = ACIS::Web::Contributions::Fuzzy::run_fuzzy_searches( $app, $context );
+    my $add     = additional_searches( $app, $context ); 
+    if ( $app->config( "fuzzy-name-search" ) ) {
+      my $search  = ACIS::Web::Contributions::Fuzzy::run_fuzzy_searches( $app, $context );
+    }
   }
 }
 
