@@ -142,6 +142,38 @@ sub make_identified_n_refused ($) {
 }
 
 
+# search and auto-add limits
+sub get_limit {
+  ( $acis and $acis->session )
+            ? $acis->session -> {'citations-auto-search-limit'}
+            : undef;
+}
+sub get_found {
+  ( $acis and $acis->session )
+            ? $acis->session -> {'citations-auto-search-found'}
+            : undef;
+}
+
+sub found_count($) {
+  ( $acis and $acis->session ) 
+    ? ($acis->session->{'citations-auto-search-found'} += $_[0])
+    : undef;
+}
+
+sub found_over_limit {
+  my $f = get_found();
+  my $l = get_limit();
+  debug "found: $f, limit: $l";
+  return( $f > $l );
+}
+sub found_over_limit_real {
+  my $f = get_found();
+  my $l = get_limit();
+  $l and ($f > $l);
+}
+
+
+
 sub personal_search_by_documents {
   my $rec  = shift || die; 
   my $psid = $rec->{sid};
@@ -181,7 +213,9 @@ sub personal_search_by_documents {
         $_->{autoaddreason} = 'preidentified';
         identify_cit_to_doc( $rec, $dsid, $_ );
         push @added, [ $dsid, $_ ];
+        found_count( 1 );
       }
+      last if found_over_limit();
 
     } else {
       debug "citation: '", $_->{nstring} , "' should be suggested to $dsid";
@@ -207,6 +241,7 @@ sub personal_search_by_names {
   debug "personal_search_by_names() for rec $psid";
 
   if ( not $sql ) { prepare; }
+  return () if found_over_limit();
 
   # build identified index and refused index
   make_identified_n_refused $rec;
@@ -219,21 +254,20 @@ sub personal_search_by_names {
   my $docs = make_docs( $rec );
 
   # list of names
-  my $names;
-  debug "preparing the nameset";
-  {
-    my $variations = $rec -> {name}{variations};
-    assert( $variations );
-    assert( ref $variations eq 'ARRAY' );
-    my @namelist = sort { length( $b ) <=> length( $a ) } @$variations;
-    # normalize the names or at least remove final dots
-    foreach ( @namelist ) {
-      s/\.$//;
-      $_ = normalize_string( $_ );
-    }
-    $names = \@namelist;
-  }
-  
+  my $names = $rec -> {name}{variations};
+#  debug "preparing the nameset";
+#  {
+#    my $variations = $rec -> {name}{variations};
+#    assert( $variations );
+#    assert( ref $variations eq 'ARRAY' );
+#    my @namelist = sort { length( $b ) <=> length( $a ) } @$variations;
+#    # normalize the names or at least remove final dots
+#    foreach ( @namelist ) {
+#      s/\.$//;
+#      $_ = normalize_string( $_ );
+#    }
+#    $names = \@namelist;
+#  }
 
   # search 
   my $r = search_for_personal_names( $names );
@@ -280,6 +314,8 @@ sub personal_search_by_names {
         identify_cit_to_doc( $rec, $target, $citation );
       }
       push @added, [ $target, $citation ];
+      found_count( 1 );
+      last if found_over_limit();
     }
   }
    
@@ -323,6 +359,7 @@ sub personal_search_by_coauthors {
   debug "personal_search_by_coauthors() for rec $psid";
 
   if ( not $sql ) { prepare; }
+  return () if found_over_limit();
 
   my $meta = $rc->{meta} ||= {};
   my $autoadd = (defined $meta -> {'co-auth-auto-add'}) ? $meta -> {'co-auth-auto-add'} : 1;
@@ -356,11 +393,13 @@ sub personal_search_by_coauthors {
         $_->{autoaddreason} = delete $_->{reason};
         identify_cit_to_doc( $rec, $dsid, $_ );
         push @added, [ $dsid, $_ ];
+        found_count( 1 );
       }
       
     } else {
       debug "citation: '", $_->{nstring} , "' should be suggested to $dsid";
     } 
+    last if found_over_limit();
   }
 
   return ( \@added );

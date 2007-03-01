@@ -32,14 +32,19 @@ sub auto_processing {
 
   my $now = time;
   {
+    my $abstinence_days = 3;  # profile maintenance doesn't have to be carried out too often
+    my $abstinence_seconds = 60*60*24* $abstinence_days;
     # profile check and cleanup, i.e. maintentance
     my $last = get_sysprof_value( $rec->{sid}, 'last-cit-prof-check-time' );
     if ( not $last 
-         or ($last < $now - 60*60*24*3) ) {  # three days or more ago?
+         or ($last < $now - $abstinence_seconds ) ) {  # a while ago?
       logit "profile check and cleanup";
       ACIS::Citations::Profile::profile_check_and_cleanup();
     }
   }
+
+  $session -> {'citations-auto-search-found'} = 0;
+  $session -> {'citations-auto-search-limit'} = $acis->config('apu-citations-auto-add-limit');
 
   my $add_by_doc    = personal_search_by_documents( $rec ) || [];
   my $add_by_names  = personal_search_by_names(     $rec ) || [];

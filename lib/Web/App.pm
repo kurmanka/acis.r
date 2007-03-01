@@ -25,7 +25,7 @@ package Web::App;   ### -*-perl-*-
 #  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 #
 #  ---
-#  $Id: App.pm,v 2.26 2007/02/21 21:51:06 ivan Exp $
+#  $Id: App.pm,v 2.27 2007/03/01 00:31:23 ivan Exp $
 #  ---
 
 
@@ -456,7 +456,6 @@ sub get_screen {
 
 sub config {
   my $self = shift;
-
   my $par  = shift;
   if ( defined $par ) {
     return $self ->{config} ->{$par};
@@ -464,7 +463,6 @@ sub config {
   
   return $self -> {config}
       if $self -> {config};
-  
 }
 
 
