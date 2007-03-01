@@ -1,7 +1,6 @@
 package Web::App::Config;
 
 use strict;
-
 use Carp::Assert;
 
 use XML::XPath;
@@ -10,56 +9,42 @@ use AppConfig;
 use Web::App::Common;
 use Web::App::Screen;
 
-
 sub read_local_configuration {
   my $app  = shift;
   my $data = shift;
   my $file = shift;
 
   my $params = $app -> configuration_parameters;
-
   my $config = new AppConfig( {
                                 CREATE => 1, 
-                                GLOBAL => {
-                                  ARGCOUNT => 1,
-                                },
+                                GLOBAL => { ARGCOUNT => 1, },
                               },
                               keys %$params );
-  
   if ( open FILE, "<:utf8", $file ) {
     $config -> file( \*FILE );
     close FILE;
   }
+  #print "Parsed $file\n";
 
-#  print "Parsed $file\n";
-
-  ###  go through the parameters list, requesting the values from 
-  ###  the file and storing them into $data hash
+  # get all of the parameters:
+  my %c = $config -> varlist( '\w' );
   
-  foreach ( keys %$params ) {
+  foreach ( keys %c ) {
+    my $value = $c{$_};
     my $p = $params-> {$_};
-    
-    my $value = $config -> get( $_ );
-
 #    print "opt: $_\tvalue: $value\n";
-    
     if ( defined $value ) {
       $data ->{$_} = $value;
-
-    } 
-
-    if ( not $value ) {
+    } else { 
+      # should we shout and die? 
+      # do we have a default for this parameter?
       if ( $p eq 'required' ) {
         die "required configuration parameter '$_' is absent"
-
       } elsif ( $p eq 'not-defined' ) {
-
       } else {
         $data ->{$_} = $p;
-#        print "\tset to default: $p\n";
       }
     }
-
   }
 
   return $data;
