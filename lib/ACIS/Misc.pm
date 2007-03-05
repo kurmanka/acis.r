@@ -24,7 +24,7 @@ package ACIS::Misc;   ### -*-perl-*-
 #  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 #
 #  ---
-#  $Id: Misc.pm,v 2.0 2005/12/27 19:47:39 ivan Exp $
+#  $Id: Misc.pm,v 2.1 2007/03/05 17:00:34 ivan Exp $
 #  ---
 
 
@@ -113,6 +113,31 @@ sub transliterate_safe {
 
 
   return $str;
+}
+
+
+sub counter_with_limit {
+  my $limit = shift;
+  my $count = 0;
+  
+  return sub { my $f = shift; 
+               if ($f eq 'add') { 
+                 my $n = shift;
+                 $count+= $n;
+               } elsif ($f eq 'inc') { $count++;
+               } elsif( $f eq 'over') {
+                 return ($count > $limit);
+               }
+             };
+}
+
+
+sub testme {
+  my $c = counter_with_limit( 4 );
+  foreach ( 1..6 ) {
+    &$c('inc');
+    print "$_: ", (&$c('over')?'y':'n'), "\n";
+  }
 }
 
 

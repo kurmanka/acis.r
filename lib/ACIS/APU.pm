@@ -219,9 +219,9 @@ sub record_apu {
   if ( $record -> {pref} {'disable-apu'} ) { return "SKIP"; }
 
   my $now = time;
-  my $last_research  = get_sysprof_value( $sid, 'last-autosearch-time' );
-  my $last_citations = get_sysprof_value( $sid, 'last-auto-citations-time' );
-  my $last_apu       = get_sysprof_value( $sid, 'last-apu-time' );
+  my $last_research  = get_sysprof_value( $sid, 'last-autosearch-time' )     || '';
+  my $last_citations = get_sysprof_value( $sid, 'last-auto-citations-time' ) || '';
+  my $last_apu       = get_sysprof_value( $sid, 'last-apu-time' )            || '';
 
   my $apu_too_recent_days  = $ACIS->config( 'minimum-apu-period-days' ) || 21;
   my $apu_too_recent_seconds = $apu_too_recent_days * 24 * 60 * 60;

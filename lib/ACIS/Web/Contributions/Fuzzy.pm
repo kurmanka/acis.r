@@ -6,6 +6,7 @@ use Carp;
 use String::Approx qw( amatch );
 
 use Web::App::Common;
+use ACIS::Resources::Search;
 use ACIS::Web::Contributions;
 use ACIS::Web::Contributions::Back qw(save_suggestions);
 use ACIS::Web::Background qw( logit );
@@ -91,7 +92,7 @@ sub search_resources_for_name_fuzzy {
   foreach ( @$dsid_list ) {
     my $r = $sql->execute( $_ );
     if ( $r ) {
-      ACIS::Web::Contributions::process_resources_search_results( $r, $context, $result );
+      process_resources_search_results( $r, $context, $result );
     }
   }
 

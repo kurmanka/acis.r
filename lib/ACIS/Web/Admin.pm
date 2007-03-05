@@ -25,7 +25,7 @@ package ACIS::Web::Admin;   ### -*-perl-*-
 #  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 #
 #  ---
-#  $Id: Admin.pm,v 2.19 2007/02/13 15:17:02 ivan Exp $
+#  $Id: Admin.pm,v 2.20 2007/03/05 17:00:34 ivan Exp $
 #  ---
 
 
@@ -858,8 +858,8 @@ sub adm_search_for_documents {
  
   if ( $where ) {
     $where .= $q->{limit};
-    require ACIS::Web::Contributions;
-    $query = ACIS::Web::Contributions::query_resources( $table, $where );
+    require ACIS::Resources::Search;
+    $query = ACIS::Resources::Search::query_resources( $table, $where );
   }
 
   debug "QUERY: $query";

@@ -15,6 +15,7 @@ use Web::App::Common;
 use ACIS::Web::Background qw( logit );
 
 require ACIS::Web::Contributions::Fuzzy;
+use ACIS::Resources::Search;
 
 
 sub start_auto_search {
@@ -172,8 +173,7 @@ sub search_for_resources_exact {
   require ACIS::Web::Contributions;
 
   foreach ( @$namelist ) {
-    my $search = 
-      ACIS::Web::Contributions::search_resources_for_exact_name( $sql, $context, $_ );
+    my $search = search_resources_for_exact_name( $sql, $context, $_ );
 
     my $found = ( defined $search ) ? scalar( @$search ) : 'nothing' ;
     logit "exact name: '$_', found: $found";
@@ -208,12 +208,8 @@ sub additional_searches {
 
   require ACIS::Web::Contributions;
 
-
   ###  NAME PART SEARCH
-  my $search = 
-    ACIS::Web::Contributions::search_resources_for_exact_phrases( 
-        $sql, $context, $namelist );
-  
+  my $search = search_resources_for_exact_phrases($sql, $context, $namelist);
   {
     my $found = ( defined $search ) ? scalar @$search : 'nothing' ;
     logit "exact phrases search for a list of names, found: $found";
@@ -232,23 +228,15 @@ sub additional_searches {
     my $email = $record -> {contact} {email};
 
     if ( $email ) {
-      my $by_email = 
-        ACIS::Web::Contributions::search_resources_by_creator_email( 
-          $sql, $context, $email );
-      
+      my $by_email = search_resources_by_creator_email($sql, $context, $email);
       save_suggestions( $sql, $context, 'exact-email-match', '', $by_email );
-
     }
   }
 
 
   ###  now search by surname alone as a substring 
   my $lastname = $record ->{name}{last};
-
-  my $suggestions_3 = 
-    ACIS::Web::Contributions::search_resources_for_exact_phrases( 
-      $sql, $context, [ $lastname ] );
-  
+  my $suggestions_3 = search_resources_for_exact_phrases($sql, $context, [$lastname]);
   {
     my $found = ( defined $suggestions_3 ) ? scalar @$suggestions_3 : 'nothing' ;
     logit "suggestions by surname as a word: $found";

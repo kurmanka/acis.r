@@ -163,15 +163,8 @@ sub found_count($) {
 sub found_over_limit {
   my $f = get_found();
   my $l = get_limit();
-  debug "found: $f, limit: $l";
-  return( $f > $l );
+  $f and $l and $f > $l;
 }
-sub found_over_limit_real {
-  my $f = get_found();
-  my $l = get_limit();
-  $l and ($f > $l);
-}
-
 
 
 sub personal_search_by_documents {

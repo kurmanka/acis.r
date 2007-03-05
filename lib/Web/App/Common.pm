@@ -25,7 +25,7 @@ package Web::App::Common;   ### -*-perl-*-
 #  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 #
 #  ---
-#  $Id: Common.pm,v 2.7 2006/09/20 23:07:28 ivan Exp $
+#  $Id: Common.pm,v 2.8 2007/03/05 17:00:34 ivan Exp $
 #  ---
 
 
@@ -112,7 +112,6 @@ use vars qw( $dumped_debug );
 $dumped_debug = 0;
 
 sub debug {
-
   my $message = join '', @_;
 
 #  return unless $Web::App::DEBUG;

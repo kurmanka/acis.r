@@ -24,7 +24,7 @@ package ACIS::Web::ARPM;        ### -*-perl-*-
 #  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 #
 #  ---
-#  $Id: ARPM.pm,v 2.5 2006/12/06 18:18:43 ivan Exp $
+#  $Id: ARPM.pm,v 2.6 2007/03/05 17:00:34 ivan Exp $
 #  ---
 
 
@@ -92,50 +92,36 @@ sub search {
 
   ####  general preparations
   ACIS::Web::Contributions::prepare( $app );
-
   $contributions = $vars -> {contributions};
   $accepted      = $contributions ->{accepted};
 #  $refused       = $contributions ->{refused};
 
   $already_accepted = $contributions -> {'already-accepted'};
   $already_rejected = $contributions -> {'already-refused'};
-
   $autosearch  = $contributions -> {autosearch};
   $pref        = $contributions -> {preferences} {arpm};
 
   my $send_email;
-  
+ 
   debug "prepare";
-
   ACIS::Web::Contributions::prepare_for_auto_search( $app );
-
   debug "original load";
-
-  $suggestions = 
-    ACIS::Web::Contributions::Back::load_suggestions
+  $suggestions = ACIS::Web::Contributions::Back::load_suggestions
        ( $app, $sid, 'contributions' );
-  
   $original = get_suggestions_ids( $suggestions );
-
 
   if ( scalar keys %$original ) {
     $vars -> {'original-suggestions'} = $original;
   }
-
 #  $vars -> {'original-already-accepted'} = join ' ', keys %$already_accepted;
 #  $vars -> {'original-already-rejected'} = join ' ', keys %$already_rejected;
 
-
   ###  Handle search
-  
   {
     debug "handle search";
-
     my @new_ids = ();
-    
     my $rel_tab_db = $app -> config -> {'metadata-db-name'};
     my $rel_tab    = "$rel_tab_db.relations";
-    
     my @refs  = ();
     my %roles = ();
     
@@ -155,11 +141,9 @@ sub search {
         push @refs, $obj;
         $roles{$obj} = $role;
         debug "found $role for $obj";
-
         $res -> next;
       }
     }
-    
     
     foreach ( @refs ) {
       if ( not $already_accepted -> {$_} 
@@ -174,17 +158,13 @@ sub search {
     ###  suggested it through email, may it not?
 
     if ( scalar @new_ids ) {
-      
       logit "id search: found ", scalar @new_ids, " items";
-
       $send_email = 1;
 
       ###  get full descriptions and build a list of short-ids
-
       my $new_full = ACIS::Web::Contributions::load_resources_by_ids( $app, \@new_ids );
       my @new_sids;
 
-      
       foreach ( @$new_full ) {
         die if not $_ ->{sid};
         push @new_sids, $_ -> {sid};
@@ -195,8 +175,6 @@ sub search {
       }
       
       my $reread_suggestions;
-
-
       if ( not $pref 
            or not defined $pref -> {'add-by-handle'}
            or $pref -> {'add-by-handle'}  ) {
@@ -206,7 +184,7 @@ sub search {
           ACIS::Web::Contributions::accept_item( $_ );
         }
         logit "id search: added";
-
+        
         my $clear_sids = {};
 
         foreach ( @$new_full ) {
@@ -217,91 +195,75 @@ sub search {
           }
         }
 
-
-         ###  remove from suggestions, if its there
-         if ( scalar keys %$clear_sids ) {
-
-           ACIS::Web::Contributions::Back::clear_from_autosearch_suggestions
-               ( $app, $sid, $clear_sids );
-
-           $reread_suggestions = 1;
-         }
-
-         ###  add into variables as "added-by-handle"
-         $vars -> {'added-by-handle'} = $new_full;
+        ###  remove from suggestions, if its there
+        if ( scalar keys %$clear_sids ) {
+          ACIS::Web::Contributions::Back::clear_from_autosearch_suggestions
+              ( $app, $sid, $clear_sids );
+          $reread_suggestions = 1;
+        }
+        
+        ###  add into variables as "added-by-handle"
+        $vars -> {'added-by-handle'} = $new_full;
         
 
+      } else {   ### add-by-handle disallowed
+        ###  So, this means we need to simply suggest the items in an email
+        ###  and add them to the suggestions table.  If they are in the
+        ###  suggestions table already, we need to make sure they have reason
+        ###  "exact-person-id-match".
+        
+        $send_email = 0;
+        my @suggest;
+        my @reset_reason_sids;
+        my @add_to_suggest_table;
 
-       } else {   ### add-by-handle disallowed
-         ###  So, this means we need to simply suggest the items in an email
-         ###  and add them to the suggestions table.  If they are in the
-         ###  suggestions table already, we need to make sure they have reason
-         ###  "exact-person-id-match".
+        foreach ( @$new_full ) {
+          my $rid  = $_ ->{id};  ###  resource id
+          my $rsid = $_ ->{sid}; ###  resource sid
+          my $suggest;
+          if ( $original -> {$rid} ) {
+            ###  already suggested, suggest again if they had a weaker
+            ###  suggestion reason.
+            
+            if ( $original ->{$rid} {reason} eq 'exact-person-id-match' ) {
+              ### do not repeat
+              ### do nothing at all 
+              
+            } else {
+              delete $original -> {$rid};
+              ###  set the suggestion reason to "exact-person-id-match"
+              $send_email = 1;
+              push @suggest, $_;
+              push @reset_reason_sids, $rsid;
+            }
+            
+          } else {
+            $send_email = 1;
+            push @suggest, $_;
+            push @add_to_suggest_table, $_;
+          }
+        }
+        
+        if ( scalar @add_to_suggest_table ) {
+          ###  add to suggestions: prepare data
+          ACIS::Web::Contributions::Back::save_suggestions
+              ( $sql, $sid, 'exact-person-id-match', 
+                '', \@add_to_suggest_table );
+        }
+        
+        if ( scalar @reset_reason_sids ) {
+          ACIS::Web::Contributions::Back::set_suggestions_reason
+              ( $app, $sid, "exact-person-id-match", \@reset_reason_sids );
+        }
+        
+        ###  add into variables as "suggest-by-handle"
+        $vars -> {'suggest-by-handle'} = \@suggest;
          
-         $send_email = 0;
-
-         my @suggest;
-         my @reset_reason_sids;
-         my @add_to_suggest_table;
-
-
-         foreach ( @$new_full ) {
-           my $rid  = $_ ->{id};  ###  resource id
-           my $rsid = $_ ->{sid}; ###  resource sid
-
-           my $suggest;
-
-           if ( $original -> {$rid} ) {
-             ###  already suggested, suggest again if they had a weaker
-             ###  suggestion reason.
-
-             if ( $original ->{$rid} {reason} eq 'exact-person-id-match' ) {
-               ### do not repeat
-               ### do nothing at all 
-
-             } else {
-               delete $original -> {$rid};
-               
-               ###  set the suggestion reason to "exact-person-id-match"
-
-               $send_email = 1;
-               push @suggest, $_;
-               push @reset_reason_sids, $rsid;
-             }
-
-           } else {
-             $send_email = 1;
-
-             push @suggest, $_;
-             push @add_to_suggest_table, $_;
-
-           }
-         }
-
-
-         if ( scalar @add_to_suggest_table ) {
-           ###  add to suggestions: prepare data
-
-           ACIS::Web::Contributions::Back::save_suggestions
-               ( $sql, $sid, 'exact-person-id-match', 
-                 '', \@add_to_suggest_table );
-         }
-         
-         if ( scalar @reset_reason_sids ) {
-           ACIS::Web::Contributions::Back::set_suggestions_reason
-               ( $app, $sid, "exact-person-id-match", \@reset_reason_sids );
-         }
-
-         ###  add into variables as "suggest-by-handle"
-         $vars -> {'suggest-by-handle'} = \@suggest;
-         
-       } ###  add-by-handle: true, false
-    
+      } ###  add-by-handle: true, false
     } ###  found something?
       else {
 #        logit "id search: nothing found";
     }        
-    
   }  ###  do handle search ?
   
 
@@ -313,10 +275,8 @@ sub search {
   if ( not defined $pref 
        or not defined $pref ->{'name-search'}
        or $pref -> {'name-search'} ) {
-
   
-    $suggestions = 
-      ACIS::Web::Contributions::Back::load_suggestions
+    $suggestions = ACIS::Web::Contributions::Back::load_suggestions
           ( $app, $sid, 'contributions' );
     
     my $count1 = count_suggestions  ( $suggestions );
@@ -324,15 +284,13 @@ sub search {
     
     ACIS::Web::Contributions::automatic_search( $app );
 
-    $suggestions = 
-      ACIS::Web::Contributions::Back::load_suggestions
+    $suggestions = ACIS::Web::Contributions::Back::load_suggestions
           ( $app, $sid, 'contributions' );
     
     my $after  = get_suggestions_ids( $suggestions );
     my $count2 = count_suggestions  ( $suggestions );
 
     if ( $count1 < $count2 ) {
-
       logit "name search: something found";
 
       ### something found
@@ -367,11 +325,8 @@ sub search {
     } else {
       ### nothing interesting
 #      logit "name search: nothing found";
-      
     }
-
   }
-
 
   
   if ( $send_email ) {
