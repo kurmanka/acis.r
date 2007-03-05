@@ -275,8 +275,6 @@ lib/ACIS/Web/CGI/Untaint/url.pm
 lib/ACIS/Web/Citations.pm
 lib/ACIS/Web/Config.pm
 lib/ACIS/Web/Contributions.pm
-lib/ACIS/Web/Contributions/Back.pm
-lib/ACIS/Web/Contributions/Fuzzy.pm
 lib/ACIS/Web/Contributions/Glimpse.pm
 lib/ACIS/Web/Events.pm
 lib/ACIS/Web/Export.pm
