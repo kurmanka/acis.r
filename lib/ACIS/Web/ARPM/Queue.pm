@@ -24,7 +24,7 @@ package ACIS::Web::ARPM::Queue;
 #  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 #
 #  ---
-#  $Id: Queue.pm,v 2.1 2006/10/16 13:06:28 ivan Exp $
+#  $Id: Queue.pm,v 2.2 2007/03/05 23:39:53 ivan Exp $
 #  ---
 
 
@@ -242,7 +242,7 @@ LIMIT $get ! );
         }
       }
 
-      my $login = ACIS::Web::ARPM::get_login_from_queue_item( $acis, $item );
+      my $login = get_login_from_queue_item( $acis, $item );
       if ( $login ) {
         push @items, $item;
         push @to_process, [ $login, $item ];
@@ -305,7 +305,7 @@ LIMIT 1! );
     my $item = $r -> {row} {what};
     
     if ( $item ) {
-      my $login = ACIS::Web::ARPM::get_login_from_queue_item( $acis, $item );
+      my $login = get_login_from_queue_item( $acis, $item );
       if ( $login ) {
         return $login;
       }
@@ -336,7 +336,7 @@ LIMIT 1
         
     my $now  = time;
     if ( $now - $last > $arpu_threshold_hours * 60 * 60 ) {
-      my $login = ACIS::Web::ARPM::get_login_from_queue_item( $acis, $item );
+      my $login = get_login_from_queue_item( $acis, $item );
       logit "yes: $login\n";
       return $login;
     }
@@ -459,7 +459,7 @@ sub task_work {
   foreach ( @ARGV ) {
     my $item = $_;
     
-    my $login = ACIS::Web::ARPM::get_login_from_queue_item( $acis, $item );
+    my $login = get_login_from_queue_item( $acis, $item );
 
     my $res;
     my $notes;
@@ -489,6 +489,57 @@ sub task_work {
 
   }
   
+}
+
+
+################
+
+sub get_login_from_queue_item {
+
+  my $acis = shift;
+  my $item = shift;
+  my $login;
+#  print "get login for $item\n";
+
+  if ( length( $item ) > 8 
+       and $item =~ /^.+\@.+\.\w+$/ ) {
+
+    return lc $item;
+
+  } else {
+
+    my $sql = $acis -> sql_object;
+
+    if ( length( $item ) > 15
+         or index( $item, ":" ) > -1 ) {
+
+#      print "is it an identifier?\n";
+      $sql -> prepare( "select owner from records where id=?" );
+      my $r = $sql -> execute( lc $item );
+      if ( $r and $r -> {row} ) {
+        $login = $r ->{row} {owner};
+
+      } else {
+        logit "get_login_from_queue_item: id $item not found";
+      }
+
+    } elsif ( $item =~ m/^p[a-z]+\d+$/ 
+              and length( $item ) < 15 ) {
+
+#      print "is it an sid?\n";
+      $sql -> prepare( "select owner,id from records where shortid=?" );
+      my $r = $sql -> execute( $item );
+      if ( $r and $r -> {row} ) {
+        $login = $r ->{row} {owner};
+
+      } else {
+        logit "get_login_from_queue_item: sid $item not found";
+      }
+
+    }
+  }
+
+  return $login;
 }
 
 

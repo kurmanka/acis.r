@@ -9,6 +9,7 @@ use base qw(Exporter);
 use vars qw(@EXPORT);
 @EXPORT = qw( 
               automatic_resource_search_now
+              prepare_for_auto_search
               get_bg_search_status
               start_auto_res_search_in_bg
               get_last_autosearch_time

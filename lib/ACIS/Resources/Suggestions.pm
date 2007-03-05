@@ -137,25 +137,21 @@ sub load_suggestions {
     $r = $sql -> execute ( $sid );
   }
 
-
+  my $count = 0;
   while ( $r -> {row} ) {
-    debug "a row";
+    $count++;
     my $row    = $r -> {row};
     my $item;
     my $reason = $row ->{reason};
     my $data   = $row ->{data};
-    my $id     = $row ->{osid};
-
-    if ( not defined $id ) {
-      warn "No id in a resource suggestion record!";
-      next;
-    }
+    my $id     = $row ->{osid} || die;
 
     if ( $data ) {
       $item = thaw( $data );
     }
 
     if ( not $reasons -> {$reason} ) {
+      # create a new group for this reason:
       $group = {};
       $group -> {reason} = $reason;
       $group -> {list}   = [];
@@ -165,9 +161,11 @@ sub load_suggestions {
 
     $list = $reasons->{$reason} {list} || die;
     push @$list, $item;
+  } continue {
     $r -> next;
   }
 
+  debug "$count rows";
   debug "load_suggestions: exit";
   return $result;
 }

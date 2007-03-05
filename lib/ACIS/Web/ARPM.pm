@@ -24,7 +24,7 @@ package ACIS::Web::ARPM;        ### -*-perl-*-
 #  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 #
 #  ---
-#  $Id: ARPM.pm,v 2.7 2007/03/05 23:14:19 ivan Exp $
+#  $Id: ARPM.pm,v 2.8 2007/03/05 23:39:53 ivan Exp $
 #  ---
 
 
@@ -65,7 +65,6 @@ my $accepted      ;
 my $already_accepted;
 my $already_rejected;
 
-my $autosearch      ;
 my $pref            ;
 
 my $suggestions;
@@ -99,13 +98,12 @@ sub search {
 
   $already_accepted = $contributions -> {'already-accepted'};
   $already_rejected = $contributions -> {'already-refused'};
-  $autosearch  = $contributions -> {autosearch};
   $pref        = $contributions -> {preferences} {arpm};
 
   my $send_email;
  
   debug "prepare";
-  ACIS::Web::Contributions::prepare_for_auto_search( $app );
+  prepare_for_auto_search( $app );
   debug "original load";
   $suggestions = load_suggestions( $app, $sid );
   $original = get_suggestions_ids( $suggestions );
@@ -120,7 +118,7 @@ sub search {
   {
     debug "handle search";
     my @new_ids = ();
-    my $rel_tab_db = $app -> config -> {'metadata-db-name'};
+    my $rel_tab_db = $app -> config('metadata-db-name');
     my $rel_tab    = "$rel_tab_db.relations";
     my @refs  = ();
     my %roles = ();
@@ -162,7 +160,7 @@ sub search {
       $send_email = 1;
 
       ###  get full descriptions and build a list of short-ids
-      my $new_full = ACIS::Web::Contributions::load_resources_by_ids( $app, \@new_ids );
+      my $new_full = load_resources_by_ids( $app, \@new_ids );
       my @new_sids;
 
       foreach ( @$new_full ) {
@@ -463,56 +461,5 @@ sub straighthen_works_hash {
   return ( \@list1, \@list2, \@bysurname );
 }
 
-
-
-################
-
-sub get_login_from_queue_item {
-
-  my $acis = shift;
-  my $item = shift;
-  my $login;
-#  print "get login for $item\n";
-
-  if ( length( $item ) > 8 
-       and $item =~ /^.+\@.+\.\w+$/ ) {
-
-    return lc $item;
-
-  } else {
-
-    my $sql = $acis -> sql_object;
-
-    if ( length( $item ) > 15
-         or index( $item, ":" ) > -1 ) {
-
-#      print "is it an identifier?\n";
-      $sql -> prepare( "select owner from records where id=?" );
-      my $r = $sql -> execute( lc $item );
-      if ( $r and $r -> {row} ) {
-        $login = $r ->{row} {owner};
-
-      } else {
-        logit "get_login_from_queue_item: id $item not found";
-      }
-
-    } elsif ( $item =~ m/^p[a-z]+\d+$/ 
-              and length( $item ) < 15 ) {
-
-#      print "is it an sid?\n";
-      $sql -> prepare( "select owner,id from records where shortid=?" );
-      my $r = $sql -> execute( $item );
-      if ( $r and $r -> {row} ) {
-        $login = $r ->{row} {owner};
-
-      } else {
-        logit "get_login_from_queue_item: sid $item not found";
-      }
-
-    }
-  }
-
-  return $login;
-}
 
 1;
