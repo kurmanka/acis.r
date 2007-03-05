@@ -234,10 +234,9 @@ sub process_text {
         warn "STILL NO ACIS!";
         last;
       }
-      require ACIS::Web::ARPM;
-      require ACIS::Web::ARPM::Queue;
+      require ACIS::APU::Queue;
       print "putting $per into the ARPU queue\n";
-      ACIS::Web::ARPM::Queue::push_item_to_queue( $acis -> sql_object, $per, 1 );
+      ACIS::APU::Queue::enqueue_item( $acis->sql_object, $per, 1 );
         
     } else {
       print "probably already claimed (or refused)\n";
