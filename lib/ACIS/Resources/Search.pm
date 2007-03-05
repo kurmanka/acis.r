@@ -1,5 +1,8 @@
 package ACIS::Resources::Search;
 
+# Low-level search for resources (i.e. academic contribution items,
+# research, etc.) functions
+
 use strict;
 use warnings;
 
@@ -19,7 +22,6 @@ use vars qw(@EXPORT);
            );
 use Storable qw(thaw);
 use Web::App::Common;
-use ACIS::Resources;
 
 sub make_resource_item_from_db_row {
   my $row = shift;

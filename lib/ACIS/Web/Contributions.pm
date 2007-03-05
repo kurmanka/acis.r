@@ -25,16 +25,18 @@ package ACIS::Web::Contributions;  ### -*-perl-*-
 #  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 #
 #  ---
-#  $Id: Contributions.pm,v 2.37 2007/03/05 17:00:34 ivan Exp $
+#  $Id: Contributions.pm,v 2.38 2007/03/05 23:14:19 ivan Exp $
 #  ---
 
 use strict;
 use Carp qw( cluck );
 use Carp::Assert;
 use Web::App::Common;
-use ACIS::Data::DumpXML::Parser;
+require ACIS::Data::DumpXML::Parser;
 
 use ACIS::Resources::Search;
+use ACIS::Resources::Suggestions;
+use ACIS::Resources::AutoSearch;
 
 my $Conf;
 
@@ -236,20 +238,92 @@ sub prepare_configuration {
 
 use ACIS::Web::SysProfile;
 
-sub get_last_autosearch_time {
-  my $app     = $Web::App::APP;
-  my $session = $app -> session;
-  my $rec     = $session -> current_record;
-
-  my $sid    = $rec->{temporarysid} || $rec->{sid};
-  my $result = get_sysprof_value( $sid, "last-autosearch-time" );
-
-  return $result;
-}
 
 ########################################################################
 ########               m a i n    s c r e e n                  #########
 ########################################################################
+
+sub find_suggested_item {  # look in suggestions or search results
+  my $contributions = shift;
+  my $id            = shift;
+  my $source        = shift;
+  assert( $id ,    '$id is untrue');
+  assert( $source, '$source is untrue');
+
+  my $suggest = $contributions ->{suggest};
+  my $search  = $contributions ->{search} ;
+  my $listlist = ($source eq 'suggestions')
+                      ? $suggest
+                      : [ $search ];
+  foreach my $list ( @$listlist ) {
+    foreach ( @{ $list -> {list} } ) {
+      if( $_ ->{id} eq $id ) { return $_; }
+    }
+  }
+  return undef;
+}
+
+
+
+sub clear_some_suggestions {
+  my $contributions = shift;
+  my $to_clear      = shift;
+
+  my $hash_to_clear = {};
+  if ( ref $to_clear eq 'ARRAY' ) {
+    foreach ( @$to_clear ) {
+      $hash_to_clear -> {$_} = 1;
+    }
+
+  } elsif ( ref $to_clear eq 'HASH' ) {
+    $hash_to_clear = $to_clear;
+
+  } else { die; }
+  
+  
+  my $suggest = $contributions -> {suggest};
+  my $count_total = 0;
+  my @clean_suggest = ();
+
+  foreach ( @$suggest ) {
+    my $count = 0;
+    my $listlist = $_ ->{list};
+    
+    foreach ( @$listlist ) {
+      my $id = $_ ->{id};
+      if ( exists $hash_to_clear ->{$id} ) {
+        undef $_;
+      } else {
+        $count++;
+        $count_total++;
+      }
+    }
+    clear_undefined $listlist;
+    
+    if ( not $count ) {
+      undef $_;
+    }
+  }
+
+  clear_undefined $suggest;
+  return $count_total;
+}
+
+
+sub research_auto_status {
+  my $app    = shift;
+  my $status = get_bg_search_status( $app );
+  if ( $status eq 'running' ) {
+    # maybe show what is found so far?
+    #show_whats_suggested( $app );
+    $app -> refresh( 5 );
+  } else {
+    # no search is going on
+    $app -> redirect_to_screen_for_record( 'research/autosuggest' );
+  }
+}
+
+
 
 sub main_screen {
   my $app = shift;
@@ -266,7 +340,7 @@ sub main_screen {
 
   my $laststatus = $contributions -> {laststatus} || '';
 
-  my $status = get_search_status( $app );
+  my $status = get_bg_search_status( $app );
   ### check search status
 
   my $last_search = get_last_autosearch_time(); 
@@ -318,30 +392,24 @@ sub main_screen {
 
     if ( $start ) {
       debug "yes, do search!";
-
       $record ->{contributions} {autosearch} = 1;
 
-
-      require ACIS::Web::Contributions::Back;
-      my $r = ACIS::Web::Contributions::Back::start_auto_search( $app );
+      my $r = start_auto_res_search_in_bg( $app );
 
       if ( $r ) {
-
         debug "started fine";
         $contributions -> {'auto-search-initiated-in-this-session'} = 1;
 
         $status = 'auto-search-started';
         $app -> clear_process_queue;
         $app -> redirect_to_screen_for_record( 'research/auto/status' );
-
         $vars -> {$status} = 1;
         $contributions -> {laststatus} = $status;
         return 1;
 
       } else {
         debug "start failed";
-
-        $app -> error ( 'auto-search-start-failed' );
+        $app -> error( 'auto-search-start-failed' );
         $status = 'auto-search-start-failed';
       }
 
@@ -351,7 +419,6 @@ sub main_screen {
            or $laststatus eq 'auto-search-started' ) {
         $status = 'auto-search-finished';
       }
-
     }
 
   } else {
@@ -379,157 +446,10 @@ sub main_screen {
 }
 
 
-sub prepare_for_auto_search {
-  my $app     = shift;
-  debug "prepare for autosearch: enter";
-
-  my $session = $app -> session;
-  my $vars    = $app -> variables;
-  my $record  = $session -> current_record;
-  my $id      = $record ->{id};
-  my $sid     = $record ->{sid};
-
-  assert( $record );
-  assert( $id );
-  assert( $contributions );
-#  my $contributions = $session ->{$id} {contributions} ;
-  my $autosearch    = $contributions -> {autosearch};
-  { 
-    if ( not exists $contributions -> {autosearch} 
-         or $autosearch == 1 ) {
-      $contributions ->{autosearch} = $autosearch = {}
-    }
-    $record -> {contributions} {autosearch} = $autosearch;
-  }
-
-  my $name = $record->{name};
-  my $variations = $name->{variations};
-  $autosearch -> {'names-list'} = $variations || [];
-
-  my $nicelist = [];
-  push @$nicelist, @{ $name ->{'additional-variations'} };
-  push @$nicelist, $name ->{full};
-  push @$nicelist, $name ->{latin}
-    if $name->{latin};
-  $autosearch -> {'names-list-nice'} = $nicelist;
-
-  debug "prepare for auto search: exit";
-}
-
-
-sub auto_search_done {
-  my $app     = shift;
-  my $session = $app -> session;
-  my $vars    = $app -> variables;
-  my $record  = $session -> current_record;
-  my $id      = $record ->{id};
-  my $sid     = $record ->{sid};
-
-  assert( $contributions );
-  my $autosearch    = $contributions -> {autosearch};
-
-  use ACIS::Web::SysProfile;
-  put_sysprof_value( $record -> {sid}, 'last-autosearch-time', scalar time );
-
-  my $names_last_change_date = $record -> {name}{'last-change-date'};
-  $autosearch -> {'for-names-last-changed'} = $names_last_change_date;
-}
-
-
-sub automatic_search {
-  my $app = shift;
-  my $session = $app -> session;
-  my $vars    = $app -> variables;
-  my $record  = $session -> current_record;
-  my $id      = $record ->{id};
-  my $sid     = $record ->{sid};
-  assert( $contributions );
-  ACIS::Web::Contributions::prepare_for_auto_search( $app );
-
-  my $autosearch    = $contributions -> {autosearch};
-  require ACIS::Web::Contributions::Back;
-  ACIS::Web::Contributions::Back::auto_search( $app );
-  ACIS::Web::Contributions::auto_search_done( $app );
-  return 1;
-}
-
-
-
-
-
-sub get_search_status {
-  my $app = shift;
-
-  my $session = $app -> session;
-  my $vars    = $app -> variables;
-  my $record  = $session -> current_record;
-  my $id      = $record -> {id} ;
-  my $sid     = $record -> {sid};
-  my $tsid    = $record->{temporarysid};
-
-  my $status  = '';
-  my $threads;
-
-  debug "get_search_status";
-
-  require ACIS::Web::Background;
-
-  if ( $tsid ) {
-    $threads = ACIS::Web::Background::check_thread( $app, $tsid );
-    $app -> sql_object -> do( "update suggestions set psid=? where psid=?", $sid, $tsid );
-    if ( $threads ) {
-      # let it run
-    } else {
-#      delete $record->{temporarysid};
-      undef $tsid;
-    }
-  } 
-
-  if ( not $tsid ) {
-    $threads = ACIS::Web::Background::check_thread( $app, $sid );
-  }
-  
-  if ( $threads ) {
-    my $types = {};
-    foreach ( @$threads ) {
-      my $t = $_ -> {type};
-      $types -> {$t} = 1;
-    }
-
-    if ( $types -> {'res-autosearch'} 
-         or $types -> {'res-auto-approx'} ) {
-      $status = 'running';
-    }
-  }
-
-  debug "check research-auto-search status: $status";
-  return $status;
-}
-
-
-
 
 ###########################################################################
 ########   a u t o   s e a r c h   s t a t u s    s c r e e n    ##########
 ###########################################################################
-
-sub research_auto_status {
-  my $app    = shift;
-  my $status = get_search_status( $app );
-  
-  if ( $status eq 'running' ) {
-    ###  what is found so far?
-#    ACIS::Web::Contributions::show_whats_suggested( $app );
-    $app -> refresh( 5 );
-
-  } else {
-    ###  no search is going on
-    $app -> redirect_to_screen_for_record( 'research/autosuggest' );
-  }
-
-}
-
-
 
 sub accept_item {
   my $item = shift;
@@ -775,10 +695,10 @@ sub process {
         ### all correct, but also we could check the item type and...
         
         assert( $source );
-        my $item = find_contribution ( $contributions, $handle, $source );
+        my $item = find_suggested_item( $contributions, $handle, $source );
 
         if ( not $item ) {
-          $app -> errlog ( 
+          $app ->errlog( 
 "Can't find a contribution among our own suggestions: id: $handle" );
           next;
         }
@@ -866,7 +786,7 @@ sub process {
       if ( $handle and $val ) {
 
         assert( $source );
-        my $item = find_contribution ( $contributions, $handle, $source );
+        my $item = find_suggested_item( $contributions, $handle, $source );
         my $sid  = $item -> {sid};
 
         if ( not $item ) {
@@ -902,7 +822,7 @@ sub process {
 
           assert( $source );
           ###  find it
-          my $item = find_contribution ( $contributions, $handle, $source );
+          my $item = find_suggested_item( $contributions, $handle, $source );
 
           if ( $refuse ) {
             refuse_item( $handle, $item );
@@ -934,12 +854,7 @@ sub process {
   $contributions -> {actions} = $statistics;
 
   my $sug_count = clear_some_suggestions( $contributions, $clear_from_suggestions );
-
-  require ACIS::Web::Contributions::Back;
-
-  ACIS::Web::Contributions::Back::clear_from_autosearch_suggestions
-      ( $app, $psid,
-        $clear_from_suggestions_sid );
+  clear_from_autosearch_suggestions($app, $psid, $clear_from_suggestions_sid);
 
 
   if ( $processed ) {
@@ -965,10 +880,7 @@ sub process {
          and not $sug_count ) {
       $app -> set_presenter( 'research/ir-guide' );
     }
-
   }
-
-
 }
 
 sub current_process {
@@ -1167,10 +1079,8 @@ sub process_refused_xml {
 
 sub switch {
   my $app = shift;
-
   my $session = $app -> session;
   my $vars    = $app -> variables;
-
   my $input   = $app -> form_input;
 
   if ( $input ->{continue} 
@@ -1181,91 +1091,7 @@ sub switch {
       $app -> redirect_to_screen_for_record( 'menu' );
     }
   }
-  
 }
-
-
-
-
-sub find_contribution {  ###  among suggestions
-  my $contributions = shift;
-  my $id            = shift;
-  my $source        = shift;
-
-  assert( $id ,    '$id is untrue');
-  assert( $source, '$source is untrue');
-
-  my $item;
-
-  my $suggest = $contributions ->{suggest};
-  my $search  = $contributions ->{search} ;
-
-  if ( $source eq 'suggestions' ) {
-    foreach my $list ( @$suggest ) {
-      foreach $item ( @{ $list -> {list} } ) {
-        if( $item ->{id} eq $id ) { return $item; }
-      }
-    }
-
-  } elsif ( $source eq 'search' ) {
-    foreach $item ( @{ $search -> {list} } ) {
-      if( $item ->{id} eq $id ) { return $item }
-    }
-  }
-
-  return $item;
-}
-
-
-
-
-
-sub clear_some_suggestions {
-  my $contributions = shift;
-  my $to_clear      = shift;
-
-  my $hash_to_clear = {};
-  if ( ref $to_clear eq 'ARRAY' ) {
-    foreach ( @$to_clear ) {
-      $hash_to_clear -> {$_} = 1;
-    }
-
-  } elsif ( ref $to_clear eq 'HASH' ) {
-    $hash_to_clear = $to_clear;
-
-  } else { die; }
-  
-  
-  my $suggest = $contributions -> {suggest};
-  my $count_total = 0;
-  my @clean_suggest = ();
-
-  foreach ( @$suggest ) {
-    my $count = 0;
-    my $listlist = $_ ->{list};
-    
-    foreach ( @$listlist ) {
-      my $id = $_ ->{id};
-      if ( exists $hash_to_clear ->{$id} ) {
-        undef $_;
-      } else {
-        $count++;
-        $count_total++;
-      }
-    }
-    clear_undefined $listlist;
-    
-    if ( not $count ) {
-      undef $_;
-    }
-  }
-
-  clear_undefined $suggest;
-
-  return $count_total;
-}
-
-
 
 
 
@@ -1308,28 +1134,22 @@ sub reload_to_main_after_a_while {
 ###   s u b    S E A R C H    #
 ############################################################################
 
-sub search {
+sub search { # research/search screen handler
   my $app = shift;
-  
   my $sql     = $app -> sql_object;
-
   my $input   = $app -> form_input;
   my $session = $app -> session;
   my $vars    = $app -> variables;
   my $record  = $session -> current_record;
   my $id      = $record ->{id};
 
-
   ###  preparations
-
   my %found_ids;
   my $search ;
 
   ###  prepare( ) is run by screen config
-
   get_configuration( $app );
   my $conf = $Conf;
-
   assert( $contributions );
 #  my $contributions = $session ->{$id} {contributions} ;
 
@@ -1342,26 +1162,21 @@ sub search {
   }
 
   my $metadata_db = $app -> config( 'metadata-db-name' );
-
-  assert( $metadata_db, "metadata-db-name must be defined" );
   my $context = {
     db      => $metadata_db,
     found   => \%found_ids,
     already => $ignore_index,
   };
-
   
 
   ###  analyse the input 
-
   my $search_type = 'resources';
   my $objects     = 'resources';
   my $table;
 
-  my $search_key = $input -> { q };    
-  my $field      = $input -> { field } || '';
-  my $phrasematch= $input -> { phrase } || 0;
-  
+  my $search_key = $input -> {q};    
+  my $field      = $input -> {field} || '';
+  my $phrasematch= $input -> {phrase} || 0;
   if ( $field eq 'id' ) {
     $phrasematch = 1;
   }
@@ -1382,9 +1197,7 @@ sub search {
            phrasematch => ( $phrasematch ) ? 'yes' : 'no',
                objects => $objects,
                };
-
     $contributions ->{search} = $search;
-
   }
   
 
@@ -1589,18 +1402,10 @@ sub search_documents {
 }
 
 
-
-use Data::Dumper;
-
-
-
-
-
 sub show_whats_suggested {
   my $app = shift;
 
   debug "show_whats_suggested: enter";
-
   my $vars    = $app -> variables;
   my $session = $app -> session;
   my $record  = $session -> current_record;
@@ -1609,13 +1414,9 @@ sub show_whats_suggested {
 
   assert( $contributions );
 #  my $contributions = $session -> {$id} {contributions};
+  prepare_configuration( $app );
 
-  ACIS::Web::Contributions::prepare_configuration( $app );
-
-  require ACIS::Web::Contributions::Back;
-
-  my $suggestions = ACIS::Web::Contributions::Back::load_suggestions_into_contributions ( $app, $sid, $contributions );
-
+  my $suggestions = load_suggestions_into_contributions( $app, $sid, $contributions );
   my $groups = scalar @$suggestions;
   debug "found groups: $groups";
 
@@ -1624,69 +1425,13 @@ sub show_whats_suggested {
 #  if ( $status ) {
 #    $vars -> {'back-search-status'} = $status;
 #  }
-
   debug "show_whats_suggested: exit";
 }
 
 
 
+1; # Cheers! ;)
 
 
-
-
-
-
-
-###############   create a new session and userdata and delete it afterwards
-
-
-sub init_search_test_prepare {
-  my $app = shift;
-
-  my $vars    = $app -> variables;
-  my $config  = $app -> config;
-  my $request = $app -> request;
-  my $cgi     = $request -> {CGI};
-
-  my $owner = {};
-
-  $owner -> {login} = 'contributions_init_search_test';
-  $owner -> {IP}    = $ENV {'REMOTE_ADDR'};
-
-  my $session = $app -> start_new_session ( $owner, "user" );
-  
-  $session -> object_set (  ACIS::Web::UserData -> new() );
-}
-
-
-sub fix_record {
-  my $app = shift;
-  my $session = $app -> session;
-  my $record  = $session -> current_record;
-  $record -> {sid} = 'pst007';
-}
-
-
-sub init_search_test_finish {
-  my $app = shift;
-  my $session = $app -> session;
-  my $vars    = $app -> variables;
-  my $record  = $session -> current_record;
-
-  $session -> close;
-  $app -> {session} = undef;
-
-  $vars -> {name} = $record->{name};
-}
-
-
-
-
-
-1;
-
-__END__
-
-##############  THE BASEMENT  #####################################
 
 

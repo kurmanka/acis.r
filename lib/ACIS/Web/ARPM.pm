@@ -24,7 +24,7 @@ package ACIS::Web::ARPM;        ### -*-perl-*-
 #  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 #
 #  ---
-#  $Id: ARPM.pm,v 2.6 2007/03/05 17:00:34 ivan Exp $
+#  $Id: ARPM.pm,v 2.7 2007/03/05 23:14:19 ivan Exp $
 #  ---
 
 
@@ -35,7 +35,8 @@ use ACIS::Web;
 use ACIS::Web::SysProfile;
 
 require ACIS::Web::Contributions;
-require ACIS::Web::Contributions::Back;
+use ACIS::Resources::Suggestions;
+use ACIS::Resources::AutoSearch;
 
 use Web::App::Common qw( debug );
 
@@ -106,8 +107,7 @@ sub search {
   debug "prepare";
   ACIS::Web::Contributions::prepare_for_auto_search( $app );
   debug "original load";
-  $suggestions = ACIS::Web::Contributions::Back::load_suggestions
-       ( $app, $sid, 'contributions' );
+  $suggestions = load_suggestions( $app, $sid );
   $original = get_suggestions_ids( $suggestions );
 
   if ( scalar keys %$original ) {
@@ -197,8 +197,7 @@ sub search {
 
         ###  remove from suggestions, if its there
         if ( scalar keys %$clear_sids ) {
-          ACIS::Web::Contributions::Back::clear_from_autosearch_suggestions
-              ( $app, $sid, $clear_sids );
+          clear_from_autosearch_suggestions( $app, $sid, $clear_sids );
           $reread_suggestions = 1;
         }
         
@@ -246,14 +245,11 @@ sub search {
         
         if ( scalar @add_to_suggest_table ) {
           ###  add to suggestions: prepare data
-          ACIS::Web::Contributions::Back::save_suggestions
-              ( $sql, $sid, 'exact-person-id-match', 
-                '', \@add_to_suggest_table );
+          save_suggestions($sql, $sid, 'exact-person-id-match', '', \@add_to_suggest_table);
         }
         
         if ( scalar @reset_reason_sids ) {
-          ACIS::Web::Contributions::Back::set_suggestions_reason
-              ( $app, $sid, "exact-person-id-match", \@reset_reason_sids );
+          set_suggestions_reason($app, $sid, "exact-person-id-match", \@reset_reason_sids);
         }
         
         ###  add into variables as "suggest-by-handle"
@@ -276,16 +272,14 @@ sub search {
        or not defined $pref ->{'name-search'}
        or $pref -> {'name-search'} ) {
   
-    $suggestions = ACIS::Web::Contributions::Back::load_suggestions
-          ( $app, $sid, 'contributions' );
+    $suggestions = load_suggestions( $app, $sid, 'contributions' );
     
     my $count1 = count_suggestions  ( $suggestions );
     my $before = get_suggestions_ids( $suggestions );
     
-    ACIS::Web::Contributions::automatic_search( $app );
+    automatic_resource_search_now( $app );
 
-    $suggestions = ACIS::Web::Contributions::Back::load_suggestions
-          ( $app, $sid, 'contributions' );
+    $suggestions = load_suggestions( $app, $sid, 'contributions' );
     
     my $after  = get_suggestions_ids( $suggestions );
     my $count2 = count_suggestions  ( $suggestions );

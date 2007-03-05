@@ -250,6 +250,11 @@ lib/ACIS/Data/DumpXML/Parser.pm
 lib/ACIS/Debug/MLeakDetect.pm
 lib/ACIS/MetaUpdate/Request.pm
 lib/ACIS/Misc.pm
+lib/ACIS/Resources.pm
+lib/ACIS/Resources/AutoSearch.pm
+lib/ACIS/Resources/Search.pm
+lib/ACIS/Resources/SearchFuzzy.pm
+lib/ACIS/Resources/Suggestions.pm
 lib/ACIS/ShortIDs.pm
 lib/ACIS/UserData/Data/Record.pm
 lib/ACIS/UserData/User/Record.pm
