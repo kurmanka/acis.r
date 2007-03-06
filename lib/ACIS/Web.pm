@@ -23,7 +23,7 @@ package ACIS::Web;   ### -*-perl-*-
 #  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 #
 #  ---
-#  $Id: Web.pm,v 2.18 2007/02/28 21:45:06 ivan Exp $
+#  $Id: Web.pm,v 2.19 2007/03/06 22:35:56 ivan Exp $
 #  ---
 
 use strict;
@@ -97,6 +97,16 @@ sub new {
 #  $self -> {CGI_UNTAINT_INCLUDE_PATH} = 'ACIS::Web::CGI::Untaint';
   return $self;
 }
+
+
+sub config {
+  my ($self, $par) = @_;
+  if ( defined $par ) {
+    return $self ->{config} ->{lc $par};
+  }
+  $self->{config};
+}
+
 
 
 sub dump_xml_serializer {
