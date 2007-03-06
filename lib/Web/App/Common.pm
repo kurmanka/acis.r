@@ -25,7 +25,7 @@ package Web::App::Common;   ### -*-perl-*-
 #  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 #
 #  ---
-#  $Id: Common.pm,v 2.8 2007/03/05 17:00:34 ivan Exp $
+#  $Id: Common.pm,v 2.9 2007/03/06 22:36:25 ivan Exp $
 #  ---
 
 
@@ -34,13 +34,14 @@ use strict;
 
 require Exporter;
 
+use Carp;
 use Carp::Assert;
 
 use vars qw( @ISA @EXPORT @EXPORT_OK $LOGFILENAME $LOGCONTENTS $LOGPRINT );
 
 @ISA = qw( Exporter );
 
-@EXPORT    = qw( debug generate_id force_dir clear_undefined );
+@EXPORT    = qw( debug complain generate_id force_dir clear_undefined );
 @EXPORT_OK = qw( date_now debug_as_is convert_date_to_ISO );
 
 
@@ -107,9 +108,15 @@ sub generate_id {
 }
 
 
+sub complain (@) {
+  carp @_;
+  debug( @_ );
+  $Web::App::APP->errlog( @_ );
+}
 
 use vars qw( $dumped_debug );
 $dumped_debug = 0;
+
 
 sub debug {
   my $message = join '', @_;

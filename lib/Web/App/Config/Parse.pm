@@ -25,7 +25,6 @@ sub read_local_configuration {
     close FILE;
   }
   #print "Parsed $file\n";
-
   # get all of the parameters:
   my %c = $config -> varlist( '\w' );
   

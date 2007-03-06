@@ -25,7 +25,7 @@ package Web::App;   ### -*-perl-*-
 #  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 #
 #  ---
-#  $Id: App.pm,v 2.27 2007/03/01 00:31:23 ivan Exp $
+#  $Id: App.pm,v 2.28 2007/03/06 22:36:25 ivan Exp $
 #  ---
 
 
@@ -385,16 +385,12 @@ sub get_config {
       if $self -> {config};
   
   my $home = $self -> {home};
-
   my $config_bin = "$home/config.bin";
-
   if ( -f $config_bin ) {
-
     eval { 
       use Storable qw( retrieve );
                               
       my $list = retrieve $config_bin;
-      
       my $sc = $self -> {screenconf} = $list->[0];
       my $mc = $self -> {config}     = $list->[1];
 
@@ -455,14 +451,11 @@ sub get_screen {
 
 
 sub config {
-  my $self = shift;
-  my $par  = shift;
+  my ($self, $par) = @_;
   if ( defined $par ) {
-    return $self ->{config} ->{$par};
+    return $self ->{config} {$par};
   }
-  
-  return $self -> {config}
-      if $self -> {config};
+  $self -> {config};
 }
 
 
