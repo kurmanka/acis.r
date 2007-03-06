@@ -24,7 +24,7 @@ package ACIS::Web::ARPM;        ### -*-perl-*-
 #  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 #
 #  ---
-#  $Id: ARPM.pm,v 2.9 2007/03/06 22:37:09 ivan Exp $
+#  $Id: ARPM.pm,v 2.10 2007/03/06 23:49:01 ivan Exp $
 #  ---
 
 
@@ -301,6 +301,7 @@ sub search {
         }
         logit "name search: added ", $c;
     } 
+    elsif (scalar @suggest_exact) { $send_email = 1; }
 
     if ($add and scalar @$add) { $vars->{'added-by-name'} = $add; }
     if ($app->config('apu-research-mail-approx-hits')) { # include approximate matches also
@@ -327,10 +328,7 @@ sub search {
     }
 
     require Web::App::Email;
-    Web::App::Email::send_mail( $app,
-                                "email/arpm-notice.xsl",
-                                %params
-                              );
+    Web::App::Email::send_mail( $app, "email/arpm-notice.xsl", %params );
     logit "email sent";
 
     foreach ( qw( added-by-handle added-by-name 
