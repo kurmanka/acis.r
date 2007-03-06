@@ -31,12 +31,9 @@ sub run_fuzzy_searches {
 
   foreach ( @$namelist ) {
     my $search = search_resources_for_name_fuzzy( $sql, $context, $_ );
-    my $found = ( defined $search ) ? scalar( @$search ) : 'nothing' ;
+    my $found = ( defined $search ) ? scalar( @$search ) : 'nothing';
     logit "fuzzy name: '$_', found: $found";
-
-    if ( $search and scalar @$search ) {
-      save_suggestions( $sql, $context, 'fuzzy-name-variation-match', '', $search );
-    }
+    ACIS::Resources::AutoSearch::save_search_results($context, 'fuzzy-name-variation-match', $search);
   }
 
   logit "search_for_resources_fuzzy: exit";

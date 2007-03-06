@@ -30,6 +30,7 @@ require ACIS::Web::Contributions;
 
 sub prepare_search_context {
   my $app = shift;
+  my $init = shift || {};
   logit "prepare_search_context: start";
 
   my $sql = $app -> sql_object;
@@ -62,6 +63,7 @@ sub prepare_search_context {
   logit scalar( keys %$ignore_index ), " items in ignore list";
 
   return {
+          %$init,
     db      => $app->config('metadata-db-name'),
     found   => {},
     already => $ignore_index,
@@ -73,7 +75,7 @@ sub prepare_search_context {
 
 sub prepare_for_auto_search {
   my $app     = shift;
-  debug "prepare for autosearch: enter";
+  debug "prepare_for_auto_search: enter";
 
   my $session = $app -> session;
   my $record  = $session -> current_record() || die;
@@ -100,7 +102,7 @@ sub prepare_for_auto_search {
     if $name->{latin};
   $autosearch -> {'names-list-nice'} = $nicelist;
 
-  debug "prepare for auto search: exit";
+  debug "prepare_for_auto_search: exit";
   return $autosearch;
 }
 
@@ -171,27 +173,6 @@ sub get_bg_search_status {
 }
 
 
-sub do_auto_search {
-  my $app = shift;
-  my $session = $app -> session;
-  my $id      = $session -> current_record -> {id};
-
-  my $context = prepare_search_context( $app );
-  if ( not $session -> {$id} {'reloaded-accepted-contributions'} ) {
-    ACIS::Web::Contributions::reload_accepted_contributions( $app );
-  }
-  my $search  = search_for_resources_exact( $app, $context );
-
-  if ( $app -> config( "research-additional-searches" ) ) {
-    my $add     = additional_searches( $app, $context ); 
-    if ( $app->config( "fuzzy-name-search" ) ) {
-      my $search  = run_fuzzy_searches( $app, $context );
-    }
-  }
-}
-
-
-
 sub search_for_resources_exact {
   my $app     = shift;
   my $context = shift;
@@ -210,14 +191,24 @@ sub search_for_resources_exact {
     my $search = search_resources_for_exact_name( $sql, $context, $_ );
     my $found = ( defined $search ) ? scalar( @$search ) : 'nothing' ;
     logit "exact name: '$_', found: $found";
-    if ( $search and scalar @$search ) {
-      save_suggestions( $sql, $context, 'exact-name-variation-match', '', $search );
-    }
+    save_search_results( $context, 'exact-name-variation-match', $search );
   }
 
   logit "search_for_resources_exact: exit";
 }
 
+sub save_search_results {
+  my ($context,$reason,$results) = @_;
+  return undef if not $results or not scalar @$results;
+  my $sql = $ACIS::Web::ACIS->sql_object;
+  if ($context->{save_result_func}) {
+    my $save_func = $context->{save_result_func};
+    &{$save_func}   ( $sql, $context, $reason, '', $results );
+  } else {
+    save_suggestions( $sql, $context, $reason, '', $results );
+  }
+  return 1;
+}
 
 sub additional_searches {
   my $app     = shift;
@@ -245,7 +236,7 @@ sub additional_searches {
     
     if ( $search and scalar @$search ) {
       if ( $found < 200 ) { 
-        save_suggestions( $sql, $context, 'name-variation-part-match', '', $search );
+        save_search_results( $context, 'name-variation-part-match', $search );
       } else {
         logit "too many hits, ignoring";
       }
@@ -257,7 +248,7 @@ sub additional_searches {
     my $email = $record -> {contact} {email};
     if ( $email ) {
       my $by_email = search_resources_by_creator_email($sql, $context, $email);
-      save_suggestions( $sql, $context, 'exact-email-match', '', $by_email );
+      save_search_results( $context, 'exact-email-match', $by_email );
     }
   }
 
@@ -270,7 +261,7 @@ sub additional_searches {
     logit "suggestions by surname as a word: $found";
     if ( $found > 0 ) {
       if ( $found < 200 ) { 
-        save_suggestions( $sql, $context, 'surname-part-match', '',  $suggestions_3 );
+        save_search_results( $context, 'surname-part-match', $suggestions_3 );
       } else {
         logit "too many hits, ignoring";
       }
@@ -284,6 +275,28 @@ sub additional_searches {
 
 
 
+
+sub do_auto_search {
+  my $app = shift;
+  my $settings = shift;
+  my $session = $app -> session;
+  my $id      = $session -> current_record -> {id};
+
+  my $context = prepare_search_context( $app, $settings );
+  if ( not $session -> {$id} {'reloaded-accepted-contributions'} ) {
+    ACIS::Web::Contributions::reload_accepted_contributions( $app );
+  }
+  search_for_resources_exact( $app, $context );
+
+  if ( $app -> config( "research-additional-searches" ) ) {
+    additional_searches( $app, $context ); 
+    if ( $app->config( "fuzzy-name-search" ) ) {
+      run_fuzzy_searches( $app, $context );
+    }
+  }
+}
+
+
 sub automatic_resource_search_now {
   my $app = shift;
   my $session = $app -> session;
@@ -291,7 +304,7 @@ sub automatic_resource_search_now {
   my $id      = $record ->{id};
   my $sid     = $record ->{sid};
   prepare_for_auto_search( $app );
-  do_auto_search( $app );
+  do_auto_search( $app, @_ );
   search_done( $app );
   return 1;
 }

@@ -213,7 +213,6 @@
       </xsl:choose>
 
       <xsl:text>to your Research Profile:</xsl:text>
-      
     </p>
 
     <xsl:call-template name='list-works'>
@@ -252,18 +251,14 @@
   </xsl:template>      
 
 
-  
 
   <xsl:template match='suggest-by-name'>
 
-    <p>
-      <xsl:call-template name='found-by-name-intro'/>
-    </p>
+    <p><xsl:call-template name='found-by-name-intro'/></p>
 
     <xsl:call-template name='list-works'>
       <xsl:with-param name='works' select='$suggest-by-name'/>
     </xsl:call-template>
-
 
   </xsl:template>      
 

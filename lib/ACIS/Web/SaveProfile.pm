@@ -23,7 +23,7 @@ package ACIS::Web::SaveProfile;   ### -*-perl-*-
 #  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 #
 #  ---
-#  $Id: SaveProfile.pm,v 2.2 2007/02/21 21:51:06 ivan Exp $
+#  $Id: SaveProfile.pm,v 2.3 2007/03/06 22:37:09 ivan Exp $
 #  ---
 
 use strict;
@@ -65,6 +65,9 @@ sub save_profile {
       use ACIS::Web::Export;
       my $res = ACIS::Web::Export::redif( $app, $record );
       debug( "ReDIF export: ", (($res) ? "OK" : "FAILED") );
+      if (not $res) {
+        debug "res: $res";
+      }
 
       $res = ACIS::Web::Export::amf( $app, $record );
       debug( "AMF export: ", (($res) ? "OK" : "FAILED") );

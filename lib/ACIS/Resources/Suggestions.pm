@@ -29,8 +29,12 @@ sub save_suggestions {
   my $context = shift || die;
   my $reason  = shift || die;
   my $role    = shift;
+
+  debug "save_suggestions(): start";
   my $doclist = shift || return 0;
   if ( not scalar @$doclist ) { return 0; }
+  debug "reason: $reason";
+  debug "items: ", scalar @$doclist;
 
   my $psid   = $context -> {sid} || die;
   my $already_suggested = $context -> {already_suggested} || die;
@@ -85,6 +89,7 @@ sub save_suggestions {
       }
     }
   }
+  debug "save_suggestions(): end";
 }
   
 

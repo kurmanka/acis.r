@@ -32,7 +32,7 @@ sub make_resource_item_from_db_row {
   my $item;
   eval { $item = thaw ( $data ); };
   if ( $@ ) { 
-    warn "failed to thaw() a database-loaded resource record: $@";
+    complain "failed to thaw() a database-loaded resource record: $@";
     $item = $row; 
     delete $row ->{data}; 
     undef $@; 
@@ -89,28 +89,33 @@ sub load_resources_by_ids {
   return \@list;
 }
 
+# this is used by functions below and by the SearchFuzzy module
 sub process_resources_search_results {
   my $sqlres  = shift || die;
   my $context = shift;
   my $result  = shift;  ## array ref
 
-  my $found_hash     = $context ->{found};
-  my $current_hash   = $context ->{already};
+  my $found_hash   = $context ->{found};
+  my $filter_hash  = $context ->{already};
 
   my $row;
   while ( $row = $sqlres->{row} ) {
     # for some reason, the $row is sometimes empty; at least it doesn't
     # contain any useful data
-    my $id  = $row -> {id} || '';
+    my $id  = $row -> {id} || next;
   
     if ( $id and $found_hash->{$id}++ ) { next; }
-    if ( $current_hash->{$id} ) { next; }
+    if ( $filter_hash->{$id} ) { next; }
     
-    my $item = make_resource_item_from_db_row( $row );
+# for performance reasons put make_resource_.. inline:
+#    my $item = make_resource_item_from_db_row( $row ); 
+    my $item = thaw( $row ->{data} );
 
     if ( not $item or not $item->{id} or not $item->{sid} ) {
-      warn "bad document record found: ", Dumper( $row ), "(id: $id)";
+      complain "bad document record found: ", Dumper( $row ), "(id: $id)";
     } else {
+      $item ->{role} = $row->{role} 
+        if $row->{role};
       push @$result, $item;
     }
     
@@ -191,14 +196,9 @@ sub search_resources_by_creator_email {
   my $result  = [];
 
   ###  the query
-  $sql -> prepare_cached( 
-     query_resources 'res_creators_separate', 'catch.email = ?'  
-                        );
+  $sql -> prepare_cached(query_resources 'res_creators_separate', 'catch.email=?');
  
-#  warn "SQL: " . $sql->error if $sql->error;
   my $res = $sql->execute ( lc $email );
-#  warn "SQL: " . $sql->error if $sql->error;
-
   if ( $res ) {
     debug "query for exact creator email: '$email', found: " . $res -> rows . " items";
     process_resources_search_results( $res, $context, $result );

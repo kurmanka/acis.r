@@ -15,8 +15,12 @@ require ACIS::APU::Queue;
 #####  MAIN PART  
 
 my $acis = ACIS::Web -> new( home => $homedir );
-my $clearlock;
 
+#use Data::Dumper;
+#debug Dumper( $acis->config );
+#exit;
+
+my $clearlock;
 my $queue;
 my $auto = 1;
 my $failed = 0;

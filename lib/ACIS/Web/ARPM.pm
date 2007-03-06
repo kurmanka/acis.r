@@ -24,7 +24,7 @@ package ACIS::Web::ARPM;        ### -*-perl-*-
 #  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 #
 #  ---
-#  $Id: ARPM.pm,v 2.8 2007/03/05 23:39:53 ivan Exp $
+#  $Id: ARPM.pm,v 2.9 2007/03/06 22:37:09 ivan Exp $
 #  ---
 
 
@@ -61,15 +61,11 @@ my $sql    ;
 my $contributions ;
 my $accepted      ;
 #my $refused       ;
-
 my $already_accepted;
 my $already_rejected;
-
 my $pref            ;
-
 my $suggestions;
 my $original ;
-
 my $pretend;
 
 
@@ -270,53 +266,48 @@ sub search {
        or not defined $pref ->{'name-search'}
        or $pref -> {'name-search'} ) {
   
-    $suggestions = load_suggestions( $app, $sid, 'contributions' );
-    
-    my $count1 = count_suggestions  ( $suggestions );
-    my $before = get_suggestions_ids( $suggestions );
-    
-    automatic_resource_search_now( $app );
-
-    $suggestions = load_suggestions( $app, $sid, 'contributions' );
-    
-    my $after  = get_suggestions_ids( $suggestions );
-    my $count2 = count_suggestions  ( $suggestions );
-
-    if ( $count1 < $count2 ) {
-      logit "name search: something found";
-
-      ### something found
-      my $suggest = [];
-      my $added   = [];
-
-      my $new  = compare_hashes( $before, $after );
-      my ( $exactlist, $approxlist ) = straighthen_works_hash( $new ); 
-      
-      if ( scalar @$exactlist ) {
-
-        $send_email = 1;
-        if ( $pref -> {'add-by-name'} ) {
-          ###  add to $accepted
-          foreach ( @$exactlist ) {
-            ACIS::Web::Contributions::accept_item( $_ );
-          }
-          logit "name search: added ", scalar @$exactlist;
-
+    my $add = [];
+    my @suggest_exact;
+    my @suggest_approx;
+    my $handler = sub { # auto-add handler
+      my ($sql,$context,$reason,$role,$results) = @_;
+      if ($reason eq 'exact-name-variation-match'
+          or $reason eq 'exact-email-match') {
+        if ($add) {
+          push @$add, @$results;
+          return;
         } else {
-          push @$suggest, @$exactlist;
+          push @suggest_exact, @$results;
         }
+      } else {
+        push @suggest_approx, @$results;
       }
-      
-      if ( scalar @$approxlist ) {
-        push @$suggest, @$approxlist;
-      }
+      # default action:
+      save_suggestions(@_);
+    };
+    if ( not $pref->{'add-by-name'} ) {
+      undef $add; 
+    }
 
-      if ( scalar @$added )   { $vars -> {'added-by-name' }  = $added;   }
-      if ( scalar @$suggest ) { $vars -> {'suggest-by-name'} = $suggest; }
-      
+    automatic_resource_search_now( $app, { save_result_func => $handler } );
+
+    if ( $add and scalar @$add ) {
+        $send_email = 1;
+        ###  add to accepted contributions
+        my $c = 0;
+        foreach ( @$add ) {
+          ACIS::Web::Contributions::accept_item( $_ );
+          $c++;
+        }
+        logit "name search: added ", $c;
+    } 
+
+    if ($add and scalar @$add) { $vars->{'added-by-name'} = $add; }
+    if ($app->config('apu-research-mail-approx-hits')) { # include approximate matches also
+      my @sug = (@suggest_exact, @suggest_approx);
+      if (scalar @sug) { $vars->{'suggest-by-name'} = \@sug; }
     } else {
-      ### nothing interesting
-#      logit "name search: nothing found";
+      if (scalar @suggest_exact) { $vars->{'suggest-by-name'} = \@suggest_exact; }
     }
   }
 
@@ -463,3 +454,43 @@ sub straighthen_works_hash {
 
 
 1;
+
+__END__
+
+    #### a piece of name searсh:
+
+    $suggestions = load_suggestions( $app, $sid, 'contributions' );
+    my $count1 = count_suggestions  ( $suggestions );
+    my $before = get_suggestions_ids( $suggestions );
+    automatic_resource_search_now( $app );
+    $suggestions = load_suggestions( $app, $sid, 'contributions' );
+    my $after  = get_suggestions_ids( $suggestions );
+    my $count2 = count_suggestions  ( $suggestions );
+    if ( $count1 < $count2 ) {
+      logit "name search: something found";
+      ### something found
+      my $suggest = [];
+      my $added   = [];
+      my $new  = compare_hashes( $before, $after );
+      my ( $exactlist, $approxlist ) = straighthen_works_hash( $new ); 
+      if ( scalar @$exactlist ) {
+        $send_email = 1;
+        if ( $pref -> {'add-by-name'} ) {
+          ###  add to $accepted
+          foreach ( @$exactlist ) {
+            ACIS::Web::Contributions::accept_item( $_ );
+          }
+          logit "name search: added ", scalar @$exactlist;
+        } else {
+          push @$suggest, @$exactlist;
+        }
+      }
+      if ( scalar @$approxlist ) {
+        push @$suggest, @$approxlist;
+      }
+      if ( scalar @$added )   { $vars -> {'added-by-name' }  = $added;   }
+      if ( scalar @$suggest ) { $vars -> {'suggest-by-name'} = $suggest; }
+    } else {
+      ### nothing interesting
+#      logit "name search: nothing found";
+    }
