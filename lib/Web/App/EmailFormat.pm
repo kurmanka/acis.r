@@ -32,19 +32,19 @@ sub format_email {
 
 ####  IMPLEMENTATION 
 
-
 my $right_margin = 73;
 my $left_margin  = 0;
 
 sub wrap {
   my $line   = shift;
   my $prefix = shift;
-
+  
   if ( length( $line ) > $right_margin ) {
     my $first_line_end = rindex( $line, " ", $right_margin );
-
     if ( $first_line_end > 1
-         and $first_line_end > $left_margin ) {
+         and $first_line_end > $left_margin
+         and $first_line_end > length($prefix)
+       ) {
       ###  the line can be safely wrapped
     } else {
       $first_line_end = index( $line, " ", $right_margin );
@@ -90,6 +90,15 @@ sub format_para {
 
 
 ## &test();
+
+sub test2 {
+  if( open T, "<:utf8", "/home/ivan/dev/acis/local/incidents/2007-03-07/difficult-body" ) {
+  } else { die 'cant open the file'; }
+  my $b = join('', <T>);
+  close T;
+  
+  print format_email( $b );
+}
 
 sub test {
 my $test = q!Dear %/1€koi8-rçÁ×ÒÉÌÁ %/1€koi8-rìÁÄÏÛÉÎ,

@@ -24,7 +24,7 @@ package ACIS::Web::ARPM;        ### -*-perl-*-
 #  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 #
 #  ---
-#  $Id: ARPM.pm,v 2.11 2007/03/07 01:07:49 ivan Exp $
+#  $Id: ARPM.pm,v 2.12 2007/03/07 22:20:20 ivan Exp $
 #  ---
 
 
@@ -259,7 +259,7 @@ sub search {
   ###  does user want us to do a name search?
   if ( not defined $pref 
        or not defined $pref ->{'name-search'}
-       or $pref -> {'name-search'} ) {
+       or $pref -> {'name-search'} ) {{ # double braces for the last statement used inside it
   
     my $add = [];
     my @suggest_exact;
@@ -315,7 +315,8 @@ sub search {
     }
 
     $vars->{'suggest-by-name'} = $s;
-  }
+  }} ### double braces intentional -- needed for the "last" statement
+  
 
   
   if ( $send_email ) {
