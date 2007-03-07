@@ -2,7 +2,6 @@ package Web::App::EmailFormat;
 
 use strict;
 
-
 #####   INTERFACE
 
 #####   This module can nicely format email messages from the intermediary
@@ -24,6 +23,7 @@ sub format_email {
   my @lines = split( /\n/, $in );
   foreach ( @lines ) {
     $out .= format_para( $_ );
+    $out .= "\n";
   }
 
   return $out;
@@ -46,7 +46,6 @@ sub wrap {
     if ( $first_line_end > 1
          and $first_line_end > $left_margin ) {
       ###  the line can be safely wrapped
-
     } else {
       $first_line_end = index( $line, " ", $right_margin );
     }
@@ -55,16 +54,13 @@ sub wrap {
       ###  normal case
       my $first_line = substr( $line, 0, $first_line_end );
       my $rest       = $prefix . substr( $line, $first_line_end+1 );
-      
-      return "$first_line\n" . wrap( $rest, $prefix );
-
+      return "$first_line\n" . wrap( $rest, $prefix ) . "\n";
     } else {
       ### can't wrap this line -- nowhere we can break
     }
-
   } 
   
-  return "$line\n";
+  return $line;
 } 
 
 
@@ -76,6 +72,7 @@ sub format_para {
   my $prefix = '';
 
   if ( $str =~ /^(\s+\W?\s*)(.+)/ ) {
+    # \W stands for a possible bullet in front of an list item
     $start = $1;
     $str   = $2;
     $prefix = ' ' x length( $1 );
@@ -83,12 +80,13 @@ sub format_para {
 
   my @lines = split( m!\^\^\^!, $str );
   foreach ( @lines ) {
-    my $l = $start . wrap( $_, $prefix );
-    $para .= $l;    
+    $para .= $start;
+    $para .= wrap( $_, $prefix );
+    $para .= "\n";
     $start = $prefix;
   }
 
-  return "$para\n";
+  return $para;
 }
 
 

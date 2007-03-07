@@ -9,6 +9,8 @@ use vars qw( @EXPORT @EXPORT_OK @ISA );
 @EXPORT_OK = qw( send_mail );
 
 use Web::App::Common;
+require Web::App::EmailFormat;
+use Encode qw( encode );
 
 ##############################################################
 ####################   EMAIL  SENDING   ######################
@@ -36,9 +38,7 @@ sub send_mail {
 
   {
     my @presenteropt = ();
-
-    if ( $app -> config( 'debug-email-data-log' ) ) {
-      my $log = $app -> config( 'debug-email-data-log' );
+    if ( my $log = $app -> config( 'debug-email-data-log' ) ) {
       ###  Logging the generated email text
       my $home = $app -> home;
       my $feeddatastring = sub { 
@@ -61,20 +61,20 @@ sub send_mail {
 
     ###  Presenter can generate email headers.  Here they are:
     my ( $pheaders, $pbody );
-    if ( $$textref =~ m/^(.+?)\n\n+(.+)$/s ) {
-      $pheaders = $1;
-      $pbody    = $2;
+    if ( my $p = index( $$textref, "\n\n" ) > -1 ) {
+      $pheaders = substr( $$textref, 0, $p );
+      $pbody = substr( $$textref, $p+2 );
+
     } else {
-      die "presenter's text doesn't match: $$textref";
+      complain "can't find where headers end and body begins";
+      die "can't find where headers end and body begins";
     }
 
 #    debug "header part: '''$pheaders'''";
     foreach ( split /\n/, $pheaders ) {
       my ( $k, $v ) = $_ =~ /^([^:\s]+):\s+(.+)$/;
-      
-      if ( not $k
-           or not $v ) {
-        warn "bad header line: '$_'";
+      if ( not $k or not $v ) {
+        complain "bad header line: '$_'";
         next;
       }
       
@@ -83,14 +83,13 @@ sub send_mail {
       debug "from presenter: $k=($v)";
     }
 
-    ###  Email body has to be formatted before sending though.
-    require Web::App::EmailFormat;
+    # mail body has to be formatted before sending:
     $body = Web::App::EmailFormat::format_email( "$pbody\n" );
   }
+  debug "body formatted: ", length( $body ), " chars";
 
-
-  ###  Now the user-supplied header parameters override the default and the
-  ###  presenter's ones.
+  #  Now the user-supplied header parameters override the default and the
+  #  presenter's ones.
   foreach ( keys %para ) {
     if ( m/^\-(\w.+)/ ) {
       my $k = ucfirst $1;
@@ -100,46 +99,34 @@ sub send_mail {
     }
   }
 
-
-  ###  Now building a header string (from a hash) and encoding the values in
-  ###  it.
-
-  use Encode qw( encode );
-
+  #  Now we build a header string (from a hash) and encode the values in it
   foreach ( sort keys %head ) {
     my $name  = $_;
-    my $value = $head {$name};
-
+    my $value = $head{$name};
     my $val   = encode( 'MIME-Q', $value );
     ### XX a nasty hack to fix Encode's "feature":
     $val =~ s!\"\n\s+!\"!;  
-
     $header .= "$name: $val\n";
   }
   
-
   my $sendmail = $config -> {sendmail};
-  
   if ( not defined $sendmail 
        or not $sendmail ) {
     debug "can't send email message, because no sendmail prog defined";
     return;
   }
 
-  
+  debug "open sendmail: $sendmail";
   if ( open MESSAGE, "|-:utf8", $sendmail ) {
     print MESSAGE $header, "\n", $body;
     close MESSAGE;
-
   } else {
     $app -> errlog( "can't open a pipe to sendmail: $sendmail" );
     return undef;
   }
 
-
   my $to = $head{To};
   my $cc = $head{Cc};
-
   $app -> sevent ( -class => 'email',
                    -action => 'sent',
                  -template => $stylesheet,
