@@ -53,6 +53,9 @@
   <xsl:variable name='suggest-by-name-count' 
                 select='count(//suggest-by-name/list-item)'/>
 
+  <xsl:variable name='suggest-by-name-listed-first'  select='number(//suggest-by-name-listed-first)'/>
+  <xsl:variable name='suggest-by-name-total-number'  select='number(//suggest-by-name-total-number)'/>
+
 
   <xsl:variable name='anything-added'
                 select='$added-by-handle-count + $added-by-name-count'/>
@@ -75,8 +78,6 @@
 
   <xsl:variable name='original-suggestions-count'
                 select='count(//original-suggestions/list-item)'/>
-
-
 
 
 
@@ -259,6 +260,11 @@
     <xsl:call-template name='list-works'>
       <xsl:with-param name='works' select='$suggest-by-name'/>
     </xsl:call-template>
+
+    <xsl:if test='$suggest-by-name-listed-first'>
+      <p>(Listed above are the first <xsl:value-of select='$suggest-by-name-listed-first'/>
+      of total <xsl:value-of select='$suggest-by-name-total-number'/> items found.)</p>
+    </xsl:if>
 
   </xsl:template>      
 

@@ -251,16 +251,6 @@ might be helpful for debugging the XSLT stylesheets.
 Default: undef, ie. feature is off.</dd>
 
 
-<dt><C>echo-apu-mails</C></dt>
-
-<dd>Whether or not send a copy of all APU mails to the
-service admin.  If set to true, admin's email will be added
-into the <code>BCC:</code> field.
-</dd>
-
-<!-- <dt><C>echo-arpu-mails</C></dt>
-<dd>an obsolete parameter, which was replaced with
-<c>echo-apu-mails</c></dd> -->
 
 <dt><C>log-profiling-data</C></dt>
 
@@ -300,6 +290,16 @@ sometimes they would find works for the users, which would
 not have been found otherwise.  Default: off.</dd>
 
 
+<dt><C>fuzzy-name-search</C></dt>
+
+<dd>Type: Boolean.  Run or not run fuzzy-matching during the research
+automatic searches?  The value does not matter if
+<c>research-additional-searches</c> is untrue, because fuzzy
+searches are a kind of additional searches.  Default: no, do
+not run.</dd>
+
+
+
 <dt><C>minimum-apu-period-days</C></dt>
 
 <dd>Type: integer number.  This is the miminum number of
@@ -310,6 +310,48 @@ been done for it less than that many days ago.  Default: 21
 effect on some users in case of a growing database, if every
 time at APU something is found and every time an email is
 sent.)</dd>
+
+
+<dt><C>echo-apu-mails</C></dt>
+
+<dd>Type: Boolean.  Whether or not send a copy of all APU
+mails to the service admin.  If set to true, admin's email
+will be added into the <code>BCC:</code> field.  </dd>
+
+<!-- <dt><C>echo-arpu-mails</C></dt>
+<dd>an obsolete parameter, which was replaced with
+<c>echo-apu-mails</c></dd> -->
+
+
+<dt><C>apu-research-mail-include-approx-hits</C></dt>
+
+<dd>Type: Boolean.  Include approximate (non-exact) matches
+into the ARPU mail?  Default: no.</dd>
+
+
+<dt><C>apu-research-max-suggestions-in-a-mail</C></dt>
+
+<dd>How many research items to list in an ARPU mail at most?
+Default: no limit.</dd>
+
+
+<dt><C>apu-citations-auto-add-limit</C></dt>
+
+<dd>Add no more than this given amount of citations to a
+person profile in one APU go.  Default: no limit.</dd>
+
+
+<dt><C>disable-citation-mails</C></dt>
+
+<dd>Type: Boolean.  Do not send APU-citation mails (even if
+changes have been done to a profile during APU).</dd>
+ 
+
+
+<dt><C></C></dt>
+
+<dd></dd>
+
 
 
 

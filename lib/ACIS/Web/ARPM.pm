@@ -24,7 +24,7 @@ package ACIS::Web::ARPM;        ### -*-perl-*-
 #  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 #
 #  ---
-#  $Id: ARPM.pm,v 2.10 2007/03/06 23:49:01 ivan Exp $
+#  $Id: ARPM.pm,v 2.11 2007/03/07 01:07:49 ivan Exp $
 #  ---
 
 
@@ -60,7 +60,6 @@ my $sql    ;
 
 my $contributions ;
 my $accepted      ;
-#my $refused       ;
 my $already_accepted;
 my $already_rejected;
 my $pref            ;
@@ -90,8 +89,6 @@ sub search {
   ACIS::Web::Contributions::prepare( $app );
   $contributions = $vars -> {contributions};
   $accepted      = $contributions ->{accepted};
-#  $refused       = $contributions ->{refused};
-
   $already_accepted = $contributions -> {'already-accepted'};
   $already_rejected = $contributions -> {'already-refused'};
   $pref        = $contributions -> {preferences} {arpm};
@@ -107,8 +104,6 @@ sub search {
   if ( scalar keys %$original ) {
     $vars -> {'original-suggestions'} = $original;
   }
-#  $vars -> {'original-already-accepted'} = join ' ', keys %$already_accepted;
-#  $vars -> {'original-already-rejected'} = join ' ', keys %$already_rejected;
 
   ###  Handle search
   {
@@ -302,14 +297,24 @@ sub search {
         logit "name search: added ", $c;
     } 
     elsif (scalar @suggest_exact) { $send_email = 1; }
+    else { last; }
 
     if ($add and scalar @$add) { $vars->{'added-by-name'} = $add; }
-    if ($app->config('apu-research-mail-approx-hits')) { # include approximate matches also
-      my @sug = (@suggest_exact, @suggest_approx);
-      if (scalar @sug) { $vars->{'suggest-by-name'} = \@sug; }
-    } else {
-      if (scalar @suggest_exact) { $vars->{'suggest-by-name'} = \@suggest_exact; }
+    my $s = \@suggest_exact;
+    if ($app->config('apu-research-mail-include-approx-hits')) { # include approximate matches also
+      push @$s, @suggest_approx; 
+      $vars->{'suggest-by-name-includes-approx'}= scalar @suggest_approx;
     }
+    
+    if (my $max = $app->config('apu-research-max-suggestions-in-a-mail')) {
+      if ( (my $all = scalar @$s) > $max ) {
+        $#$s = $max-1;
+        $vars->{'suggest-by-name-listed-first'}=$max;
+        $vars->{'suggest-by-name-total-number'}=$all;
+      }
+    }
+
+    $vars->{'suggest-by-name'} = $s;
   }
 
   
@@ -380,115 +385,4 @@ sub get_suggestions_ids {
 }
 
 
-
-sub compare_hashes {
-  my $first = shift;
-  my $secon = shift;
-  
-  my $diff  = {};
-
-  foreach ( keys %$secon ) {
-    my $k = $_;
-    my $v = $secon ->{$k};
-    
-    if ( not $first -> {$k} ) {
-      $diff -> {$k} = $v;
-    }
-  }
-  return $diff;
-}
-
-
-
-sub straighthen_works_hash {
-  my $hash = shift;
-  
-  ###  Group suggestions by certainty, and return in order of decreasing
-  ###  certainty, in such groups.
-
-  my @handle = ();
-  my @exact  = ();
-  my @approx = ();
-  my @bysurname = ();
-
-  foreach ( keys %$hash ) {
-    my $v = $hash -> {$_};
-    my $r = $v ->{reason};
-
-#    logit "work: " . $v->{title} . " ($r)";
-    
-    if ( $r eq 'exact-person-id-match' ) {
-      $v -> {status} = 1;
-      push @handle, $v;
-#      logit "> handle group";
-
-    } elsif ( $r =~ m/\bexact\b/ ) {
-      $v -> {status} = 1;
-      push @exact, $v;
-#      logit "> exact group";
-
-    } elsif ( $r =~ m/appro/ ) {
-      push @approx, $v;
-#      logit "> approximate group";
-      
-    } elsif ( $r eq 'surname-part-match' ) {
-      push @bysurname, $v;
-#      logit "> just surname group";
-
-    } elsif ( $r =~ m/\bpart\b/ ) {
-      push @approx, $v;
-#      logit "> approx group";
-
-    } else {
-#      logit "no reason or an unknown reason";
-    }
-  }
-
-  my @list1 = ( @handle, @exact );
-  my @list2 = ( @approx );
-
-  return ( \@list1, \@list2, \@bysurname );
-}
-
-
 1;
-
-__END__
-
-    #### a piece of name searсh:
-
-    $suggestions = load_suggestions( $app, $sid, 'contributions' );
-    my $count1 = count_suggestions  ( $suggestions );
-    my $before = get_suggestions_ids( $suggestions );
-    automatic_resource_search_now( $app );
-    $suggestions = load_suggestions( $app, $sid, 'contributions' );
-    my $after  = get_suggestions_ids( $suggestions );
-    my $count2 = count_suggestions  ( $suggestions );
-    if ( $count1 < $count2 ) {
-      logit "name search: something found";
-      ### something found
-      my $suggest = [];
-      my $added   = [];
-      my $new  = compare_hashes( $before, $after );
-      my ( $exactlist, $approxlist ) = straighthen_works_hash( $new ); 
-      if ( scalar @$exactlist ) {
-        $send_email = 1;
-        if ( $pref -> {'add-by-name'} ) {
-          ###  add to $accepted
-          foreach ( @$exactlist ) {
-            ACIS::Web::Contributions::accept_item( $_ );
-          }
-          logit "name search: added ", scalar @$exactlist;
-        } else {
-          push @$suggest, @$exactlist;
-        }
-      }
-      if ( scalar @$approxlist ) {
-        push @$suggest, @$approxlist;
-      }
-      if ( scalar @$added )   { $vars -> {'added-by-name' }  = $added;   }
-      if ( scalar @$suggest ) { $vars -> {'suggest-by-name'} = $suggest; }
-    } else {
-      ### nothing interesting
-#      logit "name search: nothing found";
-    }
