@@ -54,7 +54,7 @@ sub wrap {
       ###  normal case
       my $first_line = substr( $line, 0, $first_line_end );
       my $rest       = $prefix . substr( $line, $first_line_end+1 );
-      return "$first_line\n" . wrap( $rest, $prefix ) . "\n";
+      return "$first_line\n" . wrap( $rest, $prefix );
     } else {
       ### can't wrap this line -- nowhere we can break
     }
@@ -67,7 +67,6 @@ sub wrap {
 sub format_para {
   my $str = shift;
   my $para = '';
-  
   my $start  = '';
   my $prefix = '';
 
@@ -85,7 +84,6 @@ sub format_para {
     $para .= "\n";
     $start = $prefix;
   }
-
   return $para;
 }
 

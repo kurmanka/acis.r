@@ -61,19 +61,21 @@ sub send_mail {
 
     ###  Presenter can generate email headers.  Here they are:
     my ( $pheaders, $pbody );
-    if ( my $p = index( $$textref, "\n\n" ) > -1 ) {
+    if ( (my $p = index( $$textref, "\n\n" )) > -1 ) {
       $pheaders = substr( $$textref, 0, $p );
-      $pbody = substr( $$textref, $p+2 );
+      $pbody    = substr( $$textref, $p+2 );
 
     } else {
       complain "can't find where headers end and body begins";
       die "can't find where headers end and body begins";
     }
 
-#    debug "header part: '''$pheaders'''";
+    debug "header part: '''$pheaders'''";
+    debug "body part: '''$pbody'''";
     foreach ( split /\n/, $pheaders ) {
       my ( $k, $v ) = $_ =~ /^([^:\s]+):\s+(.+)$/;
       if ( not $k or not $v ) {
+        die "bad header line: '$_'";
         complain "bad header line: '$_'";
         next;
       }
@@ -87,6 +89,7 @@ sub send_mail {
     $body = Web::App::EmailFormat::format_email( "$pbody\n" );
   }
   debug "body formatted: ", length( $body ), " chars";
+#  debug "body formatted: ", $body, "\n-------";
 
   #  Now the user-supplied header parameters override the default and the
   #  presenter's ones.
