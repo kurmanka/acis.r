@@ -57,7 +57,7 @@ sub send_mail {
     my $textref = $app -> run_presenter( $stylesheet, @presenteropt );
     # run_presenter() may return a string or a reference to a string:
     if (not ref $textref) { my $t = $textref; $textref = \$t; }
-    debug "presenter generated: '''$$textref'''";
+#    debug "presenter generated: '''$$textref'''";
 
     ###  Presenter can generate email headers.  Here they are:
     my ( $pheaders, $pbody );
