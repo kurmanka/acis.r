@@ -210,15 +210,51 @@ userdata record -> {doclinks}
 
 1. get configuration
 
-2. get existing links (by a user)
+   - parse it (ACIS::DumpXML::Parse)
+
+   - check it (validate)
+
+   - query configuration:
+
+         $lab = $conf->type('follow-up')->label;
+         $rev = $conf->type('follow-up')->rev;
+         $rnm = $conf->type('follow-up')->rev->name;
+
+     or 
+
+         $lab = $conf->label('follow-up');
+         $rna = $conf->rev('follow-up');
+         $rla = $conf->revlabel('follow-up');
+
+
+2. get all current links for a record - an optional, but potentially
+   useful abstraction level
+
+       my $l = get_doclinks( $record );
+       save_doclinks( $record, $l );
+
+2. get current links for a document
+
+       $l->for_document( $dsid );
+       $l->to_document( $dsid );   #?
+       $l->from_document( $dsid ); #?
+       $l->label($type)
+       $l->all_expanded;
+       $l->all_compact;
+       $l->count;
 
 3. create a link, drop a link
+
+       $l->add($dsid1,$type,$dsid2);
+       $l->drop($dsid1,$type,$dsid2);
 
 4. screen
 
 
 ### screen design
 
+- use Yahoo! UI javascript library?
 
+- use http://script.aculo.us/?
 
 

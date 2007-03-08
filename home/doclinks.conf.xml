@@ -1,0 +1,22 @@
+<data>
+  <link-types>
+    <previous-version>
+      <label>is an earlier version of</label>
+      <reverse>follow-up</reverse>
+    </previous-version>
+    <follow-up>
+      <label>is a follow-up to</label>
+      <reverse>previous-version</reverse>
+    </follow-up>
+    <related>
+      <label>is related to</label>
+    </related>
+    <cites>
+      <label>cites</label>
+      <reverse>is-cited-by</reverse>
+    </cites>
+    <is-cited-by>
+      <label>is cited by</label>
+    </is-cited-by>
+  </link-types>
+</data>

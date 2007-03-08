@@ -127,6 +127,7 @@ home/bin/templates/upgrade_to_1.5.4.pl
 home/bin/templates/upgrade_to_1.5.7.pl
 home/configuration.xml
 home/contributions.conf.xml
+home/doclinks.conf.xml
 home/plugins/Processing/ACIS_UD/configuration.xml
 home/presentation/default/adm/events-decode.xsl
 home/presentation/default/adm/events-overview.xsl
@@ -248,6 +249,7 @@ lib/ACIS/Citations/Utils.pm
 lib/ACIS/Data/DumpXML.pm
 lib/ACIS/Data/DumpXML/Parser.pm
 lib/ACIS/Debug/MLeakDetect.pm
+lib/ACIS/DocLinks.pm
 lib/ACIS/MetaUpdate/Request.pm
 lib/ACIS/Misc.pm
 lib/ACIS/Resources.pm
