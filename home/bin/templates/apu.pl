@@ -1,12 +1,9 @@
 
 use Carp::Assert;
-
 use sql_helper;
 use ACIS::Web;
-
 use Web::App::Common;
-
-
+use strict;
 use warnings;
 
 require ACIS::APU;
@@ -69,7 +66,7 @@ if ( $queue ) {
   my $lockfile = "$homedir/apu-running.lock";
   if ( mkdir $lockfile ) {
     $clearlock = $lockfile;
-    system( "echo $$ > $lockfile/pid" );
+    system( "echo $$ >$lockfile/pid" );
     ACIS::APU::run_apu_by_queue($howmuch, -auto => $auto, 
                                   -failed => $failed, 
                                   -interactive => $interactive );
@@ -81,7 +78,9 @@ if ( $queue ) {
 
 END {
   if ( $clearlock and -d $clearlock ) {
-    system( "rm $clearlock/*" );
+    print "self pid: ", `cat $clearlock/pid`;
+    system( "rm $clearlock/*" )
+      if -f "$clearlock/pid";
     rmdir $clearlock;
   }
 }
