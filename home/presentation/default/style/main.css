@@ -1,6 +1,6 @@
 /* THE MAIN ACIS CSS STYLESHEET */
 
-/* $Id: main.css,v 2.11 2006/10/02 17:40:35 ivan Exp $ */
+/* $Id: main.css,v 2.12 2007/03/12 20:12:14 ivan Exp $ */
 
 body { 
  margin: 0;
@@ -126,7 +126,6 @@ a:active { }
 a:hover, a:active {
   text-decoration: underline; 
 }
-
 
 
 .header a:link,
@@ -809,11 +808,7 @@ a:link .hidden, a:visited .hidden {
   text-decoration: none;
 }
 
-a:link span.a {
-  color: green;
-  text-decoration: underline;
-}
-
+a:link span.a,
 a:visited span.a {
   color: green;
   text-decoration: underline;
@@ -983,13 +978,9 @@ div.tabset .tabs a:visited {
 }
 
 
-
-
 span.hidden {
  display: none;
 }
-
-
 
 div.header,
 div.subHeader p

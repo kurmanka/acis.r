@@ -210,6 +210,7 @@ home/presentation/default/person/research/autosuggest-1by1.xsl
 home/presentation/default/person/research/autosuggest-all.xsl
 home/presentation/default/person/research/autosuggest-chunk.xsl
 home/presentation/default/person/research/autoupdate.xsl
+home/presentation/default/person/research/doclinks.xsl
 home/presentation/default/person/research/identified.xsl
 home/presentation/default/person/research/ir-guide.xsl
 home/presentation/default/person/research/listings.xsl
@@ -280,6 +281,7 @@ lib/ACIS/Web/Contributions.pm
 lib/ACIS/Web/Contributions/Back.pm
 lib/ACIS/Web/Contributions/Fuzzy.pm
 lib/ACIS/Web/Contributions/Glimpse.pm
+lib/ACIS/Web/DocLinks.pm
 lib/ACIS/Web/Events.pm
 lib/ACIS/Web/Export.pm
 lib/ACIS/Web/HumanNames.pm

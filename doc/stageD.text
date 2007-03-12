@@ -226,7 +226,6 @@ userdata record -> {doclinks}
          $rna = $conf->rev('follow-up');
          $rla = $conf->revlabel('follow-up');
 
-
 2. get all current links for a record - an optional, but potentially
    useful abstraction level
 
@@ -249,6 +248,8 @@ userdata record -> {doclinks}
        $l->drop($dsid1,$type,$dsid2);
 
 4. screen
+
+
 
 
 ### screen design

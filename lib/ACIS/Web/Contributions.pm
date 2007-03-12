@@ -25,7 +25,7 @@ package ACIS::Web::Contributions;  ### -*-perl-*-
 #  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 #
 #  ---
-#  $Id: Contributions.pm,v 2.38 2007/03/05 23:14:19 ivan Exp $
+#  $Id: Contributions.pm,v 2.39 2007/03/12 20:12:14 ivan Exp $
 #  ---
 
 use strict;
@@ -183,8 +183,7 @@ sub prepare {
   }
 
   ###  make contributions visible
-  $vars ->{contributions}
-    = $session ->{$id} {contributions} = $contributions;
+  $vars ->{contributions} = $session ->{$id}{contributions} = $contributions;
 
   delete $contributions -> {actions};
 

@@ -518,6 +518,18 @@
   </screen>
 
 
+  <screen id='research/doclinks'>
+    <use module='ACIS::Web::Contributions' />
+    <use module='ACIS::Web::DocLinks' />
+    <call function='load_session_or_authenticate' />
+    <call function='ACIS::Web::Contributions::prepare'/>
+    <call function='ACIS::Web::DocLinks::prepare'/>
+    <process>
+      <call function='ACIS::Web::DocLinks::process'/>
+    </process>
+    <presentation type='xslt' filename='person/research/doclinks.xsl' />
+  </screen>
+
   <screen id='citations'>
     <use module='ACIS::Web::Citations' />
     <call function='load_session_or_authenticate' />

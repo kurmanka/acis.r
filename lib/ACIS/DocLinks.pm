@@ -7,6 +7,10 @@ use Carp::Assert;
 use Web::App::Common;
 use ACIS::Data::DumpXML::Parser;
 
+use Exporter 'import';
+use vars qw(@EXPORT);
+@EXPORT = qw( get_doclinks save_doclinks );
+
 my $conf;
 sub config {
   return $conf 
@@ -48,6 +52,7 @@ sub for_document {
   return \@r;
 }
 
+
 sub all_compact {
   my ($self) = @_;
   $self;
@@ -69,7 +74,9 @@ sub all_expanded {
 sub add {
   my ($self,$src,$rel,$trg) = @_;
   assert( $src and $rel and $trg);
-  # XXX make sure the link type $rel is defined in the config
+  # make sure the link type $rel is defined in the config
+  warn( "creating a DocLink of non-existent type: $rel\n" ), return undef
+    if not $self->config->exists($rel);
   my $add=1;
   my $print1 = join("\0",$src,$rel,$trg);
   my $print2;
@@ -188,20 +195,32 @@ sub new {
   return $self;
 }
 
+sub types {
+  my ($self) = @_;
+  return keys %$self;
+}
+
+
+sub exists {
+  my ($self,$t) = @_;
+  return $self->{$t};
+}
+
 sub label {
   my ($self,$t) = @_;
-  return $self->{$t}{label};
+  if ($self->{$t}) { $self->{$t}{label}; }
 }
 
 sub reverse {
   my ($self,$t) = @_;
-  $self->{$t}{reverse};
+  if ($self->{$t}) { $self->{$t}{reverse}; }
 }
 
 sub revlabel {
   my ($self,$t) = @_;
   my $r;
-  if ( ($r=$self->{$t}{reverse})
+  if ( $self->{$t}  
+       and ($r=$self->{$t}{reverse})
        and $self->{$r} ){
     return $self->{$r}{label};
   }
