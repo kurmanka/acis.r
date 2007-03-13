@@ -22,13 +22,6 @@
 
       <xsl:with-param name='content'>
 
-<!--
-        <xsl:call-template name='research-profile-navigation'/>
--->
-<!--
-  <h1>Research profile preferences</h1>
--->
-
 <h1>Automatic research profile update</h1>
 
 

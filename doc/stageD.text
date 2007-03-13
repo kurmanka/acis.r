@@ -192,18 +192,16 @@ link type -- has a name, description and, possibly, a reverse link type
 name; some link types have no reverse.
 
 
-
 ### configuration
 
 - document-document-links-profile -- yes / no
 
-- document-document-links-types -- ?  (or this can be done similar to
+- document-document-links-type-config -- ?  (or this can be done similar to
   contributions config, i.e. via a separate xml file)
 
 ### data structure
 
 userdata record -> {doclinks}
-
 
 
 ### components

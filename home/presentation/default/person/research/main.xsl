@@ -472,55 +472,6 @@ for your works again.</small>
         
 
 
-  <xsl:template name='research-profile-menu'>
-    
-    <ul>
-
-            <li><a ref='@research/identified'
-            screen='research/identified'>detailed identified works
-            listing</a></li>
-
-            <li><a ref='@research/autosuggest' 
-            screen='research/autosuggest'
-            >autosearch suggestions</a></li>
-
-            <li><a ref='@research/search'
-            screen='research/search'>advanced search
-            form</a></li>
-            
-<xsl:if test='$session-type = "user"'>
-
-            <li><a ref='@research/refused'
-            screen='research/refused'>refused items</a></li>
-
-            <li><a ref='@research/autoupdate'
-            screen='research/autoupdate'>automatic profile update
-            preferences</a></li>
-
-</xsl:if>
-
-    </ul>
-
-  </xsl:template>
-
-
-
-  <xsl:template name='research-profile-navigation'>
-    
-    <p class='breadCrumb'
-    ><xsl:call-template name='connector'/>
-    <xsl:text> </xsl:text>
-    <a ref='@research' >Research profile</a>:
-    </p>
-
-    <div class='supNav onThisPage'>
-
-      <xsl:call-template name='research-profile-menu'/>
-      
-    </div>
-
-  </xsl:template>
-
 
   <xsl:template name='run-automatic-search-form'>
 
@@ -585,10 +536,6 @@ for your works again.</small>
     list.</p>
 
     
-<!--
-    <xsl:call-template name='research-profile-menu'/>
--->
-
 <table class='bigmenu'>
   <tr>
     <td class='no' width='20%' valign='top' align='right'>
@@ -781,13 +728,19 @@ for your works again.</small>
 
 </xsl:if>
 
+   <!--[if-config(document-document-links-profile)]-->
+    <hl screen='research/doclinks'>
+      <xsl:text>&#160;</xsl:text>
+      <a ref='@research/doclinks'>document links</a>
+      <xsl:text>&#160;</xsl:text>
+    </hl>
+  <!--[end-if]-->
+
 </span>
-    
     </p>
 
 <xsl:text> 
 </xsl:text>
-
     </xsl:with-param></xsl:call-template>
 
     
