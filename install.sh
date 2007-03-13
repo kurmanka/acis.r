@@ -85,7 +85,7 @@ cp -r doc/img doc/*.html doc/style.css      $dest/doc/
 cp home/screens.xml            \
    home/configuration.xml      \
    home/contributions.conf.xml \
-   home/doclinks.conf.xml \
+   home/doclinks.conf.xml.default \
    main.conf.eg                $dest/
 
 ### copy VERSION
