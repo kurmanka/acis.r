@@ -127,7 +127,7 @@ home/bin/templates/upgrade_to_1.5.4.pl
 home/bin/templates/upgrade_to_1.5.7.pl
 home/configuration.xml
 home/contributions.conf.xml
-home/doclinks.conf.xml.default
+home/doclinks.conf.xml.eg
 home/plugins/Processing/ACIS_UD/configuration.xml
 home/presentation/default/adm/events-decode.xsl
 home/presentation/default/adm/events-overview.xsl

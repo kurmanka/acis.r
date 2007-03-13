@@ -196,8 +196,10 @@ name; some link types have no reverse.
 
 - document-document-links-profile -- yes / no
 
-- document-document-links-type-config -- ?  (or this can be done similar to
-  contributions config, i.e. via a separate xml file)
+$HOME/doclinks.conf.xml.eg is an example configuration file.  Rename to 
+$HOME/doclinks.conf.xml and edit to your liking.
+
+
 
 ### data structure
 
