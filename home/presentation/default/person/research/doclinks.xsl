@@ -71,19 +71,31 @@
       <form screen='@research/doclinks'>
         <div style='float:right'><a href='#' class='closeform'>[X]</a></div>
 
-        <div>add a link of type: 
-        <select name='rel'>
+        <div><b>add a link</b>
+
+        <table>
+          <tr><th>of type</th><th>to document</th></tr>
+          <tr>
+            <td valign='top'>
+        <select name='rel' size='{count($doclinks-conf/*)}'>
           <xsl:for-each select='$doclinks-conf/*'>
             <option value='{name()}'><xsl:value-of select='label'/></option>
           </xsl:for-each>
-        </select> <br/>
-        
-        to document:
+        </select> </td>
+        <td valign='top'>
+          <xsl:for-each select='$accepted/*'>
+            <input type='radio' name='trg' id='trg{sid}' value='{sid}' />
+            <label for='trg{sid}'><xsl:text> </xsl:text><xsl:value-of
+            select='title'/></label> <xsl:if test='url-about'> (<a href='{url-about}'>details</a>)</xsl:if><br/>
+          </xsl:for-each>
+<!--
         <select name='trg'>
           <xsl:for-each select='$accepted/*'>
             <option value='{sid}'><xsl:value-of select='title'/></option>
           </xsl:for-each>
-        </select><br/>
+        </select>
+-->
+        </td></tr></table>
         
         <input type='hidden' name='src' value=''/>
         <input type='submit' name='add' value='add link'/>
@@ -196,7 +208,7 @@
                   <xsl:with-param name='dsid' select='$dsid'/>
                 </xsl:call-template>
               </xsl:for-each>
-              <li sid='{$dsid}'><a href='#l' class='linkadd' >add a link</a></li>
+              <li sid='{$dsid}'><a ref='#0' class='linkadd' >add a link</a></li>
             </ul>
           </small>
             
@@ -219,6 +231,17 @@ ul.links a.linkdelete {
   color: #999;
   text-decoration: none;
 }
+
+ul.links a.linkadd {
+  text-decoration: none;
+}
+#link-form { padding: 0px; border: 1px solid #666; }
+#link-form th { text-align: left; font-weight: normal; }
+#link-form form { 
+  padding: 6px; 
+  margin:0; 
+  background:white;
+}
     </style>
 
 <script-onload>
@@ -230,17 +253,24 @@ var record_sid = "<xsl:value-of select='$record-sid'/>";
 var session_id = "<xsl:value-of select='$session-id'/>";
 
 function add_link_form () {
-  $("a.linkadd").show();
+  $("a.linkadd").show('slow');
   var dsid=this.parentNode.getAttribute('sid');
   var f=get('link-form');
   this.parentNode.insertBefore( f, null );
-  f.style.display = "";
+  $( f ).show('slow');
+  //f.style.display = "";
   $("input[@name='src']", f).get(0).setAttribute('value', dsid);
+  $("#trg"+dsid, f).get(0).setAttribute('disabled', 'y'); 
+  f.setAttribute('dsid', dsid);
   this.style.display = 'none';
   return false;
 }
 function close_add_link_form () {
   var f=get('link-form');
+  var dsid=f.getAttribute('dsid', dsid);
+  if(dsid) {
+     $("#trg"+dsid, f).get(0).removeAttribute('disabled'); 
+  }
   f.style.display = "none";
   $("a.linkadd").show();
   return false;
