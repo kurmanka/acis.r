@@ -74,9 +74,7 @@
   </screen>
   
 
-  <screen id='name'
-          process-on-POST=''
-          >
+  <screen id='name' process-on-POST='1'>
 
     <use module='ACIS::Web::User'/>
 
@@ -521,6 +519,8 @@
   <screen id='research/doclinks'>
     <use module='ACIS::Web::Contributions' />
     <use module='ACIS::Web::DocLinks' />
+    <param name='del'       required='no' />
+    <param name='add'       required='no' />
     <call function='load_session_or_authenticate' />
     <call function='ACIS::Web::Contributions::prepare'/>
     <call function='ACIS::Web::DocLinks::prepare'/>
@@ -538,7 +538,7 @@
     <presentation type='xslt' filename='citations/overview.xsl' />
   </screen>
 
-  <screen id='citations/potential'>
+  <screen id='citations/potential' process-on-POST='y'>
     <use module='ACIS::Web::Citations' />
     <call function='load_session_or_authenticate' />
     <call function='ACIS::Web::Citations::prepare'/>

@@ -74,6 +74,8 @@ sub all_expanded {
 sub add {
   my ($self,$src,$rel,$trg) = @_;
   assert( $src and $rel and $trg);
+  warn( "creating a DocLink to itself: $src\n" ), return undef
+    if $src eq $trg;
   # make sure the link type $rel is defined in the config
   warn( "creating a DocLink of non-existent type: $rel\n" ), return undef
     if not $self->config->exists($rel);

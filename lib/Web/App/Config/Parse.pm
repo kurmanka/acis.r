@@ -101,7 +101,7 @@ sub parse_screens_screens {
 
     my $screen_object = new Web::App::Screen( "$id" );
 
-    if ( defined $screen -> getAttribute( 'process-on-POST' ) ) {
+    if ( $screen -> getAttribute( 'process-on-POST' ) ) {
       $screen_object -> {'process-on-POST'} = 1;
     }
 

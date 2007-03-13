@@ -25,7 +25,7 @@ package Web::App;   ### -*-perl-*-
 #  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 #
 #  ---
-#  $Id: App.pm,v 2.28 2007/03/06 22:36:25 ivan Exp $
+#  $Id: App.pm,v 2.29 2007/03/13 07:51:18 ivan Exp $
 #  ---
 
 
@@ -1225,6 +1225,7 @@ sub add_to_process_queue {
   my $req_method = $self -> request ->{method} || '';
 
   if ( $screen -> {'process-on-POST'} ) {
+    debug "process-on-POST";
     if ( $req_method eq 'POST'
          and scalar keys %$params ) {
       $process = 1;
