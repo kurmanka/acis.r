@@ -13,6 +13,7 @@ use ACIS::Web::Background qw( logit );
 
 my $rdb;
 my $name_search_table;
+my ($min_name_length,$exact_name_prefix,$distance_level_ref);
 
 sub run_fuzzy_searches {
   my $app     = shift;
@@ -26,6 +27,10 @@ sub run_fuzzy_searches {
   $rdb = $app -> config( 'metadata-db-name' );
 
   $name_search_table = $app->sysflag('research.search.fuzzy.rare.names.table') || "$rdb.res_creators_separate";
+  $min_name_length   = $app->config('fuzzy-name-search-min-variation-length') || 7;
+  $exact_name_prefix = $app->config('fuzzy-name-search-min-common-prefix') || 3;
+  my $distance_level = int(100.0 / $min_name_length);
+  $distance_level_ref = [ $distance_level . '%' ];
 
   logit "search_for_resources_fuzzy: enter";
 
@@ -39,10 +44,6 @@ sub run_fuzzy_searches {
   logit "search_for_resources_fuzzy: exit";
 }
 
-my $min_name_length = 7;
-my $exact_name_prefix = 3;
-my $distance_level = "10%";
-my $distance_level_ref = [ $distance_level ];
 
 use Encode qw(decode_utf8);
 sub search_resources_for_name_fuzzy {

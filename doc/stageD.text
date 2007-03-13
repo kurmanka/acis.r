@@ -4,11 +4,6 @@ Stage D: full-text links, document-to-document links and fuzzy name searches
 <toc/>
 
 
-At this moment fuzzy name searches are the most complicated to my eye.
-Although I remember it wasn't too difficult when we designed it with
-Thomas in Moscow last year.  Let's try to wrap my head around it.
-
-
 <h2 id='fuzzy'>Fuzzy name searching</h2>
 
 
@@ -17,7 +12,6 @@ Thomas in Moscow last year.  Let's try to wrap my head around it.
 distance level = Levenshtein distance / string length of the name variation
 
 The default critical distance level of distance is 1/m, i.e. 1/7 
-
 e.g. if the Levenshtein distance is 2 edits and the name variation's
 length is 20, the distance level is 2/20 = 0.1 ; O.1 is less then 1/7,
 so, this would be a successful and positive match.
@@ -48,6 +42,7 @@ so, this would be a successful and positive match.
   variations.  Set is to -1 to disable this limit.
 
 <!-- these two parameters are so similar... -->
+<!-- all the above parameters are implemented -->
 
 ### implementation components
 
