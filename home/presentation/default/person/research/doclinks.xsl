@@ -69,7 +69,7 @@
   <xsl:template name='link-form-hidden'>
     <div style='display:none' id='link-form'>
       <form screen='@research/doclinks'>
-        <div style='float:right'><a href='#' class='closeform'>[X]</a></div>
+        <div style='float:right'><a href='#' class='closeform' title='close this'>[X]</a></div>
 
         <div><b>add a link</b>
 
@@ -81,7 +81,12 @@
           <xsl:for-each select='$doclinks-conf/*'>
             <option value='{name()}'><xsl:value-of select='label'/></option>
           </xsl:for-each>
-        </select> </td>
+        </select> 
+        <xsl:if test='count($accepted/*)&gt;count($doclinks-conf/*)*2'>
+          <br/>
+          <input type='submit' name='add' value=' create link '/>
+        </xsl:if>
+        </td>
         <td valign='top'>
           <xsl:for-each select='$accepted/*'>
             <input type='radio' name='trg' id='trg{sid}' value='{sid}' />
@@ -98,7 +103,7 @@
         </td></tr></table>
         
         <input type='hidden' name='src' value=''/>
-        <input type='submit' name='add' value='add link'/>
+        <input type='submit' name='add' value=' create link '/>
         or <a href='#' class='closeform'>cancel</a>
         </div>
       </form>
@@ -178,6 +183,11 @@
   <xsl:template name='research-identified'>
 
     <style>
+ul.links {
+ margin-top: 0; 
+ margin-bottom: 0; 
+}
+
 ul.links a.linkdelete {
   color: #999;
   text-decoration: none;

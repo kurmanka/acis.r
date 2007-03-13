@@ -642,8 +642,21 @@ for your works again.</small>
     </td>
   </tr>
 
-
 </xsl:if>
+
+   <!--[if-config(document-document-links-profile)]-->
+  <tr>
+    <td class='no' valign='top' align='right'>
+      <p><a ref='@research/doclinks'>6</a></p>
+    </td>
+    <td>
+      <h2><a ref='@research/doclinks' class='item'
+      >DOCUMENT TO DOCUMENT LINKS</a></h2>
+      <p>Connect your stuff.</p>
+    </td>
+  </tr>
+  <!--[end-if]-->
+
 
 </table>
 
@@ -656,7 +669,6 @@ for your works again.</small>
 
 
   <!-- RESEARCH NAVIGATION -->
-
 
   <xsl:template name='research-navigation'>
 
