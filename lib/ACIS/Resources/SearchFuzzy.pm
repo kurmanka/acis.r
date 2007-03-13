@@ -5,6 +5,10 @@ use warnings;
 use Carp;
 use String::Approx qw( amatch );
 
+use Exporter qw(import);
+use vars qw(@EXPORT);
+@EXPORT = qw(run_fuzzy_searches);
+
 use Web::App::Common;
 use ACIS::Resources::Search;
 require ACIS::Web::Contributions;
@@ -26,7 +30,7 @@ sub run_fuzzy_searches {
   my $namelist    = $autosearch -> {'names-list'};
   $rdb = $app -> config( 'metadata-db-name' );
 
-  $name_search_table = $app->sysflag('research.search.fuzzy.rare.names.table') || "$rdb.res_creators_separate";
+  $name_search_table = $app->sysvar('research.search.fuzzy.rare.names.table') || "$rdb.res_creators_separate";
   $min_name_length   = $app->config('fuzzy-name-search-min-variation-length') || 7;
   $exact_name_prefix = $app->config('fuzzy-name-search-min-common-prefix') || 3;
   my $distance_level = int(100.0 / $min_name_length);
@@ -56,9 +60,10 @@ sub search_resources_for_name_fuzzy {
   my $prefix = lc substr( $name, 0, $exact_name_prefix );
   $name = lc $name;
   my $dsid_list = [];
+  my $role_list = [];
 
   ###  the query
-  $sql -> prepare_cached( "select name,sid from $name_search_table where name like ?" );
+  $sql -> prepare_cached( "select name,sid,role from $name_search_table where name like ?" );
   warn "SQL: " . $sql->error if $sql->error;
   my $res = $sql->execute ( $prefix . '%' );
   warn "SQL: " . $sql->error if $sql->error;
@@ -68,6 +73,7 @@ sub search_resources_for_name_fuzzy {
     foreach ( @$data ) {
       my $dname = decode_utf8( $_->{name} );
       my $dsid = $_->{sid};
+      my $role = $_->{role};
       
       if ( $dname eq $name ) {
         # exact match, not our domain
@@ -76,6 +82,7 @@ sub search_resources_for_name_fuzzy {
           logit "fuzzy match: '$dname' ($dsid) ~ $name";
           # suggest $dsid
           push @$dsid_list, $dsid;
+          push @$role_list, $role;
         } else {
 #          logit "no match: '$dname' ($dsid) ~ $name";
         }
@@ -86,9 +93,10 @@ sub search_resources_for_name_fuzzy {
   logit "intermediate results: " . (scalar @$dsid_list) . ' ' . join( ' ', @$dsid_list );
 
   if ( not scalar @$dsid_list ) { return undef; }
-  $sql -> prepare_cached( "select r.id,o.data from $rdb.resources r join $rdb.objects o using(id) where sid=?" );
+  $sql -> prepare_cached( "select r.id,o.data,? as role from $rdb.resources r join $rdb.objects o using(id) where sid=?" );
   foreach ( @$dsid_list ) {
-    my $r = $sql->execute( $_ );
+    my $role = shift @$role_list;
+    my $r = $sql->execute( $role, $_ );
     if ( $r ) {
       process_resources_search_results( $r, $context, $result );
     }

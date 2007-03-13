@@ -49,18 +49,15 @@ sub save_suggestions {
     warn( "document item with no sid: " . Dumper($_) ) if not $osid;
     next if not $osid;
     
-    my $type = $_ -> {type};
-    my $ro = $role;
-    if ( $_ ->{role} ) {
-      $ro = $_ ->{role};
-    } 
+    my $type = $_->{type};
+    my $ro   = $_->{role} || $role;
+
     if ( $already_suggested->{$osid} ) {
       push @replace, $_;
       next;
     }
 
     my $data = freeze( $_ );
-    
     my $r = $sql -> execute( $psid, $osid, $type, $ro, $data );
     if ( $sql -> error
          and not $complained ) {

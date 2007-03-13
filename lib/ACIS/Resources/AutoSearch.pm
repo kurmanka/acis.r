@@ -291,6 +291,7 @@ sub do_auto_search {
   if ( $app -> config( "research-additional-searches" ) ) {
     additional_searches( $app, $context ); 
     if ( $app->config( "fuzzy-name-search" ) ) {
+      # XXX - should not do this in online search, I think; but different views are possible
       run_fuzzy_searches( $app, $context );
     }
   }

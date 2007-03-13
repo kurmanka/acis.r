@@ -25,7 +25,7 @@ package ACIS::Web::Contributions;  ### -*-perl-*-
 #  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 #
 #  ---
-#  $Id: Contributions.pm,v 2.39 2007/03/12 20:12:14 ivan Exp $
+#  $Id: Contributions.pm,v 2.40 2007/03/13 20:28:15 ivan Exp $
 #  ---
 
 use strict;
@@ -697,25 +697,20 @@ sub process {
         my $item = find_suggested_item( $contributions, $handle, $source );
 
         if ( not $item ) {
-          $app ->errlog( 
-"Can't find a contribution among our own suggestions: id: $handle" );
+          $app ->errlog( "Can't find a contribution among our own suggestions: id: $handle" );
           next;
         }
         
         my $type = $item ->{type};
-        ### XXX ... should check role appropriateness for this type of object
+        ### ZZZ should check role appropriateness for this type of object
         if ( $role eq 'editor' 
              and $type eq 'chapter' ) {
-          warn "chapter editor again!";
-          debug "chapter editor again!";
+          complain "chapter editor again!";
         }
 
         $item -> {role} = $role;
         my $sid = $item ->{sid};
         assert( $sid );
-
-        assert( not ref $handle );  ### sanity
-
         my $action = accept_item( $item );
         $statistics -> {$action} ++;
         $processed++; 

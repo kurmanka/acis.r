@@ -31,8 +31,8 @@ if ( not $doc_occur_limit and not $var_occur_limit ) {
            qq!create temporary table tmpnames2 ( name varchar(255) not null, index namesi(name) )
               select t.name from tmpnames t left join names v using(name) group by name $having2nd!,
            qq!drop table tmpnames!,
-           qq!create table rare_names (name varchar(255) not null, sid char(12) not null, primary key (name,sid))!,
-           qq!replace into rare_names select t.name,r.sid from $RDB.res_creators_separate r join tmpnames2 t using(name)!,
+           qq!create table rare_names (name varchar(255) not null, sid char(12) not null, role char(15) not null, primary key (name,sid))!,
+           qq!replace into rare_names select t.name,r.sid,r.role from $RDB.res_creators_separate r join tmpnames2 t using(name)!,
            qq!delete from rare_names using rare_names left join tmpnames2 t using(name) where t.name is null!,
            qq!drop table tmpnames2!,
           );

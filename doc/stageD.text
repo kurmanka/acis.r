@@ -44,6 +44,12 @@ so, this would be a successful and positive match.
 <!-- these two parameters are so similar... -->
 <!-- all the above parameters are implemented -->
 
+
+### administration
+
+Run bin/fuzzy_search_table script regularly to update the rare table.
+
+
 ### implementation components
 
 1. given a set of name expressions (i.e. document author names) compare
