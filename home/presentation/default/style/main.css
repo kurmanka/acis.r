@@ -1,6 +1,6 @@
 /* THE MAIN ACIS CSS STYLESHEET */
 
-/* $Id: main.css,v 2.12 2007/03/12 20:12:14 ivan Exp $ */
+/* $Id: main.css,v 2.13 2007/03/14 11:14:17 ivan Exp $ */
 
 body { 
  margin: 0;
@@ -178,6 +178,10 @@ a:active.permanent {
  color: #000;
 }
 
+a:link.evergreen,
+a:visited.evergreen,
+a:hover.evergreen,
+a:active.evergreen  { color: green !important; }
 
 
 p.site-title {

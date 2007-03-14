@@ -62,14 +62,14 @@
       </xsl:choose>
       <xsl:text> </xsl:text>
       <a class='linkdelete'
-         ref='@research/doclinks?src={list-item[1]/text()}&amp;rel={list-item[2]/text()}&amp;trg={list-item[3]/text()}&amp;del=1'>[X]</a>
+         ref='@research/doclinks?src={list-item[1]/text()}&amp;rel={list-item[2]/text()}&amp;trg={list-item[3]/text()}&amp;del=1'>[<span>X</span>]</a>
     </li>
   </xsl:template>
 
   <xsl:template name='link-form-hidden'>
     <div style='display:none' id='link-form'>
       <form screen='@research/doclinks'>
-        <div style='float:right'><a href='#' class='closeform' title='close this'>[X]</a></div>
+        <div style='float:right'><a href='#' class='closeform evergreen' title='close this'>[X]</a></div>
 
         <div><b>add a link</b>
 
@@ -131,30 +131,7 @@
 
           <xsl:call-template name='present-resource' xml:space='default'>
             <xsl:with-param name='resource' select='.'/>
-            <xsl:with-param name='for' select='concat( "remove_", $sid )' />
           </xsl:call-template>
-          
-          <xsl:variable name='cidentified' select='$citations/identified'/>
-          <xsl:variable name='cpotential'  select='$citations/potential'/>
-
-          <xsl:if test='$citations//*[name()=$dsid]'>
-            <br/><small>citations: 
-            <xsl:if test='$citations/identified/*[name()=$dsid]'>
-              <a ref='@citations/identified/{$dsid}' ><xsl:value-of
-              select='$citations/identified/*[name()=$dsid]/text()' />
-              identified</a >
-            </xsl:if>
-
-            <xsl:if test='count($citations/*/*[name()=$dsid])&gt;1'>|</xsl:if> 
-            
-            <xsl:if test='$citations/potential/*[name()=$dsid]'>
-              <a ref='@citations/potential/{$dsid}'><xsl:value-of
-              select='$citations/potential/*[name()=$dsid]/text()'/>
-              potential</a>
-            </xsl:if>
-
-            </small>
-          </xsl:if>
 
           <br/>
           <small>
@@ -164,7 +141,7 @@
                   <xsl:with-param name='dsid' select='$dsid'/>
                 </xsl:call-template>
               </xsl:for-each>
-              <li sid='{$dsid}'><a ref='#0' class='linkadd' >add a link</a></li>
+              <li sid='{$dsid}'><a ref='#0' class='linkadd evergreen' >add a link</a></li>
             </ul>
           </small>
             
@@ -180,7 +157,7 @@
         <script type="text/javascript" src='{$base-url}/script/jquery.js'></script>
   </xsl:variable>
 
-  <xsl:template name='research-identified'>
+  <xsl:template name='research-doclinks'>
 
     <style>
 ul.links {
@@ -191,6 +168,20 @@ ul.links {
 ul.links a.linkdelete {
   color: #999;
   text-decoration: none;
+  font-family: monospace;
+  font-weight: bold;
+  font-size: larger;
+}
+
+a.closeform {
+  font-family: monospace;
+  font-weight: bold;
+  font-size: larger;
+  text-decoration: none;
+}
+
+ul.links a.linkdelete span {
+  color: #666;
 }
 
 ul.links a.linkadd {
@@ -287,9 +278,9 @@ function close_add_link_form () {
   <xsl:template match='/data'>
 
     <xsl:call-template name='research-page'>
-      <xsl:with-param name='title'>your works</xsl:with-param>
+      <xsl:with-param name='title'>document-to-document links</xsl:with-param>
       <xsl:with-param name='content'>
-        <xsl:call-template name='research-identified'/>
+        <xsl:call-template name='research-doclinks'/>
       </xsl:with-param>
     </xsl:call-template>
 
