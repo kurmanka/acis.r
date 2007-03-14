@@ -47,10 +47,17 @@ if ( opendir BIN, "bin/" ) {
 }
 
 p "\@call before sort: ", join( ' ', @call ); 
-
 @call = sort { $index{$a} cmp $index{$b} } @call;
-
 p "\@call after sort: ", join( ' ', @call ); 
+
+my $upgrade_flag = "state/service.unavailable";
+my $upgrade_flag_set;
+if (scalar @call) {
+  if ( not -f $upgrade_flag ) {
+    system( "echo >$upgrade_flag" ); 
+    $upgrade_flag_set=1;
+  }
+}
 
 foreach ( @call ) {
 
@@ -64,8 +71,18 @@ foreach ( @call ) {
   } elsif ($? & 127) {
     printf "child died with signal %d, %s coredump\n",
       ($? & 127),  ($? & 128) ? 'with' : 'without';
+    die;
   }
 
+}
+
+
+if ($upgrade_flag_set) { unlink $upgrade_flag_set; }
+
+END {
+  if ($upgrade_flag_set and -f $upgrade_flag_set) { 
+    print "upgrade-in-progress flag is being left: $upgrade_flag_set\n";
+  }
 }
 
 exit 0;
