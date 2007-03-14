@@ -1,6 +1,6 @@
 /* THE MAIN ACIS CSS STYLESHEET */
 
-/* $Id: main.css,v 2.13 2007/03/14 11:14:17 ivan Exp $ */
+/* $Id: main.css,v 2.14 2007/03/14 12:31:58 ivan Exp $ */
 
 body { 
  margin: 0;
@@ -1216,3 +1216,18 @@ table.citations tbody {
 }
 
 
+div.PSA { 
+ xmargin: 3px 30em 3px 30em;       
+ xwidth: 96%;
+ xmargin-left:auto; 
+ xmargin-right:auto;
+ text-align: center;
+ margin-top: 10px;
+ font-family: "Times New Roman", serif;
+}
+
+div.PSA p {
+ border: 1px solid #e99;
+ padding: 3px 8px 3px 8px;
+ display: inline;
+}

@@ -155,6 +155,7 @@ function onLoad() {
 ><xsl:attribute name='class'><xsl:value-of select='$current-screen-id'/>Screen</xsl:attribute
 ></xsl:when></xsl:choose>
 
+   <xsl:comment> service.announcement go here </xsl:comment>
 
    <div class='header' id='top'>
 

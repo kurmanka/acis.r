@@ -23,7 +23,7 @@ package ACIS::Web;   ### -*-perl-*-
 #  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 #
 #  ---
-#  $Id: Web.pm,v 2.19 2007/03/06 22:35:56 ivan Exp $
+#  $Id: Web.pm,v 2.20 2007/03/14 12:31:58 ivan Exp $
 #  ---
 
 use strict;
@@ -174,13 +174,6 @@ sub parse_request_url {
 }
 
 
-sub userdata_dir {  
-  my $self = shift;
-  my $home = $self -> {home};
-  return "$home/userdata";
-}  
-
-
 sub find_right_screen {
   my $self = shift;
   my $scr = shift;
@@ -201,6 +194,37 @@ sub find_right_screen {
   return $res;
 }
     
+
+
+sub handle_request {
+  my $self = shift;
+  # refuse to handle if service.blocked flag is set
+  if ( $self->sysflag( 'service.blocked' ) ) {
+    if ( my $msg = $self->sysvar( 'service.blocked.message' ) ) {
+      return print $msg;
+    }
+    return print "Status: 503\nContent-Type: text/plain\n\nService Unavailable\n";
+  } 
+  $self->SUPER::handle_request( @_ );
+}
+
+sub post_process_content {
+  my $self = shift;
+  my $out  = shift;
+  my $body;
+  # assume $out is a string reference; even if not, make it so
+  if ( not ref $out ) { $body = \$out; } else { $body = $out; }
+  
+  if ( my $msg = $self->sysvar( 'service.announcement' ) ) {
+    my $mark = '<!-- service.announcement go here -->';
+    my $index = index( $$body, $mark );
+    if ( $index > -1 ) {
+      substr( $$body, $index+length($mark), 0, "<div class='PSA'>$msg</div>" );
+    }
+  }
+
+  $self->SUPER::post_process_content( $out );
+}
 
 
 sub set_auth_cookies { 
@@ -292,6 +316,13 @@ sub get_url_of_a_screen {
 }
 
 
+sub userdata_dir {  
+  my $self = shift;
+  my $home = $self -> {home};
+  return "$home/userdata";
+}  
+
+
 sub userdata_file_for_login {
   my $self  = shift;
   my $login = shift || die;
@@ -309,7 +340,6 @@ sub userdata_file_for_login {
   }
   return $udata_file;
 }
-
 
 
 sub make_paths_for_login {
@@ -528,24 +558,19 @@ sub send_mail {
   }
   die if not $header or not $body;
 
-#  my ($header, $body) = ($$messageref =~ /^(.*?)\s*\n\n+(.*)$/s);
   my @headers = split /\s*\n/, $header;
-#  debug "Headers: $header\n";
   $header = '';
   my %head = ();
-#  $self -> log( "Sending an email.  The headers:" );
   foreach ( @headers ) {
     my ( $name, $value ) = split (/:\s*/, $_);
     $head{ lc $name } = $value;
     my $val = encode( 'MIME-Q', $value );
- #   $self -> log( "$name: $val" );
 
-    ### XXX a nasty hack to fix Encode's header folding "feature":
+    ### ZZZ a nasty hack to fix Encode's header folding "feature":
     $val =~ s!\"\n\s+!\"!;  
     $header .= "$name: $val\n";
   }
   
-#  $self -> log( "Sending an email.  The headers:\n$header<<<" );
   $header .= "MIME-Version: 1.0\n";
   $header .= "Content-Type: text/plain; charset=utf-8\n";
   $header .= "Content-Transfer-Encoding: 8bit\n";
@@ -574,6 +599,7 @@ sub send_mail {
                     ($cc) ? ( -cc => $cc ) : ()
                   );
 }
+
 
 
 #use Devel::LeakTrace;
