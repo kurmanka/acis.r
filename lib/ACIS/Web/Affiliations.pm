@@ -25,7 +25,7 @@ package ACIS::Web::Affiliations;   ### -*-perl-*-
 #  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 #
 #  ---
-#  $Id: Affiliations.pm,v 2.3 2007/02/07 20:35:25 ivan Exp $
+#  $Id: Affiliations.pm,v 2.4 2007/03/14 18:27:49 ivan Exp $
 #  ---
 
 
@@ -270,24 +270,16 @@ sub search {
   my $cgi     = $app -> request -> {CGI};
   my $input   = $app -> form_input;
   my $sql     = $app -> sql_object;
-
   my $db = $app -> config( 'metadata-db-name' );
-
-
   my $key   = $input ->{ 'search-what' } || '';
   my $field = $input ->{ 'search-by' }   || '';
-
   $field =~ s/[^a-z]//g;  # untaint
 
   $app -> userlog( "affil: search: by $field, key: '$key'", );
 
   return unless ( $field =~ /^(location|name)$/ );
 
-  if ( not $key 
-       or not $field ) {
-    die;
-  }
-
+  if ( not $key or not $field ) { die; }
 
   ###  building a list of already chosen affiliations to exclude them from the
   ###  result set
@@ -319,63 +311,41 @@ sub search {
   my $word_count     = scalar @words;
   my $realword_count = scalar @realwords;
 
+  # THE PLAN IS:
+  #
+  # - check the search options, if any
+  #   --  options: search-mode: only-exact | all-words | loose-match 
+  # - do the exact key expression search
+  #   --  "select from institutions where $the_field like '%$key%'"
+  #       --  shall we include word-boundary condition into the where block?  
+  #           Yes, we should!  But how?  
+  #   > SELECT "a word a" REGEXP "[[:<:]]word[[:>:]]";      -> 1
+  #   > SELECT "a xword a" REGEXP "[[:<:]]word[[:>:]]";     -> 0
+  #
+  # - filter the results -- remove those, which are already_there
+  #   decide: is it enough or shall we search for more?  (search options?)
+  #   -- if there's more than 10 results and the search-mode is not
+  #      "all-words" or "loose-match", we stop at this
+  #   -- independently of the amount of hits, we shall stop if search-mode is
+  #      "only-exact".  Or we may do the all-words search and say to the user, 
+  #      that it might (or might not) be useful.
+  # - if we shall search further, build a list of already_found handles
+  # - execute full-text search and then filter out already_there,
+  #   already_found
+  # - unless we run a really permissive search, we shall leave out those
+  #   items, which don't contain at least one word of the @words
+  # - present the results
 
-#  $sql_helper::VERBOSE_LOG = 1;
-
-  ####################  THE PLAN  ############################################
-
-  ###   now check the search options, if any
-
-  ###   --  options: search-mode: only-exact | all-words | loose-match 
-
-  ###   do the exact key expression search
-
-  ###   --  "select from institutions where $the_field like '%$key%'"
-  
-  ###       --  shall we include word-boundary condition into the where block?  
-  ###           Yes, we shall!  But how?  RFTM!
-
-  ###                  file:///shared/RTFM/Mysql/4.1/manual_Regexp.html
-
-# mysql> SELECT "a word a" REGEXP "[[:<:]]word[[:>:]]";      -> 1
-# mysql> SELECT "a xword a" REGEXP "[[:<:]]word[[:>:]]";     -> 0
-
-  ###   filter the results -- remove those, which are already_there
-
-  ###   decide: is it enough or shall we search for more?  (search options?)
-
-  ###   -- if there's more than 10 results and the search-mode is not
-  ###      "all-words" or "loose-match", we stop at this
-
-  ###   -- independently of the amount of hits, we shall stop if search-mode is
-  ###      "only-exact".  Or we may do the all-words search and say to the user, 
-  ###      that it might (or might not) be useful.
-
-  ###   if we shall search further, build a list of already_found handles
-
-  ###   execute full-text search and then filter out already_there,
-  ###   already_found
-
-  ###   unless we run a really permissive search, we shall leave out those
-  ###   items, which don't contain at least one word of the @words
-
-  ###   present the results
 
   my $mode = 'all-words';
-  if ( $input -> {'exact-only'} ) {
-    $mode = 'exact-only';
-
-  } elsif ( $input -> {'loose-match'} ) {
-    $mode = 'loose-match';
-  }
+  if ( $input->{'exact-only'} ) {       $mode = 'exact-only';
+  } elsif ( $input->{'loose-match'} ) { $mode = 'loose-match';  }
 
   my $context = {};
   $context -> {already_there} = $already_there;
   $context -> {already_found} = $already_found;
 
-
   ###   the exact search:
-
   my @exact_matches;
   {
     my $select_what = "select data from $db.institutions ";
@@ -405,53 +375,38 @@ sub search {
 
   }
 
-#  debug "found these: ". join ', ', keys %{ $already_found };
-
-  ###   decide: is it enough or shall we search for more?  (search options?)
-
-  ###   -- if there's more than 10 results and the search-mode is not
-  ###      "all-words" or "loose-match", we stop at this
-
-  ###   -- independently of the amount of hits, we shall stop if search-mode is
-  ###      "only-exact".  Or we may do the all-words search and say to the user, 
-  ###      that it might (or might not) be useful.
+  # - decide: is it enough or shall we search for more?  (search options?)
+  #   -- if there's more than 10 results and the search-mode is not
+  #      "all-words" or "loose-match", we stop at this
+  #   -- independently of the amount of hits, we shall stop if search-mode is
+  #      "only-exact".  Or we may do the all-words search and say to the user, 
+  #      that it might (or might not) be useful.
 
 
-  ##    prepare search results
-
+  ###    prepare search results
   my $search = {};
   $search ->{key}   = $key;
   $search ->{field} = $field;
   if ( $mode ) { 
     $search ->{mode}  = $mode;
   }
-  
   my $results = $search ->{results} = {};
-
   $results ->{exact} = \@exact_matches;
-  
   $app -> variables -> {'institution-search'} = $search;
-  
 
   ###  Is that enough searching?
-
   if ( scalar @exact_matches > 10 
        and $mode ne 'loose-match' 
-       and not $input ->{'show-all-results'} 
-     ) {
+       and not $input ->{'show-all-results'} ) {
     return;
   }
-    
-  if ( $mode eq 'only-exact' 
-       and scalar @exact_matches > 4 ) {
+  if ( $mode eq 'only-exact' and scalar @exact_matches > 4 ) {
     return;
   }    
 
   
-  
   ###   execute full-text search and then filter out already_there,
   ###   already_found
-
   ###   unless we run a really permissive search, we shall leave out those
   ###   items, which don't contain at least one word of the @words
 
@@ -668,23 +623,17 @@ sub general_handler {
 
 sub submit_institution {
   my $app = shift;
-
   my $session = $app -> session;
-
   my $institution = {};
-
   my $input = $app -> form_input;
-
   my $name    = $input -> {name};
   my $oldname = $input -> {oldname} || '';
   my $id      = $input -> {id} || '';
 
   assert( $name );
-  
   debug "submit: name: $name";
   debug "submit:  old: $oldname";
   debug "submit:   id: $id";
- 
 
   foreach ( qw( name name-english location homepage 
                 email phone fax   postal   note id
@@ -693,12 +642,15 @@ sub submit_institution {
       $institution -> {$_} = $input->{$_};
     }
   }
-
-  $institution -> {'submitted-by'} = $session -> owner -> {login};
-
+  for ( $institution ) {
+    if ( $_ ->{note} 
+         and length( $_->{note} ) > 750 ) {
+      substr( $_->{note}, 750 ) = '...';
+    }
+    $_ -> {'submitted-by'} = $session -> owner -> {login};
+  }
 
   if ( $session -> {'submitted-institutions'} ) {
-
     ### append or replace an institution in the submitted list
     my $list = $session -> {'submitted-institutions'};
     my $replace;
@@ -722,46 +674,37 @@ sub submit_institution {
 
   } else {
     ### create the submitted institutions list
-    $session -> {'submitted-institutions'} = [ $institution ];
+    $session->{'submitted-institutions'} = [ $institution ];
+    $session->run_at_close( 'require ACIS::Web::Affiliations; 
+ACIS::Web::Affiliations::send_submitted_institutions_at_session_close( $self );' );
   }
 
 
-
   # adding an institution to the profile
-  
   if ( $input -> {'add-to-profile'} ) {
-
     debug "adding a submitted institution ($name) to the record";
-    $app -> userlog( "affil: add a submited institution, name: $name", $id ? " id: $id" : '' );
+    $app -> userlog( "affil: add a submitted institution, name: $name", $id ? " id: $id" : '' );
   
-
     my $record  = $session -> current_record;
     my $id      = $record -> {id};
-
     assert( $record->{type} eq 'person' );
-
     $record -> {affiliations} = []
       if not defined $record -> {affiliations};
-
     $session -> {$id} {affiliations} = []
       if not defined $session -> {$id} {affiliations} ;
-  
-    my $affiliations = $record  ->{affiliations};
-    my $unfolded     = $session -> {$id} {affiliations};
-  
+
+    my $affiliations = $record->{affiliations};
+    my $unfolded     = $session->{$id}{affiliations};
+ 
     ### additional check
     my $replace;
     my $counter = 0;
     foreach ( @$unfolded ) {
-
-      if (  
-          ( $_ -> {name} eq $name ) 
-          or ( $_ -> {name} eq $oldname ) 
-          or (
-              defined $_ -> {id} 
-              and $id
-              and ( $_ -> {id} eq $id ) 
-             )
+      if ( ($_->{name} eq $name) 
+           or ($_->{name} eq $oldname) 
+           or ( defined $_->{id} 
+                and $id
+                and ($_->{id} eq $id) )
          ) {
         ### there is already such an institution...
         $replace = $counter;
@@ -786,26 +729,19 @@ sub submit_institution {
                   -location => $institution ->{location},
 ($institution->{id})? ( -id => $institution ->{id} ): (),
                    );
-
     }
   
-  } # if "add-to-profile" 
-  else {
-    
+  } else {
     debug "not needed to add";
-
     $app -> userlog( "affil: submited an institution, but asked not to add it, name: $name", 
                      ($id ? " id: $id" : '') );
-
     $app -> sevent ( -class => 'affil',
                     -action => 'submit-not-add',
                      -descr => $institution ->{name},
                   -location => $institution ->{location},
 ($institution->{id})? ( -id => $institution ->{id} ): (),
                    );
-
   }
-
 
   $app  -> message( "institution-submission-accepted" );
 
@@ -816,7 +752,20 @@ sub submit_institution {
   } else {
     $app -> redirect_to_screen_for_record ( 'affiliations' );
   }
+}
 
+
+sub send_submitted_institutions_at_session_close {
+  my $session = shift;
+  my $acis = $ACIS::Web::ACIS;
+  if ( ref my $submitted = $session->{'submitted-institutions'} ) {
+    foreach ( @$submitted ) {
+      next if not $_;
+      $acis ->variables ->{institution} = $_;
+      $acis ->send_mail ( 'email/new-institution.xsl' );
+      undef $_;
+    }
+  }
 }
 
 

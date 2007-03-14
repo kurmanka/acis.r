@@ -28,7 +28,7 @@ package ACIS::Web;   ### -*-perl-*-
 #  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 #
 #  ---
-#  $Id: Services.pm,v 2.21 2007/02/04 02:42:23 ivan Exp $
+#  $Id: Services.pm,v 2.22 2007/03/14 18:27:49 ivan Exp $
 #  ---
 
 use strict;
@@ -54,10 +54,9 @@ sub start_session {
   my $type  = shift;
 
   assert( ref $self );
-  assert( not $self -> session ); ### XXX ?
+  assert( not $self -> session );
 
   my $sid;
-
   my $class = $SESSION_CLASS{$type};
   if ( not $class ) { 
     $self -> errlog( "Session class for session type '$type' is undefined" );
@@ -65,10 +64,8 @@ sub start_session {
   }
 
   my $session  = $class -> new( $self, @_ );
-
   if ( not $session ) {
-    $self -> errlog( "can't create session" );
-    die "can't create session";
+    complain "can't create session of $class";
   }
 
   $sid = $session ->id;

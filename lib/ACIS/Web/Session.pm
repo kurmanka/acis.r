@@ -1,10 +1,9 @@
 package ACIS::Web::Session;   ### -*-perl-*-  
-#
 #  This file is part of ACIS software, http://acis.openlib.org/
 #
 #  Description:
 #
-#    ACIS session class, main, general
+#    ACIS session class, general
 #
 #  Copyright (C) 2003 Ivan Kurmanov, ACIS project, http://acis.openlib.org/
 #
@@ -22,22 +21,17 @@ package ACIS::Web::Session;   ### -*-perl-*-
 #  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 #
 #  ---
-#  $Id: Session.pm,v 2.3 2007/02/13 14:24:37 ivan Exp $
+#  $Id: Session.pm,v 2.4 2007/03/14 18:27:49 ivan Exp $
 #  ---
 
 use strict;
-
 use Storable;
 use Data::Dumper;
 use Carp::Assert;
 
-use Web::App::Common;
-
-use base qw( Web::App::Session );
-
 use ACIS::Web::UserData;
-
-
+use Web::App::Common;
+use base qw( Web::App::Session );
 
 sub find_userdata_record_by_sid {
   my $self = shift;
@@ -322,12 +316,26 @@ sub close_without_saving {
   my $self = shift;
   my $app  = shift;
   assert( $app );
-  
+  $self -> close( $app );
+}
+
+sub run_at_close {
+  my $self = shift;
+  my $code = shift || die;
+  my $list = $self->{'.run_at_close'} ||= [];
+  push @$list, $code;
+}
+
+sub close {
+  my $self = shift;
+  my $app  = shift;
+  if (my $l = $self->{'.run_at_close'}) {
+    foreach (@$l) {
+      # that's a trick
+      eval $_;
+    }
+  }
   $self -> SUPER::close( $app );
 }
 
-
-
-###############    t h e   e n d    ###########################
-
-1;
+1; ###    t h e   e n d    ###

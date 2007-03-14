@@ -26,7 +26,7 @@ package Web::App::Session; ### -*-perl-*-
 #  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 #
 #  ---
-#  $Id: Session.pm,v 2.10 2007/02/14 23:01:33 ivan Exp $
+#  $Id: Session.pm,v 2.11 2007/03/14 18:27:49 ivan Exp $
 #  ---
 
 
@@ -395,9 +395,7 @@ sub save  {
 sub make_sticky {
   my $self = shift;
   my @par  = @_;
-  
   my $sticky = $self -> {'.sticky'};
-  
   foreach ( @par ) {
     $sticky ->{$_} = 'sticky';
   }

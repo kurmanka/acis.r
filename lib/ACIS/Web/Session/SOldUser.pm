@@ -24,7 +24,7 @@ package ACIS::Web::Session::SOldUser;   ### -*-perl-*-
 #  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 #
 #  ---
-#  $Id: SOldUser.pm,v 2.1 2006/09/30 16:11:40 ivan Exp $
+#  $Id: SOldUser.pm,v 2.2 2007/03/14 18:27:49 ivan Exp $
 #  ---
 
 use strict;
@@ -35,14 +35,21 @@ use Web::App::Common qw( &date_now debug );
 
 use ACIS::Web::Session;
 use ACIS::Web::UserData;
+use ACIS::SessionHistory;
 
 use base qw( ACIS::Web::Session );
 
 
 
-sub type { 'user' }  ## XX 'old-user' ?
+sub type { 'user' }  
 
-
+sub new {
+  my $class = shift;
+  my $acis  = shift;
+  my $self  = $class -> SUPER::new( $acis, @_ ); 
+  session_start( $self );
+  return $self;
+}
 
 sub close {
   my $self = shift;
@@ -98,33 +105,26 @@ sub close {
         die $prob;
       }
 
-      $self -> notify_user_about_profile_changes ( $app );
+      $self -> notify_user_about_profile_changes( $app );
     }
   }
 
 
-  ### send submitted institution emails
-
-  ### XXX This code is repeated.  Should not be so.  And for this type of
-  ### session, it could be done immediately in the 'submit institution screen'
-  ### processors:  Ha?
-
+  ### - send submitted institution emails -
+  ### XXX This code is repeated here and in ::SNewUser.  It should be
+  ### removed after a while, when all existing sessions are processed.
   my $submitted = $self -> {'submitted-institutions'};
   if ( ref $submitted ) {
     foreach ( @$submitted ) {
-      ### XXX 2005-09-01 14:52 a dirty hack to close a particular bad session
-      ### which had a huge note attached to the affiliation data
-      if ( $_ ->{note} 
-           and length( $_->{note} ) > 750 ) {
-        substr( $_->{note}, 750 ) = '...';
-      }
+      next if not $_;
       $app -> variables -> {institution} = $_;
       $app -> send_mail ( 'email/new-institution.xsl' );
+      undef $_;
     }
   }
 
+  session_stop( $self );
   $self -> SUPER::close( $app );
-
 }
 
 
@@ -139,7 +139,7 @@ sub close_without_saving {
   $app -> sevent ( -class  => 'session',
                    -action => 'discard',
                  );
-
+  session_discard( $self );
   $self -> SUPER::close( $app );
 }
 
