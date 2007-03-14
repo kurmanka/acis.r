@@ -1,22 +1,71 @@
-Name-English should never be left empty! (Now it can be if a
-user edits his current latin name, but what he enters is
-invalid.)
+Move session clean-up code from bin/cleanup to ACIS::Sessions module.
+
+Go through all XXX marks and either fix or re-label them as "ZZZ" or
+"maybe".
+
+Things would be nice to have:
+
+ - fastcgi support
+
+ - check APU queue building: does it really sort by time?
+
+ - a database of the configuration parameters, database tables, 
+   sysvars/sysflags, sysprof param names, etc.  I don't know how.  Via
+   ACIS itself?
+
+ - APU auto-throttling?
+
+ - improve registration confirmation system to fix our response on
+   already confirmed URLs
 
 
-On the profile page, do not list items which have no sid, or
-empty title  (e.g. RePEc:rus:* items)
+CHECK: Name-English should never be left empty! (Now it can be if a
+user edits his current latin name, but what he enters is invalid.)
+
+CHECK: On the profile page, do not list items which have no sid, or
+empty title (e.g. RePEc:rus:* items)
 
   - also: do not list editors, if the editors element is
     empty
 
+CHECK: How do I treat research profile items (/contributions/accepted)
+which have no record in the resources table?  I should remove them!
 
-How do I treat research profile items
-(/contributions/accepted) which have no record in the
-resources table?  I should remove them!
+RAS: Christian sent me some text for some email or some screen a while ago.
 
 
-short-id assignment: two simultaneous requests should not
-interfere.
+###  ACIS community building 
+
+ - prepare acis.openlib.org
+
+   - publish textilshchiki paper
+
+   - put a large banner there, that we seek like-minded people, and
+     volunteers
+
+   - review site navigation
+
+ - RAS
+
+   - maybe ask Christian to put an announcement about it into his monthly
+     mailing
+
+   - put an announcement on RAS
+
+   - Maybe make little "Did you know?" ads on RAS with links
+     to little details about ACIS.  (Or may be ACIS would be
+     just one of these.  Other details may be about RePEc,
+     EDIRC and such.)
+
+ - Maybe we should make a nice button "Powered by ACIS"
+   ("Powered by ACIS software"? "Runs on ACIS software"?)
+   with a link to acis.openlib.org.
+
+
+
+
+short-id assignment: two simultaneous requests should not cause a
+deadlock.  but how?
 
 
 Documentation to fix:

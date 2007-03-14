@@ -1,20 +1,5 @@
 # ACIS Citations TO DO List
 
-2007-02-13 16:24
-
-things would be nice to do:
-
- - fastcgi support
-
- - user login history db table
-
- - check APU queue building: does it really sort by time?
-
- - service-wide announcements and easy down-time switches for upgrades, etc.
-
-
-### update citations.html document
-
 ### check the recent failed and "no" items in the RAS' apu_queue
 
 ### citations
@@ -29,38 +14,6 @@ things would be nice to do:
 
   - does main.conf.eg needs a revision?  Add comments?
 
-
-### APU
-
-  - implement auto-throttling?
-
-
-###  ACIS community building 
-
- - prepare acis.openlib.org
-
-   - publish textilshchiki paper
-
-   - put a large banner there, that we seek like-minded people, and
-     volunteers
-
-   - review site navigation
-
- - RAS
-
-   - maybe ask Christian to put an announcement about it into his monthly
-     mailing
-
-   - put an announcement on RAS
-
-   - Maybe make little "Did you know?" ads on RAS with links
-     to little details about ACIS.  (Or may be ACIS would be
-     just one of these.  Other details may be about RePEc,
-     EDIRC and such.)
-
- - Maybe we should make a nice button "Powered by ACIS"
-   ("Powered by ACIS software"? "Runs on ACIS software"?)
-   with a link to acis.openlib.org.
 
 
 
