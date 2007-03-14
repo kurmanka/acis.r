@@ -27,7 +27,7 @@ package ACIS::Web::NewUser; ### -*-perl-*-
 #  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 #
 #  ---
-#  $Id: NewUser.pm,v 2.6 2007/02/13 14:24:37 ivan Exp $
+#  $Id: NewUser.pm,v 2.7 2007/03/14 21:22:56 ivan Exp $
 #  ---
 
 
@@ -142,16 +142,12 @@ sub initial_process {
     $app -> clear_process_queue;
     return;
   }
-
-
   $owner -> {IP} = $ENV{'REMOTE_ADDR'};
 
   debug "creating a session";
-  my $session = $app -> start_session ( 'new-user', $login, $owner );
-
+  my $session = $app -> start_session( 'new-user', $login, $owner );
   my $sid     = $session -> id;
   debug "new session created: $sid";
-
   $app -> sevent ( -class => 'new-user',
                    -login => $login,
                     -file => $paths ->{'user-data'},
@@ -165,13 +161,9 @@ sub initial_process {
   }
 
   $app -> process_form_data;
-
   $app -> userlog ( "initial registration" ); 
-
   prepare_user( $app );
-
   $app -> redirect_to_screen( 'new-user/additional' );
-
 
   if ( $form_input -> {'remember-me'} ) {
     $app -> set_authentication_cookie( 'login', $login );
@@ -184,22 +176,17 @@ sub initial_process {
 
 
 sub prepare_user {
-
   my $app = shift;
-  
   my $session = $app -> session;
   my $record  = $session -> current_record;
   
   debug ( Dumper $record );
-
   assert( $record->{name} );
   assert( $record->{name} -> {last} );
-
 
   $record ->{type} = 'person';
 
   my $name         = $record -> {name}; 
-
   my $first_name   = $name -> {first};
   my $middle       = $name -> {middle};
   my $last_name    = $name -> {last};
@@ -210,20 +197,15 @@ sub prepare_user {
   if ( $suffix ) {
     $full_name .= ", $suffix";
   }
-
   $full_name =~ s/\s+/ /g;
-
   debug( "Full name: $full_name" );
-
   $app -> userlog ( "initial: full name: $full_name" );
     
   $record  ->{name} {full} = $full_name;
   $session -> object -> {owner} {name} = $full_name;
-
   $app -> sevent ( -class => 'new-user',
                -humanname => $full_name, 
                  );
-
 
   if ( $session ->type eq 'new-user' ) {
     $session ->owner ->{name}  = $full_name;
@@ -248,18 +230,12 @@ sub prepare_user {
     } else {
       delete $session -> {'ask-latin-name'};
     }
-
   }
-    
 
   ### generate initial name variations
-
   my $variations_list = ACIS::Web::Person::generate_name_variations( $record );
-
   $record -> {name}{'additional-variations'} = $variations_list;
-
   ACIS::Web::Person::compile_name_variations( $app, $record );
-
 }
 
 

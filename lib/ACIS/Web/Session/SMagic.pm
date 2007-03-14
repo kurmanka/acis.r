@@ -24,7 +24,7 @@ package ACIS::Web::Session::SMagic;   ### -*-perl-*-
 #  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 #
 #  ---
-#  $Id: SMagic.pm,v 2.0 2005/12/27 19:47:40 ivan Exp $
+#  $Id: SMagic.pm,v 2.1 2007/03/14 21:22:56 ivan Exp $
 #  ---
 
 use strict;
@@ -41,13 +41,11 @@ use base qw( ACIS::Web::Session::SOldUser );
 
 sub type { 'magic' }  
 
-
 # sub new { 
 #  my $class = shift;
 #  my @para = @_;
 #  my $acis  = $para[0];
 #  my $owner = $para[1];
-
 #  my $s = $class -> SUPER::new( @para );
 # 
 #  return $s;
@@ -56,21 +54,17 @@ sub type { 'magic' }
 sub set_notify_template { 
   my $self = shift;
   my $file = shift;  assert( $file );
-
   $self -> {_} {notify_template} = $file;
 }
 
 sub notify_user_about_profile_changes {
   my $self = shift;
   my $app  = shift;
-  
   my $mode = $self -> {_}{mode};
   my $file = $self -> {_}{notify_template};
 
-  if ( $file ) { ### XXX can I leave it like this?
-    assert( $file );
-
-    $app -> send_mail ( $file ) ;
+  if ( $file ) { 
+    $app -> send_mail( $file );
   }
 }
 

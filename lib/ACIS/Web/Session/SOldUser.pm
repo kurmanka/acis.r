@@ -24,7 +24,7 @@ package ACIS::Web::Session::SOldUser;   ### -*-perl-*-
 #  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 #
 #  ---
-#  $Id: SOldUser.pm,v 2.2 2007/03/14 18:27:49 ivan Exp $
+#  $Id: SOldUser.pm,v 2.3 2007/03/14 21:22:56 ivan Exp $
 #  ---
 
 use strict;
@@ -35,21 +35,11 @@ use Web::App::Common qw( &date_now debug );
 
 use ACIS::Web::Session;
 use ACIS::Web::UserData;
-use ACIS::SessionHistory;
 
 use base qw( ACIS::Web::Session );
 
 
-
 sub type { 'user' }  
-
-sub new {
-  my $class = shift;
-  my $acis  = shift;
-  my $self  = $class -> SUPER::new( $acis, @_ ); 
-  session_start( $self );
-  return $self;
-}
 
 sub close {
   my $self = shift;
@@ -59,13 +49,10 @@ sub close {
   my $userdata = $self  -> object ;
 
   if ( $userdata ) {
-
     my $owner = $userdata -> {owner};
-
     if ( $self -> has_userdata_changed ) {
 
       $owner -> {'last-change-date'} = date_now();
-
       ###  process userdata owner login change
       if ( $owner -> {'old-login'} ) {
         $app -> userlog ( "log off: login change from ", 
@@ -101,10 +88,7 @@ sub close {
       ### write userdata and request RI update
       $self -> save_userdata( $app );
       
-      if ( $prob ) { 
-        die $prob;
-      }
-
+      if ( $prob ) { die $prob; }
       $self -> notify_user_about_profile_changes( $app );
     }
   }
@@ -123,25 +107,9 @@ sub close {
     }
   }
 
-  session_stop( $self );
   $self -> SUPER::close( $app );
 }
 
-
-sub close_without_saving {
-  my $self = shift;
-  my $app  = shift;
-  assert( $app );
-  
-
-  $app -> log( "session close without saving data" );
-
-  $app -> sevent ( -class  => 'session',
-                   -action => 'discard',
-                 );
-  session_discard( $self );
-  $self -> SUPER::close( $app );
-}
 
 
 

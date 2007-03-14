@@ -24,7 +24,7 @@ package ACIS::Web::Session::SNewUser;   ### -*-perl-*-
 #  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 #
 #  ---
-#  $Id: SNewUser.pm,v 2.2 2007/03/14 18:27:49 ivan Exp $
+#  $Id: SNewUser.pm,v 2.3 2007/03/14 21:22:56 ivan Exp $
 #  ---
 
 use strict;
@@ -33,29 +33,25 @@ use Carp::Assert;
 
 use ACIS::Web::Session;
 use ACIS::Web::UserData;
-use ACIS::SessionHistory;
 
 use base qw( ACIS::Web::Session );
 
 use Web::App::Common qw( &date_now );
 
+sub type { 'new-user' }
+
 sub new {
   my $class = shift;
   my $acis  = shift;
   my $login = shift;
-
   my $self  = $class -> SUPER::new( $acis, @_ ) or return undef; 
-  
-  $acis    -> update_paths_for_login ( $login );
+  $acis    -> update_paths_for_login( $login );
   my $udata = $acis -> create_userdata();
   $self    -> object_set( $udata );
   $udata -> {owner} = $self ->{'.owner'};
-  session_start( $self );
   return $self;
 }
 
-
-sub type { 'new-user' }
 
 
 sub close {
@@ -88,11 +84,19 @@ sub close {
   ### remove registration session
   my $old_session_file = $self ->{'remove-old-session-file'};
   unlink $old_session_file;
-  session_stop( $self );
 
   $self -> SUPER::close( $app );
 }
 
+
+sub very_old {  
+  my $self = shift;
+  my $filename = $self->{'.filename'};
+  my $mtime    = ( stat( $filename ) )[9];
+  my $now      = time();
+  my $days     = $ACIS::Web::ACIS -> config( 'new-user-session-lifetime' ) || 7;
+  return( $now - $mtime > 60 * 60 * 24 * $days ); ### a week old?
+}
 
 
 sub close_without_saving {
@@ -100,12 +104,7 @@ sub close_without_saving {
   my $app  = shift;
   assert( $app );
 
-  $app -> log( "session close without saving data" );
-  $app -> sevent ( -class  => 'session',
-                   -action => 'discard',
-                 -startend => 0 
-                 );
-  session_discard( $self );
+  $self->{'.discarded'} = 1;
 
   my $sql = $app -> sql_object;
   my $id  = $self -> id;

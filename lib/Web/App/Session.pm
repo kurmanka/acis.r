@@ -26,28 +26,25 @@ package Web::App::Session; ### -*-perl-*-
 #  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 #
 #  ---
-#  $Id: Session.pm,v 2.11 2007/03/14 18:27:49 ivan Exp $
+#  $Id: Session.pm,v 2.12 2007/03/14 21:22:56 ivan Exp $
 #  ---
 
 
 use strict;
-
 use Storable;
 use Carp::Assert;
 
 use Web::App::Common;
 
+sub type { 'default' }
 
 sub new {
   my $class  = shift;
-  my $app    = shift;
-
-  assert( $app );
-
+  my $app    = shift || die;
   my $owner  = shift;
+  my %par    = @_;
   my $expire = $app -> config( 'session-lifetime' );
   my $dir    = $app -> sessions_dir;
-
   my $id = generate_id();
 
   while ( -f "$dir/$id" ) {
@@ -73,12 +70,14 @@ sub new {
               '.app'      => $app,
               '_'         => {},
              };
-
   bless $self, $class;
-  
 
   if ( defined $expire ) {
     $self -> {'.lifetime'} = $expire * 60;
+  }
+
+  if ( $par{object} and $par{file} ) {
+    $self->object_set( $par{object}, $par{file} );
   }
 
   $app -> event( -class  => 'session',
@@ -103,7 +102,6 @@ sub load {
   my $class    = shift;
   my $app      = shift;
   my $filename = shift;
-
   my $self;
   
   if ( not -f $filename ) { return undef; }
@@ -143,21 +141,6 @@ sub expired {
   return 0;
 }
 
-
-sub very_old {  ### XXX somewhat dirty
-  my $self = shift;
-
-  my $filename = $self->{'.filename'};
-  my $mtime    = ( stat( $filename ) )[9];
-  my $now      = time();
-
-  if( $now - $mtime > 60 * 60 * 24 * 7 ) {  ### a week old?
-    ###  too old
-    return 1;
-  } else {
-    return 0;
-  }
-}
 
 
 sub filename {
@@ -231,12 +214,6 @@ sub id {
   my $self = shift;
   return $self->{'.id'};
 }
-
-sub type { 
-  my $self = shift;
-  return 'default';
-}
-
 
 sub owner { 
   my $self = shift;
@@ -375,7 +352,6 @@ sub save  {
   if ( $self -> {'.closed'} ) {
     return;
   }
-
   delete $self ->{'.app'};
 
 #  use Data::Dumper;

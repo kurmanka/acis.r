@@ -28,7 +28,7 @@ package ACIS::Web;   ### -*-perl-*-
 #  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 #
 #  ---
-#  $Id: Services.pm,v 2.22 2007/03/14 18:27:49 ivan Exp $
+#  $Id: Services.pm,v 2.23 2007/03/14 21:22:56 ivan Exp $
 #  ---
 
 use strict;
@@ -60,7 +60,7 @@ sub start_session {
   my $class = $SESSION_CLASS{$type};
   if ( not $class ) { 
     $self -> errlog( "Session class for session type '$type' is undefined" );
-    return undef; 
+    die "Session class for session type '$type' is undefined";
   }
 
   my $session  = $class -> new( $self, @_ );
@@ -73,7 +73,6 @@ sub start_session {
 
   $self -> set_session_cookie( $sid );
   $self -> session( $session );
-
   return $session;
 }
 
@@ -103,7 +102,6 @@ sub load_session {
   my $override;  
   my $sessions_dir = "$home/sessions";
   my $sfilename    = "$sessions_dir/$seid";
-
   my $session = $SESSION_CLASS_MAIN -> load( $app, $sfilename );
 
   use Scalar::Util qw( blessed );
@@ -238,11 +236,8 @@ sub clear_session_cookie {
 sub create_userdata {
   my $app = shift;
   my $class = shift || "ACIS::Web::UserData";
-
   assert( $app -> paths -> {'user-data'} );
-
   my $file = $app -> paths -> {'user-data'};
-  
   my $userdata = $class -> new( $file );
 }
 
@@ -279,14 +274,10 @@ sub check_login_and_pass {
 #   'existing-session-loaded' - 
 
   my $app   = shift;
-  
   my $login = shift;
+  $login = lc $login; # lower-case it
   my $pass  = shift;
   my $override = shift; # ?
-
-
-  ### lower-case login
-  $login = lc $login; 
 
 
   ###  now it's time to check, if such a user exists and if her
@@ -294,18 +285,14 @@ sub check_login_and_pass {
   ###  if both true, check the lock;
 
   my $udata_file    = $app -> userdata_file_for_login( $login );
-
   if ( not -f $udata_file ) {
     return 'no-account';
   }
 
-
   my $lock = "$udata_file.lock";
-  
   if ( -f $lock ) {{
 
     debug "found lock file at '$lock'";
-
     my $sid; 
     if ( open LOCK, $lock ) {
       $sid = <LOCK>;
@@ -340,7 +327,6 @@ sub check_login_and_pass {
     if ( $owner and $owner ->{login} ) {
       if ( $login eq lc $owner ->{login} ) {
 
-
         if ( not equal_passwords( $pass, $owner ->{password} ) ) {
           return "wrong-password:$owner->{password}";
         }
@@ -361,7 +347,7 @@ sub check_login_and_pass {
   } 
 
 
-  my $udata = load ACIS::Web::UserData ( $udata_file );
+  my $udata = load ACIS::Web::UserData( $udata_file );
 
   if ( not defined $udata
        or not defined $udata->{owner}
@@ -375,7 +361,6 @@ sub check_login_and_pass {
   if ( not equal_passwords $pass, $udata -> {owner} {password} ) {
     return "wrong-password:$udata->{owner}{password}";
   }
-
    
   return $udata;
 }
@@ -522,13 +507,9 @@ sub authenticate {
 
     my $udata = $status;
     $app -> update_paths_for_login( $login );
-
-    return login_start_session ( $app, $udata, $login );
-
-  } else {
-    ### XX ??
+    return login_start_session( $app, $udata, $login );
   }
-
+  # else ?
   return undef;
 }
 
@@ -538,17 +519,13 @@ sub login_start_session {
   my $app     = shift;
   my $udata   = shift;
   my $login   = shift;
+  $login = lc $login;
 
   my $request = $app -> request;
-
   my $udata_file = $app -> paths -> {'user-data'};
 
   ### create a session
-  
   my $owner = $udata -> {owner};
-
-  $login = lc $login;
-
   if ( lc $owner->{login} ne $login ) {
     $app -> errlog( 
        "[$login] login entered and userdata's owner don't match, userdata: $owner->{login}" );
@@ -561,16 +538,18 @@ sub login_start_session {
                      } );
     return undef;
   }
+  $owner -> {IP} = $ENV{'REMOTE_ADDR'};
 
-  $owner -> {IP} = $ENV {'REMOTE_ADDR'};
+  my $session = $app -> start_session( "user", $owner,
+                                       object => $udata,
+                                       file   => $udata_file );
 
-  
-  my $session = $app -> start_session( "user", $owner );
-
+  ### make a copy of userdata in session
+  #$session -> object_set( $udata, $udata_file );
+  #session_start( $session );
   my $sid = $session -> id;
   assert( $sid );
-
-  $app -> sevent ( -class => 'auth',
+  $app -> sevent(  -class => 'auth',
                   -action => 'success',
                    -descr => 'user entered',
                    -file  => $udata_file,
@@ -578,69 +557,39 @@ sub login_start_session {
                    -IP    => $owner->{IP},
                -humanname => $owner->{name},
                  );
-
-  
-  ### make a copy of userdata in session
-  $session -> object_set( $udata, $udata_file );
-
-
+   
   ### now do some compatibility checks for the userdata
   use ACIS::Web::Person;
-
   my $records = $udata -> {records};
-
   if ( not $records ) {
     $records = $udata ->{records} = [];
   }
-
   foreach ( @$records ) {
-    if ( $_ ->{type} eq 'person' ) {
+    if ( $_->{type} eq 'person' ) {
       ACIS::Web::Person::bring_up_to_date( $app, $_, $udata );
     }
   }
-
-
   put_sysprof_value( $login, 'last-login-date', date_now() );
 
-
-  ###  compatibility userdata update 
-  ###  XXX to be removed
-  foreach ( qw( initial-registered-date last-change-date ) ) {
-
-    if ( $owner -> {$_} 
-         and $owner -> {$_} =~ /[a-zA-Z]+/
-       ) {
-      my $date = convert_date_to_ISO( $owner -> {$_} );
-      $owner -> {$_} = $date;
-    }
-  }
-  ###### udata lock was here
-
   my $auto_login = $app -> form_input ->{'auto-login'} || '';
- 
   if ( $auto_login eq "true" )  {
     my $pass = $app -> form_input ->{pass};
-
     $app -> set_auth_cookies( $login, $pass );
   } 
 
   ### redirect to the same screen, but with session id
-
   my $base_url = $app -> config( 'base-url' );
   my $screen   = $app -> {request} -> {screen} || '';
-
-  my $URI = "$base_url/$screen!$sid";  ### XXX URL structure, dependency
+  my $URI = "$base_url/$screen!$sid";  ### ZZZ application URL structure dependency
 
   $app -> userlog( "logged in", 
                    ($screen and $screen ne 'index') ? " to screen $screen" : '', 
                    ", session $sid",
                    ", IP ", $ENV{REMOTE_ADDR} );
-
   debug "requesting a redirect to $URI";
-  
   $app -> clear_process_queue;
   $app -> redirect( $URI );
-  
+
   return $udata;
 }
 

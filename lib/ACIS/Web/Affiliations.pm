@@ -25,7 +25,7 @@ package ACIS::Web::Affiliations;   ### -*-perl-*-
 #  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 #
 #  ---
-#  $Id: Affiliations.pm,v 2.4 2007/03/14 18:27:49 ivan Exp $
+#  $Id: Affiliations.pm,v 2.5 2007/03/14 21:22:56 ivan Exp $
 #  ---
 
 
@@ -758,7 +758,8 @@ ACIS::Web::Affiliations::send_submitted_institutions_at_session_close( $self );'
 sub send_submitted_institutions_at_session_close {
   my $session = shift;
   my $acis = $ACIS::Web::ACIS;
-  if ( ref my $submitted = $session->{'submitted-institutions'} ) {
+  my $submitted = $session->{'submitted-institutions'};
+  if ( $submitted and ref $submitted ) {
     foreach ( @$submitted ) {
       next if not $_;
       $acis ->variables ->{institution} = $_;

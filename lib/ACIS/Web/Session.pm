@@ -21,7 +21,7 @@ package ACIS::Web::Session;   ### -*-perl-*-
 #  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 #
 #  ---
-#  $Id: Session.pm,v 2.4 2007/03/14 18:27:49 ivan Exp $
+#  $Id: Session.pm,v 2.5 2007/03/14 21:22:56 ivan Exp $
 #  ---
 
 use strict;
@@ -32,6 +32,18 @@ use Carp::Assert;
 use ACIS::Web::UserData;
 use Web::App::Common;
 use base qw( Web::App::Session );
+use ACIS::SessionHistory;
+
+sub new {
+  my $class = shift;
+  my $acis  = shift;
+  my $self  = $class -> SUPER::new( $acis, @_ ); 
+  session_start( $self );
+  # maybe:
+  #  $acis -> session_start_hook( $self );
+  return $self;
+}
+
 
 sub find_userdata_record_by_sid {
   my $self = shift;
@@ -316,6 +328,7 @@ sub close_without_saving {
   my $self = shift;
   my $app  = shift;
   assert( $app );
+  $self->{'.discarded'} = 1;
   $self -> close( $app );
 }
 
@@ -333,9 +346,30 @@ sub close {
     foreach (@$l) {
       # that's a trick
       eval $_;
+      if ($@) {
+        complain "a problem during run_at_close session hook: $@, original code was: `$_'";
+      }
     }
   }
+
+  if ( $self->{'.discarded'} ) {
+    $app -> log( "session close without saving data" );
+    $app -> sevent ( -class  => 'session',
+                     -action => 'discard',
+                     -startend => 0 
+                   );
+    session_discard( $self );
+  } else {
+    session_stop( $self );
+  }
+
   $self -> SUPER::close( $app );
 }
+
+
+sub very_old { 0 };
+
+
+
 
 1; ###    t h e   e n d    ###

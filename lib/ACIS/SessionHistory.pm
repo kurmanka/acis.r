@@ -1,5 +1,7 @@
 package ACIS::SessionHistory;
 
+# called from ACIS::Web::Session
+
 use strict;
 use warnings;
 use Exporter qw(import);
@@ -9,7 +11,7 @@ use Web::App::Common;
 
 sub session_history_event {
   my ($sessionid,$login,$type,$act) = @_;
-  my $sql = $ACIS::Web::ACIS -> sql_helper;
+  my $sql = $ACIS::Web::ACIS -> sql_object;
   $sql -> prepare_cached( "insert into session_history values (NOW(),?,?,?,?)" );
   $sql -> execute( $sessionid,$login,$type,$act );  
 }
@@ -19,7 +21,7 @@ sub session_stop {
   my $sessionid=$session->id;
   my $login; 
   eval { $login=$session->object->{owner}->{login}; };
-  complain( "can't find session's user login: $sessionid"), return undef 
+  complain( "can't find session's user login: $sessionid")
     if not $login;
   my $type = $session->type;
   session_history_event($sessionid,$login,$type,'stop');
@@ -31,8 +33,14 @@ sub session_start {
   my $sessionid=$session->id;
   my $login; 
   eval { $login=$session->object->{owner}->{login}; };
-  complain( "can't find session's user login: $sessionid"), return undef 
-    if not $login;
+  if (not $login) {
+#    complain( "can't find session's user login: $sessionid");
+    $login = $session->owner->{login};
+  }
+  if (not $login) {
+    complain( "can't find session's owner login: $sessionid");
+    $login = 'unknown'; # XXX 
+  }
   my $type = $session->type;
   session_history_event($sessionid,$login,$type,'start');
 }
@@ -42,8 +50,10 @@ sub session_discard {
   my $sessionid=$session->id;
   my $login; 
   eval { $login=$session->object->{owner}->{login}; };
-  complain( "can't find session's user login: $sessionid"), return undef 
-    if not $login;
+  $login=$session->owner->{login}
+    if not $login; 
+  complain( "can't find session's user login: $sessionid"), $login='unknown'
+    if not $login; 
   my $type = $session->type;
   session_history_event($sessionid,$login,$type,'discard');
 }
