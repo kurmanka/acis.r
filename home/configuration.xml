@@ -5,7 +5,7 @@
     that is a working ARDB core configuration file.  Produces:
     documents table, collections table, authors table.
 
-    $Id: configuration.xml,v 2.13 2007/03/13 20:28:15 ivan Exp $
+    $Id: configuration.xml,v 2.14 2007/03/14 18:28:17 ivan Exp $
 
 -->
 
@@ -512,13 +512,23 @@
     <field name='url'   sql-type='varchar(200)' />
     <field name='file'  sql-type='varchar(200)' />
 -->
-    <field name='chain'    sql-type='char(16)'/>
-    <field name='startend' sql-type='tinyint'/>
+    <field name='chain'    sql-type='char(16)'/><!-- session id -->
+    <field name='startend' sql-type='tinyint'/><!-- 1 is session start, -1 is session end -->
 
     <field name='packed'   sql-type='mediumblob'/>
 
     <create-table-sql line='index( date, chain )'/>
   </table>    
+
+  <table name='acis:session_history'>
+    <field name='date'  sql-type='datetime not null' />
+    <field name='sessionid' sql-type='char(16) not null' />
+    <field name='login' sql-type='varchar(100) not null' />
+    <field name='type'  sql-type='varchar(10) not null' />
+    <field name='act'   sql-type='enum("start","stop","discard") not null' />
+    <create-table-sql line='primary key(date,sessionid,act), index(login,type)'/>
+  </table>
+
 
 
   <!-- APU Queue -->
