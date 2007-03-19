@@ -331,17 +331,13 @@ sub show_events_for {
   die if $sql->error;
 
 
-
   my $sessions = {};
   my @events   = ();
   my $days     = {};
-
   my $scount = 0;
   $ecount = 0;
   my $stopped_at = '';
-  
   my $tail   = '';  ###  tail is until what time to scan after the main read
-
   my $mode = 'collect';
   my $e;
   my $row;
@@ -400,11 +396,8 @@ sub show_events_for {
 
       if ( $se ->{about} {closed} ) {
         my $closed = $se ->{about} {closed};
-        
         my $log = $se->{log};
-        
         debug "$chid, a closed session";
-        
         if ( $e ->{packed} and $log ) {
         } else {
           debug "with no packed log";
@@ -432,9 +425,7 @@ sub show_events_for {
               next;
             }
           }
-
           $ecount += scalar @$log;
-
 
           ## do not scan for further events of this session
           delete $sessions->{$chid};
@@ -458,9 +449,7 @@ sub show_events_for {
     
     my $se = $sessions ->{$chid};
     if ( $se ) {
-
       chain_process_event( $se, $e );
-
       if ( $se -> {complete} ) { 
         delete $sessions ->{$chid};
       }
@@ -651,9 +640,7 @@ sub recent_events_raw {
   my $acis = shift;
 
   my $period = $acis -> form_input -> {hours} || 25;
-
   my $d = $acis -> get_recent_events( $period );
-
   my $sql = $acis -> sql_object;
   die if $sql->error;
   
@@ -712,9 +699,7 @@ sub recent_events_decode {
       my $e    = make_event_from_db_row( $d->{row} );
       my $chid = $e ->{chain};
 
-
       ###  event dispatcher
-
       if ( $chid and $chain_ids{$chid} ) {
         my $chain = $chain_ids{$chid};
 
@@ -906,14 +891,12 @@ sub events {
     } else {
       debug "request not recognized: $_";
     }
-
   }
 
   my $elimit = $acis -> get_cookie( "elimit" ) || '';
   my $slimit = $acis -> get_cookie( "slimit" ) || '';
 
   if ( $start ) {
-
     debug "start: @$start";
     debug "end  : ", ($end? "@$end" : '');
     
@@ -1104,18 +1087,16 @@ sub events_show_screen {
 sub check_date ($) {
   my $date = shift;
   require Date::Manip;
-  my $t = Date::Manip::ParseDateString( $date );
-  return $t;
+  return Date::Manip::ParseDateString( $date );
 }
 
 
 sub parse_date ($) {
-
   my $string = shift;
   for ( $string ) {
     if ( m!^(\d{4})-(\d{1,2})-(\d{1,2})(?:[/\s](\d{2}:\d{2}(?::\d{2})?))?$! ) {
       my $date = sprintf( "%04d-%02d-%02d", $1, $2, $3 );
-      my $time = $4;
+      my $time = $4 || '';
       if ( $time and $time =~ /^\d\d:\d\d$/ ) {
         $time = "$time:00";
       }
