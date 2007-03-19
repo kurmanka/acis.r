@@ -1,7 +1,3 @@
-
-INVESTIGATE: Use of uninitialized value in join or string at
-/home/aras/acis/lib/ACIS/Web/Admin/Events.pm line 917.
-
 Move session clean-up code from bin/cleanup to ACIS::Sessions module.
 
 Go through all XXX marks and either fix or re-label them as "ZZZ" or

@@ -259,6 +259,7 @@ lib/ACIS/Resources/Search.pm
 lib/ACIS/Resources/SearchFuzzy.pm
 lib/ACIS/Resources/Suggestions.pm
 lib/ACIS/SessionHistory.pm
+lib/ACIS/Sessions.pm
 lib/ACIS/ShortIDs.pm
 lib/ACIS/UserData/Data/Record.pm
 lib/ACIS/UserData/User/Record.pm
