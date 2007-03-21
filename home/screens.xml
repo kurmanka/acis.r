@@ -535,11 +535,19 @@
     <use module='ACIS::Web::FullTextURLs' />
     <call function='load_session_or_authenticate' />
     <call function='ACIS::Web::Contributions::prepare'/>
-    <call function='ACIS::Web::FullTextURLs::prepare'/>
     <process>
-      <call function='ACIS::Web::DocLinks::process'/>
+      <call function='ACIS::Web::FullTextURLs::process'/>
     </process>
+    <call function='ACIS::Web::FullTextURLs::prepare'/>
     <presentation type='xslt' filename='person/research/fturls.xsl' />
+  </screen>
+
+  <screen id='research/fturls/xmlpost'>
+    <use module='ACIS::Web::FullTextURLs' />
+    <call function='load_session_or_authenticate' />
+    <process>
+      <call function='ACIS::Web::FullTextURLs::process'/>
+    </process>
   </screen>
 
 

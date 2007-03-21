@@ -279,7 +279,7 @@ sub process_authors {
       $au =~ s/(?:^\x{1}|\x{1}$)//g;
       $au =~ s/\x{1}/ & /g;
       $item -> {authors} = $au;
-      warn "authors: ".$authors;
+      #warn "authors: ".$authors;
     }
   }
 }
