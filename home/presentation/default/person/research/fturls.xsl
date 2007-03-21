@@ -118,7 +118,6 @@
     <xsl:variable name='choice' select='"yy"'/>
     <xsl:choose>
       <xsl:when test='string-length($choice)'>
-        <br/>is: 
         <xsl:call-template name='present-menu-choice'>
           <xsl:with-param name='code' select='substring($choice,1,1)'/>
           <xsl:with-param name='menu' select='$recognition-menu'/>
@@ -149,27 +148,22 @@
 </xsl:call-template>
 
 var menus = new Array(recognition_menu,archival_menu);
-var record_sid = "<xsl:value-of select='$record-sid'/>";
+var psid = "<xsl:value-of select='$record-sid'/>";
 var session_id = "<xsl:value-of select='$session-id'/>";
 var form_open;
 var dsid;
 var href;
+var item;
 
 function change_choice_click () {
   if( form_open ) { close_choice_form() }
   dsid=this.getAttribute('dsid');
-  href=$(this).parent('li').find('a.out').attr('href');
+  item=$(this).parent('li')[0];
+  href=$(item).find('a.out').attr('href');
   var f=get('choice-form');
   this.parentNode.insertBefore( f, this );
-  //$(f).show('slow');
-  $(f).slideDown('normal',hide_menu2);
-  //hide_menu2();
-  //get('menu2').style.display = "none";
+  $(f).slideDown('normal');
   form_open = true;
-//  //f.style.display = "";
-//  $("input[@name='src']", f).get(0).setAttribute('value', dsid);
-//  $("#trg"+dsid, f).get(0).setAttribute('disabled', 'y'); 
-//  f.setAttribute('dsid', dsid);
   this.style.display = 'none';
   return false;
 }
@@ -184,14 +178,20 @@ function close_choice_form () {
   return false;
 }
 
-function show_menu2() {
-  $('#menu1').after( $('#menu2')[0] );
-  $('#menu2').show('slow');
+function show_menu2(el) {
+  //$('#menu1').hide();
+  //$('#menu2').show();
+  if (el) {
+    $(el).after( get('menu2') );
+  } else {
+    $('#menu1').after( get('menu2') );
+  }
+  $('#menu2').slideDown('normal');
 }
 
 function hide_menu2() {
-  get('menu2').style.display="none";
-  $('#menu2').hide();
+  hide('menu2');
+  $('#choice-menu').append( get('menu2') );
 }
 
 function choice() {
@@ -213,12 +213,38 @@ function choice() {
   }
   form.setAttribute('choice', newchoice );
   if (menu==0 &amp;&amp; menus[0][code].second) { 
-     show_menu2(); 
+     show_menu2(this); 
      return false; 
   }
-  $('#submit', form).attr( 'value', 'choice is ' + newchoice );
-  $('#submit', form).parent().append( newchoice + " " + href + " " + dsid );
+  send_choice( dsid, psid, href, newchoice );
+  //$('#submit', form).attr( 'value', 'choice is ' + newchoice );
+  //$('#submit', form).parent().append( newchoice + " " + href + " " + dsid );
   return false;
+}
+
+function send_choice( dsid, psid, href, choice ) {
+  var url = "fturls/smallpost!" + session_id;
+//  var url = "/" + psid + "/research/fturls!" + session_id;
+//  var url = psid + "/research/fturls/smallpost!" + session_id;
+  $.post( url, 
+    { 'dsid': dsid, 'psid': psid, 'href': href, 'choice': choice }, 
+    function() { update_page( dsid, psid, href, choice ); }
+  );
+}
+
+function update_page(dsid, psid, href, choice) {
+  //close_choice_form();
+  $(item).find('span').empty().addClass('new').append( make_choice_text(choice) );
+  //$('a.changechoice[@dsid='+dsid+']').parent().find('a[@href="'+href+'"]');
+  close_choice_form();
+}
+
+function make_choice_text(choice) {
+  var text = menus[0][choice.substr(0,1)].label;
+  if (choice.length &gt; 1) {
+    text = text + ', ' + menus[1][choice.substr(1,1)].label
+  }
+  return text;
 }
 
 </script>
@@ -254,10 +280,14 @@ function choice() {
           <br/>
           <ul>
           <xsl:for-each select='$fturls/list-item/*[name()=$dsid]/list-item'>
-            <li><a href='{url}' class='out'><xsl:call-template name='present-url'/></a> 
-            <xsl:call-template name='present-choice'>
-              <xsl:with-param name='choice' select='choice/text()'/>
-            </xsl:call-template> 
+            <li><a href='{url}' class='out'><xsl:call-template name='present-url'/></a>
+            <br/>
+            <xsl:text>is: </xsl:text> 
+            <span>
+              <xsl:call-template name='present-choice' xml:space='default'>
+                <xsl:with-param name='choice' select='choice/text()'/>
+              </xsl:call-template>
+            </span>
             - 
             <a href='#' class='evergreen changechoice' choice='{choice/text()}'
                dsid='{$dsid}' >change</a>
@@ -277,13 +307,10 @@ function choice() {
     <div style='display: none' id='choice-form'>
       <form>
         <div style='float:right'><a ref='#' class='evergreen closeform'>[X]</a></div>
-        <small>
-        <p id='menu1'><xsl:call-template name='recognition-menu'/></p>
-        <p><input type='submit' id='submit' name='submit' value='do?'/></p>
-        </small>
+        <div id='menu1'><xsl:call-template name='recognition-menu'/></div>
       </form>
-    <p id='menu2' style='display:none'><xsl:call-template
-    name='archival-menu'/></p>
+    <div id='menu2' style='display:none;'><xsl:call-template
+    name='archival-menu'/></div>
     </div>
 
   </xsl:template>
@@ -300,6 +327,15 @@ a.closeform {
   font-weight: bold;
   font-size: larger;
   text-decoration: none;
+}
+#choice-form form div ul.menu { margin: 12px; margin-left: 30px; xpadding: 2px; }
+span.new {color: green;font-style:italic}
+#menu1, #menu2 { padding: 6px; }
+#choice-form { padding: 0px; border: 1px solid #666; }
+#choice-form form { 
+  font-size: smaller;
+  padding: 6px; 
+  margin:0; 
 }
 
     </style>
