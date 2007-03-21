@@ -7,6 +7,15 @@ Stage D: full-text links, document-to-document links and fuzzy name searches
 <h2 id='fuzzy'>Fuzzy name searching</h2>
 
 
+### TODO 
+
+- documentation
+
+- fuzzy search enabled for default background search (not only under
+  APU)?
+
+- XXX marks?  
+
 ### notions
 
 distance level = Levenshtein distance / string length of the name variation
@@ -69,6 +78,24 @@ String::Approx
 
 
 <h2 id='fturls'>Full-text file recognition</h2>
+
+### TODO
+
+1. fix the screen
+
+   - items' count
+
+   - works and urls with no decision should be listed first
+
+   - item to the profile menu
+
+   - highlight the selected item in the first menu
+
+   - add explanations or links to explanations
+
+2. configuration
+
+3. input: safer handling previous urls
 
 
 ### input
@@ -198,6 +225,15 @@ optionally.)
 
 
 <h2 id='d2d'>Document to document links</h2>
+
+### TODO
+
+- screen: improve destination document listing (menu); for instance,
+  follow Sune's recommendation
+
+- document
+
+- XXX marks?  
 
 ### notions
 
