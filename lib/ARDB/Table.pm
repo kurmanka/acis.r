@@ -229,35 +229,28 @@ sub add_mapping {
 sub produce_record {
   my $self = shift;
   my $record = shift;
-
   my $fields = $self -> {fields};
-  
   my $result = {};
 
   foreach my $field_name ( sort keys %$fields ) {
-
-     # changes by Iku on 2003-05-22 19:22
      my $content = $fields->{$field_name}; 
 
      if ( ref $content eq 'ARRAY' ) {
-       ### XXX 
-       $result -> { $field_name } =
-         join ' ', $record ->get_value ( @{ $content } );
+       $result -> {$field_name} =
+         join ' ', $record ->get_value( @$content );
 
      } else {
        no strict;
-       my @val = &{ $content } ( $record ) ;
+       my @val = &{$content}( $record ) ;
        if( scalar @val ) {
-         $result -> { $field_name } = join( ' ', @val );
+         $result -> {$field_name} = join( ' ', @val );
        } else {
-         $result -> { $field_name } = '';
+         $result -> {$field_name} = '';
        } 
      }
-
    }
   
   return $result;
-  
 }
 
 

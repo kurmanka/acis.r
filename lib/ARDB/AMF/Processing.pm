@@ -2,19 +2,16 @@ package ARDB::AMF::Processing;
 
 use strict;
 use Carp::Assert;
+use Storable qw( freeze );
+use Digest::MD5;
 
 use ACIS::ShortIDs;
-
 require ARDB::ReDIF::Processing;
-
-use Storable qw( freeze );
-
 require AMF::2ReDIF;
 
 my $rec;
 my $te ;
 my $sid;
-
 my $ardb;
 my $relations;
 
@@ -26,7 +23,6 @@ sub prepare {
 }
 
 
-sub get ($);
 
 use vars qw( $acis );
 
@@ -37,10 +33,13 @@ my $item;
 my $authors;
 my @authors;
 my @au_emails;
-
 my $editors;
 my @editors;
 my @ed_emails;
+
+
+sub get ($) { return $rec -> get_value( @_ ); }
+
 
 
 sub process_text {
@@ -52,9 +51,7 @@ sub process_text {
   my $id   = $rec ->id;
   my $url  = get 'displaypage';
   my $type = short_lc_record_type();
-
   my $do_store = 1;
-
   my $config = $ardb -> {config};
   my $sql    = $ardb -> {sql_object};
 
@@ -62,16 +59,10 @@ sub process_text {
   
   if ( not $do_store ) {
     if ( $sid ) {
-      my $table  = $config -> table( 'res_creators_bulk' );
-      $table -> delete_where ( $sql, "sid=?", $sid );
-      
-      $table  = $config -> table( 'res_creators_separate' );
-      $table -> delete_where ( $sql, "sid=?", $sid );
-      
-      $table  = $config -> table( 'resources' );
-      $table -> delete_where ( $sql, "id=?", $id );
+      $config -> table( 'res_creators_bulk' ) ->delete_where( $sql, "sid=?", $sid );
+      $config -> table( 'res_creators_separate' ) ->delete_where( $sql, "sid=?", $sid );
+      $config -> table( 'resources' ) ->delete_where( $sql, "id=?", $id );
     }
-
     $ardb -> {record} = { id => $id, type => $rec -> type };
     return;
   }
@@ -92,7 +83,7 @@ sub process_text {
     if ( $name ) { $item -> {title} = $name; }
   }
 
-
+  #warn "call process_authors() and _editors()";
   process_authors();
   process_editors();
   
@@ -100,7 +91,6 @@ sub process_text {
   ###
   ###  RESOURCES  table
   ###
-
   {
     my $row = {
                id   => $id,
@@ -243,7 +233,9 @@ sub process_text {
     }
   }
   
-  
+  # full-text urls
+  process_fulltext_urls();
+
   ### 
   ###  finishing the item
   ###
@@ -265,25 +257,29 @@ sub process_authors {
   $authors = '';
   @authors   = ();
   @au_emails = ();
-
   {
     my @aus = $rec -> get_value( 'hasauthor' );
-
     foreach ( @aus ) {
-      my $name = $_->{name}[0] || next;
+#      use Data::Dumper; 
+#      warn Dumper($_)."\n";
+      my ($name) = $_->get_value('name') || next;
       $name =~ s/(^\s+|\s+$)//g;
       next if not $name;
-      my $em = $_ ->{email}[0][0] || '';
+#      my ($name2) = $_->{name}[0][0] || '';
+#      $name2 =~ s/(^\s+|\s+$)//g;
+#      if ( ref $name2 ) { warn '$_->{name}[0][0] is ref ' . "$name2\n"; }
+      my $em = $_ ->get_value('email') || '';
       push @au_emails, $em;
       push @authors,   $name;
     }
-    $authors = ARDB::ReDIF::Processing::normalize_personal_names ( \@authors );
+    $authors = ARDB::ReDIF::Processing::normalize_personal_names( \@authors );
 
     if ( $authors ) {
       my $au = $authors;
       $au =~ s/(?:^\x{1}|\x{1}$)//g;
       $au =~ s/\x{1}/ & /g;
       $item -> {authors} = $au;
+      warn "authors: ".$authors;
     }
   }
 }
@@ -297,10 +293,10 @@ sub process_editors {
     my @eds = $rec-> get_value( 'editor' );
 
     foreach ( @eds ) {
-      my $name = $_->{name}[0] || next;
+      my $name = $_->get_value('name') || next;
       $name =~ s/(^\s+|\s+$)//g;
       next if not $name;
-      my $em = $_ ->{email}[0][0] || '';
+      my $em = $_ ->get_value('email') || '';
       push @ed_emails, $em;
       push @editors  , $name;
     }
@@ -424,19 +420,45 @@ sub generate_short_id {
 
 
 
-sub get ($) { return $rec -> get_value( @_ ); }
-
 
 sub process_organization {
   my $ARDB = shift;
   my $rec  = shift;
   my $sql  = $ARDB -> sql_object;
-
   $te = AMF::2ReDIF::translate( $rec );
-
   ARDB::ReDIF::Processing::process_institution( $ARDB, $te, $relations, 1 );
 }
 
+
+sub process_fulltext_urls {
+  my @authurls = get 'file/url';
+  my @addiurls = get 'hasversion/file/url';
+
+  assert( $sid );
+  # XXX clearing old urls
+  handle_urls( \@authurls, 'authoritative' ); 
+  handle_urls( \@addiurls, 'automatic' ); 
+}
+
+sub handle_urls {
+  my ($list,$nature) = @_;
+
+  assert( $nature eq 'authoritative' or $nature eq 'automatic' );
+  my $config = $ardb -> {config};
+  my $sql    = $ardb -> {sql_object};
+  my $table_urls = $config -> table( 'acis:ft_urls' );
+  foreach ( @$list ) {
+    next if not $_;
+    my $item = {
+                dsid => $sid,
+                url  => $_,
+                checksum => Digest::MD5::md5( $_ ),
+                nature => $nature
+               };
+    $table_urls -> store_record( $item, $sql );
+  }
+  
+}
 
 1;
 

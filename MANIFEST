@@ -124,6 +124,7 @@ home/bin/templates/upgrade_to_1.5.27.pl
 home/bin/templates/upgrade_to_1.5.3.pl
 home/bin/templates/upgrade_to_1.5.34.pl
 home/bin/templates/upgrade_to_1.5.4.pl
+home/bin/templates/upgrade_to_1.5.53.pl
 home/bin/templates/upgrade_to_1.5.7.pl
 home/configuration.xml
 home/contributions.conf.xml
@@ -211,6 +212,7 @@ home/presentation/default/person/research/autosuggest-all.xsl
 home/presentation/default/person/research/autosuggest-chunk.xsl
 home/presentation/default/person/research/autoupdate.xsl
 home/presentation/default/person/research/doclinks.xsl
+home/presentation/default/person/research/fturls.xsl
 home/presentation/default/person/research/identified.xsl
 home/presentation/default/person/research/ir-guide.xsl
 home/presentation/default/person/research/listings.xsl
@@ -251,6 +253,7 @@ lib/ACIS/Data/DumpXML.pm
 lib/ACIS/Data/DumpXML/Parser.pm
 lib/ACIS/Debug/MLeakDetect.pm
 lib/ACIS/DocLinks.pm
+lib/ACIS/FullTextURLs.pm
 lib/ACIS/MetaUpdate/Request.pm
 lib/ACIS/Misc.pm
 lib/ACIS/Resources.pm
@@ -286,6 +289,7 @@ lib/ACIS/Web/Contributions/Glimpse.pm
 lib/ACIS/Web/DocLinks.pm
 lib/ACIS/Web/Events.pm
 lib/ACIS/Web/Export.pm
+lib/ACIS/Web/FullTextURLs.pm
 lib/ACIS/Web/HumanNames.pm
 lib/ACIS/Web/Import.pm
 lib/ACIS/Web/MetaUpdate.pm

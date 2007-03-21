@@ -120,6 +120,20 @@ Co-authors may make contradictory choices. An ACIS installation records
 such choices, but does not resolve them.
 
 
+Short versions of the menu items, first menu ("recognition"):
+
+1. wrong (n)
+2. abstract page (d)
+3. full-text file of another version (r)
+4. correct full-text file (y)
+
+second menu ("permission"):
+
+1. may archive (y)
+2. archive, but check for updates (c)
+3. do not archive (n)
+
+
 
 ### configuration 
 
@@ -131,15 +145,13 @@ such choices, but does not resolve them.
 table: **ft_urls**
 
 - dsid char(14) not null
-- url char(255) not null
-- fullurl text 
+- url char(255) not null -- no
+- fullurl text -- BINARY? ie. BLOB?
 - checksum char(22)
-- nature ENUM('authoritative','automatic')
+- nature ENUM(\'authoritative\',\'automatic\')
 
 <co>PRIMARY KEY( dsid, checksum )</co>
 
-The question is what would happen to the URLs which are longer than the
-255 limit?  ok, if we do not 
 
 table: **ft_urls\_choices**
 

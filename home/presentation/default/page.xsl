@@ -681,7 +681,10 @@ function form_check_<xsl:value-of select='@name'/> () {
 
   <xsl:template match='a[@href]' mode='link-filter'>
     <xsl:copy>
+      <xsl:copy-of select='@*'/>
+<!--
       <xsl:copy-of select='@href|@tabindex|@class|@title|@id|@name|@style|@onclick|@accesskey'/>
+-->
       <xsl:call-template name='link-attributes'/>
       <xsl:apply-templates mode='link-filter'/>
     </xsl:copy>

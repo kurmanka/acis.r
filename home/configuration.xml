@@ -5,7 +5,7 @@
     that is a working ARDB core configuration file.  Produces:
     documents table, collections table, authors table.
 
-    $Id: configuration.xml,v 2.14 2007/03/14 18:28:17 ivan Exp $
+    $Id: configuration.xml,v 2.15 2007/03/21 01:00:15 ivan Exp $
 
 -->
 
@@ -575,7 +575,7 @@
 
   <table name='acis:citations'>
     <field name='cnid'            sql-type='SERIAL'/> <!-- BIGINT UNSIGNED NOT NULL AUTO_INCREMENT UNIQUE -->
-    <field name='clid'            sql-type='CHAR(38) NOT NULL'/>
+    <field name='clid'            sql-type='CHAR(38) BINARY NOT NULL'/>
     <field name='ostring'         sql-type='TEXT NOT NULL'/>
     <field name='nstring'         sql-type='VARCHAR(255) NOT NULL'/>
     <field name='trgdocid'        sql-type='VARCHAR(255)'/>
@@ -587,7 +587,7 @@
 
   <table name='acis:citations_deleted'>
     <field name='cnid'            sql-type='BIGINT UNSIGNED NOT NULL UNIQUE'/> <!-- a backup for citations.cnid -->
-    <field name='clid'            sql-type='CHAR(38) NOT NULL PRIMARY KEY'/>
+    <field name='clid'            sql-type='CHAR(38) BINARY NOT NULL PRIMARY KEY'/>
   </table>
 
   <!-- history of citations -->
@@ -625,6 +625,30 @@
      <field name='dsid'  sql-type='CHAR(15) NOT NULL'/>
      <field name='cnid' sql-type='BIGINT UNSIGNED NOT NULL'/>
      <create-table-sql> PRIMARY KEY (psid,dsid,cnid) </create-table-sql>
+  </table>
+
+
+  <!-- stage d: full-text links recognition -->
+
+  <table name='acis:ft_urls'><!-- input data: full-text URLs for documents -->
+    <field name='dsid'     sql-type='char(14) not null'/>
+    <field name='url'      sql-type='blob not null'/>
+    <field name='checksum' sql-type='char(16) binary not null'/>
+    <field name='nature'   sql-type="ENUM('authoritative','automatic') not null"/>
+    <x-field name='source'   sql-type=''/>
+    <create-table-sql> PRIMARY KEY( dsid, checksum ), index url_i( url(30) ) </create-table-sql>
+  </table>
+
+  <table name='acis:ft_urls_choices'><!-- users' choices about full-text URLs -->
+    <field name='dsid'     sql-type='char(14) not null'/>
+    <field name='checksum' sql-type='char(16) binary not null'/>
+    <field name='psid'     sql-type='char(14) not null'/>
+    <field name='choice'   sql-type='char(2) NOT NULL'/>
+    <!-- above: first char: d|y|r|n (corresponding menu items:
+         2|4|3|1).  second char: y|c|n (1|2|3) -->
+    <field name='time' sql-type='datetime not null'/>
+    <create-table-sql> primary key prim(dsid, checksum, psid), index t_i(time), index psid_i(psid) </create-table-sql>
+    
   </table>
 
 
