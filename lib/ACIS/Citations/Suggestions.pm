@@ -309,6 +309,7 @@ sub load_similarity_suggestions ($$) {
   my $psid     = shift;
   my $dsidlist = shift;
   if ( not $sql ) { prepare; }
+  if ( not scalar @$dsidlist ) { return []; }
   my @slist = ();
   debug "load_similarity_suggestions($psid,$dsidlist)";
 

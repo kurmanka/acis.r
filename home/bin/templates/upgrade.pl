@@ -1,6 +1,6 @@
+use strict;
 
-
-my $name;
+#my $name;
 my $verno;
 my $old;
 
@@ -16,7 +16,7 @@ if ( -f 'VERSION' ) {
 if ( $old and     
      $old =~ 
      m!^([\w\-\,\.\s]+?)\s+(\d[\.\d\w]+)\s+(\d{4}-\d{2}-\d{2})\s\[(\w+)\]! ){
-  $name  = $1;
+  #$name  = $1;
   $verno = $2;
 
 } else {
@@ -27,7 +27,7 @@ if ( $old and
 $verno = normalize( $verno );
 p "current verno: $verno";
 
-my $index = {};
+my %index = ();
 my @call;
 
 if ( opendir BIN, "bin/" ) {
@@ -35,11 +35,11 @@ if ( opendir BIN, "bin/" ) {
   foreach ( @scripts ) {
     if ( $_ =~ /^upgrade_to_(\d[\d\.]+)$/ ) {
       p "script: $_";
-      if ( normalize( $1 ) gt $verno ) {
-        my $numberstring = normalize( $1 );
+      my $numberstring;
+      if ( ($numberstring=normalize($1)) gt $verno ) {
         p "number: $numberstring";
         p "would run it";
-        $index{$_} = numberstring;
+        $index{$_} = $numberstring;
         push @call, $_;
       }
     }
