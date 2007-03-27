@@ -25,7 +25,7 @@ package ACIS::Web::Affiliations;   ### -*-perl-*-
 #  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 #
 #  ---
-#  $Id: Affiliations.pm,v 2.5 2007/03/14 21:22:56 ivan Exp $
+#  $Id: Affiliations.pm,v 2.6 2007/03/27 12:16:49 ivan Exp $
 #  ---
 
 
@@ -763,7 +763,7 @@ sub send_submitted_institutions_at_session_close {
     foreach ( @$submitted ) {
       next if not $_;
       $acis ->variables ->{institution} = $_;
-      $acis ->send_mail ( 'email/new-institution.xsl' );
+      $acis ->send_mail( 'email/new-institution.xsl' );
       undef $_;
     }
   }

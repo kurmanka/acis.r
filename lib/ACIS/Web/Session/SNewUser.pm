@@ -24,7 +24,7 @@ package ACIS::Web::Session::SNewUser;   ### -*-perl-*-
 #  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 #
 #  ---
-#  $Id: SNewUser.pm,v 2.3 2007/03/14 21:22:56 ivan Exp $
+#  $Id: SNewUser.pm,v 2.4 2007/03/27 12:16:49 ivan Exp $
 #  ---
 
 use strict;
@@ -77,10 +77,11 @@ sub close {
   ### existing sessions with 'submitted-institutions' are closed.
   my $submitted = $self -> {'submitted-institutions'};
   foreach ( @$submitted ) {
+    next if not $_;
     $app -> variables -> {institution} = $_;
     $app -> send_mail( 'email/new-institution.xsl' );
+    undef $_;
   }
-
   ### remove registration session
   my $old_session_file = $self ->{'remove-old-session-file'};
   unlink $old_session_file;
