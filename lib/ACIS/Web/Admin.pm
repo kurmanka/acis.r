@@ -25,7 +25,7 @@ package ACIS::Web::Admin;   ### -*-perl-*-
 #  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 #
 #  ---
-#  $Id: Admin.pm,v 2.20 2007/03/05 17:00:34 ivan Exp $
+#  $Id: Admin.pm,v 2.21 2007/03/27 08:12:41 ivan Exp $
 #  ---
 
 
@@ -310,55 +310,33 @@ sub userdata_offline_reload_contributions {
   my $acis = shift;
   my $login = shift;
 
-
   debug "offline work for $login";
-
   my $paths = $acis ->{paths};
-
   my $session;
   my $userdata;
   my $userdata_file;
 
   $acis -> update_paths_for_login( $login );
+  $userdata = get_hands_on_userdata( $acis ) or return undef;
 
-  $userdata = get_hands_on_userdata( $acis );
-
-  if ( not $userdata ) {
-    return undef;
-  }
-
-  ###  create a session for that user-data
-  
-  my $owner = { login => $0 };
-  $owner -> {'IP'} = '0.0.0.0';
-  
-  $session = $acis -> start_session ( "magic", $owner );
+  ###  create a session for that userdata
+  $session = $acis -> start_session( "magic", { login => $0, IP => '0.0.0.0' } );
   $session -> object_set( $userdata );
-
   
-  ###  do maintenance
-
-  {
-    ###  loop around records for records' maintenance
-    my $num = 0;
-    foreach ( @{ $userdata->{records} } ) {
-      $session -> set_current_record_no( $num );
-
-      ### do the record maintenance here
-
-      # for instance, reload the contributions:
-      require ACIS::Web::Contributions;
-      ACIS::Web::Contributions::reload_accepted_contributions( $acis );
-
-      $num ++;
-    }
+  ###  go through the records 
+  my $num = 0;
+  foreach ( @{ $userdata->{records} } ) {
+    $session -> set_current_record_no( $num );
+    ### do things here
+    # for instance, reload the contributions:
+    require ACIS::Web::Contributions;
+    ACIS::Web::Contributions::reload_accepted_contributions( $acis );
+    $num++;
   }
-
 
   ###  close session
-
   $session -> close( $acis );
-  
+  return $num;
 }
 
 
@@ -366,34 +344,24 @@ sub userdata_offline_reload_contributions {
 
 sub get_hands_on_userdata {
   my $acis    = shift;
-
   my $userdata;
-
   my $paths            = $acis -> paths;
-
   my $userdata_file    = $paths -> {'user-data'};
   my $userdata_lock    = $paths -> {'user-data-lock'};
   my $userdata_deleted = $paths -> {'user-data-deleted'};
 
   if ( not -f $userdata_file ) {
-    # no such user 
-#    print "no such file (or user): $userdata_file\n";
     die "no such file (or user): $userdata_file\n";
     return undef;
   }
 
-
-
   ###  need to check the lock
   my $lock = $userdata_lock;
-  
+ 
   if ( -f $lock ) {
-
     debug "found lock file at '$lock'";
-
     my $sid; 
     my $home = $acis -> home;
-
     if ( open LOCK, $lock ) {
       $sid = <LOCK>;
       close LOCK;
@@ -402,9 +370,8 @@ sub get_hands_on_userdata {
 
     ### go get the session, if it exists
     ### ignore the lock if it doesn't
-    
-    my $file = "$home/sessions/$sid";
 
+    my $file = "$home/sessions/$sid";
     if ( not -f $file ) {
       debug "but session doesn't exist ($file)";
       goto AFTER_LOCK;
@@ -419,26 +386,20 @@ sub get_hands_on_userdata {
     }
     
     debug "and in fact, there is a session";
-
     ###  does it belong to the user?
     if ( $session -> type eq 'user' 
          or $session -> type eq 'new-user' ) {
-      ###  we can't go on -- the user is working on the userdata
-    
+      ###  we can't go on -- the user is working on her account
     } else {
       ###  it is another session of ours or similar
-      debug "and in fact, there is a session";
-      
+      debug "neither user type, nor new-user type; strange";
     }
-#    print "userdata is locked\n";
     return 0;
   }
  AFTER_LOCK:
 
-
   ###  load the userdata
-
-  $userdata = load ACIS::Web::UserData ( $userdata_file );
+  $userdata = load ACIS::Web::UserData( $userdata_file );
 
   if ( not defined $userdata
        or not defined $userdata->{owner}
@@ -447,7 +408,7 @@ sub get_hands_on_userdata {
      ) {
     # a problem
 
-    print "userdata is corrupted";
+    print "userdata is corrupt";
     return 0;
   }
 
@@ -459,9 +420,7 @@ sub get_hands_on_userdata {
 
 sub user_republish {
   my $acis = shift;
-
   my $user = $acis -> form_input ->{login};
-  
 }
 
 
