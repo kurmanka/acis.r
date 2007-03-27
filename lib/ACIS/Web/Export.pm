@@ -23,7 +23,7 @@ package ACIS::Web::Export; ### -*-perl-*-
 #  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 #
 #  ---
-#  $Id: Export.pm,v 2.3 2007/03/06 22:37:09 ivan Exp $
+#  $Id: Export.pm,v 2.4 2007/03/27 11:37:37 ivan Exp $
 #  ---
 
 use strict;
@@ -34,7 +34,7 @@ use Web::App::Common ;
 sub redif {
   my $acis   = shift;
   my $record = shift;
-  my $gendir = $acis ->config( 'metadata-ReDIF-output-dir' ) or return undef;
+  my $gendir = $acis ->config( 'metadata-redif-output-dir' ) or return undef;
   debug( "ReDIF: gendir $gendir" );
 
   my $sid  = $record ->{sid};
@@ -111,7 +111,7 @@ sub amf {
   my $acis   = shift;
   my $record = shift;
 
-  my $gendir = $acis -> config( 'metadata-AMF-output-dir' ) 
+  my $gendir = $acis -> config( 'metadata-amf-output-dir' ) 
     or return undef;
   debug( "AMF: gendir $gendir" );
 

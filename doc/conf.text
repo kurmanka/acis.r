@@ -140,7 +140,7 @@ ACIS will send.  Required.</dd>
 short-ids, if you care).  Required.</dd>
 
 
-<dt><C>metadata-ReDIF-output-dir</C></dt>
+<dt><C>metadata-redif-output-dir</C></dt>
 
 <dd>
 Directory to put generated ReDIF files into.
@@ -148,7 +148,7 @@ Optional.
 </dd>
 
 
-<dt><C>metadata-AMF-output-dir</C></dt>
+<dt><C>metadata-amf-output-dir</C></dt>
 
 <dd>
 Directory to put generated AMF files into.

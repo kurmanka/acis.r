@@ -91,7 +91,15 @@ String::Approx
 
    - highlight the selected item in the first menu
 
+   - scroll the page vertically so that the menu is in the screen
+     middle?
+
    - add explanations or links to explanations
+
+   - clean the xslt file
+
+   - javascript links should have the same appearance as on the
+     doclinks screen
 
 2. configuration
 
@@ -231,9 +239,13 @@ optionally.)
 - screen: improve destination document listing (menu); for instance,
   follow Sune's recommendation
 
+- use Ajax to send the new link data and update the page?
+
+- use Ajax to delete a link?
+
 - document
 
-- XXX marks?  
+- fix XXX marks?
 
 ### notions
 

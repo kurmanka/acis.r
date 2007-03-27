@@ -28,7 +28,7 @@ package ACIS::Web::Config;   ### -*-perl-*-
 #  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 #
 #  ---
-#  $Id: Config.pm,v 2.11 2007/01/18 01:35:21 ivan Exp $
+#  $Id: Config.pm,v 2.12 2007/03/27 11:37:37 ivan Exp $
 #  ---
 
 
@@ -64,8 +64,8 @@ sub configuration_parameters {
     
     # The data that ACIS produces
     'person-id-prefix',    'required',
-    'metadata-ReDIF-output-dir', 'not-defined',
-    'metadata-AMF-output-dir',   'not-defined',
+    'metadata-redif-output-dir', 'not-defined',
+    'metadata-amf-output-dir',   'not-defined',
     
     # database parameters
     'metadata-db-name', 'required',
