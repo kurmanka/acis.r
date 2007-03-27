@@ -21,7 +21,7 @@ package ACIS::Web::Session;   ### -*-perl-*-
 #  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 #
 #  ---
-#  $Id: Session.pm,v 2.5 2007/03/14 21:22:56 ivan Exp $
+#  $Id: Session.pm,v 2.6 2007/03/27 22:11:49 ivan Exp $
 #  ---
 
 use strict;
@@ -124,10 +124,8 @@ sub current_record {
 sub choose_record {
   my $self = shift;
   my $id   = shift || die;
-
   my $num  = 0;
   my $list = $self->object->{records};
-
   foreach ( @$list ) {
     if ( $_ ->{id} eq $id 
          or $_ ->{sid} eq $id ) { 
