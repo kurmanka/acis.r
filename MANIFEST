@@ -96,6 +96,7 @@ home/bin/templates/export_name_variations.pl
 home/bin/templates/fuzzy_search_table.pl
 home/bin/templates/mvrec.pl
 home/bin/templates/offline_maintain.pl
+home/bin/templates/recover_citation_events.pl
 home/bin/templates/recreate_profile_pages.pl
 home/bin/templates/reparse_config.pl
 home/bin/templates/restore_table_backup.pl
