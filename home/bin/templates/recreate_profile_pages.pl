@@ -1,57 +1,79 @@
 
 use strict;
 use warnings;
-
 use Carp::Assert;
-
 use ACIS::Web;
 use sql_helper;
 
+sub get_profile_details($);
 
-#####  MAIN PART  
-
+# get $acis object, prepare a session
 my $acis = ACIS::Web -> new( home => $homedir );
 my $sql = $acis->sql_object;
-
-
-
-my $owner = { login => $0 };
-$owner -> {'IP'} = '0.0.0.0';
-  
-my $session = $acis -> start_session( "magic", $owner );
+my $session = $acis -> start_session( "magic", { login => $0, IP => '0.0.0.0' } );
 assert( $acis ->session );
 
+my $switches = {};
+my $queue = [];
+foreach ( @ARGV ) {
+  if ( m!^-(\w.*)! ) { $switches->{$1}=1; next; }
+  if ( m!^--(\w*)! ) { $switches->{$1}=1; next; }
+  push @$queue, get_profile_details( $_ );
+}
 
-$sql -> prepare( "select login,userdata_file from users" );
-my $r = $sql -> execute();
 
+if ( $switches->{a} ) {
+  $sql -> prepare( "select login,userdata_file from users" );
+  my $r = $sql -> execute();
+  push @$queue, $r->data;
+}
+
+sub get_profile_details($) {
+  my $in = shift;
+  my $where = '';
+  my @params;
+  for ($in) {
+    if (m!\w\@[\w\-\.]+\.\w+! ) { # login / email
+      $where = 'login=?';
+      push @params, $_;
+      next;
+    } elsif (m!^p\w+\d+! ) { # short-id
+      warn "do not support shortids yet: $_\n";
+    } else {
+      warn "what is this: $_?\n";
+    }
+  }
+  if ( $where ) { $where = "where $where"; }
+  $sql->prepare( "select login,userdata_file from users $where" );
+  my $r = $sql->execute( @params );
+  return $r->{row};
+}
 
 require ACIS::Web::Admin;
 
-while( $r->{row} ) {
-  my $udf   = $r->{row} {'userdata_file'};
-  my $login = $r->{row} {login};
+foreach my $p (@$queue)  {
+  my $udf   = $p -> {'userdata_file'};
+  my $login = $p -> {login};
+  
+  if ($switches->{qdebug} or $switches->{find}) {
+    print "u file: $udf\t\tlogin: $login\n";
+    next;
+  }
   
   if ( $udf and -r $udf ) {
     $acis -> update_paths_for_login( $login );
-    assert( $acis->session, "no session in acis object 1" );
     my $userdata = ACIS::Web::Admin::get_hands_on_userdata( $acis );
-    assert( $acis->session, "no session in acis object 2" );
     if ( not $userdata ) { next; }
     $session -> object_set( $userdata );
-    assert( $acis->session, "no session in acis object 3" );
 
-    ###  do maintenance
+    # do things
     require ACIS::Web::SaveProfile;
     ACIS::Web::SaveProfile::save_profile( $acis );
     print "$login\n";
   }
-
-} continue {
-  $r -> next;
 }
 
 ###  close session
-$session -> close( $acis );
+$session -> close( $acis ) if $session;
   
 
