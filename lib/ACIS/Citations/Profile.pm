@@ -73,6 +73,11 @@ sub profile_check_and_cleanup () {
       } elsif ( $_->{clid} ) {
         $id = $_->{clid};
       } 
+      if (not $id) {
+        undef $_;
+        debug "a citation is gone";
+        next;
+      }
       my $r = $sql->execute( $id );
   
       if ( $r and $r->{row} and $r->{row}{cnid} ) {

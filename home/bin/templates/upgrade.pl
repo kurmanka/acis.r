@@ -50,7 +50,7 @@ p "\@call before sort: ", join( ' ', @call );
 @call = sort { $index{$a} cmp $index{$b} } @call;
 p "\@call after sort: ", join( ' ', @call ); 
 
-my $upgrade_flag = "state/service.unavailable";
+my $upgrade_flag = "state/service.blocked";
 my $upgrade_flag_set;
 if (scalar @call) {
   if ( not -f $upgrade_flag ) {
