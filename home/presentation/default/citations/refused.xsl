@@ -42,7 +42,7 @@ input.light {
 
 <p style='margin-top: 1em;'>
   <input type='submit' class='inputsubmit important'
-   value='DELETE THESE CITATIONS' />
+   value='ACCEPT THESE CITATIONS' /> as pointing to your work
 </p>
         </form>
 
