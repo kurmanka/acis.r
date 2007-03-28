@@ -652,7 +652,7 @@ for your works again.</small>
     <td>
       <h2><a ref='@research/doclinks' class='item'
       >DOCUMENT TO DOCUMENT LINKS</a></h2>
-      <p>Connect your stuff.</p>
+      <p>Connect your research works.</p>
     </td>
   </tr>
   <!--[end-if]-->

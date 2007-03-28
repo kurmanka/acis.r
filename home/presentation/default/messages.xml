@@ -53,7 +53,7 @@
   <message id='unrefused-citation' >The citation was deleted from the refused list.</message>
   <message id='saved-citations-autoupdate-pref'>Your preferences were saved.</message>
 
-  <message id='added-doclink'>Added a document link!</message>
+  <message id='added-doclink'>Added a document link.</message>
   <message id='deleted-doclink'>Removed a document link.</message>
 
 </table>
