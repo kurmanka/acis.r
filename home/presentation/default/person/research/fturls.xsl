@@ -8,7 +8,7 @@
     <par id='research/main'/>
   </xsl:variable>
 
-  <xsl:variable name='current-screen-id'>research/doclinks</xsl:variable>
+  <xsl:variable name='current-screen-id'>research/fturls</xsl:variable>
 
 
   <!--    v a r i a b l e s    -->
@@ -263,7 +263,10 @@ function make_choice_text(choice) {
       <th class='desc'> item description </th>
     </tr>
     
-    <xsl:for-each select='$list/list-item[id and title]' xml:space='preserve'>
+    <xsl:for-each select='$list/list-item[id and title]'>
+      <xsl:sort
+          select='count($fturls/list-item/*[name()=current()/sid]//choice[not(text())])' 
+          order='descending'/>
       <xsl:variable name="sid"  select='generate-id(.)'/>
       <xsl:variable name="dsid" select='sid'/>
       <xsl:variable name="id"   select='id'/>
@@ -291,7 +294,7 @@ function make_choice_text(choice) {
                 <xsl:with-param name='choice' select='choice/text()'/>
               </xsl:call-template>
             </span>
-            <span class='change'>- 
+            <span class='change'> - 
             <a href='#' class='evergreen changechoice' choice='{choice/text()}'
                dsid='{$dsid}' >change</a></span>
             </li>
@@ -353,22 +356,18 @@ $("ul.menu a").click( choice );
 <xsl:call-template name='scripts'/>
 <xsl:call-template name='hidden-choice-form'/>
 
-    <h1>Document's full-text links</h1>
+    <h1>Documents' full-text links</h1>
 
     <xsl:call-template name='show-status'/>
 
     <xsl:variable name='current-count' 
-                  select='count( $current/list-item )'/>
+                  select='count($fturls/list-item/*)'/>
 
     <xsl:choose>
       <xsl:when test='$current/list-item'>
           <xsl:choose>
           <xsl:when test='$current-count &gt; 1'>
-            <p>Here are the <xsl:value-of select='$current-count'/>
-            works, that you claim you have authored:</p>
-          </xsl:when>
-          <xsl:when test='count( $current/list-item ) = 1'>
-            <p>Here is the work, that you claim you have authored:</p>
+            <p>Here are your works, for which we have full text links.</p>
           </xsl:when>
           </xsl:choose>
 

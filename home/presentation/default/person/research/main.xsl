@@ -644,7 +644,7 @@ for your works again.</small>
 
 </xsl:if>
 
-   <!--[if-config(document-document-links-profile)]-->
+  <!--[if-config(document-document-links-profile)]-->
   <tr>
     <td class='no' valign='top' align='right'>
       <p><a ref='@research/doclinks'>6</a></p>
@@ -658,13 +658,26 @@ for your works again.</small>
   <!--[end-if]-->
 
 
+  <!--[if-config(full-text-urls-recognition)]-->
+  <tr>
+    <td class='no' valign='top' align='right'>
+      <p><a ref='@research/fturls'>7</a></p>
+    </td>
+    <td>
+      <h2><a ref='@research/fturls' class='item'
+      >DOCUMENTS' FULL-TEXT LINKS</a></h2>
+      <p>Check the files.</p>
+    </td>
+  </tr>
+  <!--[end-if]-->
+
+
 </table>
 
 
 <phrase ref='research-main-epilog'/>
 
   </xsl:template>
-
 
 
 
@@ -744,6 +757,14 @@ for your works again.</small>
     <hl screen='research/doclinks'>
       <xsl:text>&#160;</xsl:text>
       <a ref='@research/doclinks'>document links</a>
+      <xsl:text>&#160;</xsl:text>
+    </hl>
+  <!--[end-if]-->
+
+   <!--[if-config(full-text-urls-recognition)]-->
+    <hl screen='research/fturls'>
+      <xsl:text>&#160;</xsl:text>
+      <a ref='@research/fturls'>full-text links</a>
       <xsl:text>&#160;</xsl:text>
     </hl>
   <!--[end-if]-->
