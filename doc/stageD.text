@@ -83,11 +83,7 @@ String::Approx
 
 1. fix the screen
 
-   - items' count
-
-   - works and urls with no decision should be listed first
-
-   - item to the profile menu
+   - add listed works count?
 
    - highlight the selected item in the first menu
 
