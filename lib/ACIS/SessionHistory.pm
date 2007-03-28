@@ -23,6 +23,7 @@ sub session_stop {
   eval { $login=$session->object->{owner}->{login}; };
   complain( "can't find session's user login: $sessionid")
     if not $login;
+  $login ||='unknown';
   my $type = $session->type;
   session_history_event($sessionid,$login,$type,'stop');
 }
