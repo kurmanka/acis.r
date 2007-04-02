@@ -25,7 +25,7 @@ package ACIS::Web::Admin;   ### -*-perl-*-
 #  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 #
 #  ---
-#  $Id: Admin.pm,v 2.22 2007/04/02 11:34:30 ivan Exp $
+#  $Id: Admin.pm,v 2.23 2007/04/02 11:38:46 ivan Exp $
 #  ---
 
 
@@ -240,7 +240,7 @@ sub offline_userdata_service {
   }
 
   ###  create a session for that user-data
-  my $owner = {login=>$0, IP=>'0.0.0.0'}
+  my $owner = {login=>$0, IP=>'0.0.0.0'};
   $session = $acis -> start_session( "magic", $owner );
   $session -> object_set( $userdata );
 
