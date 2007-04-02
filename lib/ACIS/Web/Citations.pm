@@ -302,6 +302,7 @@ sub process_identified {
 
   if ( scalar @citations > 1 )  {    $acis -> message( "deleted-citations" ); }
   elsif ( scalar @citations == 1 ) { $acis -> message( "deleted-citation"  ); }
+  else                             { $acis -> message( "deleted-no-citation" ); }
 }
 
 
