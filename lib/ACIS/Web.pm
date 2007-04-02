@@ -23,7 +23,7 @@ package ACIS::Web;   ### -*-perl-*-
 #  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 #
 #  ---
-#  $Id: Web.pm,v 2.20 2007/03/14 12:31:58 ivan Exp $
+#  $Id: Web.pm,v 2.21 2007/04/02 12:17:20 ivan Exp $
 #  ---
 
 use strict;
@@ -203,7 +203,7 @@ sub handle_request {
     if ( my $msg = $self->sysvar( 'service.blocked.message' ) ) {
       return print $msg;
     }
-    return print "Status: 503\nContent-Type: text/plain\n\nService Unavailable\n";
+    return print "Status: 503\nCache-Control: no-cache\nPragma: no-cache\nContent-Type: text/plain\n\nService Unavailable\n";
   } 
   $self->SUPER::handle_request( @_ );
 }
