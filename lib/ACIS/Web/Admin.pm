@@ -25,7 +25,7 @@ package ACIS::Web::Admin;   ### -*-perl-*-
 #  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 #
 #  ---
-#  $Id: Admin.pm,v 2.21 2007/03/27 08:12:41 ivan Exp $
+#  $Id: Admin.pm,v 2.22 2007/04/02 11:34:30 ivan Exp $
 #  ---
 
 
@@ -221,21 +221,16 @@ sub offline_userdata_service {
   my $acis  = shift || die;
   my $login = shift || die;
   my $func  = shift || die;
-  my $rec   = shift;
-  my $par   = shift || {};
-
+  my $rec   = shift; 
+  # any other parameters, if given, will be passed to the $func function
   my $resu;
 
   debug "offline work for $login";
-
   my $paths = $acis ->{paths};
-
   my $session;
   my $userdata;
   my $userdata_file;
-
   $acis -> update_paths_for_login( $login );
-
   eval {
     $userdata = get_hands_on_userdata( $acis );
   };
@@ -245,11 +240,8 @@ sub offline_userdata_service {
   }
 
   ###  create a session for that user-data
-  
-  my $owner = { login => $0 };
-  $owner -> {'IP'} = '0.0.0.0';
-  
-  $session = $acis -> start_session ( "magic", $owner );
+  my $owner = {login=>$0, IP=>'0.0.0.0'}
+  $session = $acis -> start_session( "magic", $owner );
   $session -> object_set( $userdata );
 
   my $user = $userdata->{owner};
@@ -263,7 +255,7 @@ sub offline_userdata_service {
                    -login => $ulogin,
                  -process => $owner -> {login},
                -humanname => $user->{name},
-       ($rec) ? ( -record => $rec ) : (),                   
+       ($rec) ? ( -record => $rec ) : (),        
                  );
 
   $acis -> {'presenter-data'} {request} {user} {name}  = $user->{name};
@@ -274,6 +266,7 @@ sub offline_userdata_service {
     if ( not $session -> choose_record( $rec ) ) {
       debug "No such record $rec";
       $acis -> errlog( "No such record $rec" );
+      die "can't run offline service for record $rec because the record is not found in account";
       return(undef);
     }
   }
@@ -289,17 +282,20 @@ sub offline_userdata_service {
     no strict;
     $resu = &{ $func } ( $acis, @_ );
   };
-  if ( $@ ) {
-    debug "offline service failed: $@";
-    $acis-> errlog( "offline service failed: $@" );
-    if ( $par->{complain} ) {
-      die $@;
-    }
-  }
+  my $error = $@;
 
   ###  close session
-  $session -> close( $acis );
-  $acis->clear_after_request();
+  eval {
+    $session -> close( $acis );
+    $acis->clear_after_request();
+  };
+  $error ||= $@;
+
+  if ( $error ) {
+    debug "offline service failed: $error";
+    $acis-> errlog( "offline service $func failed: $error" );
+    die $error;
+  }
 
   return $resu;
 }
@@ -310,7 +306,7 @@ sub userdata_offline_reload_contributions {
   my $acis = shift;
   my $login = shift;
 
-  debug "offline work for $login";
+  debug "userdata_offline_reload_contributions() for $login";
   my $paths = $acis ->{paths};
   my $session;
   my $userdata;

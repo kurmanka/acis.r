@@ -173,12 +173,10 @@ sub run_apu_by_queue {
       ###  XXX $qitem is not always a record identifier, but
       ###  offline_userdata_service expects an indentifier if anything on
       ###  4th parameter position
-      $res = ACIS::Web::Admin::offline_userdata_service
-                        ( $ACIS, $login, 'ACIS::APU::record_apu', $rid, $class ) 
-                          || 'FAIL';
+      $res = ACIS::Web::Admin::offline_userdata_service( $ACIS, $login, 'ACIS::APU::record_apu', $rid, $class ) || 'FAIL';
       if ($@) { $notes = $@; }
     };
-    if ( $@ ) {
+    if ($@) {
       $res   = "FAIL"; 
       $notes = $@;
     }

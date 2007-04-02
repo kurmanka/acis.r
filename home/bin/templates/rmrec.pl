@@ -18,7 +18,7 @@ use ACIS::Web::Admin;
 ###  get hands on the userdata (if possible),
 ###  create a session and then do the work
 
-my $res= ACIS::Web::Admin::offline_userdata_service( $acis, $login, 'ACIS::rmrec::delete_record', $rec, $rec );
+my $res=ACIS::Web::Admin::offline_userdata_service($acis, $login, 'ACIS::rmrec::delete_record', $rec);
 
 
 package ACIS::rmrec;
