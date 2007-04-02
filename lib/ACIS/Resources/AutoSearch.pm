@@ -93,7 +93,7 @@ sub prepare_for_auto_search {
 
   my $name = $record->{name};
   my $variations = $name->{variations};
-  $autosearch -> {'names-list'} = $variations || [];
+  $autosearch -> {'names-list'} = [grep {$_} @$variations];
 
   my $nicelist = [];
   push @$nicelist, @{ $name ->{'additional-variations'} };
@@ -188,6 +188,7 @@ sub search_for_resources_exact {
 
   ###  search for exact matches
   foreach ( @$namelist ) {
+    next if not $_;
     my $search = search_resources_for_exact_name( $sql, $context, $_ );
     my $found = ( defined $search ) ? scalar( @$search ) : 'nothing' ;
     logit "exact name: '$_', found: $found";

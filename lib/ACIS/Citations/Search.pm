@@ -79,9 +79,7 @@ sub search_for_document($) {
 
 sub search_for_personal_names($) {
   my $names = shift || die;
-
   if ( not $sql ) { prepare; }
-
   debug "search_for_personal_names: $names (" , scalar @$names, " names)";
 
   my @cl = ();
@@ -89,6 +87,7 @@ sub search_for_personal_names($) {
   
   my $q = '';
   foreach ( @$names ) {
+    next if not $_;
     debug "name: $_";
     $q .= '"'. $_ . '" ';
   }

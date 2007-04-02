@@ -24,7 +24,7 @@ package ACIS::Web::ARPM;        ### -*-perl-*-
 #  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 #
 #  ---
-#  $Id: ARPM.pm,v 2.12 2007/03/07 22:20:20 ivan Exp $
+#  $Id: ARPM.pm,v 2.13 2007/04/02 14:31:56 ivan Exp $
 #  ---
 
 
@@ -37,6 +37,7 @@ use ACIS::Web::SysProfile;
 require ACIS::Web::Contributions;
 use ACIS::Resources::Suggestions;
 use ACIS::Resources::AutoSearch;
+use ACIS::Resources::Search;
 
 use Web::App::Common qw( debug );
 

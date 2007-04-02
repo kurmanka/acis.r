@@ -60,7 +60,6 @@ if (scalar @call) {
 }
 
 foreach ( @call ) {
-
   print "Now will run: $_\n";
   system( "bin/$_" ) == 0
     or warn "failed to execute: $?";
@@ -73,15 +72,18 @@ foreach ( @call ) {
       ($? & 127),  ($? & 128) ? 'with' : 'without';
     die;
   }
-
 }
 
-
-if ($upgrade_flag_set) { unlink $upgrade_flag_set; }
+if ($upgrade_flag_set) {  
+  unlink $upgrade_flag; 
+}
+if (scalar @call) {
+  print "upgrade finished\n";
+}
 
 END {
-  if ($upgrade_flag_set and -f $upgrade_flag_set) { 
-    print "upgrade-in-progress flag is being left: $upgrade_flag_set\n";
+  if ($upgrade_flag_set and -f $upgrade_flag) { 
+    print "upgrade-in-progress flag is being left: $upgrade_flag\n";
   }
 }
 

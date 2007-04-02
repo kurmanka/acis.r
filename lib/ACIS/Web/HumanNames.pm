@@ -56,9 +56,9 @@ sub normalize_and_filter_names($) {
   my ($l) = @_;
   my $h = {};
   foreach ( @$l ) {
-    next if not $_;
+    if (not $_) { undef $_; next; }
     normalize_name();
-    next if not $_;
+    if (not $_) { undef $_; next; }
     undef $_ if $h->{$_}++;
   }
   clear_undefined $l;
