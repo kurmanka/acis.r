@@ -77,9 +77,8 @@ if ( $queue ) {
 }
 
 END {
-  print "END {}\n";#XXXX
   if ( $clearlock and -d $clearlock ) {
-    print "self pid: ", `cat $clearlock/pid`;
+    #print "self pid: ", `cat $clearlock/pid`;
     system( "rm $clearlock/*" )
       if -f "$clearlock/pid";
     rmdir $clearlock;
