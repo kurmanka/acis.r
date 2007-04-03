@@ -28,7 +28,7 @@ package ARDB::Plugin::Processing::ACIS_UD;   ### -*-perl-*-
 #  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 #
 #  ---
-#  $Id: ACIS_UD.pm,v 2.0 2005/12/27 19:47:40 ivan Exp $
+#  $Id: ACIS_UD.pm,v 2.1 2007/04/03 11:49:06 ivan Exp $
 #  ---
 
 
@@ -102,42 +102,42 @@ sub process_record {
 sub record_delete_cleanup {
   my $ardb   = shift;
   my $record = shift;
-
   my $relations = $ardb -> relations;
-  
   my $record_type = $record -> type;
-  
   my $config     = $ardb -> {config};
   my $sql_object = $ardb -> {sql_object};
 
   if ( $record_type eq 'acis-record-person' ) {
-
     ###  Personal profile processing
     my $sid     = $record -> get_value( 'sid' );
     my $id      = $record -> get_value( 'id' );
 
     if ( $sid ) {
-      $config -> table( 'acis:names' )
-        -> delete_records( 'shortid', $sid, $sql_object );
-
-      $config -> table( 'acis:sysprof' )
-        -> delete_records( 'id', $sid, $sql_object );
-
-      $config -> table( 'acis:suggestions' )
-        -> delete_records( 'psid', $sid, $sql_object );
-
-      $config -> table( 'acis:threads' )
-        -> delete_records( 'psid', $sid, $sql_object );
-
-      $config -> table( 'acis:arpm_queue' )
-        -> delete_records( 'what', $sid, $sql_object );
+      # clean personal database records by sid
+      my @clean = qw( acis:names       shortid
+                      acis:sysprof     id
+                      acis:suggestions psid
+                      acis:threads     psid
+                      acis:apu_queue   what
+                      acis:cit_old_sug psid
+                      acis:cit_sug     psid
+                      acis:ft_urls_choices psid
+                    );
+      while( scalar @clean ) {
+        my $tname = shift @clean;
+        my $field = shift @clean;
+        if (my $table = $config->table( $tname )) {
+          $table->delete_records( $field, $sid, $sql_object );
+        } else {
+          warn "can't clean rec $sid from table $tname";
+        }
+      }
     }
 
-    $config -> table( 'acis:arpm_queue' )
+    $config -> table( 'acis:apu_queue' )
       -> delete_records( 'what', $id, $sql_object );
 
   }
-  
   return 1;
 } 
 
