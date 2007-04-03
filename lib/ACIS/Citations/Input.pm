@@ -108,6 +108,7 @@ sub process_record {
     my $clid = "$srcdocsid-$md5";
     delete $index->{$clid};
     $cit -> {clid}     = $clid;
+    $cit -> {srcdocsid} = $srcdocsid;
     $cit -> {ostring}  = $ost;
     $cit -> {trgdocid} = $_->{trgdocid};
     $cit -> {nstring}  = make_citation_nstring $ost;

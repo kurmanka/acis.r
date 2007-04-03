@@ -63,7 +63,7 @@ citations.ostring,citations.cnid,res.id as srcdocid,res.title as srcdoctitle,
 res.authors as srcdocauthors,res.urlabout as srcdocurlabout
 FROM $from 
   JOIN citations USING (cnid)
-  JOIN $rdbname.resources as res ON (res.sid = substring_index(citations.clid,'-',1))
+  JOIN $rdbname.resources as res ON (res.sid = citations.srcdocsid)
   $joins
 WHERE $where";
 }

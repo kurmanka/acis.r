@@ -302,7 +302,7 @@ sub select_citations_sql {
   my $rdbname = $acis->config( 'metadata-db-name' );
   return "SELECT citations.cnid,citations.ostring,citations.nstring,citations.trgdocid,
     res.id as srcdocid,res.title as srcdoctitle,res.authors as srcdocauthors,res.urlabout as srcdocurlabout 
-  FROM citations INNER JOIN $rdbname.resources as res ON (res.sid = substring_index(citations.clid,'-',1)) ";
+  FROM citations INNER JOIN $rdbname.resources as res ON (res.sid = citations.srcdocsid) ";
 }  
 
 

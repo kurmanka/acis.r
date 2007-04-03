@@ -1,5 +1,5 @@
 package sql_helper;
-# $Id: sql_helper.pm,v 2.5 2007/03/27 22:11:26 ivan Exp $
+# $Id: sql_helper.pm,v 2.6 2007/04/03 08:27:13 ivan Exp $
 
 use DBI;
 # ? just for early detection of DBD::mysql absence
@@ -427,11 +427,10 @@ sub execute {
          or $dbherrstr
          or $self->{verbose_log} 
           ) {
-      $self->query_log ( "execute res: " , $dbh ->errstr , ($time ? " $time":'') );
+      $self->query_log( "execute res: " , $dbh ->errstr , ($time ? " $time":'') );
     }
 
     if ( not $r or $@ ) { 
-#       $sth -> finish;
       return undef; 
     }
       
