@@ -260,7 +260,7 @@ function make_choice_text(choice) {
     <xsl:param name='list'/>
 
     <tr class='here'>
-      <th class='desc'> item description </th>
+      <th class='desc'> item description and links </th>
     </tr>
     
     <xsl:for-each select='$list/list-item[id and title]'>
@@ -275,9 +275,9 @@ function make_choice_text(choice) {
       <xsl:if test='$fturls/list-item/*[name()=$dsid]'>
 
       <xsl:variable name='alternate'><xsl:if test='position() mod 2'> alternate</xsl:if></xsl:variable>
-      <tr class='resource{$alternate}' id='row_{$sid}'>
+      <tr class='{$alternate}' id='row_{$sid}'>
         
-        <td class='description'>
+        <td>
           <xsl:call-template name='present-resource' xml:space='default'>
             <xsl:with-param name='resource' select='.'/>
           </xsl:call-template>
@@ -285,7 +285,7 @@ function make_choice_text(choice) {
           <xsl:for-each select='$fturls/list-item/*[name()=$dsid]/list-item'>
             <li><a href='{url}' class='ft'><xsl:call-template name='present-url'/></a>
             <br/>
-            <xsl:text>is: </xsl:text> 
+            <xsl:text>is </xsl:text> 
             <span class='choice' xml:space='default'>
               <xsl:if test='not(string-length(choice))'>
                 <xsl:attribute name='class'>choice default</xsl:attribute>
@@ -315,10 +315,8 @@ function make_choice_text(choice) {
         <div style='float:right'><a ref='#' class='evergreen closeform'>[X]</a></div>
         <div id='menu1'><xsl:call-template name='recognition-menu'/></div>
       </form>
-    <div id='menu2' style='display:none;'><xsl:call-template
-    name='archival-menu'/></div>
+      <div id='menu2' style='display:none;'><xsl:call-template name='archival-menu'/></div>
     </div>
-
   </xsl:template>
 
   <xsl:variable name='additional-head-stuff'>
@@ -344,7 +342,7 @@ span.default {color: gray}
   padding: 6px; 
   margin:0; 
 }
-
+#resources-ft td { padding-bottom: .6em; } 
     </style>
 
 <script-onload>
@@ -364,16 +362,17 @@ $("ul.menu a").click( choice );
                   select='count($fturls/list-item/*)'/>
 
     <xsl:choose>
-      <xsl:when test='$current/list-item'>
+      <xsl:when test='$current-count and $current/list-item'>
           <xsl:choose>
           <xsl:when test='$current-count &gt; 1'>
-            <p>Here are your works, for which we have full text links.</p>
+            <p>Here are those of your works, for which we have full text
+            links.</p>
           </xsl:when>
           </xsl:choose>
 
           <p><small>This page requires JavaScript in your browser to work.</small></p>
           
-          <table class='resources'>
+          <table id='resources-ft'>
             <xsl:call-template name='table-resources-for-ftlinks'>
               <xsl:with-param name='list' select='$current'/>
             </xsl:call-template>
@@ -381,12 +380,11 @@ $("ul.menu a").click( choice );
 
       </xsl:when>
       <xsl:otherwise>
-        <p>At this moment, there are no works in your research profile; and
-        there are no links either.</p>
+        <p>At this moment, there are no works in your research profile for
+        which we have full-text links.</p>
       </xsl:otherwise>
     </xsl:choose>
     
-
 
   </xsl:template>
 
