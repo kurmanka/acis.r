@@ -24,7 +24,7 @@ foreach ( @q ) {
     print "  - result: modified ", $r->rows, " rows\n";
   }
   if ($sql->error) {
-    print "  - error: " , $sql->error, " rows\n";
+    print "  - error: " , $sql->error, "\n";
     last;
   }
 }
