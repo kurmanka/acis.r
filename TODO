@@ -1,3 +1,7 @@
+export_authorcites script should have a mode to export all "similar"
+items and the "preidentified" items from just the given time frame.
+
+
 Go through all XXX marks and either fix or re-label them as "ZZZ" or
 "maybe".
 

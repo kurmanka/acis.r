@@ -83,23 +83,15 @@ String::Approx
 
 1. fix the screen
 
-   - add listed works count?
-
-   - highlight the selected item in the first menu
+   - add listed works count? - not critical, maybe
 
    - scroll the page vertically so that the menu is in the screen
-     middle?
+     middle? - maybe
 
-   - add explanations or links to explanations
+   - add explanations or links to explanations - Thomas hasn't yet sent
+     me the explanations
 
-   - clean the xslt file
-
-   - javascript links should have the same appearance as on the
-     doclinks screen
-
-2. configuration
-
-3. input: safer handling previous urls
+3. input: safer handling for the urls 
 
 
 ### input
