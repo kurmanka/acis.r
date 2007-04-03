@@ -69,7 +69,7 @@
   <xsl:template name='link-form-hidden'>
     <div style='display:none' id='link-form'>
       <form screen='@research/doclinks'>
-        <div style='float:right'><a href='#' class='closeform evergreen' title='close this'>[X]</a></div>
+        <div style='float:right'><a href='#' class='closeform js' title='close this'>[X]</a></div>
 
         <div><b>add a link</b>
 
@@ -141,7 +141,7 @@
                   <xsl:with-param name='dsid' select='$dsid'/>
                 </xsl:call-template>
               </xsl:for-each>
-              <li sid='{$dsid}'><a ref='#0' class='linkadd evergreen' >add a link</a></li>
+              <li sid='{$dsid}'><a ref='#0' class='linkadd js' >add a link</a></li>
             </ul>
           </small>
             
@@ -184,9 +184,6 @@ ul.links a.linkdelete span {
   color: #666;
 }
 
-ul.links a.linkadd {
-  text-decoration: none;
-}
 #link-form { padding: 0px; border: 1px solid #666; }
 #link-form th { text-align: left; font-weight: normal; }
 #link-form form { 

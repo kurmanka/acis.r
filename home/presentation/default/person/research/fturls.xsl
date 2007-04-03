@@ -22,9 +22,9 @@
 
   <xsl:variable name='recognition-menu-items'>
     <item code='n'>wrong</item>
-    <item code='d'>abstract page</item>
-    <item code='r' allow-second='y'>full-text file of another version</item>
-    <item code='y' default='y' allow-second='y'>correct full-text file</item>
+    <item code='d'>points to an abstract page</item>
+    <item code='r' allow-second='y'>points to a full-text file of another version</item>
+    <item code='y' default='y' allow-second='y'>points to a correct full-text file</item>
   </xsl:variable>
   <xsl:variable name='recognition-menu' select='exsl:node-set($recognition-menu-items)'/>
 
@@ -54,7 +54,7 @@
           <xsl:if test='@default'>
             <xsl:attribute name='class'>default</xsl:attribute>
           </xsl:if>
-          <a href='#' class='evergreen'><xsl:value-of select='text()'/></a>
+          <a href='#' class='js'><xsl:value-of select='text()'/></a>
         </li>
     </xsl:for-each>
   </xsl:template>
@@ -75,7 +75,7 @@
   </xsl:template>
 
   <xsl:template name='recognition-menu'>
-    <p>this url for the above document is:</p>
+    <p>The link for the above document is:</p>
     <ul id='recognition-menu' class='menu' menu='0'>
       <xsl:call-template name='render-menu'>
         <xsl:with-param name='menu' select='$recognition-menu'/>
@@ -129,7 +129,7 @@
           <xsl:with-param name='menu' select='$recognition-menu'/>
         </xsl:call-template>
         <xsl:if test='string-length($choice-str) &gt; 1'>
-          <xsl:text>, </xsl:text>
+          <xsl:text>; </xsl:text>
           <xsl:call-template name='present-menu-choice'>
             <xsl:with-param name='code' select='substring($choice-str,2,1)'/>
             <xsl:with-param name='menu' select='$archival-menu'/>
@@ -181,13 +181,12 @@ function close_choice_form () {
   form.style.display = "none";
   form.setAttribute('choice','');
   hide_menu2();
+  $("a.selected",form).removeClass('selected');
   $("a.changechoice").show();
   return false;
 }
 
 function show_menu2(el) {
-  //$('#menu1').hide();
-  //$('#menu2').show();
   if (el) {
     $(el).after( get('menu2') );
   } else {
@@ -219,7 +218,8 @@ function choice() {
   }
   form.setAttribute('choice', newchoice );
   if (menu==0 &amp;&amp; menus[0][code].second) { 
-     show_menu2(this); 
+     show_menu2(this);
+     $(this).addClass('selected');
      return false; 
   }
   send_choice( dsid, psid, href, newchoice );
@@ -285,7 +285,7 @@ function make_choice_text(choice) {
           <xsl:for-each select='$fturls/list-item/*[name()=$dsid]/list-item'>
             <li><a href='{url}' class='ft'><xsl:call-template name='present-url'/></a>
             <br/>
-            <xsl:text>is </xsl:text> 
+            <!-- <xsl:text>the URL </xsl:text> -->
             <span class='choice' xml:space='default'>
               <xsl:if test='not(string-length(choice))'>
                 <xsl:attribute name='class'>choice default</xsl:attribute>
@@ -295,7 +295,7 @@ function make_choice_text(choice) {
               </xsl:call-template>
             </span>
             <span class='change'> - 
-            <a href='#' class='evergreen changechoice' choice='{choice/text()}'
+            <a href='#' class='js changechoice' choice='{choice/text()}'
                dsid='{$dsid}' >change</a></span>
             </li>
           </xsl:for-each>
@@ -312,7 +312,7 @@ function make_choice_text(choice) {
   <xsl:template name='hidden-choice-form'>
     <div style='display: none' id='choice-form'>
       <form>
-        <div style='float:right'><a ref='#' class='evergreen closeform'>[X]</a></div>
+        <div style='float:right'><a ref='#' class='js closeform'>[X]</a></div>
         <div id='menu1'><xsl:call-template name='recognition-menu'/></div>
       </form>
       <div id='menu2' style='display:none;'><xsl:call-template name='archival-menu'/></div>
@@ -332,17 +332,19 @@ a.closeform {
   font-size: larger;
   text-decoration: none;
 }
-#choice-form form div ul.menu { margin: 12px; margin-left: 30px; xpadding: 2px; }
+#choice-form form div ul.menu { margin: 12px; margin-left: 30px; }
 span.new {color: green;font-style:italic}
 span.default {color: gray}
 #menu1, #menu2 { padding: 6px; }
 #choice-form { padding: 0px; border: 1px solid #666; }
+#choice-form p { margin: 0; }
 #choice-form form { 
   font-size: smaller;
   padding: 6px; 
   margin:0; 
 }
 #resources-ft td { padding-bottom: .6em; } 
+a.selected { color: #000 !important; }
     </style>
 
 <script-onload>
