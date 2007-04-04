@@ -600,24 +600,17 @@ sub process_resource {
 sub process_resource_lost {
   my $ardb   = shift;
   my $record = shift;
-
   my $config = $ardb -> config;
   my $sql    = $ardb -> sql_object;
-
   my $sid    = $record -> {sid};
-
   if ( $sid ) {
-    foreach ( qw( res_creators_bulk
-                  res_creators_separate
-                ) ) {
-      my $table  = $config -> table( $_ );
-      $table -> delete_records( 'sid', $sid, $sql );
+    foreach ( qw( res_creators_bulk res_creators_separate ) ) {
+      $config ->table($_) ->delete_records( 'sid', $sid, $sql );
     }
+    $config -> table( "acis:suggestions" ) ->delete_records( 'osid', $sid, $sql );
 
-    {
-      my $table  = $config -> table( "acis:suggestions" );
-      $table -> delete_records( 'osid', $sid, $sql );
-    }
+    require ACIS::FullTextURLs;
+    ACIS::FullTextURLs::clear_urls_for_dsid($sid,$ardb);
   }
 }
 

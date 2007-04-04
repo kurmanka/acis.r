@@ -6,8 +6,71 @@ use warnings;
 use Digest::MD5;
 use Carp;
 use Carp::Assert;
-
 use Web::App::Common;
+use Exporter qw(import);
+use vars qw(@EXPORT_OK);
+@EXPORT_OK=qw( process_urls_for_resource store_urls_for_dsid clear_urls_for_dsid get_urls_for_dsid get_choices_for_dsid save_choice );
+
+# these functions are called from ARDB handlers
+
+sub process_urls_for_resource {
+  my ($dsid, $authlist, $autolist, $ardb) = @_;
+  assert( $dsid );
+  store_urls_for_dsid( $dsid, $authlist, 'authoritative', $ardb ); 
+  store_urls_for_dsid( $dsid, $autolist, 'automatic', $ardb ); 
+
+  # clear old urls (the disappeared ones)
+  my $urlindex = {};
+  foreach (@$authlist) { $urlindex->{$_}=1 } 
+  foreach (@$autolist) { $urlindex->{$_}=1 }
+
+  my $config = $ardb->{config};
+  my $sql    = $ardb->{sql_object};
+  my $table  = $config->table('acis:ft_urls');
+  my $tabname = $table->realname;
+  $sql->prepare( "select url from $tabname where dsid=?" );
+  my $r = $sql->execute( $dsid );
+  while ( $r and $r->row ) {
+    my $rec = $r->row;
+    my $url = $rec->{url};
+    if ( not $urlindex->{$url} ) {
+      $sql->prepare_cached( "delete from $tabname where dsid=? and url=?" );
+      $sql->execute( $dsid, $url );
+    }
+    $r->next;
+  }
+}
+
+sub store_urls_for_dsid {
+  my ($dsid,$list,$nature,$ardb) = @_;
+  die if not $ardb;
+  assert( $nature eq 'authoritative' or $nature eq 'automatic' );
+  my $config = $ardb -> {config};
+  my $sql    = $ardb -> {sql_object};
+  my $table  = $config -> table( 'acis:ft_urls' );
+  foreach ( @$list ) {
+    next if not $_;
+    my $item = {
+                dsid => $dsid,
+                url  => $_,
+                checksum => Digest::MD5::md5( $_ ),
+                nature => $nature
+               };
+    $table ->store_record( $item, $sql );
+  }
+}
+
+sub clear_urls_for_dsid {
+  my ($dsid,$ardb) = @_;
+  my $sql    = $ardb -> {sql_object};
+  my $config = $ardb -> {config};
+  my $table  = $config -> table( 'acis:ft_urls' );
+  die if not $sql or not $table;
+  $table->delete_records( 'dsid', $dsid, $sql );
+}
+
+
+# the following functions are called from the ACIS::Web handlers 
 
 sub get_urls_for_dsid($) {
   my ($dsid) = @_;

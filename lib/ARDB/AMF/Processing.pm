@@ -8,6 +8,7 @@ use Digest::MD5;
 use ACIS::ShortIDs;
 require ARDB::ReDIF::Processing;
 require AMF::2ReDIF;
+require ACIS::FullTextURLs;
 
 my $rec;
 my $te ;
@@ -248,6 +249,24 @@ sub process_text {
 
 }
 
+sub process_text_lost {
+  # a copy of process_resource_lost() from ARDB::ReDIF::Processing
+  my $ardb   = shift;
+  my $record = shift;
+  my $config = $ardb -> config;
+  my $sql    = $ardb -> sql_object;
+  my $sid    = $record -> {sid};
+  if ( $sid ) {
+    foreach ( qw( res_creators_bulk res_creators_separate ) ) {
+      $config ->table($_) ->delete_records( 'sid', $sid, $sql );
+    }
+    $config -> table( "acis:suggestions" ) ->delete_records( 'osid', $sid, $sql );
+    require ACIS::FullTextURLs;
+    ACIS::FullTextURLs::clear_urls_for_dsid($sid,$ardb);
+  }
+}
+
+
 sub process_collection {
   process_text( );
 }
@@ -434,30 +453,7 @@ sub process_fulltext_urls {
   my @authurls = get 'file/url';
   my @addiurls = get 'hasversion/file/url';
 
-  assert( $sid );
-  # XXX clearing old urls
-  handle_urls( \@authurls, 'authoritative' ); 
-  handle_urls( \@addiurls, 'automatic' ); 
-}
-
-sub handle_urls {
-  my ($list,$nature) = @_;
-
-  assert( $nature eq 'authoritative' or $nature eq 'automatic' );
-  my $config = $ardb -> {config};
-  my $sql    = $ardb -> {sql_object};
-  my $table_urls = $config -> table( 'acis:ft_urls' );
-  foreach ( @$list ) {
-    next if not $_;
-    my $item = {
-                dsid => $sid,
-                url  => $_,
-                checksum => Digest::MD5::md5( $_ ),
-                nature => $nature
-               };
-    $table_urls -> store_record( $item, $sql );
-  }
-  
+  ACIS::FullTextURLs::process_urls_for_resource( $sid, \@authurls, \@addiurls, $ardb );
 }
 
 1;

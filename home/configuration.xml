@@ -5,7 +5,7 @@
     that is a working ARDB core configuration file.  Produces:
     documents table, collections table, authors table.
 
-    $Id: configuration.xml,v 2.16 2007/04/03 08:27:13 ivan Exp $
+    $Id: configuration.xml,v 2.17 2007/04/04 17:12:19 ivan Exp $
 
 -->
 
@@ -214,15 +214,10 @@
  </put-processing>
 
 
- <delete-processing 
-  record-type=
+ <delete-processing record-type=
   'ReDIF-Series 1.0,ReDIF-Paper 1.0,ReDIF-Article 1.0,ReDIF-Book 1.0,ReDIF-Chapter 1.0,ReDIF-Software 1.0,paper,article,book,chapter,software,series'>
-   
-   <call-perl-function
-    name='ARDB::ReDIF::Processing::process_resource_lost' />
-   
+   <call-perl-function name='ARDB::ReDIF::Processing::process_resource_lost' />
    <delete-from-table table='resources' by='id'/>
-
  </delete-processing>
 
 
@@ -245,54 +240,33 @@
  
 
  <put-processing record-type='collection,text,organization'>
-   
-   <call-perl-function
-    name='ARDB::AMF::Processing::prepare' />
-   
+   <call-perl-function name='ARDB::AMF::Processing::prepare' />
  </put-processing>
 
-
-
-
-
  <put-processing record-type='organization'>
-
-   <call-perl-function
-       name='ARDB::AMF::Processing::process_organization' />
-   
+   <call-perl-function name='ARDB::AMF::Processing::process_organization' />
  </put-processing>
  
  <delete-processing record-type="organization">
    <delete-from-table table='institutions' by='id'/>
  </delete-processing>
-
-
-
  
  <put-processing record-type='text'>
-   
-    <call-perl-function
-          name='ARDB::AMF::Processing::process_text' />
-   
+    <call-perl-function name='ARDB::AMF::Processing::process_text' />
  </put-processing>
 
+ <delete-processing record-type='text'>
+   <call-perl-function name='ARDB::AMF::Processing::process_text_lost' />
+   <delete-from-table table='resources' by='id'/>
+ </delete-processing>
 
  <put-processing record-type='collection'>
-   
-    <call-perl-function
-          name='ARDB::AMF::Processing::process_collection' />
-   
+    <call-perl-function name='ARDB::AMF::Processing::process_collection' />
  </put-processing>
-
-
 
  <put-processing record-type='collection,text,organization'>
-   
-    <call-perl-function
-          name='ARDB::AMF::Processing::extract_part_of_relationships' />
-   
+    <call-perl-function name='ARDB::AMF::Processing::extract_part_of_relationships' />
  </put-processing>
-
 
 
  <!-- adding ReDIF archives for completeness and for RAS' meta/update -->

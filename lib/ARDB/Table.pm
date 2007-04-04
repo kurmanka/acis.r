@@ -31,6 +31,8 @@ sub new {
   return $self;
 }
 
+sub realname { $_[0]->{realname}; }
+
 
 sub add_field {
   my $self   = shift;
@@ -46,7 +48,6 @@ sub add_field {
 sub create_table_statement {
   my $self = shift;
   my $data = shift;
-
   $self -> {create_statement_body} .= "$data\n";
 }
 
@@ -71,7 +72,7 @@ sub store_values {
   $sql_data =~ s/(.*), *$/$1/;
 
   my $name = $self->{realname};
-  print 'insert into '. $name . ' set ' . $sql_data;
+  #print 'insert into '. $name . ' set ' . $sql_data;
   $sql_object -> prepare ( 'insert into '. $name . ' set ' . $sql_data );
   $sql_object -> execute ( @params );
 }
@@ -81,14 +82,11 @@ sub store_values {
 sub perform_create {
   my $self       = shift;
   my $sql_object = shift;
-
   $self -> {create_statement_body} =~ s/\s*,\s*$//;
   my $creation_params = $self -> {create_statement_body} ;
   my $table_name = $self -> {realname} ;
   $sql_object -> prepare ( "CREATE TABLE $table_name ( $creation_params )" );
-
   my $r = $sql_object -> execute;
-
   if ( $r ) { return undef;
   } else {
     return $sql_object -> error;
@@ -99,8 +97,7 @@ sub perform_create {
 sub perform_delete {
   my $self       = shift;
   my $sql_object = shift;
-
-  my $table_name = $self -> {realname} ;
+  my $table_name = $self -> {realname};
   $sql_object -> prepare ( "DROP TABLE $table_name" );
   $sql_object -> execute ();
 }
@@ -142,7 +139,6 @@ sub delete_records {
   my $table = $self -> {realname};
   $sql -> prepare ( "DELETE FROM $table WHERE $column=?" );
   $sql -> execute ( $id );
- 
 }
 
 
