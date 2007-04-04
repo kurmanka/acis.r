@@ -21,9 +21,8 @@ sub session_stop {
   my $sessionid=$session->id;
   my $login; 
   eval { $login=$session->object->{owner}->{login}; };
-  complain( "can't find session's user login: $sessionid")
-    if not $login;
-  $login ||='unknown';
+  $login ||= $session->owner->{login};
+  $login ||= 'unknown';
   my $type = $session->type;
   session_history_event($sessionid,$login,$type,'stop');
 }
@@ -34,14 +33,8 @@ sub session_start {
   my $sessionid=$session->id;
   my $login; 
   eval { $login=$session->object->{owner}->{login}; };
-  if (not $login) {
-#    complain( "can't find session's user login: $sessionid");
-    $login = $session->owner->{login};
-  }
-  if (not $login) {
-    complain( "can't find session's owner login: $sessionid");
-    $login = 'unknown'; # XXX 
-  }
+  $login ||= $session->owner->{login};
+  $login ||= 'unknown';
   my $type = $session->type;
   session_history_event($sessionid,$login,$type,'start');
 }
@@ -51,10 +44,8 @@ sub session_discard {
   my $sessionid=$session->id;
   my $login; 
   eval { $login=$session->object->{owner}->{login}; };
-  $login=$session->owner->{login}
-    if not $login; 
-  complain( "can't find session's user login: $sessionid"), $login='unknown'
-    if not $login; 
+  $login ||= $session->owner->{login};
+  $login ||= 'unknown';
   my $type = $session->type;
   session_history_event($sessionid,$login,$type,'discard');
 }
