@@ -79,7 +79,7 @@ if ( $queue ) {
 END {
   if ( $clearlock and -d $clearlock ) {
     #print "self pid: ", `cat $clearlock/pid`;
-    system( "rm $clearlock/*" )
+    unlink "$clearlock/pid" 
       if -f "$clearlock/pid";
     rmdir $clearlock;
     undef $clearlock;
