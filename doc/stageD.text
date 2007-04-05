@@ -91,9 +91,6 @@ String::Approx
    - add explanations or links to explanations - Thomas hasn't yet sent
      me the explanations
 
-   - change item color back to normal (after being selected), if user
-     chose another submenu
-
 ### input
 
 authoritative:
