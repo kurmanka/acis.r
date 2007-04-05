@@ -66,8 +66,8 @@
     <xsl:for-each select='$menu/item'>
 '<xsl:value-of select='@code'/>': { label: "<xsl:value-of select='text()'/>"<xsl:text/>
     <xsl:choose><xsl:when
-    test='@default'>, default: true</xsl:when><xsl:otherwise></xsl:otherwise></xsl:choose>
-    <xsl:if test='@allow-second'>, second: true</xsl:if> 
+    test='@default'>, 'default': true</xsl:when><xsl:otherwise></xsl:otherwise></xsl:choose>
+    <xsl:if test='@allow-second'>, 'second': true</xsl:if> 
     <xsl:text/> }<xsl:if test='position()&lt;last()'>,</xsl:if>
     </xsl:for-each>
 <xsl:text> };
@@ -219,6 +219,7 @@ function choice() {
   form.setAttribute('choice', newchoice );
   if (menu==0 &amp;&amp; menus[0][code].second) { 
      show_menu2(this);
+     $("a.selected",form).removeClass('selected');
      $(this).addClass('selected');
      return false; 
   }
@@ -244,7 +245,7 @@ function update_page(dsid, href, choice) {
 function make_choice_text(choice) {
   var text = menus[0][choice.substr(0,1)].label;
   if (choice.length &gt; 1) {
-    text = text + ', ' + menus[1][choice.substr(1,1)].label
+    text = text + '; ' + menus[1][choice.substr(1,1)].label
   }
   return text;
 }
