@@ -2,7 +2,6 @@ package ACIS::Citations::Input;
 
 use strict;
 use warnings;
-use Carp::Assert;
 
 require ARDB::Local;
 my $ardb;
@@ -13,7 +12,6 @@ my $adb;
 use Digest::MD5;
 use ACIS::Citations::Utils qw( make_citation_nstring );
 sub DEBUG() { 1 }
-
 
 sub prepare() {
   if ( not $ardb ) { 
@@ -52,9 +50,7 @@ sub process_record {
   print "src doc id: $srcdocid\n"
     if DEBUG;
 
-  # prepare
   prepare;
-  assert( $ardb );
   
   # find srcdocsid and URL
   my $srcdocsid = find_doc_details( $srcdocid );

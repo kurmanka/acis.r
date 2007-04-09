@@ -81,15 +81,21 @@ String::Approx
 
 ### TODO
 
-1. fix the screen
+1. input data -- support LoTEc data format
+   ftp://all.repec.org/LotEc
+
+   - configure test.acis to use that
+
+2. fix the screen
 
    - add listed works count? - not critical, maybe
 
    - scroll the page vertically so that the menu is in the screen
-     middle? - maybe
+     middle? - maybe; not critical
 
    - add explanations or links to explanations - Thomas hasn't yet sent
      me the explanations
+
 
 ### input
 

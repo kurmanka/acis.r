@@ -1,110 +1,67 @@
 <?xml version="1.0"?>
-
 <!-- 
 
-    that is a working ARDB core configuration file.  Produces:
+    That is a working ARDB core configuration file.  Produces:
     documents table, collections table, authors table.
 
-    $Id: configuration.xml,v 2.17 2007/04/04 17:12:19 ivan Exp $
+    $Id: configuration.xml,v 2.18 2007/04/09 23:31:32 ivan Exp $
 
 -->
-
 <configuration>
 
-
-<relation-type name="written-by" reverse="wrote" default-retrieve="record">
+  <relation-type name="written-by" reverse="wrote"  default-retrieve="record">
     <view name='nothing' retrieve='nothing' />
     <view name='brief' retrieve="name,handle" />
-</relation-type>
+  </relation-type>
 
-<relation-type 
-        name="wrote"
-        reverse="written-by"
-        default-retrieve="record">
+  <relation-type name="wrote" reverse="written-by"  default-retrieve="record">
+    <view name="brief" retrieve="title,handle,authors:author/name" />
+    <view name="brief-with-creation-date" retrieve="title,handle,authors:author/name,creation-date"/>
+  </relation-type>
 
-        <view name="brief" retrieve="title,handle,authors:author/name" />
-
-        <view name="brief-with-creation-date" retrieve="title,handle,authors:author/name,creation-date"/>
-
-</relation-type>
-
-<relation-type 
-        name="cited-by"
-        reverse="cites" 
-    default-retrieve='title,handle,authors:author/name'
-        >
-</relation-type>
-
-<relation-type 
-    name="cites"
-    reverse="cited-by" 
-    default-retrieve='title,handle,authors:author/name'
-        >
-</relation-type>
-
-<relation-type
-    name='part-of'
-    reverse='has-part' 
-    default-retrieve='nothing'>
-
+  <relation-type name="cited-by" reverse="cites"    default-retrieve='title,handle,authors:author/name'>
+  </relation-type>
+  <relation-type name="cites"    reverse="cited-by" default-retrieve='title,handle,authors:author/name'>
+  </relation-type>
+  
+  <relation-type name='part-of' reverse='has-part'  default-retrieve='nothing'>
     <view name='extended' retrieve='name,title,type,handle' />
+  </relation-type>
 
-</relation-type>
-
-<relation-type
-    name='has-part'
-    reverse='part-of' 
-    default-retrieve='nothing'>
+  <relation-type name='has-part'  reverse='part-of' default-retrieve='nothing'>
     <view name='extended' retrieve='id' />
+  </relation-type>
+  
+  <relation-type name='has-shortid'         default-retrieve='id' />  <!-- reverse='is-shortid-of' -->
+  <relation-type name='classified-under'    default-retrieve='id,title' />
+  <relation-type name='affiliated-with'     default-retrieve='title,location'/>
 
-</relation-type>
+  <relation-type name="related" undirected="yes" default-retrieve="handle"/>
 
-<relation-type
-    name='has-shortid'
-    default-retrieve='id' />
+  <!--
+      A table element configures an SQL table. 
+      
+      It only defines table structure and SQL details.
+      
+      What it does not define is mapping from template data to table
+      records.
+  -->
 
-<!-- reverse='is-shortid-of' -->
-
-
-<relation-type
-    name='classified-under'
-    default-retrieve='id,title' />
-
-
-<relation-type 
-    name='affiliated-with'
-    default-retrieve='title,location'
-/>
-
-
-<relation-type
-        name="related"
-        undirected="yes"
-        default-retrieve="handle"
-         />
+  <!-- a global objects table -->
+  <table name='objects'>
+    <field name='id'    sql-type="CHAR(250) NOT NULL PRIMARY KEY" />
+    <field name='data'  sql-type='blob' />
+  </table>
 
 
-<!--
-        A table element configures an SQL table. 
+  <use-perl-module>ARDB::ReDIF::Processing</use-perl-module>
 
-        It only defines table structure and SQL details.
-
-        What it does not define is mapping from template data to table
-        records.
-
--->
-
-<use-perl-module>ARDB::ReDIF::Processing</use-perl-module>
-
-<!-- ReDIF-Person 1.0 records we don't need to process.  We
-     already have acis-record-person, which holds the same
-     data. -->
-
-
-
+  <!-- ReDIF-Person 1.0 records we don't need to process.  We
+       already have acis-record-person, which hold the same
+       data. -->
 
 <!-- ReDIF-Institution 1.0 processing -->
-
+  
 <!-- institutions table -->
 
 <table name='institutions'>
@@ -135,13 +92,8 @@
 
 
 <put-processing record-type='ReDIF-Institution 1.0'>
-
-    <call-perl-function
-          name='ARDB::ReDIF::Processing::process_institution' />
-
-    <call-perl-function
-      name='ARDB::ReDIF::Processing::extract_part_of_relationships' />
-
+  <call-perl-function name='ARDB::ReDIF::Processing::process_institution' />
+  <call-perl-function name='ARDB::ReDIF::Processing::extract_part_of_relationships' />
 </put-processing>
 
 <delete-processing record-type="ReDIF-Institution 1.0">
@@ -153,7 +105,6 @@
 <!-- ReDIF document template-types -->
 
 <table name="resources"> 
-
         <field name="id"       sql-type=" CHAR(255) NOT NULL PRIMARY KEY" />
         <field name="sid"      sql-type=" CHAR(15) NOT NULL" />
         <field name="type"     sql-type=" CHAR(20) NOT NULL" />
@@ -170,7 +121,6 @@
           FULLTEXT INDEX title_ft ( title ),
           INDEX sid_i ( sid )
         </create-table-sql>
-
 </table>
 
 
@@ -202,32 +152,20 @@
    </create-table-sql>
  </table>
 
-
  <put-processing record-type='ReDIF-Series 1.0,ReDIF-Paper 1.0,ReDIF-Article 1.0,ReDIF-Book 1.0,ReDIF-Chapter 1.0,ReDIF-Software 1.0'>
-   
-    <call-perl-function
-      name='ARDB::ReDIF::Processing::process_resource' />
-
-    <call-perl-function
-      name='ARDB::ReDIF::Processing::extract_part_of_relationships' />
-   
+   <call-perl-function name='ARDB::ReDIF::Processing::process_resource' />
+   <call-perl-function name='ARDB::ReDIF::Processing::extract_part_of_relationships' />
  </put-processing>
 
-
- <delete-processing record-type=
-  'ReDIF-Series 1.0,ReDIF-Paper 1.0,ReDIF-Article 1.0,ReDIF-Book 1.0,ReDIF-Chapter 1.0,ReDIF-Software 1.0,paper,article,book,chapter,software,series'>
+ <delete-processing 
+     record-type=
+     'ReDIF-Series 1.0,ReDIF-Paper 1.0,ReDIF-Article 1.0,ReDIF-Book 1.0,ReDIF-Chapter 1.0,ReDIF-Software 1.0,paper,article,book,chapter,software,series'>
    <call-perl-function name='ARDB::ReDIF::Processing::process_resource_lost' />
    <delete-from-table table='resources' by='id'/>
  </delete-processing>
 
 
  <!-- end -->
-
-
- <table name='objects'>
-   <field name='id'    sql-type="CHAR(250) NOT NULL PRIMARY KEY" />
-   <field name='data'  sql-type='blob' />
- </table>
 
 
 
@@ -284,12 +222,9 @@
 
 
   <perl-module name='ARDB::Plugin::Processing::ACIS_UD'/>
-
   <database alias='acis'/>
 
-
   <!--  ############    R E C O R D S    ##################   -->
-
  
   <table name='acis:records'>
   
@@ -298,15 +233,13 @@
     <field name='owner'     sql-type=' char(110) not null '/>
     <field name='userdata_file'   
                             sql-type=' char(200) binary not null'/>
-
     <field name='namelast'  sql-type=' char(70) not null' />
     <field name='namefull'  sql-type=' char(70) not null'/>
     <field name='profile_url' 
                             sql-type='char(100) binary not null default ""'/>
     <field name='homepage'  sql-type='char(130) binary not null default ""'/>
-
     <field name='emailmd5'  sql-type='char(16) binary not null default ""'/>
-    
+   
 <create-table-sql>
  index( id ), 
  index( namelast ), 
@@ -344,48 +277,24 @@
       </field-attribute-mapping>
     </store-to-table>
 
+    <!-- There is also additional record processing by the plugin
+         itself.  See ARDB::Plugin::Processing::ACIS_UD::process_record.  -->
 
-    <!--  
-
-    There is also additional record processing by the plugin itself.  See
-    ARDB::Plugin::Processing::ACIS_UD::process_record.
-
-    -->
-
-
-    <build-forward-relation 
-      type="affiliated-with" 
-      attributes="affiliations"
-      />
-
-    <build-forward-relation 
-      type="reject" 
-      attributes="contributions/refused/id"
-      />
-
-    <build-forward-relation 
-      type="accept" 
-      attributes="contributions/accepted/id"
-      />
-
+    <build-forward-relation type="affiliated-with" attributes="affiliations"   />
+    <build-forward-relation type="reject"          attributes="contributions/refused/id" />
+    <build-forward-relation type="accept"          attributes="contributions/accepted/id"/>
 
   </put-processing>
 
 
 
   <delete-processing record-type='acis-record-person'>
-
     <delete-from-table table='acis:records' by='id' />
-    
-    <call-perl-function
-     name='ARDB::Plugin::Processing::ACIS_UD::record_delete_cleanup' />
-    
+    <call-perl-function name='ARDB::Plugin::Processing::ACIS_UD::record_delete_cleanup' />
     <!--
       <delete-from-table table='acis:names'   by='id' />
     -->
-
   </delete-processing>
-
 
 
 
@@ -393,17 +302,14 @@
 
 
   <table name='acis:users'>
-  
     <field name='login'    sql-type=' varchar(255) not null primary key ' />
     <field name='name'     sql-type=' varchar(255)' />
     <field name='password' sql-type=' char(20) not null '/>
     <field name='userdata_file'
                            sql-type=' char(200) not null ' />
-                          
   </table>
   
   <put-processing record-type='acis-user'>
-
     <store-to-table table='acis:users'>
       <field-attribute-mapping>
         <field-associations
@@ -413,7 +319,6 @@
           userdata_file='FILENAME'/>
       </field-attribute-mapping>
     </store-to-table>
-    
   </put-processing>
 
   <delete-processing record-type='acis-user'>
@@ -431,7 +336,7 @@
     <field name='id'       sql-type=' VARCHAR(255) NOT NULL' />
     <field name='param'    sql-type=' VARCHAR(255) NOT NULL' />
     <field name='data'     sql-type=' BLOB' />
-                          
+                       
     <create-table-sql> PRIMARY KEY ( id, param )</create-table-sql>
 
   </table>
@@ -446,10 +351,7 @@
     <field name='type'      sql-type="CHAR(15) NOT NULL"/>
     <field name='started'   sql-type='DATETIME NOT NULL'/>
     <field name='checkpoint' sql-type='DATETIME'/>
-    
-    <create-table-sql>
-      PRIMARY KEY ( psid, type )
-    </create-table-sql>
+    <create-table-sql> PRIMARY KEY(psid, type)</create-table-sql>
   </table>
 
 
@@ -462,9 +364,7 @@
     <field name="target"   sql-type="CHAR(15) NOT NULL"/>
     <field name='time'     sql-type='DATETIME NOT NULL'/>
     <field name='data'     sql-type='BLOB NOT NULL'/>
-    <create-table-sql>
-      PRIMARY KEY ( psid, osid )
-    </create-table-sql>
+    <create-table-sql> PRIMARY KEY(psid, osid) </create-table-sql>
   </table>
 
 
@@ -610,8 +510,8 @@
     <field name='url'      sql-type='blob not null'/>
     <field name='checksum' sql-type='char(16) binary not null'/>
     <field name='nature'   sql-type="ENUM('authoritative','automatic') not null"/>
-    <x-field name='source'   sql-type=''/>
-    <create-table-sql> PRIMARY KEY( dsid, checksum ), index url_i( url(30) ) </create-table-sql>
+    <field name='source'   sql-type='varchar(255) not null'/>
+    <create-table-sql> PRIMARY KEY(dsid,checksum,source), index url_i(url(30)), index source_i(source(50))</create-table-sql>
   </table>
 
   <table name='acis:ft_urls_choices'><!-- users' choices about full-text URLs -->
@@ -623,9 +523,7 @@
          2|4|3|1).  second char: y|c|n (1|2|3) -->
     <field name='time' sql-type='datetime not null'/>
     <create-table-sql> primary key prim(dsid, checksum, psid), index t_i(time), index psid_i(psid) </create-table-sql>
-    
   </table>
-
 
 </configuration>
 

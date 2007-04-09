@@ -127,6 +127,7 @@ home/bin/templates/upgrade_to_1.5.34.pl
 home/bin/templates/upgrade_to_1.5.4.pl
 home/bin/templates/upgrade_to_1.5.53.pl
 home/bin/templates/upgrade_to_1.5.58.pl
+home/bin/templates/upgrade_to_1.5.64.pl
 home/bin/templates/upgrade_to_1.5.7.pl
 home/configuration.xml
 home/contributions.conf.xml
@@ -256,6 +257,8 @@ lib/ACIS/Data/DumpXML/Parser.pm
 lib/ACIS/Debug/MLeakDetect.pm
 lib/ACIS/DocLinks.pm
 lib/ACIS/FullTextURLs.pm
+lib/ACIS/FullTextURLs/Input.pm
+lib/ACIS/FullTextURLs/List.pm
 lib/ACIS/MetaUpdate/Request.pm
 lib/ACIS/Misc.pm
 lib/ACIS/Resources.pm
@@ -332,6 +335,7 @@ lib/ARDB/Table.pm
 lib/ARDB/Test.pm
 lib/RePEc/Index/Collection/ACIS_UD.pm
 lib/RePEc/Index/Collection/CitationsAMF.pm
+lib/RePEc/Index/Collection/FullTextUrlsAMF.pm
 lib/Web/App.pm
 lib/Web/App/Common.pm
 lib/Web/App/Config.pm

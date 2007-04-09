@@ -12,6 +12,9 @@ for col in $metadata_collections; do
    if test "$coltype" = "CitationsAMF"; then
       colproc='proc=ACIS::Citations::Input'
    fi
+   if test "$coltype" = "FullTextUrlsAMF"; then
+      colproc='proc=ACIS::FullTextURLs::Input'
+   fi
    echo $colhome $coltype $col $colproc
 done
 

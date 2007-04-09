@@ -6,7 +6,6 @@ use Carp::Assert;
 use ACIS::ShortIDs;
 
 #require ARDB::Record::Simple;
-
 use Storable qw( freeze );
 use ACIS::Web::HumanNames qw(normalize_name);
 
@@ -608,9 +607,6 @@ sub process_resource_lost {
       $config ->table($_) ->delete_records( 'sid', $sid, $sql );
     }
     $config -> table( "acis:suggestions" ) ->delete_records( 'osid', $sid, $sql );
-
-    require ACIS::FullTextURLs;
-    ACIS::FullTextURLs::clear_urls_for_dsid($sid,$ardb);
   }
 }
 

@@ -8,10 +8,13 @@ use Digest::MD5;
 use ACIS::ShortIDs;
 require ARDB::ReDIF::Processing;
 require AMF::2ReDIF;
+
 require ACIS::FullTextURLs;
+use ACIS::FullTextURLs::Input qw( process_urls_for_resource clear_urls_for_dsid );
 
 my $rec;
-my $te ;
+my $te;
+my $id;
 my $sid;
 my $ardb;
 my $relations;
@@ -42,14 +45,12 @@ my @ed_emails;
 sub get ($) { return $rec -> get_value( @_ ); }
 
 
-
 sub process_text {
-
   assert( $ardb );
   assert( $rec );
   assert( $relations );
 
-  my $id   = $rec ->id;
+  $id   = $rec ->id;
   my $url  = get 'displaypage';
   my $type = short_lc_record_type();
   my $do_store = 1;
@@ -59,7 +60,7 @@ sub process_text {
   if ( not $sid ) { $do_store = 0; }
   
   if ( not $do_store ) {
-    if ( $sid ) {
+    if ($sid) {
       $config -> table( 'res_creators_bulk' ) ->delete_where( $sql, "sid=?", $sid );
       $config -> table( 'res_creators_separate' ) ->delete_where( $sql, "sid=?", $sid );
       $config -> table( 'resources' ) ->delete_where( $sql, "id=?", $id );
@@ -261,8 +262,8 @@ sub process_text_lost {
       $config ->table($_) ->delete_records( 'sid', $sid, $sql );
     }
     $config -> table( "acis:suggestions" ) ->delete_records( 'osid', $sid, $sql );
-    require ACIS::FullTextURLs;
-    ACIS::FullTextURLs::clear_urls_for_dsid($sid,$ardb);
+    # update full-text urls table
+    clear_urls_for_dsid($sid,$ardb);
   }
 }
 
@@ -448,12 +449,10 @@ sub process_organization {
   ARDB::ReDIF::Processing::process_institution( $ARDB, $te, $relations, 1 );
 }
 
-
 sub process_fulltext_urls {
   my @authurls = get 'file/url';
   my @addiurls = get 'hasversion/file/url';
-
-  ACIS::FullTextURLs::process_urls_for_resource( $sid, \@authurls, \@addiurls, $ardb );
+  process_urls_for_resource( $sid, \@authurls, \@addiurls, $id, $ardb );
 }
 
 1;
