@@ -5,6 +5,8 @@ doc/adm.html
 doc/adm.text
 doc/apache-conf.html
 doc/apache-conf.text
+doc/apu.html
+doc/apu.text
 doc/bdb-private.html
 doc/bdb-private.text
 doc/check-filelist.pl

@@ -86,15 +86,15 @@ String::Approx
 
    - configure test.acis to use that
 
-2. fix the screen
+2. improve / fix the screen
 
    - add listed works count? - not critical, maybe
 
    - scroll the page vertically so that the menu is in the screen
      middle? - maybe; not critical
 
-   - add explanations or links to explanations - Thomas hasn't yet sent
-     me the explanations
+   - add explanations or links to explanations -- Thomas hasn't yet sent
+     me the wording corrections and/or explanations
 
 
 ### input
@@ -253,9 +253,14 @@ $HOME/doclinks.conf.xml and edit to your liking.
 
 
 
-### data structure
+### data storage
 
-userdata record -> {doclinks}
+The URLs are stored in the ft_urls table.  The user decisions (choices)
+are stored in the ft_urls_choices table.  <b>They are not stored in
+userdata!</b> (Contrary to where every other piece of data given by
+users is stored.)
+
+
 
 
 ### components

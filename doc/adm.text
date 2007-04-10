@@ -159,66 +159,9 @@ capture its output into a log file.  For example
     */11 * * * * /home/user/acis/bin/clean-up >> /home/user/acis/clean-up.log
 
 
-### <C>bin/apu</C> script
+### <co>bin/apu</co> script
 
-Automatic profile update utility.  Usage:
-
-<pre>    bin/apu [<i>command</i> [<i>arguments</i>] ]</pre>
-
-To be specific:
-
-<dl>
-
-<dt><co>bin/apu [<i>number</i>]</co></dt>
-
-<dd>
-
-  Run regular <abbr title='Automatic Profile Update'>APU</abbr> 
-  processing for the next personal
-  record on the queue.  If there's nothing on the queue, it
-  will take a record from the general list of records.  It
-  will pick the record which didn't have an automatic
-  processing for the longest time among all.
-
-  <p><co><i>number</i></co> is how many records to run
-  processing for and it can be any positive integer number;
-  default: 1.</p>
-
-  <p>Run this at low-load periods or regularly as a
-  cron-job.</p>
-
-<p>Frequency of the APU runs and the <co><i>number</i></co>
-argument you use is important.  Make it high enough to cover
-all the users.  If you have 300 personal records, it will be
-more than enough to run "<co>bin/apu 4</co>" three times a
-day.  (It will go through 12 records a day, ~360 per
-month.)</p>
-
-<p>In case you run it too often, it will start skipping
-queued items.  The script will skip a record, if it has
-already done APU for the record recently. See
-<c>minimum-apu-period-days</c>.
-</p>
-
-
-
-
-</dd>
-
-<dt><co>bin/apu queue <i>id</i></co></dt>
-
-<dd>Put the record <i>id</i> onto the APU queue.  <i>id</i>
-may be a short-id, an id, or a user account email
-address.</dd>
-
-
-</dl>
-
-Normally <f>bin/apu</f> prints nothing and writes a log in
-<f>autoprofileupdate.log</f> in home directory.  In case of
-trouble it reports to STDERR.
-
-
+See <c>bin/apu</c>.
 
 
 ### <C>bin/events_archiving</C> script

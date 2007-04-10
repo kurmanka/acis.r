@@ -1,6 +1,12 @@
 export_authorcites script should have a mode to export all "similar"
 items and the "preidentified" items from just the given time frame.
 
+Citations (and SimMatrix) should have a mode of work for big accounts.
+When working on a big account, we shouldn't do online citation
+comparisons.  (Seek XXXX in ACIS/Web/Citations.pm.)
+What is a big account should be configurable in one way or the other.
+
+
 
 Go through all XXX marks and either fix or re-label them as "ZZZ" or
 "maybe".
