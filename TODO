@@ -7,7 +7,6 @@ comparisons.  (Seek XXXX in ACIS/Web/Citations.pm.)
 What is a big account should be configurable in one way or the other.
 
 
-
 Go through all XXX marks and either fix or re-label them as "ZZZ" or
 "maybe".
 
@@ -40,6 +39,16 @@ CHECK: How do I treat research profile items (/contributions/accepted)
 which have no record in the resources table?  I should remove them!
 
 RAS: Christian sent me some text for some email or some screen a while ago.
+
+
+Documentation:
+
+-  Document special markup that can be used in the <a
+   ref='phrases'>phrases</a> and <a ref='site'>site/ files</a>.
+
+-  Short ids database and maintenance
+
+
 
 
 ###  ACIS community building 

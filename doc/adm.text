@@ -1385,10 +1385,5 @@ socket; the daemon listens to it.</td>
 
 
 
-## To write
 
-1. Special markup that can be used in <a
-   ref='phrases'>phrases</a> and <a ref='site'>site/ files</a>.
-
-2. Short ids database and maintenance
-
+<id>$Id: adm.text,v 2.7 2007/04/11 13:25:57 ivan Exp $</id>
