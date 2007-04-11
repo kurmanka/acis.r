@@ -69,7 +69,7 @@
   </xsl:template>
 
 
-  <xsl:template match='c|f|a'>
+  <xsl:template match='c|f|a[not(@ref) and not(@href)]'>
     <xsl:variable name='name'>
       <xsl:apply-templates mode='text'/>
     </xsl:variable>

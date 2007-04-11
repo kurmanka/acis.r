@@ -8,42 +8,118 @@ Research Profile
 Introduction & Overview
 -----------------------
 
+Research profile is one of the main parts of a personal record in ACIS.
+It lists the research works that the person has authored or otherwise
+took part in creation of.  Research works are usually documents:
+articles or papers, but it can also be a book or a chapter in a book,
+a software component, a series, et cetera.
+
+At the same time, research profile is a part of the ACIS web interface
+which is designed to let users manage their list of research works.
+
+When a person includes a work into his or her <abbr 
+title='research profile' >RP</abbr>, we oftern refer to the event as
+"claiming"; we say, for instance, <i>the user claimed a document</i>.
+
+ACIS maintains its own database of documents and other research items.
+(We sometimes use a general word "resource" to refer to them.)  And
+users do not have an ability to directly add their own stuff to the
+document database.  The personal RPs can only include items that are
+already present in the resource database.
+
+
 
 Research Profile Screens
 ------------------------
 
 ### Identified Items
 
-this is the RP
+The identified items screen lists all the currently-claimed works of a
+person.  And it allows to remove items from the list, for example, to
+fix a mistake of adding a wrong item.
 
-### Automatic Search
 
-by name variations
+### Automatic Suggestions
+
+<a ref='rp-autosearch'>Automatic search</a> is the main procedure that
+we execute to find works for a person's RP.  Automatic Suggestions
+screen is where we show the results of the automatic search and let
+user either accept them or not, individually.
+
 
 ### Refused Items
 
-a blacklist of sorts
+The refused items is a list of research items which should not be
+suggested for inclusion into the person's RP.  It is a blacklist of
+sorts.
+
+The refused items screen lets user review the list and delete items for
+it, if desired.  
+
 
 ### Manual Search
 
-by title, by id
+While <a ref='rp-autosearch'>automatic search</a> should find every
+resource an ACIS service has for a person, sometimes the metadata is
+not accurate.  This and other reasons mean that automatic search is not
+always absolutely effective.  Therefore, we let users do their own
+search by several different criteria: by the work title, by the
+author/editor name, by record identifier.
+
+On the Manual search screen users do those searches and handle their
+results.
+
 
 ### Auto Update Preferences
 
-switches
+ACIS provides <a href='apu.html'>APU</a> -- automatic profile update
+service, which executes automatic research searches for a person even
+when user is not directly asking that.  It may automatically add
+closely matching items to the person's RP.  But if user doesn't want
+that service, he can disable it on the Auto Update preferences screen.
 
-### Document-to-Document Links
 
-tight relations
+<h3 id='doclinks'>Document-to-Document Links</h3>
+
+Document-to-document links is an advanced feature of RP.  It lets users
+connect the works of their RP with each other, specifying the type of
+relation between them.  For instance, many different works may be
+different versions of the same research report.  Some work is a
+continuation of an earlier one.  And so on.  
+
+The range of possible relation types is defined by the system
+administrator.
+
+On the Document-to-document links screen users can review and delete
+the links they have previously created and they can create new ones.
+
 
 ### Fulltext URLs
 
-right or wrong?
+Another advanced and optional feature of RP.  If you have full-text
+links for your research works (articles, papers, etc.) but the data is
+not 100% authoritative, you may ask the authors to review and flag
+right and wrong links.  At the same time, you may ask them for their
+permission to archive the full-text file (if it is correct).  Please
+refer to <a
+href='http://acis.openlib.org/documents/textilshchiki.html'>Textilshchiki</a>
+document, section <i>Full-text file recognition</i> for a better
+description of the rationale for this feature.
+
+Anyway, the screen shows the currently known full-text URLs for each of
+the RP items.  (There may be several URLs per item.)  And for each URL
+it shows the assumed default status or the user-made decision about the
+URL.  User can review his or her previous decisions and change them.
 
 
 
-Automatic research search
--------------------------
+### Main Research Profile screen
+
+General
+
+
+
+<h2 id='rp-autosearch'>Automatic research search</h2>
 
 
 ### Exact searches
@@ -53,6 +129,35 @@ Automatic research search
 ### Fuzzy name search
 
 
+<h2 id='rp-conf'>Research profile configuration</h2>
+
+### Automatic search 
+
+- <c>research-additional-searches</c>
+
+
+### Document-to-document links
+
+The whole feature has to be enabled with a
+<c>document-document-links-profile</c> parameter.
+
+The relation types have to be specified in an XML file
+<f>doclinks.conf.xml</f> in the ACIS installation directory.  The file
+has a simple structure; a self-explanatory example file is supplied in
+<f>doclinks.conf.xml.eg</f>.
+
+
+### Full-text URLs 
+
+The whole feature won't be there unless you have enabled it with a
+<c>full-text-urls-recognition</c> parameter.
+
+
+
+
+
+<h2 id='rp-tech'>Research Profile technical details</h2>
+
 ### Technical: Resources database
 
 ### Technical: Suggestions storage
@@ -61,6 +166,6 @@ Automatic research search
 
 
 
-<id>$Id: researchprofile.text,v 2.1 2007/04/11 13:25:57 ivan Exp $</id>
+<id>$Id: researchprofile.text,v 2.2 2007/04/11 23:19:47 ivan Exp $</id>
 
 

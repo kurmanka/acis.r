@@ -8,13 +8,16 @@ ACIS Software Documentation
    - <p><a href='bdb-private.html'>Berkeley DB: private
      installation</a></p>
 
-
 3. <a href='adm.html'>Administration guide</a>
    
    - <a href='conf.html'>Configuration reference</a>
 
    - <a href='apache-conf.html'>Configuring Apache for ACIS</a>
    
+4. <a href='researchprofile.html'>Research Profile</a>
+
+5. <a href='apu.html'>Automatic Profile Update -- APU</a>
+
 4. <a href='daemon.html'>Update daemon</a>
 
 5. <a href='internal.html'>Programmer's guide (ACIS Internals)</a>

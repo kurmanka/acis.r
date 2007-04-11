@@ -430,6 +430,15 @@ values: "<co>RePEcRec</co>" or "<co>AMF</co>".</dd>
 
 
 
+<!-- Stage D -->
+
+<dt><C>document-document-links-profile</C></dt>
+
+<dd>Enable <a ref='doclinks'>Document to document links</a>
+screen?  Default: false.</dd>
+
+
+
 
 </dl>
 

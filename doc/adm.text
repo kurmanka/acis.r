@@ -1167,7 +1167,7 @@ Check <f>screens.xml</f> file for that.
 
 
 
-<h2 id='installation-file'>Files in an ACIS installation</h2>
+<h2 id='installation-files'>Files in an ACIS installation</h2>
 
 
 It will be useful if you know a little bit about what files
@@ -1386,4 +1386,4 @@ socket; the daemon listens to it.</td>
 
 
 
-<id>$Id: adm.text,v 2.7 2007/04/11 13:25:57 ivan Exp $</id>
+<id>$Id: adm.text,v 2.8 2007/04/11 23:19:47 ivan Exp $</id>

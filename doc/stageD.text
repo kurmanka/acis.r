@@ -163,7 +163,11 @@ second menu ("permission"):
 
 ### configuration 
 
+conf parameter:
+
 - full-text-urls-recognition -- on or off
+
+
 
 
 ### data tables
@@ -228,7 +232,8 @@ optionally.)
 ### TODO
 
 - screen: improve destination document listing (menu); for instance,
-  follow Sune's recommendation
+  follow Sune's recommendation.  Or Thomas' idea of 
+  alphabetical order.
 
 - use Ajax to send the new link data and update the page?
 
