@@ -6,11 +6,6 @@ ACIS::APU -- Automatic Profile Update
 
 =cut
 
-#
-#  This module is a partial replacement for ACIS::Web::ARPM
-#  and ACIS::Web::ARPM::Queue.
-#
-
 use strict;
 use warnings;
 use Exporter;
@@ -197,7 +192,7 @@ sub run_apu_by_queue {
 
 
 use ACIS::Web::SysProfile;
-require ACIS::Web::ARPM;
+require ACIS::APU::RP;
 require ACIS::Citations::AutoUpdate;
 
 sub record_apu {
@@ -248,7 +243,7 @@ sub record_apu {
        or $class
      ) {
     $research = 1;
-    ACIS::Web::ARPM::search( $acis, $pretend );
+    ACIS::APU::RP::search( $acis, $pretend );
   }
 
   # citations 

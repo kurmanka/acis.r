@@ -1,14 +1,13 @@
-package ACIS::Web::ARPM;        ### -*-perl-*-  
+package ACIS::APU::RP;        ### -*-perl-*-  
+# previously was known as ACIS::Web::ARPM
 #
 #  This file is part of ACIS software, http://acis.openlib.org/
 #
 #  Description:
 #
-#    Automatic Research Profile Update (old: Maintenance)
+#    Automatic Profile Update (APU) for Research Profile
 #
-#
-#  Copyright (C) 2004 Ivan Kurmanov for ACIS project, http://acis.openlib.org/
-#
+#  Copyright (C) 2004-2007 Ivan Kurmanov for ACIS project, http://acis.openlib.org/
 #
 #  This program is free software; you can redistribute it and/or modify
 #  it under the terms of the GNU General Public License, version 2, as
@@ -24,14 +23,11 @@ package ACIS::Web::ARPM;        ### -*-perl-*-
 #  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 #
 #  ---
-#  $Id: ARPM.pm,v 2.13 2007/04/02 14:31:56 ivan Exp $
+#  $Id: RP.pm,v 1.1 2007/04/11 10:04:34 ivan Exp $
 #  ---
-
-
 
 use strict;
 use ACIS::Web;
-
 use ACIS::Web::SysProfile;
 
 require ACIS::Web::Contributions;
@@ -46,12 +42,7 @@ use vars qw( $APP @ISA @EXPORT_OK $interactive );
 
 use ACIS::APU qw( logit );
 
-#require Exporter;
-#@ISA       = qw( Exporter );
-#@EXPORT_OK = qw( logit );
-
 my $app = $APP;
-
 my $session;
 my $vars   ;
 my $record ;
@@ -75,7 +66,7 @@ sub search {
   $app = shift;
   $pretend = shift; ### XXX not implemented yet
 
-  debug "enter ARPM::search()";
+  debug "enter RP::search()";
 
   $session = $app -> session;
   $vars    = $app -> variables;
