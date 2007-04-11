@@ -69,7 +69,7 @@
   </xsl:template>
 
 
-  <xsl:template match='c|f'>
+  <xsl:template match='c|f|a'>
     <xsl:variable name='name'>
       <xsl:apply-templates mode='text'/>
     </xsl:variable>
