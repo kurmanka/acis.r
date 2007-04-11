@@ -185,16 +185,17 @@ script.</dd>
 
 <dt>ACIS::APU::Queue</dt> <dd>Provides APU queue management.</dd>
 
-<dt>ACIS::Web::ARPM</dt> <dd>A legacy module, which provided APU
-predecessor called ARPM in the past.  It is still used by APU for some
-tools.</dd>
+<dt>ACIS::APU::RP</dt> <dd>Does research-profile processing.</dd>
 
-<dt>ACIS::Web::ARPM::Queue</dt> <dd>The legacy queue-management
-companion of ACIS::Web::ARPM.  Not used anymore.</dd>
+<dt>ACIS::Citations::AutoUpdate</dt> <dd>Does citations-profile
+automatic processing.</dd>
+
 </dl>
 
+Scripts:
 
-
+<dl><dt>home/bin/template/apu.pl</dt> <dd>Provides command-line
+interface ACIS::APU module.  Is basis for the <a>bin/apu</a> script.</dd></dl>
 
 
 
