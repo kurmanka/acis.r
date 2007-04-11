@@ -294,7 +294,7 @@ not have been found otherwise.  Default: off.</dd>
 
 <dd>Type: Boolean.  Run or not run fuzzy-matching during the research
 automatic searches?  The value does not matter if
-<c>research-additional-searches</c> is untrue, because fuzzy
+<c>research-additional-searches</c> is false, fuzzy
 searches are a kind of additional searches.  Default: no, do
 not run.</dd>
 

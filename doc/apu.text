@@ -33,7 +33,7 @@ changes done.
 
 
 And yet another thing APU does is related to the <a
-ref='citations.html'>citations profile</a>.  After looking at the
+href='citations.html'>citations profile</a>.  After looking at the
 person's research profile, and doing a research items search, APU also
 looks for new citations for the research profile items.  And if there
 are any, it would either automatically identify them to RP items or
@@ -51,14 +51,14 @@ So at this time APU performs three functions for personal profiles:
  - runs automatic citations searches
 
 
-APU script: <C>bin/apu</C>
---------------------------
+The <C>bin/apu</C> script
+-------------------------
 
 
 APU is done for users while they are not logged in and not interacting
 with the service.  So it is run separately from the main web
 application interface.  All the APU-related functions are available via
-the <c>bin/apu</c> script.  
+the <a>bin/apu</a> script.  
 
 Usage:
 
@@ -111,7 +111,8 @@ end of the queue is reached.</dd>
 </dl>
 
 
-### How to run <c>bin/apu</c>?
+How to run bin/apu?
+-------------------
 
 Run it at low-load periods or regularly as a cron-job.
 
@@ -133,20 +134,19 @@ Configuration parameters
 ------------------------
 
 These are the APU-related ACIS configuration parameters (to be used in
-the the main.conf configuration file):
+the the <a>main.conf</a> configuration file):
 
  - <c>minimum-apu-period-days</c> 
  - <c>echo-apu-mails</c>
  - <c>apu-research-mail-include-approx-hits</c>
  - <c>apu-research-max-suggestions-in-a-mail</c>
  - <c>apu-citations-auto-add-limit</c>
+ - <c>disable-citation-mails</c>
 
 
-Queue management
-----------------
 
-*isn't it too technical?*
-
+Technical: Queue management
+---------------------------
 
 APU stores it's queue in the apu_queue table.
 
@@ -174,14 +174,44 @@ deletes the table content and starts over again.  This usually happens
 automatically.
 
 
+Technical: Responsible perl code
+--------------------------------
+
+These modules in ACIS are responsible for APU:
+
+<dl>
+<dt>ACIS::APU</dt> <dd>General APU logic.  Used directly by the apu
+script.</dd>
+
+<dt>ACIS::APU::Queue</dt> <dd>Provides APU queue management.</dd>
+
+<dt>ACIS::Web::ARPM</dt> <dd>A legacy module, which provided APU
+predecessor called ARPM in the past.  It is still used by APU for some
+tools.</dd>
+
+<dt>ACIS::Web::ARPM::Queue</dt> <dd>The legacy queue-management
+companion of ACIS::Web::ARPM.  Not used anymore.</dd>
+</dl>
+
+
+
+
+
+
+
+<ignore>
+
 Research profile update
 -----------------------
 
-
+ZZZ Should I explain more things here?
 
 Citations profile update
 ------------------------
 
+ZZZ Should I explain more things here?
+
+</ignore>
 
 
 

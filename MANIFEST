@@ -245,6 +245,7 @@ home/screens.xml
 install.sh
 lib/ACIS/APU.pm
 lib/ACIS/APU/Queue.pm
+lib/ACIS/APU/RP.pm
 lib/ACIS/Citations/AutoUpdate.pm
 lib/ACIS/Citations/CitDocSim.pm
 lib/ACIS/Citations/Events.pm
@@ -279,8 +280,6 @@ lib/ACIS/Web/Admin/Events.pm
 lib/ACIS/Web/Admin/EventsArchiving.pm
 lib/ACIS/Web/Affiliations.pm
 lib/ACIS/Web/AllModules.pm
-lib/ACIS/Web/ARPM.pm
-lib/ACIS/Web/ARPM/Queue.pm
 lib/ACIS/Web/Background.pm
 lib/ACIS/Web/CGI/Untaint/latinname.pm
 lib/ACIS/Web/CGI/Untaint/name.pm

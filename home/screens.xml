@@ -306,9 +306,8 @@
 
 
   <screen id='research/autoupdate'>
-
     <use module='ACIS::Web::Contributions'/>
-    <use module='ACIS::Web::ARPM'/>
+    <!-- <use module='ACIS::APU::RP'/> -->
 
     <param name ='arpm-name-search' 
            maxlen='10'
@@ -334,22 +333,16 @@
   </screen>    
     
 
-  <screen id='re-search'>
-
-    <use module='ACIS::Web::ARPM'/>
-    
+  <!-- <screen id='re-search'>
+    <use module='ACIS::APU::RP'/>
     <call function='load_session_or_authenticate' />
     <call function='ACIS::Web::Contributions::prepare'/>
-    <call function='ACIS::Web::ARPM::search'/> 
-
-
+    <call function='ACIS::APU::RP::search'/> 
     <presentation type='xslt' filename='person/research-arpm-email.xsl' />
-
-  </screen>
+  </screen> -->
 
 
   <screen id='research'>
-
     <use module='ACIS::Web::Contributions' />
     <use module='ACIS::Web::Background'/>
 
