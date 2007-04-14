@@ -742,6 +742,20 @@ re-calculated with then-current similarity function.</p>
 <p>Default value: 100</p></dd>
 
 
+
+<dt><C>citations-max-online-comparisons</C></dt>
+
+<dd><p>A limit on the number of computationally expensive
+citation-document comparisons to run for a online user.  This is to
+avoid putting a big load on a running system, and thus making it
+unresponsive to user.  Depending on the machine performance and the
+number of users, setting it to something like 400 may be a good
+idea.</p>
+
+<p>Default: undefined, i.e. no limit.</p>
+
+</dd>
+
 </dl>
 
 
@@ -1368,7 +1382,7 @@ the data and stability of the user profiles.
 
 
 <id>
-$Id: citations.text,v 2.54 2007/02/21 07:56:54 ivan Exp $
+$Id: citations.text,v 2.55 2007/04/14 18:58:30 ivan Exp $
 </id>
 
 

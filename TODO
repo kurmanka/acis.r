@@ -1,10 +1,5 @@
-export_authorcites script should have a mode to export all "similar"
-items and the "preidentified" items from just the given time frame.
-
-Citations (and SimMatrix) should have a mode of work for big accounts.
-When working on a big account, we shouldn't do online citation
-comparisons.  (Seek XXXX in ACIS/Web/Citations.pm.)
-What is a big account should be configurable in one way or the other.
+make full-text urls (research/fturls) screen unavailable for new
+registrations
 
 amf personal metadata output: add shortid as <acis:shortid>, where acis
 represents the http://acis.openlib.org/ namespace
@@ -13,6 +8,9 @@ doclinks screen: sort research items in the menu in alphabetical order?
 
 Go through all XXX marks and either fix or re-label them as "ZZZ" or
 "maybe".
+
+Does main.conf.eg needs a revision? Add comments?
+
 
 Things would be nice to have:
 
@@ -46,6 +44,8 @@ RAS: Christian sent me some text for some email or some screen a while ago.
 
 
 Documentation:
+
+-  update data backup instructions (section What to backup and how to restore)
 
 -  Document special markup that can be used in the <a
    ref='phrases'>phrases</a> and <a ref='site'>site/ files</a>.

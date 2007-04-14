@@ -56,7 +56,7 @@ so, this would be a successful and positive match.
 
 ### administration
 
-Run bin/fuzzy_search_table script regularly to update the rare table.
+Run bin/fuzzy\_search\_table script regularly to update the rare table.
 
 
 ### implementation components
