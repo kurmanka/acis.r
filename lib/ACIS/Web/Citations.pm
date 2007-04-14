@@ -298,11 +298,25 @@ sub process_identified {
       push @citations, $cit;
     }
   }
-  $mat -> consider_new_citations( \@citations );
+
+  handle_reavailable_citations( \@citations );
 
   if ( scalar @citations > 1 )  {    $acis -> message( "deleted-citations" ); }
   elsif ( scalar @citations == 1 ) { $acis -> message( "deleted-citation"  ); }
   else                             { $acis -> message( "deleted-no-citation" ); }
+}
+
+sub handle_reavailable_citations {
+  my ($cit) = @_;
+  my $limit = $acis->config('citations-max-online-comparisons');
+  my $citnum = scalar @$cit;
+  my $rpnum  = scalar @$research_accepted;
+  if ( not $limit 
+       or ($citnum*$rpnum < $limit) ) {
+    $mat -> consider_new_citations( \@$cit ); 
+  } else {
+    debug "skipped considering new citations because of the max comparisons limit";
+  }
 }
 
 
@@ -440,8 +454,9 @@ sub process_refused {
       push @citations, $cit;
     }
   }
-  $mat -> consider_new_citations( \@citations );  ### XXXX Should not be done for huge matrices or big number of citations
 
+  handle_reavailable_citations( \@citations );
+  
   if ( scalar @citations > 1 )  {    $acis -> message( "unrefused-citations" ); }
   elsif ( scalar @citations == 1 ) { $acis -> message( "unrefused-citation" );  }
 
