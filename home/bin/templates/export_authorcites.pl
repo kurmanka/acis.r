@@ -45,6 +45,19 @@ if ( $month eq 'this' ) {
   }
   $where = "WHERE ce.time>=$prev_month and ce.time < DATE_FORMAT(CURDATE(),'\%Y\%m01')";
 
+} elsif ( $month eq 'last-and-all' ) {
+  # preidentified citations from the previous month and
+  # similar citations from all the time
+  # coauthor citations -- not included
+  my $prev_month;
+  $sql->prepare( "select DATE_FORMAT(DATE_SUB(CURDATE(),INTERVAL 1 MONTH),'\%Y\%m01') as d ");
+  my $r = $sql->execute();
+  if ( $r and $r->{row}{d} ) {
+    #print $r->{row}{d}, "\n";
+    $prev_month = $r->{row}{d};
+  }
+  $where = "WHERE (ce.reason='preidentified' and ce.time>=$prev_month and ce.time < DATE_FORMAT(CURDATE(),'\%Y\%m01')) or (ce.reason='similar')";
+
 } elsif ( $month =~ /^\d{4}\-\d{2}$/ ) {
 
   $month .= "-01";
@@ -75,10 +88,6 @@ qq!select res.id as docid,rec.id as pid,citedres.id as citeddocid from citation_
    $where
    order by pid,ce.time asc!,
 );
-
-#print "please wait while we upgrade the database...\n";
-
-#print "q: ", @q, "\n";
 
 $sql -> prepare( @q );
 my $r = $sql -> execute;
