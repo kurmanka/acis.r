@@ -27,7 +27,7 @@ package ACIS::Web::NewUser; ### -*-perl-*-
 #  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 #
 #  ---
-#  $Id: NewUser.pm,v 2.7 2007/03/14 21:22:56 ivan Exp $
+#  $Id: NewUser.pm,v 2.8 2007/04/18 17:00:51 ivan Exp $
 #  ---
 
 
@@ -645,10 +645,10 @@ sub fix_temporary_sid {
 
   if ( $new_sid 
        and $new_sid ne $old_sid ) {
-    ###  fix acis.suggestions and acis.threads tables accordingly
-    ###  XX  we need a cleaner way to do that 
+    # fix rp_suggestions and threads tables accordingly
+    # XX  we need a cleaner way to do that 
     my $sql = $app -> sql_object;
-    foreach ( qw( suggestions/psid sysprof/id ) ) {
+    foreach ( qw( rp_suggestions/psid sysprof/id ) ) {
       my ( $table, $field ) = split '/', $_;
       $sql -> do( "update $table set $field='$new_sid' where $field='$old_sid'" );
     }

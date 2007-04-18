@@ -25,7 +25,7 @@ package ACIS::Web::Contributions;  ### -*-perl-*-
 #  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 #
 #  ---
-#  $Id: Contributions.pm,v 2.40 2007/03/13 20:28:15 ivan Exp $
+#  $Id: Contributions.pm,v 2.41 2007/04/18 17:00:51 ivan Exp $
 #  ---
 
 use strict;
@@ -1404,21 +1404,14 @@ sub show_whats_suggested {
   my $session = $app -> session;
   my $record  = $session -> current_record;
   my $id      = $record -> {id};
-  my $sid     = $record -> {sid};
+  my $psid    = $record -> {sid};
 
   assert( $contributions );
-#  my $contributions = $session -> {$id} {contributions};
   prepare_configuration( $app );
 
-  my $suggestions = load_suggestions_into_contributions( $app, $sid, $contributions );
+  my $suggestions = load_suggestions_into_contributions( $app, $psid, $contributions );
   my $groups = scalar @$suggestions;
   debug "found groups: $groups";
-
-#  my $status = ACIS::Web::Background::check_thread( $app, $sid, 'contributions' );
-#
-#  if ( $status ) {
-#    $vars -> {'back-search-status'} = $status;
-#  }
   debug "show_whats_suggested: exit";
 }
 

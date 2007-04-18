@@ -146,7 +146,7 @@ sub get_bg_search_status {
 
   if ( $tsid and $sid ) {
     $threads = ACIS::Web::Background::check_thread( $app, $tsid );
-    $app -> sql_object -> do( "update suggestions set psid=? where psid=?", $sid, $tsid );
+    $app -> sql_object -> do( "update rp_suggestions set psid=? where psid=?", $sid, $tsid );
     if ( $threads ) {
       # let it run
     } else {
@@ -202,11 +202,12 @@ sub save_search_results {
   my ($context,$reason,$results) = @_;
   return undef if not $results or not scalar @$results;
   my $sql = $ACIS::Web::ACIS->sql_object;
+  my $psid = $context->{sid};
   if ($context->{save_result_func}) {
     my $save_func = $context->{save_result_func};
-    &{$save_func}   ( $sql, $context, $reason, '', $results );
+    &{$save_func}   ( $sql, $psid, $reason, undef, $results );
   } else {
-    save_suggestions( $sql, $context, $reason, '', $results );
+    save_suggestions( $sql, $psid, $reason, undef, $results );
   }
   return 1;
 }

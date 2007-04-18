@@ -606,7 +606,7 @@ sub process_resource_lost {
     foreach ( qw( res_creators_bulk res_creators_separate ) ) {
       $config ->table($_) ->delete_records( 'sid', $sid, $sql );
     }
-    $config -> table( "acis:suggestions" ) ->delete_records( 'osid', $sid, $sql );
+    $config -> table( "acis:rp_suggestions" ) ->delete_records( 'dsid', $sid, $sql );
   }
 }
 

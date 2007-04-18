@@ -24,7 +24,7 @@ package ACIS::Web::Session::SNewUser;   ### -*-perl-*-
 #  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 #
 #  ---
-#  $Id: SNewUser.pm,v 2.4 2007/03/27 12:16:49 ivan Exp $
+#  $Id: SNewUser.pm,v 2.5 2007/04/18 17:00:51 ivan Exp $
 #  ---
 
 use strict;
@@ -109,7 +109,7 @@ sub close_without_saving {
 
   my $sql = $app -> sql_object;
   my $id  = $self -> id;
-  foreach ( qw( suggestions/psid threads/psid sysprof/id ) ) {
+  foreach ( qw( rp_suggestions/psid threads/psid sysprof/id ) ) {
     my ( $table, $field ) = split '/', $_;
     $sql -> do( "delete from $table where $field='$id'" );
   }

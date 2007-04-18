@@ -28,7 +28,7 @@ package ARDB::Plugin::Processing::ACIS_UD;   ### -*-perl-*-
 #  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 #
 #  ---
-#  $Id: ACIS_UD.pm,v 2.1 2007/04/03 11:49:06 ivan Exp $
+#  $Id: ACIS_UD.pm,v 2.2 2007/04/18 17:00:51 ivan Exp $
 #  ---
 
 
@@ -116,7 +116,7 @@ sub record_delete_cleanup {
       # clean personal database records by sid
       my @clean = qw( acis:names       shortid
                       acis:sysprof     id
-                      acis:suggestions psid
+                      acis:rp_suggestions psid
                       acis:threads     psid
                       acis:apu_queue   what
                       acis:cit_old_sug psid

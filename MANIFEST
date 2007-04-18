@@ -44,6 +44,8 @@ doc/make.linked.pl
 doc/make.simple.pl
 doc/overview.html
 doc/overview.text
+doc/researchprofile.html
+doc/researchprofile.text
 doc/roman-todo.html
 doc/roman-todo.text
 doc/stage3-todo.html
@@ -129,6 +131,7 @@ home/bin/templates/upgrade_to_1.5.53.pl
 home/bin/templates/upgrade_to_1.5.58.pl
 home/bin/templates/upgrade_to_1.5.64.pl
 home/bin/templates/upgrade_to_1.5.7.pl
+home/bin/templates/upgrade_to_1.5.70.pl
 home/configuration.xml
 home/contributions.conf.xml
 home/doclinks.conf.xml.eg

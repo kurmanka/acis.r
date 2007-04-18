@@ -1,3 +1,9 @@
+ACIS is disk-space hungry; it is a disk space HOG.  
+
+  - limit RI history tracking to only a number of latest events?
+
+  - research suggestions table has some stupid superfluity
+
 make full-text urls (research/fturls) screen unavailable for new
 registrations
 

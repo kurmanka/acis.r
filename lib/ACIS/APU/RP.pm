@@ -23,7 +23,7 @@ package ACIS::APU::RP;        ### -*-perl-*-
 #  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 #
 #  ---
-#  $Id: RP.pm,v 1.1 2007/04/11 10:04:34 ivan Exp $
+#  $Id: RP.pm,v 1.2 2007/04/18 17:00:51 ivan Exp $
 #  ---
 
 use strict;
@@ -226,7 +226,7 @@ sub search {
         
         if ( scalar @add_to_suggest_table ) {
           ###  add to suggestions: prepare data
-          save_suggestions($sql, $sid, 'exact-person-id-match', '', \@add_to_suggest_table);
+          save_suggestions($sql, $sid, 'exact-person-id-match', undef, \@add_to_suggest_table);
         }
         
         if ( scalar @reset_reason_sids ) {

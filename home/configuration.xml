@@ -4,7 +4,7 @@
     That is a working ARDB core configuration file.  Produces:
     documents table, collections table, authors table.
 
-    $Id: configuration.xml,v 2.18 2007/04/09 23:31:32 ivan Exp $
+    $Id: configuration.xml,v 2.19 2007/04/18 17:00:51 ivan Exp $
 
 -->
 <configuration>
@@ -354,33 +354,26 @@
     <create-table-sql> PRIMARY KEY(psid, type)</create-table-sql>
   </table>
 
-
-  <table name="acis:suggestions">
-    <field name="psid"     sql-type="CHAR(10) NOT NULL"/>
-    <field name="osid"     sql-type="CHAR(10) NOT NULL"/>
-    <field name="type"     sql-type="CHAR(15) NOT NULL"/>
-    <field name="role"     sql-type="CHAR(15) NOT NULL"/>
+  <!-- research profile suggestions -->
+  <table name="acis:rp_suggestions">
+    <field name="psid"     sql-type="CHAR(15) NOT NULL"/>
+    <field name="dsid"     sql-type="CHAR(15) NOT NULL"/>
+    <field name="role"     sql-type="CHAR(15) NOT NULL"/><!-- not actually used -->
     <field name="reason"   sql-type="CHAR(30) NOT NULL"/>
-    <field name="target"   sql-type="CHAR(15) NOT NULL"/>
     <field name='time'     sql-type='DATETIME NOT NULL'/>
-    <field name='data'     sql-type='BLOB NOT NULL'/>
-    <create-table-sql> PRIMARY KEY(psid, osid) </create-table-sql>
+    <create-table-sql> PRIMARY KEY(psid, dsid) </create-table-sql>
   </table>
 
 
   <table name='acis:events'>
     <field name='date'  sql-type='datetime not null' />
-
     <field name='type'  sql-type='varchar(10)' />
            <!-- error, notice, warning -->
-
     <field name='class' sql-type='varchar(20)' /> 
            <!-- authenticate, session, contributions, ... -->
-
     <field name='action' sql-type='varchar(30)'/>         
     <field name='descr' sql-type='text'/>
     <field name='data'  sql-type='text'/>
-
 <!--
     <field name='login' sql-type='varchar(100)' />
     <field name='url'   sql-type='varchar(200)' />
@@ -388,9 +381,7 @@
 -->
     <field name='chain'    sql-type='char(16)'/><!-- session id -->
     <field name='startend' sql-type='tinyint'/><!-- 1 is session start, -1 is session end -->
-
     <field name='packed'   sql-type='mediumblob'/>
-
     <create-table-sql line='index( date, chain )'/>
   </table>    
 
