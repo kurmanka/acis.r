@@ -438,9 +438,11 @@ values: "<co>RePEcRec</co>" or "<co>AMF</co>".</dd>
 screen?  Default: false.</dd>
 
 
-
-
 </dl>
+
+
+Also see <a ref='cit-screen-conf'>Citations screens parameters</a>.
+
 
 
 Updating a running system's configuration -- <C>bin/setup</C> utility

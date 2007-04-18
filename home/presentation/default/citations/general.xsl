@@ -51,8 +51,35 @@
 
   </xsl:template>
 
+  <!-- this variant is used on the citations/potential screen if configuration parameter citation-presentation-reverse is enabled -->
+  <xsl:template name='citation-as-in-by'>
+    <xsl:param name='label'/>
+    <p class='cit-first'><i class='tech'>as: </i> 
+    <xsl:choose>
+      <xsl:when test='$label'>
+        <label for='{$label}' class='citstring' title='is this your work mentioned here?'
+               ><xsl:value-of select='ostring'/></label>
+      </xsl:when>
+      <xsl:otherwise>
+        <span class='citstring' title='is this your work mentioned here?'
+              ><xsl:value-of select='ostring'/></span>
+      </xsl:otherwise>
+    </xsl:choose>
+    </p>
 
-
+    <p class='cit-follow'><i class='tech'>in: </i>
+    <xsl:choose>
+      <xsl:when test='string(srcdocurlabout)'>
+        <a class='citingtitle' href='{srcdocurlabout}' title='the citing document'><xsl:value-of select='srcdoctitle'/></a>
+      </xsl:when>
+      <xsl:otherwise>
+        <span class='citingtitle' title='the citing document'><xsl:value-of select='srcdoctitle'/></span>
+      </xsl:otherwise>
+    </xsl:choose>
+    by <xsl:value-of select='srcdocauthors'/></p>
+    
+  </xsl:template>
+   
 
 
 

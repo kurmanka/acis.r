@@ -8,9 +8,6 @@ ACIS is disk-space hungry; it is a disk space HOG.
   - change RI history object to a much simplier array structure
     (instead of a hash)
 
-amf personal metadata output: add shortid as <acis:shortid>, where acis
-represents the http://acis.openlib.org/ namespace
-
 doclinks screen: sort research items in the menu in alphabetical order?
 
 Go through all XXX marks and either fix or re-label them as "ZZZ" or

@@ -670,7 +670,7 @@ extension to be processed by ACIS.
 
 
 
-### Citations screens
+<h3 id='cit-screen-conf'>Citations screens parameters</h3>
 
 
 The citations profile is enabled and configured via the
@@ -754,6 +754,18 @@ idea.</p>
 
 <p>Default: undefined, i.e. no limit.</p>
 
+</dd>
+
+
+<dt><C>citation-presentation-reverse</C></dt>
+
+<dd><p>On the potential citations screen, show HOW the work is cited
+first, and WHERE it is cited second.  For example: "as: ...(citation
+string) in: ...(work title) by ... (authors)".  This may make looking
+through a large list of citations easier for the user.</p>
+
+<p>Default: off.  So by default each citation is presented this way:
+"in: ... by ..." on the first line, and "as: ..." on the second.</p>
 </dd>
 
 </dl>
@@ -1382,7 +1394,7 @@ the data and stability of the user profiles.
 
 
 <id>
-$Id: citations.text,v 2.55 2007/04/14 18:58:30 ivan Exp $
+$Id: citations.text,v 2.56 2007/04/18 20:20:16 ivan Exp $
 </id>
 
 

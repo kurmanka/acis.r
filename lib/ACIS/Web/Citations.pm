@@ -142,6 +142,8 @@ sub prepare_potential {
   $vars -> {document} = $document;
   $vars -> {potential_new} = prepare_citations_list $citations_new;
   $vars -> {potential_old} = prepare_citations_list $citations_old;
+  $vars -> {'citation-presentation-reverse'} = 'yes'
+    if $acis->config('citation-presentation-reverse');
 
   prepare_prev_next();
 

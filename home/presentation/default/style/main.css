@@ -1,6 +1,6 @@
 /* THE MAIN ACIS CSS STYLESHEET */
 
-/* $Id: main.css,v 2.15 2007/04/03 20:38:28 ivan Exp $ */
+/* $Id: main.css,v 2.16 2007/04/18 20:20:16 ivan Exp $ */
 
 body { 
  margin: 0;
@@ -1186,12 +1186,14 @@ td.subheader p {
   margin:0;
 }
 
-p.citing-document {
+p.citing-document,
+p.cit-first {
   margin: 0ex 0 1ex 0;
   padding: 0;
 }
 
-p.cited-as {
+p.cited-as,
+p.cit-follow {
   margin: 1ex 0 1ex 0;
   padding: 0;
 }

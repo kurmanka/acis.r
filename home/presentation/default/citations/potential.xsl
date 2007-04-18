@@ -45,10 +45,19 @@
           </input>
         </td>
         <td class='citation'>
-
-          <xsl:call-template name='citation'>
-            <xsl:with-param name='label' select='concat("add", $i)'/>
-          </xsl:call-template>
+          
+          <xsl:choose>
+            <xsl:when test='//citation-presentation-reverse'>
+              <xsl:call-template name='citation-as-in-by'>
+                <xsl:with-param name='label' select='concat("add", $i)'/>
+              </xsl:call-template>
+            </xsl:when>
+            <xsl:otherwise>
+              <xsl:call-template name='citation'>
+                <xsl:with-param name='label' select='concat("add", $i)'/>
+              </xsl:call-template>
+            </xsl:otherwise>
+          </xsl:choose>
 
           <input type='hidden' name='cid{$i}' value='{$cnid}'/>
           <input type='submit' name='refuse{$i}'  class='light' 
