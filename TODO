@@ -1,6 +1,9 @@
 ACIS is disk-space hungry; it is a disk space HOG.  
 
   - limit RI history tracking to only a number of latest events?
+
+     - how does berkeley db manage space fragmentation in the
+       database?
  
   - change RI history object to a much simplier array structure
     (instead of a hash)

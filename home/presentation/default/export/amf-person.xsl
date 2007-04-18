@@ -1,6 +1,7 @@
 <xsl:stylesheet
   xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
   xmlns:exsl="http://exslt.org/common"
+  xmlns:acis='http://acis.openlib.org'
   version="1.0">
 
 <!--  exclude-result-prefixes='exsl xml x' -->  
@@ -23,23 +24,18 @@
      xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance'
      xsi:schemaLocation="http://amf.openlib.org http://amf.openlib.org/2001/amf.xsd"
      >
-  <xsl:text>
-  </xsl:text>
-
+<xsl:text>
+</xsl:text>
   <xsl:apply-templates select='//record'/>
-
-  <xsl:text>
-  </xsl:text>
+<xsl:text>
+</xsl:text>
 </amf>
 </xsl:template>
 
   <xsl:template match='//record[id and type="person"]' 
-                xml:space='preserve'>
-    <xsl:variable name='citations'
-                  select='citations/identified'/>
-
-    <person xmlns='http://amf.openlib.org'
-            id='{id}'>
+                xml:space='preserve'
+    ><xsl:variable name='citations' select='citations/identified'/>
+    <person xmlns='http://amf.openlib.org' id='{id}'>
       <name><xsl:value-of select='name/full'/></name>
 <xsl:if test='name/prefix/text()'
 >      <nameprefix><xsl:value-of select='name/prefix'/></nameprefix>
@@ -68,8 +64,7 @@
 ><xsl:if test='contact/fax/text()'
 >      <fax><xsl:value-of select='contact/fax'/></fax>
 </xsl:if
->
-<xsl:if test='$response-data/affiliations/list-item'>
+><xsl:if test='$response-data/affiliations/list-item'>
       <ispartof>
 <xsl:for-each select='$response-data/affiliations/list-item'>
         <organization><xsl:if test='id/text()'><xsl:attribute 
@@ -126,6 +121,7 @@
         </xsl:if></xsl:for-each
 ></xsl:if
 >
+      <acis:shortid><xsl:value-of select='sid'/></acis:shortid>
     </person>
 </xsl:template>
 
