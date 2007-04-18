@@ -642,8 +642,6 @@ for your works again.</small>
     </td>
   </tr>
 
-</xsl:if>
-
   <!--[if-config(document-document-links-profile)]-->
   <tr>
     <td class='no' valign='top' align='right'>
@@ -670,6 +668,9 @@ for your works again.</small>
     </td>
   </tr>
   <!--[end-if]-->
+
+</xsl:if>
+
 
 
 </table>
@@ -751,23 +752,23 @@ for your works again.</small>
       <xsl:text>&#160;</xsl:text>
     </hl>
 
-</xsl:if>
-
-   <!--[if-config(document-document-links-profile)]-->
+    <!--[if-config(document-document-links-profile)]-->
     <hl screen='research/doclinks'>
       <xsl:text>&#160;</xsl:text>
       <a ref='@research/doclinks'>document links</a>
       <xsl:text>&#160;</xsl:text>
     </hl>
-  <!--[end-if]-->
+    <!--[end-if]-->
 
-   <!--[if-config(full-text-urls-recognition)]-->
+    <!--[if-config(full-text-urls-recognition)]-->
     <hl screen='research/fturls'>
       <xsl:text>&#160;</xsl:text>
       <a ref='@research/fturls'>full-text links</a>
       <xsl:text>&#160;</xsl:text>
     </hl>
-  <!--[end-if]-->
+    <!--[end-if]-->
+
+</xsl:if>
 
 </span>
     </p>

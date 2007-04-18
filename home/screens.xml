@@ -305,34 +305,6 @@
   </screen>
 
 
-  <screen id='research/autoupdate'>
-    <use module='ACIS::Web::Contributions'/>
-    <!-- <use module='ACIS::APU::RP'/> -->
-
-    <param name ='arpm-name-search' 
-           maxlen='10'
-           place='record:contributions/preferences/arpm/name-search'/>
-    <param name ='arpm-add-by-handle' 
-           maxlen='10'
-           place='record:contributions/preferences/arpm/add-by-handle'/>
-    <param name ='arpm-add-by-name'   
-           maxlen='10'
-           place='record:contributions/preferences/arpm/add-by-name'/>
-
-    <call function='load_session_or_authenticate' />
-
-    <process>
-      <call function='process_form_data' />
-    </process>
-
-    <call function='prepare_form_data' />
-    <call function='ACIS::Web::Contributions::prepare'/>
-
-    <presentation type='xslt' filename='person/research/autoupdate.xsl' />
-
-  </screen>    
-    
-
   <!-- <screen id='re-search'>
     <use module='ACIS::APU::RP'/>
     <call function='load_session_or_authenticate' />
@@ -460,54 +432,60 @@
   </screen>
 
 
-
   <screen id='research/search'>
-
     <use module='ACIS::Web::Contributions' />
-
     <call function='load_session_or_authenticate' />
     <call function='ACIS::Web::Contributions::prepare'/>
-
     <process>
       <call function='ACIS::Web::Contributions::search'/>
       <call function='ACIS::Web::Contributions::process'/>
     </process>
-    
     <presentation type='xslt' filename='person/research/search.xsl' />
-
   </screen>
-
-
 
 
   <screen id='research/auto/status'>
-
     <use module='ACIS::Web::Contributions' />
-
     <call function='load_session_or_authenticate' />
     <call function="ACIS::Web::Contributions::research_auto_status"/>
-
     <presentation type='xslt' filename='person/research/auto-status.xsl' />
   </screen>
 
+
   <screen id='research/autosuggest-1by1'>
-
     <use module='ACIS::Web::Contributions' />
-
     <call function='load_session_or_authenticate' />
     <call function='ACIS::Web::Contributions::prepare'/>
-
     <process>
       <call function='ACIS::Web::Contributions::process'/>
     </process>
-
     <call function="ACIS::Web::Contributions::show_whats_suggested"/>
     <call function="ACIS::Web::Contributions::reload_if_nothing_to_suggest"/>
-
-    <presentation type='xslt'
-                  filename='person/research/autosuggest-1by1.xsl' />
+    <presentation type='xslt' filename='person/research/autosuggest-1by1.xsl' />
   </screen>
 
+
+  <screen id='research/autoupdate'>
+    <use module='ACIS::Web::Contributions'/>
+    <!-- <use module='ACIS::APU::RP'/> -->
+    <param name ='arpm-name-search' 
+           maxlen='10'
+           place='record:contributions/preferences/arpm/name-search'/>
+    <param name ='arpm-add-by-handle' 
+           maxlen='10'
+           place='record:contributions/preferences/arpm/add-by-handle'/>
+    <param name ='arpm-add-by-name'   
+           maxlen='10'
+           place='record:contributions/preferences/arpm/add-by-name'/>
+    <call function='load_session_or_authenticate' />
+    <process>
+      <call function='process_form_data' />
+    </process>
+    <call function='prepare_form_data' />
+    <call function='ACIS::Web::Contributions::prepare'/>
+    <presentation type='xslt' filename='person/research/autoupdate.xsl' />
+  </screen>    
+    
 
   <screen id='research/doclinks'>
     <use module='ACIS::Web::Contributions' />
