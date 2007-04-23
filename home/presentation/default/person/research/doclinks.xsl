@@ -89,6 +89,7 @@
         </td>
         <td valign='top'>
           <xsl:for-each select='$accepted/*'>
+            <xsl:sort select='title/text()'/>
             <input type='radio' name='trg' id='trg{sid}' value='{sid}' />
             <label for='trg{sid}'><xsl:text> </xsl:text><xsl:value-of
             select='title'/></label> <xsl:if test='url-about'> (<a href='{url-about}'>details</a>)</xsl:if><br/>
