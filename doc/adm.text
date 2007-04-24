@@ -36,12 +36,12 @@ tables from the specified database.  If no database and no
 tables are specified, it backups most important tables from
 the ACIS database.  Currently these are:
 
-  acis.sysprof acis.suggestions acis.cit_suggestions
-  sid.sid_id_to_handle sid.sid_last_numbers
+    acis.sysprof acis.suggestions acis.cit_suggestions
+    sid.sid_id_to_handle sid.sid_last_numbers
 
 "acis" and "sid" here stand for your configuration values
-<c>acis-db-name</c> and <c>sid-db-name</c>
-respectively.
+<c>acis-db-name</c> and <c>sid-db-name</c> respectively if they are
+defined, or <c>db-name</c> if they are not.
 
 A directory is created for the backup files, based on
 <c>backup-directory</c> and the current date.  For example,
@@ -359,7 +359,7 @@ Here is how your <f>logrotate.conf</f> file could look like:
     }
 
 
-If the version of logrotate you have supports <c>dateext</c>
+If the version of logrotate you have supports <co>dateext</co>
 directive, you may use that as well.
 
 You will probably want to rotate your web-server's logs in a
@@ -459,22 +459,16 @@ enough space.  In that case additionally create copies of:
 
 <li>the MySQL tables;</li>
 
-<li>the <a href='daemon'>update daemon</a> database.</li>
+<li>the <a ref='ri-daemon'>update daemon</a> database.</li>
 
 </ul>
 
 
 #### MySQL tables
 
-**This section needs to be updated -- IKu** <!-- XXX TODO -->
+See <c>bin/backup\_tables</c> and <c>bin/restore_table\_backup</c> scripts.
 
-ACIS uses several MySQL databases, as they are defined by
-<c>acis-db-name</c>, <c>metadata-db-name</c> and
-<c>sid-db-name</c> configuration parameters (some of these
-may be the same database).  Backup all the tables in these
-databases.
-
-Consult MySQL documentation on the topic: <a
+Consult MySQL documentation on additional ways to back up the mysql tables: <a
 href='http://dev.mysql.com/doc/refman/4.1/en/backup.html'>Database Backups</a>
 and all the section <a
 href='http://dev.mysql.com/doc/refman/4.1/en/disaster-prevention.html' >Backup
@@ -790,7 +784,7 @@ date or a period of time.  Just enter the starting date and
 
 Alternatively, you can directly request the screen to show
 events for a particular date, via URL.  Add a date in format
-YYYY-MM-DD to the URL of the <c>/adm/events/</c> screen and
+YYYY-MM-DD to the URL of the <c>/adm/events</c>/ screen and
 you get that.  E.g.,
 
     http://acis.super.edu/adm/events/2005-11-04
@@ -814,12 +808,11 @@ At this time there are two filters defined:
 
 <dt><co>hidemagic</co></dt>
 
-<dd>Do not show so called "magic" sessions.  Magic sessions
-are those created by ACIS machinery itself to do work on
-behalf of the users.  For instance, the <c>bin/apru</c>
-works via such sessions.  If you filter out the magic
-sessions, you will only the see the actual users
-(supposedly, human) interacting with ACIS via the web
+<dd>Do not show so called "magic" sessions.  Magic sessions are those
+created by ACIS machinery itself to do work on behalf of the users.
+For instance, the <a href='apu.html'>APU</a> works via such sessions.
+If you filter out the magic sessions, you will only the see the actual
+users (supposedly, human) interacting with ACIS via the web
 interface.</dd>
 
 <dt><co>onlyresearch</co></dt>
@@ -1386,4 +1379,4 @@ socket; the daemon listens to it.</td>
 
 
 
-<id>$Id: adm.text,v 2.8 2007/04/11 23:19:47 ivan Exp $</id>
+<id>$Id: adm.text,v 2.9 2007/04/24 15:37:35 ivan Exp $</id>

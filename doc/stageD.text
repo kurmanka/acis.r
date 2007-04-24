@@ -50,6 +50,11 @@ so, this would be a successful and positive match.
   is 0, ie. a name expression should not be present among name
   variations.  Set is to -1 to disable this limit.
 
+- fuzzy-name-search-via-web -- should fuzzy name searches be run when
+  research search is initiated by the online user?  (When a search is
+  APU-initiated, this is a question of <c>fuzzy-name-search</c>.)
+
+
 <!-- these two parameters are so similar... -->
 <!-- all the above parameters are implemented -->
 

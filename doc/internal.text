@@ -3,6 +3,9 @@ Programmer's guide (Internals)
 
 <toc/>
 
+*** 2007-04-24 18:32: portions of this document may be
+    significatly out of date.***
+
 Overview
 --------
 
@@ -411,17 +414,8 @@ href='http://daringfireball.net/projects/markdown/'
 <c>ardb.conf</c>, <c>acis.conf</c>
 </dd>
 
-<dt><F>home/bin/rid.start</F></dt>
-<dd><a ref='ri-daemon'>Update daemon</a> start utility
-(template), see <c>bin/rid.start</c>
-</dd>
-
-<dt><F>home/bin/rid.stop</F></dt>
-<dd>
-<a ref='ri-daemon'>Update daemon</a> stop utility
-(template), see <c>bin/rid.stop</c>
-
-</dd>
+<dt><F>home/bin/rid</F></dt> <dd><a ref='ri-daemon'>Update
+daemon</a> start/stop utility, see <c>bin/rid</c> </dd>
 
 <dt><F>home/bin/setup</F></dt>
 <dd>
@@ -843,7 +837,10 @@ phrase.</dd>
 
 ### ACIS:: hierarchy
 
-#### ACIS::Web -- Web interface of ACIS
+<h4 id='ACIS::Web'>ACIS::Web -- Web interface of ACIS</h4>
+
+*** 2007-04-24 18:27: some of these modules are now renamed
+    and re-organized significantly.***
 
 <dl>
 

@@ -51,6 +51,13 @@ So at this time APU performs three functions for personal profiles:
  - runs automatic citations searches
 
 
+## Some older terms
+
+<dl><dt><C>ARPU</C></dt><dd>Automatic Research Profile Update.  It used
+to be a separate feature, but now -- a part of APU.</dd>
+</dl>
+
+
 The <C>bin/apu</C> script
 -------------------------
 

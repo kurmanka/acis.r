@@ -670,106 +670,14 @@ extension to be processed by ACIS.
 
 
 
-<h3 id='cit-screen-conf'>Citations screens parameters</h3>
+<h3>Citations screens parameters</h3>
 
+The citations profile is enabled and configured via the the <a
+href='conf.html'>main.conf</a> configuration file.  (Just as every
+other part of the ACIS web interface.)
 
-The citations profile is enabled and configured via the
-<co>[ACIS]</co> section of the <a
-href='conf.html'>main.conf</a> configuration file.  In this
-it is not much different from other parts of the ACIS web
-interface.
-
-The configuration parameters are:
-
-<dl>
-
-<dt><C>citations-profile</C></dt>
-
-<dd>To show the citation profile to the users or not?
-Boolean value.  Default: false.</dd>
-
-
-<dt><C>citation-document-similarity-func</C></dt>
-
-<dd>
-
-<p>The parameter specifies a Perl function which ACIS will
-call internally.  The function will be called for assessing
-similarity between a citation string and a document record
-and must conform to the <a ref='cit-doc-similarity-pi'
->Citation-document similarity assessment interface</a>.</p>
-
-<p>The function must accept two parameters on input and
-return a numerical value between 0 (no similarity) and 1 (a
-perfect match) inclusive.</p>
-
-<p>The default value for this parameter provides a function,
-documented in section <a
-ref='similarity-default-func'>Default citation-document
-similarity assessment algorithm</a>.</p>
-
-</dd>
-
-
-<dt><C>citation-document-similarity-useful-threshold</C></dt>
-
-<dd><p>Citations, which have similarity value less than this
-threshold, won't even be suggested for user's consideration as
-potential.</p>
-
-<p>Default value: 0.65</p></dd>
-
-
-<dt><C>citation-document-similarity-preselect-threshold</C></dt>
-
-<dd><p>Citations, which have similarity value higher or equal
-than this threshold, will be offered as pre-selected by default
-(for a specific document).</p>
-
-<p>Default value: 0.85</p></dd>
-
-
-
-<dt><C>citation-document-similarity-ttl</C></dt>
-
-<dd><p>Time-to-live for calculated similarity values in days.
-After a similarity value is calculated by the similarity
-function, the value is stored in the database.  After
-time-to-live days pass since the original calculation took
-place, this value will be considered expired and will be
-re-calculated with then-current similarity function.</p>
-
-<p>Default value: 100</p></dd>
-
-
-
-<dt><C>citations-max-online-comparisons</C></dt>
-
-<dd><p>A limit on the number of computationally expensive
-citation-document comparisons to run for a online user.  This is to
-avoid putting a big load on a running system, and thus making it
-unresponsive to user.  Depending on the machine performance and the
-number of users, setting it to something like 400 may be a good
-idea.</p>
-
-<p>Default: undefined, i.e. no limit.</p>
-
-</dd>
-
-
-<dt><C>citation-presentation-reverse</C></dt>
-
-<dd><p>On the potential citations screen, show HOW the work is cited
-first, and WHERE it is cited second.  For example: "as: ...(citation
-string) in: ...(work title) by ... (authors)".  This may make looking
-through a large list of citations easier for the user.</p>
-
-<p>Default: off.  So by default each citation is presented this way:
-"in: ... by ..." on the first line, and "as: ..." on the second.</p>
-</dd>
-
-</dl>
-
+See <a ref='cit-screen-conf'>Citations screens</a> parameters in
+another document.
 
 
 
@@ -1394,7 +1302,7 @@ the data and stability of the user profiles.
 
 
 <id>
-$Id: citations.text,v 2.56 2007/04/18 20:20:16 ivan Exp $
+$Id: citations.text,v 2.57 2007/04/24 15:37:35 ivan Exp $
 </id>
 
 

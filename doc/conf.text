@@ -21,6 +21,9 @@ ACIS home directory.
 Parameters
 ----------
 
+
+### Core 
+
 <dl>
 
 <dt><C>site-name</C></dt>
@@ -133,26 +136,115 @@ ACIS will send.  Required.</dd>
 <dd> A mail-sending program name.  May be something like
 <code>/usr/sbin/sendmail -t</code> .  Required.</dd>
 
+</dl>
+
+
+### Perl and CGI
+
+
+<dt><C>perlbin</C></dt>
+
+<dd>Perl binary to use for ACIS and its utilities.  Default:
+taken from <co>`which perl`</co> during
+<c>bin/setup</c>.</dd>
+
+
+<dt><C>cgi-pperl-binary</C></dt>
+
+<dd>Type: string.  Enables support for Matt Sergeant's fine <a
+ href='http://search.cpan.org/dist/PPerl/'>PPerl</a> instead of plain old slow
+ CGI.  If set, it will be used instead of perl in the CGI script's shebang
+ line (the first line of the script, which normally says
+ <co>"#!/usr/bin/perl"</co>).  It will also cause the CGI script to be adapted
+ in some minor ways to the PPerl environment: some modules will be preloaded
+ and clean-ups will be done after each request processed.</dd>
+
+
+<dt><C>cgi-pperl-reinit</C></dt>
+
+<dd>Type: string.  Command to reinitialize or simply shutdown the PPerl
+process.  See previous entry for PPerl pointers.  The command will be executed
+by the <c>bin/setup</c> script after installation or configuration changes.
+</dd>
+
+
+
+
+### Database parameters
+
+<dl> <!-- DATABASE PARAMETERS -->
+
+<dt><C>db-name</C></dt>
+
+<dd>Name of a MySQL database that ACIS and its components
+will use to store its own data.  Required.</dd>
+
+<dt><C>db-user</C></dt>
+
+<dd>Name of the MySQL database user to use when connecting
+to MySQL server.  Required.
+</dd>
+
+<dt><C>db-pass</C></dt>
+
+<dd>Password to use when connecting to MySQL server.
+Required.</dd>
+
+
+<dt><C>acis-db-name</C></dt>
+<dt><C>sid-db-name</C></dt>
+<dt><C>metadata-db-name</C></dt>
+
+<dd>All three are deprecated parameters replaced by the
+single <c>db-name</c>.  They were used to specify MySQL
+database names for specific compontents of ACIS.  Certain
+database tables would then go to "acis" database, some to
+"sid" database and the rest to the "metadata" database.
+Should not be used in new acis installations.</dd>
+
+</dl>
+
+### Data input (primary metadata: research, institutions, citations, etc.)
+
+<dl><!-- METADATA COLLECTIONS -->
+
+<dt><C>metadata-collections</C></dt>
+
+<dd>Additional metadata collections to monitor and process
+with the RI daemon.  The variable contains space-delimited
+collection identifiers for ACIS to process.  Each collection
+must be further defined with a pair of corresponding
+<c>metadata-<i>X</i>-home</c> and
+<c>metadata-<i>X</i>-type</c> parameters, where <i>X</i> is
+the identifier.  The identifiers must be unique.
+Optional.</dd>
+
+<dt><C>metadata-<i>X</i>-type</C></dt>
+
+<dd>Type of data collection <i>X</i>.  Useful possible
+values: "<co>RePEcRec</co>" or "<co>AMF</co>".</dd>
+
+
+<dt><C>metadata-<i>X</i>-home</C></dt>
+
+<dd>Directory where the files of collection <i>X</i> are.</dd>
+</dl>
+
+### Data output (personal data and submitted institutions)
+
+<dl>
 
 <dt><C>person-id-prefix</C></dt>
-
-<dd> Prefix to generated personal record identifiers (not
+<dd>Prefix to the generated personal record identifiers (not
 short-ids, if you care).  Required.</dd>
 
 
 <dt><C>metadata-redif-output-dir</C></dt>
-
-<dd>
-Directory to put generated ReDIF files into.
-Optional.
+<dd>Directory to put generated ReDIF files into.  Optional.
 </dd>
 
-
 <dt><C>metadata-amf-output-dir</C></dt>
-
-<dd>
-Directory to put generated AMF files into.
-Optional.
+<dd>Directory to put generated AMF files into.  Optional.
 </dd>
 
 
@@ -163,123 +255,15 @@ database.  When users submit an institution's data, message
 will be sent to this address.  Defaults to
 <c>admin-email</c>, if not specified.</dd>
 
-
-<dt><C>admin-access-pass</C></dt>
-
-<dd>Special administrator's password to access the <a
-href='adm.html#adm-slash'>administrator's screens</a>.  Must
-be at least 6 characters long.  Optional.  When not
-specified only users which have admin privileges can access
-the screens and only while they are logged in.  <a
-href='adm.html#amd-slash-access'>Read more about it.</a></dd>
+</dl>
 
 
 
-<dt><C>template-set</C></dt>
+<h3 id='conf-research'>Research profile</h3>
 
-<dd>Name of a set of XSLT presentation files to use.  A set
-of XSLT presentation files is a directory, path, relative to
-<co>{HOME}/presentation/</co> directory.  Default value:
-"<co>default</co>".  So by default XSLT templates are read
-from <co>{HOME}/presentation/default/</co>.
-</dd>
+See <a href='researchprofile.html'>Research Profile</a> document.
 
-
-
-<dt><C>umask</C></dt>
-
-<dd>The umask to use when creating files and directories.
-This value directly influences the access permissions of the
-created files.  Read perl's <code>perldoc -f umask</code>
-and/or Unix' <code>man umask</code>.  Optional.</dd>
-
-
-<dt><C>backup-directory</C></dt>
-
-<dd>Type: string.  Path to a directory for
-<c>bin/backup_tables</c> to put its backups into.  Must
-exist at the time <c>bin/backup_tables</c> is run.
-</dd>
-
-
-
-<!-- DEBUGGING AND LOGGING PARAMETERS -->
-
-
-<dt><C>debug-info-visible</C></dt>
-
-<dd>Whether or not to append debuging info to each generated
-web page.  Do not enable this on production systems: it can
-be used by hackers to gain knowledge of the internal site
-configuration, which is not a safe thing.  Also, makes pages
-much bigger and system slower.
-
-Default: undef, ie. feature is off.</dd>
-
-
-
-<dt><C>debug-log</C></dt>
-
-<dd>When specified to a writeable file name, each ACIS
-request's processing will be debug-logged to this file.
-Verbose.
-
-Default: undef, ie. the feature is off.</dd>
-
-
-<dt><C>extreme-debug</C></dt>
-
-<dd>Enables printing of the internal debugging messages on
-every web page immediately, as ACIS processes a request.
-
-Default: undef, ie. feature is off.</dd>
-
-
-<dt><C>debug-transformations</C></dt>
-
-<dd>ACIS uses XSLT stylesheets to produce HTML pages (and
-email messages).  For each request ACIS generates an XML
-document and then pipes it to the appropriate XSLT
-stylesheet.  When this option is enabled, ACIS will save
-intermediate XML file into
-<co>{HOME}/presenter_data.xml</co> and the XSLT result into
-<co>{HOME}/presenter_result.xml</co>.  If the files exist,
-ACIS will overwrite it silently, so at any given time these
-files will contain only the last request' data.  This option
-might be helpful for debugging the XSLT stylesheets.
-
-Default: undef, ie. feature is off.</dd>
-
-
-
-<dt><C>log-profiling-data</C></dt>
-
-<dd>Boolean parameter.  Enables logging of system profiling
-data to the <f>{HOME}/profiling.log</f>.  Default: off.</dd>
-
-
-<dt><C>show-profiling-data</C></dt>
-
-<dd>Boolean parameter.  Enables display of system profiling
-data (timings) at the end of each page.  Default: off.</dd>
-
-
-<dt><C>requests-log</C></dt>
-
-<dd>Name of file to log every incoming request to.  Defaults
-to string <code>"*stderr*"</code> which means "log to
-standard error output filehandle".  Usually, Apache
-redirects stderr output of CGI scripts to the error
-log of the website.</dd>
-
-
-<dt><C>require-modules</C></dt>
-
-<dd>List of perl modules or simply ".pl" files to load
-(<co>require</co>) upon system start.  Whitespace
-separated.</dd>
-
-
+<dl>
 <dt><C>research-additional-searches</C></dt>
 
 <dd>Type: boolean.  Whether or not to run additional, disk
@@ -289,8 +273,25 @@ increase quality of search under certain conditions;
 sometimes they would find works for the users, which would
 not have been found otherwise.  Default: off.</dd>
 
+<!-- Stage D -->
 
-<dt><C>fuzzy-name-search</C></dt>
+<dt><C>document-document-links-profile</C></dt>
+
+<dd>Enable <a ref='doclinks'>Document to document links</a>
+screen?  Default: false.</dd>
+
+<dt><C>full-text-urls-recognition</C></dt>
+<dd>Enable Full-Text URLs screen in research profile?
+Default: no.</dd>
+
+</dl>
+
+
+<h4 id='conf-fuzzy'>Fuzzy search</h4>
+
+See <a ref='research-fuzzy'>Fuzzy search</a> in research profile.
+
+<dl><dt><C>fuzzy-name-search</C></dt>
 
 <dd>Type: Boolean.  Run or not run fuzzy-matching during the research
 automatic searches?  The value does not matter if
@@ -299,7 +300,40 @@ searches are a kind of additional searches.  Default: no, do
 not run.</dd>
 
 
+<dt><C>fuzzy-name-search-min-common-prefix</C></dt>
+<dd>The number of characters n
+  of at the start of a name variation that has to match in the name
+  expressions exactly.  Default: 3.</dd>
 
+<dt><C>fuzzy-name-search-min-variation-length</C></dt> <dd>The minimum number of
+  characters m that a name variation would have to have in order to
+  qualify for being fuzzy matched. The default is 7.</dd>
+
+<dt><C>fuzzy-name-search-max-name-occurr-in-doc-names</C></dt>
+  <dd>The maximum number
+  of occurrences of a name expression in the document author names
+  table before it is considered for fuzzy matching. The default is 1.
+  If this parameter is set to 0 or is not set, no maximum is checked.</dd>
+
+<dt><C>fuzzy-name-search-max-name-occurr-in-name-variations</C></dt><dd>The maximum
+  number of occurrences of a name expression in the name variations
+  table before it is considered for fuzzy matching. By default, maximum
+  is 0, ie. a name expression should not be present among name
+  variations.  Set is to -1 to disable this limit.</dd>
+
+<dt><C>fuzzy-name-search-via-web</C></dt><dd>should fuzzy name searches be run when
+  research search is initiated by the online user?  (When a search is
+  APU-initiated, this is a question of
+  <c>fuzzy-name-search</c>.)  Default: false.</dd>
+
+</dl>
+
+
+<h3 id='apu-conf'>APU</h3>
+
+This is about <a href='apu.html'>automatic profile update</a>.
+
+<dl>
 <dt><C>minimum-apu-period-days</C></dt>
 
 <dd>Type: integer number.  This is the miminum number of
@@ -346,102 +380,230 @@ person profile in one APU go.  Default: no limit.</dd>
 <dd>Type: Boolean.  Do not send APU-citation mails (even if
 changes have been done to a profile during APU).</dd>
  
+</dl>
 
 
-<dt><C></C></dt>
+<h3 id='cit-screen-conf'>Citations screens</h3>
 
-<dd></dd>
+This is for <a href='citations.html'>citations features</a>.
 
+<dl>
 
+<dt><C>citations-profile</C></dt>
 
-
-<!-- GENERAL PARAMETERS -->
-
-
-
-<dt><C>perlbin</C></dt>
-
-<dd>Perl binary to use for ACIS and its utilities.  Default:
-taken from <co>`which perl`</co> during
-<c>bin/setup</c>.</dd>
+<dd>To show the citation profile to the users or not?
+Boolean value.  Default: false.</dd>
 
 
-<dt><C>cgi-pperl-binary</C></dt>
+<dt><C>citation-document-similarity-func</C></dt>
 
-<dd>Type: string.  Enables support for Matt Sergeant's fine <a
- href='http://search.cpan.org/dist/PPerl/'>PPerl</a> instead of plain old slow
- CGI.  If set, it will be used instead of perl in the CGI script's shebang
- line (the first line of the script, which normally says
- <co>"#!/usr/bin/perl"</co>).  It will also cause the CGI script to be adapted
- in some minor ways to the PPerl environment: some modules will be preloaded
- and clean-ups will be done after each request processed.</dd>
+<dd>
 
+<p>The parameter specifies a Perl function which ACIS will
+call internally.  The function will be called for assessing
+similarity between a citation string and a document record
+and must conform to the <a ref='cit-doc-similarity-pi'
+>Citation-document similarity assessment interface</a>.</p>
 
-<dt><C>cgi-pperl-reinit</C></dt>
+<p>The function must accept two parameters on input and
+return a numerical value between 0 (no similarity) and 1 (a
+perfect match) inclusive.</p>
 
-<dd>Type: string.  Command to reinitialize or simply shutdown the PPerl
-process.  See previous entry for PPerl pointers.  The command will be executed
-by the <c>bin/setup</c> script after installation or configuration changes.
+<p>The default value for this parameter provides a function,
+documented in section <a
+ref='similarity-default-func'>Default citation-document
+similarity assessment algorithm</a>.</p>
+
 </dd>
 
 
-<!-- DATABASE PARAMETERS -->
+<dt><C>citation-document-similarity-useful-threshold</C></dt>
 
-<dt><C>db-name</C></dt>
+<dd><p>Citations, which have similarity value less than this
+threshold, won't even be suggested for user's consideration as
+potential.</p>
 
-<dd>Name of a MySQL database that ACIS and its components
-will use to store its own data.  Required.</dd>
+<p>Default value: 0.65</p></dd>
 
-<dt><C>db-user</C></dt>
 
-<dd>Name of the MySQL database user to use when connecting
-to MySQL server.  Required.
+<dt><C>citation-document-similarity-preselect-threshold</C></dt>
+
+<dd><p>Citations, which have similarity value higher or equal
+than this threshold, will be offered as pre-selected by default
+(for a specific document).</p>
+
+<p>Default value: 0.85</p></dd>
+
+
+
+<dt><C>citation-document-similarity-ttl</C></dt>
+
+<dd><p>Time-to-live for calculated similarity values in days.
+After a similarity value is calculated by the similarity
+function, the value is stored in the database.  After
+time-to-live days pass since the original calculation took
+place, this value will be considered expired and will be
+re-calculated with then-current similarity function.</p>
+
+<p>Default value: 100</p></dd>
+
+
+
+<dt><C>citations-max-online-comparisons</C></dt>
+
+<dd><p>A limit on the number of computationally expensive
+citation-document comparisons to run for a online user.  This is to
+avoid putting a big load on a running system, and thus making it
+unresponsive to user.  Depending on the machine performance and the
+number of users, setting it to something like 400 may be a good
+idea.</p>
+
+<p>Default: undefined, i.e. no limit.</p>
+
 </dd>
 
-<dt><C>db-pass</C></dt>
 
-<dd>Password to use when connecting to MySQL server.
-Required.</dd>
+<dt><C>citation-presentation-reverse</C></dt>
 
+<dd><p>On the potential citations screen, show HOW the work is cited
+first, and WHERE it is cited second.  For example: "as: ...(citation
+string) in: ...(work title) by ... (authors)".  This may make looking
+through a large list of citations easier for the user.</p>
 
-<!-- METADATA COLLECTIONS -->
-
-
-<dt><C>metadata-collections</C></dt>
-
-<dd>Additional metadata collections to monitor and process
-with the RI daemon.  The variable contains space-delimited
-collection identifiers for ACIS to process.  Each collection
-must be further defined with a pair of corresponding
-<c>metadata-<i>X</i>-home</c> and
-<c>metadata-<i>X</i>-type</c> parameters, where <i>X</i> is
-the identifier.  The identifiers must be unique.
-Optional.</dd>
-
-<dt><C>metadata-<i>X</i>-type</C></dt>
-
-<dd>Type of data collection <i>X</i>.  Useful possible
-values: "<co>RePEcRec</co>" or "<co>AMF</co>".</dd>
-
-
-<dt><C>metadata-<i>X</i>-home</C></dt>
-
-<dd>Directory where the files of collection <i>X</i> are.</dd>
-
-
-
-<!-- Stage D -->
-
-<dt><C>document-document-links-profile</C></dt>
-
-<dd>Enable <a ref='doclinks'>Document to document links</a>
-screen?  Default: false.</dd>
-
+<p>Default: off.  So by default each citation is presented this way:
+"in: ... by ..." on the first line, and "as: ..." on the second.</p>
+</dd>
 
 </dl>
 
 
-Also see <a ref='cit-screen-conf'>Citations screens parameters</a>.
+
+
+
+### Logging, debugging and performance profiling
+
+<dl>
+
+<dt><C>debug-info-visible</C></dt>
+
+<dd>Whether or not to append debuging info to each generated
+web page.  Do not enable this on production systems: it can
+be used by hackers to gain knowledge of the internal site
+configuration, which is not a safe thing.  Also, makes pages
+much bigger and system slower.
+
+Default: undef, ie. feature is off.</dd>
+
+
+<dt><C>debug-log</C></dt>
+
+<dd>When specified to a writeable file name, each ACIS
+request's processing will be debug-logged to this file.
+Verbose.
+
+Default: undef, ie. the feature is off.</dd>
+
+
+<dt><C>extreme-debug</C></dt>
+
+<dd>Enables printing of the internal debugging messages on
+every web page immediately, as ACIS processes a request.
+
+Default: undef, ie. feature is off.</dd>
+
+
+<dt><C>debug-transformations</C></dt>
+
+<dd>ACIS uses XSLT stylesheets to produce HTML pages (and
+email messages).  For each request ACIS generates an XML
+document and then pipes it to the appropriate XSLT
+stylesheet.  When this option is enabled, ACIS will save
+intermediate XML file into
+<co>{HOME}/presenter_data.xml</co> and the XSLT result into
+<co>{HOME}/presenter_result.xml</co>.  If the files exist,
+ACIS will overwrite it silently, so at any given time these
+files will contain only the last request' data.  This option
+might be helpful for debugging the XSLT stylesheets.
+
+Default: undef, ie. feature is off.</dd>
+
+
+<dt><C>log-profiling-data</C></dt>
+
+<dd>Boolean parameter.  Enables logging of system profiling
+data to the <f>{HOME}/profiling.log</f>.  Default: off.</dd>
+
+
+<dt><C>show-profiling-data</C></dt>
+
+<dd>Boolean parameter.  Enables display of system profiling
+data (timings) at the end of each page.  Default: off.</dd>
+
+
+<dt><C>requests-log</C></dt>
+
+<dd>Name of file to log every incoming request to.  Defaults
+to string <code>"*stderr*"</code> which means "log to
+standard error output filehandle".  Usually, Apache
+redirects stderr output of CGI scripts to the error
+log of the website.</dd>
+
+</dl>
+
+
+### Other 
+
+<dl>
+<dt><C>admin-access-pass</C></dt>
+
+<dd>Special administrator's password to access the <a
+href='adm.html#adm-slash'>administrator's screens</a>.  Must
+be at least 6 characters long.  Optional.  When not
+specified only users which have admin privileges can access
+the screens and only while they are logged in.  <a
+href='adm.html#amd-slash-access'>Read more about it.</a></dd>
+
+
+
+<dt><C>template-set</C></dt>
+
+<dd>Name of a set of XSLT presentation files to use.  A set
+of XSLT presentation files is a directory, path, relative to
+<co>{HOME}/presentation/</co> directory.  Default value:
+"<co>default</co>".  So by default XSLT templates are read
+from <co>{HOME}/presentation/default/</co>.
+</dd>
+
+<dt><C>presenters-dir</C></dt> <dd>Specifies a path, where
+to search for XSLT templates and some other related files.
+Overrides <c>template-set</c> if defined.  Default: XSLT
+templates are read from
+<co>{HOME}/presentation/default/</co>.</dd>
+
+
+<dt><C>umask</C></dt>
+
+<dd>The umask to use when creating files and directories.
+This value directly influences the access permissions of the
+created files.  Read perl's <code>perldoc -f umask</code>
+and/or Unix' <code>man umask</code>.  Optional.</dd>
+
+
+<dt><C>require-modules</C></dt>
+
+<dd>List of perl modules or simply ".pl" files to load
+(<co>require</co>) upon system start.  Whitespace
+separated.</dd>
+
+
+<dt><C>backup-directory</C></dt>
+
+<dd>Type: string.  Path to a directory for
+<c>bin/backup_tables</c> to put its backups into.  Must
+exist at the time <c>bin/backup_tables</c> is run.
+</dd>
+
+</dl>
 
 
 

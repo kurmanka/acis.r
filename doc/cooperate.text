@@ -609,7 +609,7 @@ implemented and configured properly:
     It involves the <co>/meta/update</co> screen, a
     site-specific mirroring function and the usual ACIS
     processing with <a href='daemon.html'>update daemon</a>
-    and ARPU.  That's level 4 as well.
+    and APU.  That's level 4 as well.
 
 
 
@@ -974,5 +974,5 @@ will be accompanied by date and time of the request.
 
 
 <id>
-$Id: cooperate.text,v 2.1 2005/12/30 20:55:37 ivan Exp $
+$Id: cooperate.text,v 2.2 2007/04/24 15:37:35 ivan Exp $
 </id>

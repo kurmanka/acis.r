@@ -126,17 +126,40 @@ General
 
 ### Additional searches
 
-### Fuzzy name search
+<h3 id='research-fuzzy'>Fuzzy name search</h3>
+
+Features to find mistyped author (editor) names in the document 
+metadata.  
+
+This requires running <c>bin/fuzzy\_search\_table</c> utility every once
+in a while and some <a ref='conf-fuzzy'>configuration</a>.
+
+Find a detailed explanation of how this is supposed to work in the <a
+href='http://acis.openlib.org/documents/textilshchiki.html'>Textilshchiki</a>
+document, section <i>Fuzzy searching</i>.
+
+#### <C>bin/fuzzy\_search_table</C> script
+
+The script initializes the database tables which are needed for the
+fuzzy name search to work.  Should be run regularly.  Depending on size
+of your documents database, it may take a while to do its job.  
+
+Takes no arguments and prints out its progress (the executed database
+statements) to standard output.
 
 
 <h2 id='rp-conf'>Research profile configuration</h2>
+
+See all <a ref='conf-research'>research profile parameters</a>.
+
 
 ### Automatic search 
 
 - <c>research-additional-searches</c>
 
 
-### Document-to-document links
+
+<h3 id='research-doclinks'>Document-to-document links</h3>
 
 The whole feature has to be enabled with a
 <c>document-document-links-profile</c> parameter.
@@ -153,6 +176,14 @@ The whole feature won't be there unless you have enabled it with a
 <c>full-text-urls-recognition</c> parameter.
 
 
+### Fuzzy search
+
+- <c>fuzzy-name-search</c>
+- <c>fuzzy-name-search-min-common-prefix</c>
+- <c>fuzzy-name-search-min-variation-length</c>
+- <c>fuzzy-name-search-max-name-occurr-in-doc-names</c>
+- <c>fuzzy-name-search-max-name-occurr-in-name-variations</c>
+- <c>fuzzy-name-search-via-web</c>
 
 
 
@@ -166,6 +197,6 @@ The whole feature won't be there unless you have enabled it with a
 
 
 
-<id>$Id: researchprofile.text,v 2.2 2007/04/11 23:19:47 ivan Exp $</id>
+<id>$Id: researchprofile.text,v 2.3 2007/04/24 15:37:36 ivan Exp $</id>
 
 

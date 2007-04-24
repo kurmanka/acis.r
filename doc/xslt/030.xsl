@@ -73,24 +73,18 @@
     <xsl:variable name='name'>
       <xsl:apply-templates mode='text'/>
     </xsl:variable>
+    <xsl:variable name='item' select='exsl:node-set($map)/index/item[@name=$name or @id=$name]'/>
 
-    <xsl:variable name='item'
-                  select='exsl:node-set($map)/index/item[@name=$name]'/>
     <xsl:choose>
       <xsl:when test='$item'>
-      
-    <xsl:variable name='file'
-                  select='$item/@file'/>
-
-    <a class='{name()}' href='{$file}#{$item/@id}'>
-      <xsl:apply-templates/>
-    </a>
-
+        <xsl:variable name='file' select='$item/@file'/>
+        <a class='{name()}' href='{$file}#{$item/@id}'><xsl:apply-templates/></a>
       </xsl:when>
+
       <xsl:otherwise>
-<!--
-        <xsl:message>Broken &lt;C&gt; link to <xsl:value-of select='$name'/></xsl:message>
--->
+        <xsl:if test='name()="a" or name()="c"'>
+          <xsl:message>Broken link to <xsl:value-of select='$name'/></xsl:message>
+        </xsl:if>
         <code class='{name()} BROKEN'>
           <xsl:apply-templates/>
         </code>
