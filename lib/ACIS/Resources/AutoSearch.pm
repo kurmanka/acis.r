@@ -288,13 +288,19 @@ sub do_auto_search {
   if ( not $session -> {$id} {'reloaded-accepted-contributions'} ) {
     ACIS::Web::Contributions::reload_accepted_contributions( $app );
   }
+
+  debug "auto search initiated: ", $settings->{via_web} ? "online" : "apu";
   search_for_resources_exact( $app, $context );
 
   if ( $app -> config( "research-additional-searches" ) ) {
     additional_searches( $app, $context ); 
     if ( $app->config( "fuzzy-name-search" ) ) {
-      # XXX - should not do this in online search, I think; but different views are possible
-      run_fuzzy_searches( $app, $context );
+      # are we running search started via web interface, or started via
+      # APU?  If via the web, check if that's ok for fuzzy search.
+      if ( not $settings->{via_web} 
+           or $app->config( "fuzzy-name-search-via-web" ) ) {
+        run_fuzzy_searches( $app, $context );
+      }
     }
   }
 }
@@ -327,7 +333,8 @@ sub start_auto_res_search_in_bg {
   my $res = ACIS::Web::Background::run_thread ( 
               $app, $sid,
              'res-autosearch', 
-             'ACIS::Resources::AutoSearch::do_auto_search'
+             'ACIS::Resources::AutoSearch::do_auto_search',
+             { via_web => 1 },
             );
 
   if ( $res ) {

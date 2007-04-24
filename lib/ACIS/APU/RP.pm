@@ -23,7 +23,7 @@ package ACIS::APU::RP;        ### -*-perl-*-
 #  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 #
 #  ---
-#  $Id: RP.pm,v 1.2 2007/04/18 17:00:51 ivan Exp $
+#  $Id: RP.pm,v 1.3 2007/04/24 15:38:03 ivan Exp $
 #  ---
 
 use strict;
@@ -276,7 +276,7 @@ sub search {
       undef $add; 
     }
 
-    automatic_resource_search_now( $app, { save_result_func => $handler } );
+    automatic_resource_search_now( $app, { save_result_func => $handler, via_apu => 1 } );
 
     if ( $add and scalar @$add ) {
         $send_email = 1;

@@ -90,7 +90,7 @@ sub search_resources_for_name_fuzzy {
     }
   }
 
-  logit "intermediate results: " . (scalar @$dsid_list) . ' ' . join( ' ', @$dsid_list );
+  #logit "intermediate results: " . (scalar @$dsid_list) . ' ' . join( ' ', @$dsid_list );
 
   if ( not scalar @$dsid_list ) { return undef; }
   $sql -> prepare_cached( "select r.id,o.data,? as role from $rdb.resources r join $rdb.objects o using(id) where sid=?" );

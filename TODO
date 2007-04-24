@@ -1,3 +1,19 @@
+RAS: Christian suggests wording for the confirmation screen:
+
+   Please check your mailbox, where a confirmation message should
+   arrive shortly. Follow the instructions detailed in this
+   message. Your registration will not be valid until this last step is
+   completed. If you did not get the message:
+
+   1) check that the email address is correct (see above);
+   2) messages may sometimes take a while to clear some hurdles (firewalls,
+      spam checks), so wait a little more;
+   3) check your spam or junk-mail folder;
+   4) alert the RePEc Author Service admin (email at foot of page).
+
+(Sat, 27 Jan 2007 17:15:39 -0500 (EST))
+
+
 ACIS is disk-space hungry; it is a disk space HOG.  
 
   - limit RI history tracking to only a number of latest events?
@@ -7,8 +23,6 @@ ACIS is disk-space hungry; it is a disk space HOG.
  
   - change RI history object to a much simplier array structure
     (instead of a hash)
-
-doclinks screen: sort research items in the menu in alphabetical order?
 
 Go through all XXX marks and either fix or re-label them as "ZZZ" or
 "maybe".
@@ -44,7 +58,6 @@ empty title (e.g. RePEc:rus:* items)
 CHECK: How do I treat research profile items (/contributions/accepted)
 which have no record in the resources table?  I should remove them!
 
-RAS: Christian sent me some text for some email or some screen a while ago.
 
 
 Documentation:

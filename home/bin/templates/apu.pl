@@ -58,7 +58,8 @@ if ( $queue ) {
 } else {
   my $howmuch = shift @ARGV;
 
-  if ( $howmuch +0 <= 0 ) { 
+  if ( not defined $howmuch 
+       or $howmuch +0 <= 0 ) { 
     print "give a positive numeric argument\n"; 
     exit 1;
   }

@@ -1,5 +1,8 @@
 #!/usr/local/bin/perl
 
+# this script reads main.conf file and generates a number of other
+# configuration files for different ACIS components
+
 use strict; 
 
 use Carp::Assert;
