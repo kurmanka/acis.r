@@ -30,11 +30,22 @@ q!insert into citations_identified_personal
      where dsid is not null 
      group by cnid,psid,dsid 
      having last='added'!,
-q!create temporary table citations_identified
+# 
+q!drop table citations_identified!,
+# ?
+# temporary
+q!create  table citations_identified
     (cnid BIGINT UNSIGNED NOT NULL, 
      dsid char(12) not null, 
-     index (dsid) ) 
+     index (dsid), index (cnid) ) 
      select distinct cnid,dsid from citations_identified_personal!,
+#q!select count(*) from citations left join citations_identified ci using (cnid) where ci.cnid is null and trgdocid is not null!,
+# this is to pass through the CitEc data that we didn't find use for (yet):
+qq!insert into citations_identified 
+   select c.cnid,r.sid from citations c 
+     join $RDB.resources r on (c.trgdocid=r.id) 
+     left join citations_identified ci using (cnid) 
+   where ci.cnid is null and trgdocid is not null!,
 );
 
 print "please wait while we build the temporary tables...\n";
