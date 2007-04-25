@@ -60,7 +60,7 @@
         role: <xsl:value-of select='role'/>
       </xsl:if>
       
-      (id:&#160;<xsl:value-of select='id'/>)
+      (id:&#160;<xsl:value-of select='id'/>, dsid: <xsl:value-of select='sid'/>)
     </span>
     </li>
   </xsl:for-each>
