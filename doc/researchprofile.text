@@ -175,9 +175,13 @@ has a simple structure; a self-explanatory example file is supplied in
 The whole feature won't be there unless you have enabled it with a
 <c>full-text-urls-recognition</c> parameter.
 
-If you have full-text URLs data in AMF, separate from the document
-data, configure it as a special metadata collection in main.conf.
-Use <co>FullTextUrlsAMF</co> as its type.
+If you have full-text URLs data in AMF format, separate from the
+document data, configure it as a special metadata collection in
+main.conf.  Use <co>FullTextUrlsAMF</co> as its type.
+
+The data format is:
+
+XXXXX
 
 ### Fuzzy search
 
@@ -200,6 +204,6 @@ Use <co>FullTextUrlsAMF</co> as its type.
 
 
 
-<id>$Id: researchprofile.text,v 2.4 2007/04/25 21:54:19 ivan Exp $</id>
+<id>$Id: researchprofile.text,v 2.5 2007/05/02 20:28:24 ivan Exp $</id>
 
 
