@@ -1,9 +1,9 @@
-perlparams=-w
 if test "$cgi_pperl_binary"
 then 
-    perlbin="$cgi_pperl_binary"
+   echo "#!$cgi_pperl_binary -w $perlparams"
+else
+   echo "#!$perlbin -w $perlparams"
 fi
-echo "#!$perlbin $perlparams"
 echo 
 echo "use lib qw( $homelib );"
 if test $perllibprepend
@@ -42,6 +42,7 @@ if test "$cgi_pperl_binary"; then
      echo 'BEGIN { $Web::App::DEBUG = "on"; }'
      echo "BEGIN { \$Web::App::DEBUGLOGFILE = '$debug_log_special'; "
      echo '}'
+     # this is for special debugging that I used to do via pperl --iku
      echo 'if ( $PPERL::DEBUG ) {'
      echo '  $PPerlServer::SIGUSR1HANDLERS= [ \&Web::App::Common::dump_debug ];'
 #     echo '} else {'
