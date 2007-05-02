@@ -50,14 +50,13 @@ sub profile_check_and_cleanup () {
     # XXX this assumes that all citations here have the same
     # identification in them and thus it reuses the prepared SQL
     # statement
+    $q = 'select cnid from citations where cnid=?';
     if ( $a_cit->{srcdocsid} and $a_cit->{checksum} ) {
       $q = 'select cnid from citations where clid=?';
-    } elsif ( $a_cit ->{citid} or $a_cit->{cnid} ) {
-      $q = 'select cnid from citations where cnid=?';
     } elsif ( $a_cit->{clid} ) {
       $q = 'select cnid from citations where clid=?';
     } else {
-      die "how do I upgrade this citations: " . Dumper( $a_cit ) . "?";
+      #die "how do I upgrade this citations: " . Dumper( $a_cit ) . "?";
     }
     $sql -> prepare_cached( $q );
 
@@ -74,8 +73,8 @@ sub profile_check_and_cleanup () {
         $id = $_->{clid};
       } 
       if (not $id) {
-        undef $_;
-        debug "a citation is gone";
+        # undef $_;
+        debug "no citation id";
         next;
       }
       my $r = $sql->execute( $id );
@@ -84,14 +83,25 @@ sub profile_check_and_cleanup () {
         # ok; update cnid
         $_->{cnid} = $r->{row}{cnid};
       } elsif ( $r )  {
-        undef $_;
-        debug "delete citation $id (it is gone)";
+        #undef $_;
+        #debug "delete citation $id (it is gone)";
+        debug "citation $id is not found anymore";
+        $_->{notfound} = localtime;
         next;
       } else {
-        die "can't check a citation: no result from execute() (q:$q)";
+        complain "can't check a citation: no result from execute() (q:$q)";
+        last;
       }
 
+      # if the citation's source document is not in the document
+      # database anymore, the citation would be gone from the citations
+      # table.  Citations::Input would do that, I believe.  Or
+      # maybe RePEc::Index::Collection::CitationsAMF
+
       if ( not $_->{srcdoctitle} or not $_->{srcdocid} ) {
+        # this would mean the citation hash is incomplete
+        # this shouldn't happen to any recently added citations, but
+        # I'll leave it here for a while for extra care
         if ( not load_citation_details( $_ ) ) {
           undef $_;
           debug "delete citation $id (can't find source doc details)";

@@ -27,7 +27,7 @@ package ACIS::Web::NewUser; ### -*-perl-*-
 #  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 #
 #  ---
-#  $Id: NewUser.pm,v 2.8 2007/04/18 17:00:51 ivan Exp $
+#  $Id: NewUser.pm,v 2.9 2007/05/02 20:26:24 ivan Exp $
 #  ---
 
 
@@ -179,7 +179,7 @@ sub prepare_user {
   my $app = shift;
   my $session = $app -> session;
   my $record  = $session -> current_record;
-  
+  assert( $record );
   debug ( Dumper $record );
   assert( $record->{name} );
   assert( $record->{name} -> {last} );
@@ -302,8 +302,9 @@ sub additional_process {
   
   my $record = $session -> current_record;
 
+  assert( defined $app -> get_form_value('name-variations') );
   $record -> {name} {'additional-variations'} = 
-    [ split ( /\s*[\n\r]+/, $app -> get_form_value ('name-variations') ) ];
+    [ split ( /\s*[\n\r]+/, $app -> get_form_value('name-variations') ) ];
 
 
   require ACIS::Web::Person;

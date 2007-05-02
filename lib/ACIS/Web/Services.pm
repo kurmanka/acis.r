@@ -28,7 +28,7 @@ package ACIS::Web;   ### -*-perl-*-
 #  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 #
 #  ---
-#  $Id: Services.pm,v 2.23 2007/03/14 21:22:56 ivan Exp $
+#  $Id: Services.pm,v 2.24 2007/05/02 20:26:24 ivan Exp $
 #  ---
 
 use strict;
@@ -781,9 +781,9 @@ sub check_input_parameters {
   
   my $required_absent;
   my $invalid_value;
-  my $screen        = $self -> request -> {'screen'};
+  my $screen        = $self -> request -> {'screen'} || die;
   my $screen_config = $self -> get_screen( $screen );
-  my $params        = $screen_config -> {variables};
+  my $params        = $screen_config -> {variables} || warn "Screen $screen: no {variables} defined";
 
   my $vars       = $self -> variables;
   my $form_input = $self -> form_input;
@@ -811,7 +811,7 @@ sub check_input_parameters {
 
   my $errors;
 
-  debug "screen has " . (scalar @$params) . " param(s) defined";
+  debug "screen has " . (scalar @$params) . " param(s) defined"; # XXXX check $params defined-ness?
 
   foreach ( @$params ) {
     my $type     = $_ -> {type};

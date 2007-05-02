@@ -25,7 +25,7 @@ package Web::App;   ### -*-perl-*-
 #  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 #
 #  ---
-#  $Id: App.pm,v 2.29 2007/03/13 07:51:18 ivan Exp $
+#  $Id: App.pm,v 2.30 2007/05/02 20:26:24 ivan Exp $
 #  ---
 
 
@@ -444,7 +444,7 @@ sub parse_config {
 
 sub get_screen {
   my $self = shift;
-  my $name = shift;
+  my $name = shift || die;
   return $self->{screenconf} {screens} {$name};
 }
 
@@ -635,10 +635,8 @@ sub username {
 
 
 sub find_right_screen {
-
   # we have a request, we need to find out to which screen it belongs, which
   # screen is responsible for processing it.  That's the task of this method.
-
   my $self   = shift;
   my $screen = shift;
   
@@ -814,13 +812,11 @@ sub handle_request {
   }
 
 
-  if ( not $screen_name ) {
-    ### default screen name
-    $screen_name = $config -> {'default-screen-name'};
-  }
+  ### default screen name
+  $screen_name ||= $config ->{'default-screen-name'};
   debug "this is request for screen: $screen_name";
-
-
+  die if not $screen_name;
+  
   my @event = ( -class  => 'request', 
                 -screen => $screen_name );
 
@@ -870,7 +866,7 @@ sub handle_request {
   $request ->{params} = $form_input;
 
 
-  if ( not defined $self -> get_screen( $screen_name ) ) {
+  if ( not defined $self ->get_screen( $screen_name ) ) {
     ###  something else can be here, something more general
 
     my $try = $self -> find_right_screen( $screen_name );
@@ -886,7 +882,6 @@ sub handle_request {
                       -descr  => '404' );
 
       $self -> response_status( "404 Not found" );
-     
       $self -> set_error( 'screen-not-found' );
       $screen_name = $config -> {'screen-not-found'};
 
@@ -896,17 +891,15 @@ sub handle_request {
   }
 
   my $responsible = $screen_name;
-
   if ( $request -> {responsibility_of} ) {
     $responsible = $request -> {responsibility_of};
   }
-
+  die if not $responsible;
   $self -> add_to_process_queue( $responsible );
   $self -> set_presenter( $responsible );
 
   
   ###  handle the request by running the processors
-
   my $handler_error;
   $self -> time_checkpoint( 'before_processors' );
   eval {
