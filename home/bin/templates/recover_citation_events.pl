@@ -4,6 +4,7 @@ use warnings;
 use Carp::Assert;
 use ACIS::Web;
 use sql_helper;
+use Web::App::Common;
 
 sub get_profile_details($);
 
@@ -33,6 +34,7 @@ sub get_profile_details($) {
   my $in = shift;
   my $where = '';
   my @params;
+
   for ($in) {
     if (m!\w\@[\w\-\.]+\.\w+! ) { # login / email
       $where = 'login=?';
@@ -51,6 +53,9 @@ sub get_profile_details($) {
 }
 
 require ACIS::Web::Admin;
+
+my $VERBOSE = $switches->{verbose};
+my $CLEAN   = $switches->{clean};
 
 foreach my $p (@$queue)  {
   my $udf   = $p -> {'userdata_file'};
@@ -84,7 +89,10 @@ foreach my $p (@$queue)  {
       if (not $cit or not $ide) { next; }
 
       my $count = 0;
-      $sql -> prepare_cached( "select cnid from citations where clid=?" );
+      my $notfound = 0;
+      my $q = "select cnid from citations where clid=?";
+      if ($switches->{deleted}) { $q = "select cnid from citations_deleted where clid=?"; }
+      $sql -> prepare_cached( $q );
       $s2 -> prepare_cached( "insert into citation_events (cnid,psid,dsid,event,reason,time) VALUES (?,?,?,?,?,?)" );
       foreach my $dsid ( keys %$ide ) {
         my $list = $ide->{$dsid};
@@ -98,7 +106,8 @@ foreach my $p (@$queue)  {
           if ($r and $r->{row} and $r->{row}{cnid} ) {
             my $cnid = $r->{row}{cnid};
             my $in=$s2->execute($cnid,$psid,$dsid,'autoadded',$reason,$date);
-            #print "$cnid,$psid,$dsid,event,$reason,$date: $in\n";
+            print "$cnid,$psid,$dsid,event,$reason,$date: $in\n"
+              if $VERBOSE;
             $count++;
 
             if ($in) {
@@ -114,12 +123,16 @@ foreach my $p (@$queue)  {
               delete $_->{trgdocid} if not defined $_->{trgdocid};
             }
           } else {
-            #print "- $srcdocsid-$checksum\n";
+            $notfound++;
+            print "- $srcdocsid-$checksum\n"
+              if $VERBOSE;
+            undef $_ if $CLEAN;
           }
         }
+        clear_undefined($list) if $CLEAN;
       }
 
-      print "$login $psid ($count)\n";
+      print "$login $psid ($count/$notfound)\n";
     } continue { $no++;
     }
     $session->object->save;
