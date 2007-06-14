@@ -97,19 +97,30 @@ sub process_record {
     if DEBUG;
 
   # process and save citations
+  my $prev_ostring = '';
+  my @moretrgdocids;
   foreach ( @$record ) {
     next if not ref $_;
-    my $ost = $_->{ostring};
-    my $md5 = Digest::MD5::md5_base64( $ost );
-    my $clid = "$srcdocsid-$md5";
-    delete $index->{$clid};
-    $cit -> {clid}     = $clid;
-    $cit -> {srcdocsid} = $srcdocsid;
-    $cit -> {ostring}  = $ost;
-    $cit -> {trgdocid} = $_->{trgdocid};
-    $cit -> {nstring}  = make_citation_nstring $ost;
-    $cit -> {cnid} = (exists $delindex->{$clid}) ? $delindex->{$clid} : undef;
-    
+    next if not $_->{ostring};
+    if ($_->{ostring} eq $prev_ostring) {
+      # assume the previously built $cit, except for the additional trgdocid:
+      push @moretrgdocids, $_->{trgdocid};
+      $cit->{moretrgdocids} = join (' ', @moretrgdocids);
+
+    } else {
+      @moretrgdocids = ();
+      $prev_ostring = 
+        my $ost = $_->{ostring};
+      my $md5 = Digest::MD5::md5_base64( $ost );
+      my $clid = "$srcdocsid-$md5";
+      delete $index->{$clid};
+      $cit -> {clid}     = $clid;
+      $cit -> {srcdocsid} = $srcdocsid;
+      $cit -> {ostring}  = $ost;
+      $cit -> {trgdocid} = $_->{trgdocid};
+      $cit -> {nstring}  = make_citation_nstring $ost;
+      $cit -> {cnid} = (exists $delindex->{$clid}) ? $delindex->{$clid} : undef;
+    }
     $table -> store_record ( $cit, $sql );
   }
 

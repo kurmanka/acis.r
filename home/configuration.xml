@@ -4,7 +4,7 @@
     That is a working ARDB core configuration file.  Produces:
     documents table, collections table, authors table.
 
-    $Id: configuration.xml,v 2.19 2007/04/18 17:00:51 ivan Exp $
+    $Id: configuration.xml,v 2.20 2007/06/14 05:46:36 ivan Exp $
 
 -->
 <configuration>
@@ -445,6 +445,8 @@
     <field name='ostring'         sql-type='TEXT NOT NULL'/>
     <field name='nstring'         sql-type='VARCHAR(255) NOT NULL'/>
     <field name='trgdocid'        sql-type='VARCHAR(255)'/>
+    <field name='moretrgdocids'   sql-type='TEXT NULL'/>
+    
 
     <create-table-sql> PRIMARY KEY (clid),
     FULLTEXT INDEX (nstring),
