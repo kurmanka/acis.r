@@ -120,6 +120,7 @@ sub process_record {
       $cit -> {trgdocid} = $_->{trgdocid};
       $cit -> {nstring}  = make_citation_nstring $ost;
       $cit -> {cnid} = (exists $delindex->{$clid}) ? $delindex->{$clid} : undef;
+      $cit -> {moretrgdocids} = '';
     }
     $table -> store_record ( $cit, $sql );
   }
