@@ -4,7 +4,7 @@
     That is a working ARDB core configuration file.  Produces:
     documents table, collections table, authors table.
 
-    $Id: configuration.xml,v 2.20 2007/06/14 05:46:36 ivan Exp $
+    $Id: configuration.xml,v 2.21 2007/06/24 13:52:04 ivan Exp $
 
 -->
 <configuration>
@@ -473,10 +473,10 @@
   </table>
 
   <table name='acis:cit_doc_similarity'>
-    <field name='cnid'   sql-type='BIGINT UNSIGNED NOT NULL'/>
+    <field name='cnid'    sql-type='BIGINT UNSIGNED NOT NULL'/>
     <field name='dsid'    sql-type='CHAR(15) NOT NULL'/>
     <field name='similar' sql-type='TINYINT NOT NULL'/>
-    <field name='time'    sql-type='DATETIME NOT NULL'/>
+    <field name='time'    sql-type='DATE NOT NULL'/>
     <create-table-sql>PRIMARY KEY (cnid,dsid), INDEX docind (dsid)</create-table-sql>
   </table>
 
