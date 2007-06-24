@@ -64,8 +64,8 @@ echo ${bdbbindir}db_checkpoint -1 -h $ridir/data && echo ${bdbbindir}db_archive 
 cd $homedir
 tar czf $arcdir/update_db.tgz RI/data && echo packed the data
 
-find $backupdir -name update_db.tgz -mtime +3 -print | xargs echo will remove these old files:
-find $backupdir -name update_db.tgz -mtime +3 -print | xargs /bin/rm -f
+find $backupdir -name update_db.tgz -mtime +1 -print | xargs echo will remove these old files:
+find $backupdir -name update_db.tgz -mtime +1 -print | xargs /bin/rm -f
 
 }
 
