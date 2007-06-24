@@ -18,8 +18,8 @@
 
         <p>This is the 1<sup>st</sup> of 6 steps of registering.</p>
 
-        <form xsl:use-attribute-sets='form' name='theform' class='important'>
-
+        <form xsl:use-attribute-sets='form' 
+              screen='new-user' name='theform' class='important'>
 
           <xsl:call-template name='fieldset'>
             <xsl:with-param name='content' xmlns='http://x'>
