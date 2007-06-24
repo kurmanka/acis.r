@@ -25,7 +25,7 @@ package Web::App;   ### -*-perl-*-
 #  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 #
 #  ---
-#  $Id: App.pm,v 2.30 2007/05/02 20:26:24 ivan Exp $
+#  $Id: App.pm,v 2.31 2007/06/24 13:48:53 ivan Exp $
 #  ---
 
 
@@ -638,7 +638,7 @@ sub find_right_screen {
   # we have a request, we need to find out to which screen it belongs, which
   # screen is responsible for processing it.  That's the task of this method.
   my $self   = shift;
-  my $screen = shift;
+  my $screen = shift || die;
   
   $screen =~ s!^/!!g; ### just to be sure
   $screen =~ s!/$!!g;
@@ -650,7 +650,7 @@ sub find_right_screen {
   my $subscreen;
   my $screen_rev = reverse $screen;
   
-  while ( $screen_rev =~ m!([^/]+)/(.+)! ) {
+  while ( $screen_rev =~ m!([^/]*)/(.+)! ) {
     $screen_rev = $2;
     my $substep = reverse $1;
     if ( $subscreen ) {
@@ -886,7 +886,7 @@ sub handle_request {
       $screen_name = $config -> {'screen-not-found'};
 
     } else {
-      $screen_name = $try;
+      $request->{screen} = $screen_name = $try;
     }
   }
 
@@ -945,7 +945,8 @@ sub handle_request {
 
   if ( $handler_error ) {
     $self->post_scriptum;
-    die $handler_error;
+    die $handler_error; # should we really die here??? YYYY
+    # may be call something like $self->critical_handler_error($error)?
   }
 
   ###  prepare and send response
