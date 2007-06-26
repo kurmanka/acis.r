@@ -25,7 +25,7 @@ package ACIS::Web::Admin;   ### -*-perl-*-
 #  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 #
 #  ---
-#  $Id: Admin.pm,v 2.23 2007/04/02 11:38:46 ivan Exp $
+#  $Id: Admin.pm,v 2.24 2007/06/26 02:41:32 ivan Exp $
 #  ---
 
 
@@ -85,7 +85,7 @@ sub check_access_real {
 
   $acis -> clear_process_queue;
   $acis -> set_presenter( 'adm/pass' );
-  return;
+  return 0;
 }
 
 
