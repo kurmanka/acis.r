@@ -16,11 +16,18 @@ use ACIS::Web;
 my $ACIS = ACIS::Web -> new();
 my $sql = $ACIS -> sql_object;
 my $mdb = $ACIS -> config( 'metadata-db-name' );
-my $func = shift;
-my $where = " AND " . get_range_condition( 'ce.time', @ARGV );
+my $func  = shift || die;
+my $where; 
+my $name; 
 my $limit = '';
 
 if ($func) { 
+  my ($monthday,$spec) = @ARGV;
+  die if not $monthday;
+  die if not $spec;
+  $where = " AND " . get_range_condition( 'ce.time', $monthday, $spec );
+  $name  = get_range_name( $monthday, $spec );
+  print "$name\n";
   eval "get_$func(\$where,\$limit);";
 }
 #get_count($where,$limit);
@@ -118,28 +125,34 @@ sub test_ranges {
     my $l = shift @ranges || die;
     my $s = shift @ranges || die;
     my $c = get_range_condition( 'time', $l, $s );
-    print "$l $s: $c\n";
+    my $name = get_range_name( $l, $s );
+    print "$l $s: $c ($name)\n";
   }
 }
                 
 
-
+sub get_range_name {
+  my ($length,$spec) = @_;
+  my ($s,$e) = get_range( $length,$spec );
+  if ($length eq 'month') { 
+    return(substr($s,0,7));
+  } elsif($length eq 'day') { 
+    return $s;
+  }
+}
 
 sub get_range_condition {
   my ($field,$length,$spec) = @_;
   my ($s,$e) = get_range( $length,$spec );
   if ($e) {
-    return "$field >= $s and $field <$e";
+    return "$field >= '$s' and $field <'$e'";
   } else {
-    return "$field >= $s";
+    return "$field >= '$s'";
   }
 }
 
 sub get_range {
   my ($length,$spec) = @_;
-  my $start;
-  my $end;
- 
   if ($length eq 'month') {
     return get_month_range( $spec );
   } else {
@@ -149,63 +162,84 @@ sub get_range {
 
 sub get_month_range {
   my $spec = shift;
+  my $startq;
+  my $endq;
+  my $start;
+  my $end;
 
   if ($spec eq 'this') {
-    return( "DATE_FORMAT(CURDATE(),'\%Y\%m01')", ); 
+    $startq = "DATE_FORMAT(CURDATE(),'\%Y-\%m-01')";
 
   } elsif ($spec eq 'last') {
-    my $prev_month;
-    $sql->prepare( "select DATE_FORMAT(DATE_SUB(CURDATE(),INTERVAL 1 MONTH),'\%Y\%m01') as d ");
-    my $r = $sql->execute();
-    if ( $r and $r->{row}{d} ) {
-      $prev_month = $r->{row}{d};
-    }
-    return( "'$prev_month'", "DATE_FORMAT(CURDATE(),'\%Y\%m01'");
+    $startq = "DATE_FORMAT(DATE_SUB(CURDATE(),INTERVAL 1 MONTH),'\%Y-\%m-01')";
+    $endq   = "DATE_FORMAT(CURDATE(),'\%Y-\%m-01')";
 
   } elsif ($spec =~ m!^(\d{4}\-\d{2})!) {
-    my $start = "$1-01";
-    my $end;
-    $sql->prepare( "select DATE_FORMAT(DATE_ADD('$start',INTERVAL 1 MONTH),'\%Y\%m01') as d ");
-    my $r = $sql->execute();
-    if ( $r and $r->{row}{d} ) {
-      #print $r->{row}{d}, "\n";
-      $end = $r->{row}{d};
-    }
-    return( "'$start'", "'$end'" );
+    $start = "$1-01";
+    $endq  = "DATE_FORMAT(DATE_ADD('$start',INTERVAL 1 MONTH),'\%Y-\%m-01')";
+
+  } else {
+    die "can't get month range: $spec";
   }
-  die "can't get month range: $spec";
+
+  if ($startq) {
+    $sql->prepare( "select $startq as start" );
+    my $r = $sql->execute();
+    if ( $r and $r->{row}{start} ) {
+      $start = $r->{row}{start};
+    }
+  }
+  if ($endq) {
+    $sql->prepare( "select $endq as end" );
+    my $r = $sql->execute();
+    if ( $r and $r->{row}{end} ) {
+      $end = $r->{row}{end};
+    }
+  }
+
+  return( $start, $end );
 }
 
 
 sub get_day_range {
   my $spec = shift;
+  my $startq;
+  my $endq;
+  my $start;
+  my $end;
 
-  if ($spec eq 'this' 
-      or $spec eq 'today') {
-    return( "DATE_FORMAT(CURDATE(),'\%Y\%m\%d')", undef); 
+  if ($spec eq 'this' or $spec eq 'today') {
+    $startq = "CURDATE()";
 
-  } elsif ($spec eq 'last' 
+  } elsif ($spec eq 'last'
            or $spec eq 'yesterday') {
-    my $y;
-#    $sql->prepare( "select DATE_FORMAT(DATE_SUB(CURDATE(),INTERVAL 1 DAY),'\%Y\%m\%d') as d ");
-    $sql->prepare( "select DATE_SUB(CURDATE(),INTERVAL 1 DAY) as d");
-    my $r = $sql->execute();
-    if ( $r and $r->{row}{d} ) {
-      $y = $r->{row}{d};
-    }
-    return( "'$y'", "CURDATE()");
+    $startq = "DATE_SUB(CURDATE(),INTERVAL 1 DAY)";
+    $endq   = "CURDATE()";
 
   } elsif ($spec =~ m!^(\d{4}\-\d{2}-\d{2})!) {
-    my $start = $1;
-    my $end;
-    $sql->prepare( "select DATE_ADD('$start',INTERVAL 1 DAY) as d ");
-    my $r = $sql->execute();
-    if ( $r and $r->{row}{d} ) {
-      $end = $r->{row}{d};
-    }
-    return( "'$start'", "'$end'" );
+    $start = $1;
+    $endq  = "DATE_ADD('$start',INTERVAL 1 DAY)";
+
+  } else {
+    die "can't get day range: $spec";
   }
-  die "can't get day range: $spec";
+
+  if ($startq) {
+    $sql->prepare( "select $startq as start" );
+    my $r = $sql->execute();
+    if ( $r and $r->{row}{start} ) {
+      $start = $r->{row}{start};
+    }
+  }
+  if ($endq) {
+    $sql->prepare( "select $endq as end" );
+    my $r = $sql->execute();
+    if ( $r and $r->{row}{end} ) {
+      $end = $r->{row}{end};
+    }
+  }
+
+  return( $start, $end );
 }
 
 
