@@ -37,7 +37,48 @@ sub get_count {
   my ($where,$limit) = @_;
   my $q =
   qq!select count(*) as c from citation_events as ce
-      join citations c using (cnid)
+        join citations c using (cnid)
+      where (ce.event='added' or
+             ce.event='unidentified' or 
+             (ce.event='autoadded' and ce.reason='similar')) 
+            $where
+      order by time asc
+      $limit!;
+
+  $sql -> prepare( $q );
+  my $r = $sql -> execute;
+
+  if ( $r and $r->{row} ) {
+    print $r->{row}->{c}, "\n";
+  }
+}
+
+sub get_count0 {
+  my ($where,$limit) = @_;
+  my $q =
+  qq!select count(*) as c from citation_events as ce
+      where (ce.event='added' or
+             ce.event='unidentified' or 
+             (ce.event='autoadded' and ce.reason='similar')) 
+            $where
+      order by time asc
+      $limit!;
+
+  $sql -> prepare( $q );
+  my $r = $sql -> execute;
+
+  if ( $r and $r->{row} ) {
+    print $r->{row}->{c}, "\n";
+  }
+}
+
+sub get_count2 {
+  my ($where,$limit) = @_;
+  my $q =
+  qq!select count(*) as c from citation_events as ce
+        join citations c using (cnid)
+        join ${mdb}.resources as src on (src.sid=c.srcdocsid)
+        join ${mdb}.resources as trg on (trg.sid=ce.dsid)
       where (ce.event='added' or
              ce.event='unidentified' or 
              (ce.event='autoadded' and ce.reason='similar')) 
@@ -83,7 +124,7 @@ sub get_data {
   my $q =
   qq!  select src.id as srcdocid,RIGHT(c.clid,22) as md5,trg.id as trgdocid,ce.event 
      from citation_events as ce
-        left join citations c using (cnid)
+        join citations c using (cnid)
         join ${mdb}.resources as src on (src.sid=c.srcdocsid)
         join ${mdb}.resources as trg on (trg.sid=ce.dsid)
       where (ce.event='added' or
@@ -100,7 +141,7 @@ sub get_data {
     while( $r->{row} ) {
       my $d = $r->{row};
       my $srcdocid = $d->{srcdocid};
-      my $md5      = $d->{md5};
+      my $md5      = $d->{md5} || '';
       my $trgdocid = $d->{trgdocid};
       my $event    = $d->{event};
       print $srcdocid, "\t", $md5, "\t", $trgdocid, "\t", $event, "\n";
