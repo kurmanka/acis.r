@@ -58,6 +58,7 @@ sub new_citation($;$) {
 
   $ostring =~ s/^\s+//g;
   $ostring =~ s/\s+$//g;
+  $ostring =~ s/\s+/ /g;
   
   my $c = { ostring => $ostring };
   if ( $trgdocid ) {
