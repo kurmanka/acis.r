@@ -173,44 +173,40 @@ conf parameter:
 - full-text-urls-recognition -- on or off
 
 
+### data storage
+
+The URLs are stored in the ft_urls table.  The user decisions (choices)
+are stored in the ft\_urls\_choices table.  (See below.)  <b>They are
+not stored in userdata!</b> (Contrary to where every other piece of
+data given by users is stored.)
+
 
 
 ### data tables
 
-table: **ft_urls**
+table **ft_urls**:
 
-- dsid char(14) not null
-- url char(255) not null -- no
-- fullurl text -- BINARY? ie. BLOB?
-- checksum char(22)
-- nature ENUM(\'authoritative\',\'automatic\')
+- dsid char(15) not null
+- url blob not null 
+- checksum char(16) binary not null
+- nature ENUM(\'authoritative\',\'automatic\') not null
+- source varchar(255) not null
 
-<co>PRIMARY KEY( dsid, checksum )</co>
+<co>PRIMARY KEY( dsid, checksum ), index url\_i(url(30)), index
+source\_i(source(50))</co>
 
 
-table: **ft_urls\_choices**
+table **ft_urls\_choices**:
 
-- dsid char(14) not null
-- url char(255) not null
-- as an alternative: checksum CHAR(22) not null
-- psid char(14) not null
-- choice char(2) NOT NULL. Value first char: d|y|r|n (corresponding
-  menu items: 2|4|3|1).  Value second char: y|c|n (1|2|3)
+- dsid char(15) not null
+- checksum char(16) binary not null
+- psid char(15) not null
+- choice char(2) not null -- first char: d|y|r|n (corresponding menu items:
+   2|4|3|1); second char: y|c|n (1|2|3) 
 - time datetime not null
 
+<co>primary key prim(dsid, checksum, psid), index t\_i(time), index psid\_i(psid)</co>
 
-### data structures
-
-userdata record -> {fturls} is a list of (document,url,choice1,choice2,date?)
-packages?
-
-do we really need to store it in the userdata?  We could, but this
-becomes a pretty expensive storage, does it not?  But, on the other
-hand, that's what the userdata is for.  That is its primary purpose: to
-hold what the user has told us.  Hmm.  
-
-We could, of course, try solving it by using another storage method,
-e.g. Storable would pack things in a much more compact way.
 
 
 ### implementation components
@@ -230,6 +226,8 @@ old ones, and only leave the most recent one.
 
 (it could also move the old ones to a separate archive table,
 optionally.)
+
+
 
 
 <h2 id='d2d'>Document to document links</h2>
@@ -260,16 +258,6 @@ name; some link types have no reverse.
 
 $HOME/doclinks.conf.xml.eg is an example configuration file.  Rename to 
 $HOME/doclinks.conf.xml and edit to your liking.
-
-
-
-### data storage
-
-The URLs are stored in the ft_urls table.  The user decisions (choices)
-are stored in the ft_urls_choices table.  <b>They are not stored in
-userdata!</b> (Contrary to where every other piece of data given by
-users is stored.)
-
 
 
 
