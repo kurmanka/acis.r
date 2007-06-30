@@ -314,7 +314,7 @@ sub compare_citation_to_documents {
       $recalc = 1;
 
     } else {
-      debug "nothing";
+      #debug "nothing";
     }
   }
 

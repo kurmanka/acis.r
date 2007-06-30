@@ -43,53 +43,43 @@ sub profile_check_and_cleanup () {
       next;
     }
 
-    my $a_cit = $identified->{$_}->[0];
-    my $q; 
     # XXX this is a backwards-compatible upgrade code; should be
     # removed after a while
-    # XXX this assumes that all citations here have the same
-    # identification in them and thus it reuses the prepared SQL
-    # statement
-    $q = 'select cnid from citations where cnid=?';
-    if ( $a_cit->{srcdocsid} and $a_cit->{checksum} ) {
-      $q = 'select cnid from citations where clid=?';
-    } elsif ( $a_cit->{clid} ) {
-      $q = 'select cnid from citations where clid=?';
-    } else {
-      #die "how do I upgrade this citations: " . Dumper( $a_cit ) . "?";
-    }
-    $sql -> prepare_cached( $q );
+    my $s2 = $sql->other;
+    $sql -> prepare_cached( 'select cnid from citations where cnid=?' );
+    $s2  -> prepare( 'select cnid from citations where clid=?' );
 
     my $cits = $identified->{$_};
     foreach (@$cits) {
       my $id;
+      my $r;
+
       # XXX this is a backwards-compatible upgrade code; should be
       # removed after a while
       if ( $_->{srcdocsid} and $_->{checksum} ) {
         $id = $_->{srcdocsid}. '-'. $_->{checksum};
-      } elsif ( $_ ->{citid} or $_->{cnid} ) {
-        $id = $_->{citid} || $_->{cnid};
-      } elsif ( $_->{clid} ) {
-        $id = $_->{clid};
-      } 
-      if (not $id) {
-        # undef $_;
+        $r = $s2->execute( $id );
+
+      } elsif ( $_->{cnid} ) {
+        $id = $_->{cnid};
+        $r = $sql->execute( $id );
+
+      } else {
+        undef $_;
         debug "no citation id";
         next;
       }
-      my $r = $sql->execute( $id );
   
       if ( $r and $r->{row} and $r->{row}{cnid} ) {
         # ok; update cnid
         $_->{cnid} = $r->{row}{cnid};
       } elsif ( $r )  {
-        #undef $_;
-        #debug "delete citation $id (it is gone)";
+        undef $_;
         debug "citation $id is not found anymore";
-        $_->{notfound} = localtime;
+        #$_->{notfound} = scalar localtime;
         next;
       } else {
-        complain "can't check a citation: no result from execute() (q:$q)";
+        complain "can't check a citation: no result from execute()";
         last;
       }
 
@@ -147,35 +137,35 @@ sub update_refused {
   my $research_accepted = $record ->{contributions}{accepted} || [];
   my $refused = $citations ->{refused} || [];
 
+  my $s2 = $sql->other;
+  $sql -> prepare_cached( 'select cnid from citations where cnid=?' );
+  $s2  -> prepare( 'select cnid from citations where clid=?' );
+
   foreach (@$refused) {
     # XXX this is a backwards-compatible citation upgrade code; should
     # be simplified after it is ran for every existing profile; then
     # only cnid should be expected and used.
+    my $r;
     my $id;
-    my $q;
     if ( $_->{srcdocsid} and $_->{checksum} ) {
       $id = $_->{srcdocsid}. '-'. $_->{checksum};
-      $q = 'select cnid from citations where clid=?';
-    } elsif ( $_ ->{citid} or $_->{cnid} ) {
-      $id = $_->{citid} || $_->{cnid};
-      $q = 'select cnid from citations where cnid=?';
-    } elsif ( $_->{clid} ) {
-      $id = $_->{clid};
-      $q = 'select cnid from citations where clid=?';
+      $r = $s2->execute($id);
+    } elsif ( $_->{cnid} ) {
+      $r = $sql->execute($id=$_->{cnid});
+    } else {
+      undef $_;
+      next;
     } 
-    
-    $sql -> prepare_cached( $q );
-    my $r = $sql->execute( $id );        
-    
+
     if ( $r and $r->{row} and $r->{row}{cnid} ) {
       # ok; update cnid
       $_->{cnid} = $r->{row}{cnid};
     } elsif ( $r )  {
       undef $_;
-      debug "delete citation $id (it is gone)";
+      debug "delete refused citation $id (it is gone)";
       next;
     } else {
-      die "can't check a citation: no result from execute() (q:$q)";
+      die "can't check a citation: no result from execute()";
     }
     
     if ( not $_->{srcdoctitle} or not $_->{srcdocid} ) {
