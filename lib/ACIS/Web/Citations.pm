@@ -45,7 +45,7 @@ sub cleanup {
 sub get_doc_by_sid ($) {
   my $dsid = $_[0] || return undef;
   foreach ( @{ $research_accepted } ) {
-    if ( $_->{sid} eq $dsid ) { 
+    if ( $_->{sid} and $_->{sid} eq $dsid ) {
       return $_;
     }    
   }
@@ -92,7 +92,7 @@ sub prepare() {
 
 sub prepare_citations_list($) {
   # prepare new citations list
-  my $srclist = shift;
+  my $srclist = shift || []; 
   my $list = []; 
   my $index = {};
   my $minsim = min_useful_similarity;
@@ -349,9 +349,9 @@ sub prepare_doclist {
 
   my @tmp;
   foreach ( @$research_accepted ) {
-    my $d   = $_;
-    my $dsid = $_->{sid};
-    next if $ind->{$dsid};
+    my $d    = $_;
+    my $dsid = $_->{sid} || next;  
+    next if $ind->{$dsid};  
 
     my $id  = $citations->{identified}{$dsid} || [];
     my $old = prepare_citations_list $mat->{old}{$dsid};
