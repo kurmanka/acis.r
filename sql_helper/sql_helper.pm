@@ -1,5 +1,5 @@
 package sql_helper;
-# $Id: sql_helper.pm,v 2.6 2007/04/03 08:27:13 ivan Exp $
+# $Id: sql_helper.pm,v 2.7 2007/06/30 00:33:37 ivan Exp $
 
 use DBI;
 # ? just for early detection of DBD::mysql absence
@@ -158,9 +158,10 @@ sub other {
   my $id  = $self->{id};
   my $new = { %$self, id => "${id}.copy" };
   bless $new, ref($self);
-  undef $self->{sth};
-  undef $self->{query};
-
+#  undef $new->{dbh};
+  undef $new->{sth};
+  undef $new->{query};
+  $new->{dbh} = $new->reconnect;  
   return $new;
 }
 
@@ -287,11 +288,11 @@ sub reconnect {
     $self->log( "too many reconnection attempts" );
     die;
   }
-
   my $dbh = $self -> real_connect;
 
   if ( $dbh ) {
     $self->log( "reconnected" );
+    $self->{dbh} = $dbh;
   }
   $self->{reconnected} = ++$counter;
   
