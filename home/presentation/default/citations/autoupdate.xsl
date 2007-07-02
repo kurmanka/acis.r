@@ -28,12 +28,15 @@
 
 <form screen='@citations/autoupdate'
       class='important' name='f'> 
-
-  <p>We can do automatic additions to your citation profile
+ 
+<phrase ref='citations-autoupdate-intro'>
+ <p>We can do automatic additions to your citation profile
   in certain cases (explained below).  An email
   notification will be sent to you every time we change
   your profile automatically.  Here you may disable or
   enable automatic changes to your profile.</p>
+</phrase>
+
 
 <h2>Preferences</h2>
 
@@ -65,13 +68,15 @@
 
   <p><input type='submit' class='important' value=' SAVE '/></p>
 
+
+  <phrase ref='citations-autoupdate-notification-mails-note'>
   <p>The notification messages will be sent from address:</p>
 
   <p class='pad'><tt><xsl:value-of select='$system-email'/></tt></p>
 
   <p>Please add this address to your spam filter's whitelist
   to make sure it does not stop these messages.</p>
- 
+  </phrase>
 
 </form>       
 
