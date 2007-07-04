@@ -307,7 +307,7 @@ sub compare_citation_to_documents {
         $suggestion->{time} = today();
       }
 
-    } elsif ( $v ) {
+    } elsif ( $v >= min_useful_similarity ) {
       debug "add the suggestion";
       my $new = not get_cit_old_status( $psid, $dsid, $cit->{cnid} );
       $self->_add_sugs( [{ %$cit, dsid=> $dsid, reason=> 'similar', similar=> $v, new=>$new, time=>today() }] );
