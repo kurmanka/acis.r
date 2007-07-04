@@ -25,7 +25,7 @@ package ACIS::Web::Contributions;  ### -*-perl-*-
 #  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 #
 #  ---
-#  $Id: Contributions.pm,v 2.41 2007/04/18 17:00:51 ivan Exp $
+#  $Id: Contributions.pm,v 2.42 2007/07/04 15:50:52 ivan Exp $
 #  ---
 
 use strict;
@@ -1243,7 +1243,7 @@ sub reload_accepted_contributions {
     my $role = $_ ->{role};
     
     my $reload = reload_contribution( $app, $id, $metadata_db );
-    if ( $reload ) {
+    if ( $reload and $reload->{sid} ) {
       $_ = $reload;
       $_ ->{role} = $role;
       delete $_->{frozen};
