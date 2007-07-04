@@ -1,5 +1,7 @@
 #!/usr/bin/perl
 
+# version 2
+
 use strict;
 use warnings;
 use citec;
@@ -20,11 +22,13 @@ open INPUT, "<$input"
   or die "can't open $input";
 
 my $findref_st = $dbh->prepare( "select id from REFERENCIA where docid=? and md5=?" ) or die;
+my $updst = $dbh->prepare( "update CITA set ref_cita=? where cita=? and escitado=?" ) or die;
 my $addst = $dbh->prepare( "replace into CITA (cita,escitado,ref_cita,fecha) values (?,?,?,NOW())" ) or die;
 my $delst = $dbh->prepare( "delete from CITA where cita=? and escitado=?" ) or die;
 
 my $count_all = 0;
 my $count_added = 0;
+my $count_updated = 0;
 my $count_ref_not_found = 0;
 my $count_deleted = 0;
 
@@ -49,9 +53,17 @@ while( <INPUT> ) {
   $refid ||= '';
   if ( $event eq 'added' 
        or $event eq 'autoadded' ) {
-#    print "add $refid -> $trgdocid\n";
-    $addst->execute( $srcdocid, $trgdocid, $refid );
-    $count_added++;
+    #print "add $refid -> $trgdocid\n";
+    my $update = $updst-> execute( $refid, $srcdocid, $trgdocid ) or die;
+    # execute() returns number of rows affected
+    if ($update eq '0E0') {
+      # update didn't work because there is no such record
+      # so we add it
+      $addst->execute( $srcdocid, $trgdocid, $refid );
+      $count_added++;
+    } else {
+      $count_updated++;
+    }
 
   } elsif ( $event eq 'unidentified' ) {
 #    print "drop $refid -> $trgdocid\n";
@@ -60,5 +72,5 @@ while( <INPUT> ) {
   }
 }
 
-print "all: $count_all\t added: $count_added\t removed: $count_deleted\t ref not found: $count_ref_not_found\n";
+print "all: $count_all\tadded: $count_added\tupdated: $count_updated\tremoved: $count_deleted\tref not found: $count_ref_not_found\n";
 
