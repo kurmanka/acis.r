@@ -321,10 +321,12 @@ not run.</dd>
   is 0, ie. a name expression should not be present among name
   variations.  Set is to -1 to disable this limit.</dd>
 
-<dt><C>fuzzy-name-search-via-web</C></dt><dd>should fuzzy name searches be run when
-  research search is initiated by the online user?  (When a search is
-  APU-initiated, this is a question of
-  <c>fuzzy-name-search</c>.)  Default: false.</dd>
+<dt><C>fuzzy-name-search-via-web</C></dt><dd>Should fuzzy
+  name searches be run when research search is initiated by
+  the online user?  (When a search is APU-initiated, this is
+  a question of <c>fuzzy-name-search</c>.)  Default: false.
+  (This option requires enabled <c>fuzzy-name-search</c> and
+  <c>research-additional-searches</c>.)</dd>
 
 </dl>
 
