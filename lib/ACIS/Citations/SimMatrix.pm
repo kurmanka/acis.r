@@ -16,9 +16,7 @@ use vars qw( @EXPORT );
 
 use Web::App::Common;
 use ACIS::Web::SysProfile;
-use ACIS::Citations::Suggestions qw( get_cit_doc_similarity 
-                 store_cit_doc_similarity
-                 clear_cit_doc_similarity
+use ACIS::Citations::Suggestions qw(
                  get_cit_sug
                  store_cit_sug
                  clear_cit_sug
@@ -210,9 +208,7 @@ sub testme {
 
 use strict;
 use warnings;
-use ACIS::Citations::Suggestions qw( get_cit_doc_similarity 
-                                     store_cit_doc_similarity   
-                                     get_cit_sug
+use ACIS::Citations::Suggestions qw( get_cit_sug
                                      store_cit_sug
                                      add_cit_old_sug
                                      clear_cit_old_sug          

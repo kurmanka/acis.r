@@ -4,7 +4,7 @@ use strict;
 use Data::Dumper; # for debuggings
 
 use Web::App::Common;
-use ACIS::Citations::Suggestions qw( get_cit_doc_similarity store_cit_doc_similarity );
+use ACIS::Citations::Suggestions qw( get_cit_doc_similarity store_cit_doc_similarity clear_cit_doc_similarity );
 use ACIS::Citations::Utils;
 
 use base qw( Exporter );
@@ -50,6 +50,9 @@ sub compare_citation_to_docs {
   my $func = $acis->config( 'citation-document-similarity-func' ) 
     || 'ACIS::Citations::Utils::cit_document_similarity';
 
+  my $min_useful_sim = min_useful_similarity;
+  my $store_useless  = $acis->config('citations-do-not-store-useless-similarity') ? 0 : 1;
+
   debug "will use similarity function: $func";
 
   my $cnid = $cit->{cnid} || die "citation must have numeric non-zero cnid";
@@ -63,6 +66,7 @@ sub compare_citation_to_docs {
          and ACIS::Citations::Utils::time_to_recompare_cit_doc( $t ) ) {
       debug "similarity from db: $similarity, but it is outdated; recompare";
       undef $similarity;
+      clear_cit_doc_similarity( $cnid, $dsid );      
     }
 
     if ( defined $similarity and $t ) {
@@ -74,7 +78,10 @@ sub compare_citation_to_docs {
       no strict 'refs';
       $similarity = sprintf( '%u', &{$func}( $cit, $doc ) * 100 );
       debug "similarity computed: $similarity";
-      store_cit_doc_similarity( $cnid, $dsid, $similarity );
+      if ($similarity >= $min_useful_sim 
+          or $store_useless ) {
+        store_cit_doc_similarity( $cnid, $dsid, $similarity );
+      }
     }
     $sims->{$dsid} = $similarity;
   }

@@ -479,7 +479,22 @@ through a large list of citations easier for the user.</p>
 <dd><p>Boolean.  If true, enables one additional online
 search.  When user first enters into citations profile (in a
 session), immediately execute a search for citations by his
-document ids.</p></dd>
+document ids.  Default: false.</p></dd>
+
+
+<dt><C>citations-do-not-store-useless-similarity</C></dt>
+
+<dd><p>Boolean.  When ACIS runs a citation-document
+comparison, it usually (by default) stores its value in the
+database.  (In the cit_doc_similarity table.)  Later these
+comparison results may be reused.  If this parameter is set to a
+true value, then only those comparisons which resulted in a
+usefully-high similarity value would have their result stored
+in the database.</p>
+
+<p>This is a way to trade performance for database size
+(i.e. disk space).  Default: false.</p></dd>
+
 
 </dl>
 
