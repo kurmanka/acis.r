@@ -504,7 +504,7 @@ sub check_consistency {
   close $f2;
 
   debug "matrices are different; see " . $f1->filename . " and " . $f2->filename;
-  Carp::cluck "matrices are different; see " . $f1->filename . " and " . $f2->filename;
+  Carp::cluck scalar(localtime) . ": matrices are different; see " . $f1->filename . " and " . $f2->filename;
  
 
   # the tests:

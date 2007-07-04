@@ -318,11 +318,11 @@ sub load_similarity_suggestions ($$) {
     sql_select_sug( "sim.*,old.dsid as oldflag", 
                     "cit_doc_similarity as sim",
                     "LEFT JOIN cit_old_sug AS old ON (old.psid=? and old.cnid=sim.cnid and old.dsid=sim.dsid)",
-                    "sim.similar>0 and ($cond)" )
+                    "sim.similar>? and ($cond)" )
   );
 
   my $sth = $sql->{last_sth};
-  $sth->execute($psid);
+  $sth->execute($psid,min_useful_similarity);
   my $res = $sth->fetchall_arrayref( {} );
   $sth -> finish;
 
