@@ -185,6 +185,7 @@ home/presentation/default/global.xsl
 home/presentation/default/indent.xsl
 home/presentation/default/index.xsl
 home/presentation/default/messages.xml
+home/presentation/default/misc/application-error.xsl
 home/presentation/default/misc/forgotten-password.xsl
 home/presentation/default/misc/local-document.xsl
 home/presentation/default/misc/login-pass.xsl
