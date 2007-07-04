@@ -25,7 +25,7 @@ package Web::App;   ### -*-perl-*-
 #  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 #
 #  ---
-#  $Id: App.pm,v 2.31 2007/06/24 13:48:53 ivan Exp $
+#  $Id: App.pm,v 2.32 2007/07/04 08:13:26 ivan Exp $
 #  ---
 
 
@@ -920,7 +920,7 @@ sub handle_request {
   };
 
   if ( $@ ) {
-    debug "processors finished with an error: $@";
+    debug "processors aborted with an error: $@";
     $handler_error = $@;
   } else {
     debug "processors finished";
@@ -944,9 +944,7 @@ sub handle_request {
   }
 
   if ( $handler_error ) {
-    $self->post_scriptum;
-    die $handler_error; # should we really die here??? YYYY
-    # may be call something like $self->critical_handler_error($error)?
+    $self->critical_handler_error( $handler_error );
   }
 
   ###  prepare and send response
@@ -988,6 +986,14 @@ sub handle_request {
 }
 ####   e n d    o f    h a n d l e   r e q u e s t   s u b 
 
+
+sub critical_handler_error {
+  my ($self,$message) = @_;
+  $self -> set_presenter( 'application-error' );
+  $self -> variables ->{handlererror} = $message;
+  $self -> errlog( "application error: $message" );
+  warn "application error:\n$message\ndebug log:\n$Web::App::Common::LOGCONTENTS------\n";
+}
 
 
 sub run_presenter {
@@ -1255,7 +1261,7 @@ sub set_presenter {
   }
 
   assert( $self );
-  assert( $self-> get_screen( $screen ) );
+  $self-> get_screen( $screen ) or die "no such screen: $screen";
 
   $self ->{presenter} =
     $self -> get_screen( $screen ) -> {presentation};

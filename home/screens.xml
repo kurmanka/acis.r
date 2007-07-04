@@ -946,4 +946,9 @@
   </screen>
 
 
+  <screen id='application-error'>
+    <presentation type='xslt' filename='misc/application-error.xsl'/>
+  </screen>
+
+
 </screens>
