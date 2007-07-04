@@ -38,11 +38,13 @@ use vars qw( @EXPORT_OK );
 my $acis;
 my $sql;
 my $select_citations;
+my $cit_by_docid_sql;
 
 sub prepare() {
   $acis = $ACIS::Web::ACIS;
   $sql  = $acis -> sql_object;
   $select_citations = select_citations_sql( );
+  $cit_by_docid_sql = "$select_citations where trgdocid=?";
 }
 
 
@@ -66,10 +68,9 @@ sub decode_citations_search_results {
 sub search_for_document($) {
   my $docid = shift || die;
   if ( not $sql ) { prepare; }
-
   debug "search_for_documents: $docid";
 
-  $sql -> prepare_cached( "$select_citations where trgdocid=?" );
+  $sql -> prepare_cached( $cit_by_docid_sql );
   my $r = $sql -> execute( $docid );
   my $cl = decode_citations_search_results( $r );
   debug "search_for_documents: found ", scalar @$cl, " items";
@@ -178,6 +179,10 @@ sub personal_search_by_documents {
 
   my $meta = $rc->{meta} ||= {};
   my $autoadd = (defined $meta->{'auto-identified-auto-add'} ) ? $meta->{'auto-identified-auto-add'} : 1;
+  if ( not $autoadd ) {
+    return ();
+  }
+
   my @added   = ();
 
   # build identified index and refused index

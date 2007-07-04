@@ -76,6 +76,11 @@ sub prepare() {
   if (not $session -> {$id} {'citations-checked-and-cleaned'} ) {
     require ACIS::Citations::Profile;
     ACIS::Citations::Profile::profile_check_and_cleanup();
+
+    if ($acis->config('citations-by-document-search-at-profile-load')) {
+      require ACIS::Citations::Search;
+      ACIS::Citations::Search::personal_search_by_documents( $record );
+    }
     $session -> {$id} {'citations-checked-and-cleaned'} = 1;
   }
 

@@ -129,7 +129,7 @@ sub update_refused {
   my $record = $acis -> session->current_record;
   if ( not $record->{citations} ) { return undef; }
       
-  debug "citations profile_check_and_cleanup()";
+  debug "citations update_refused()";
 
   my $psid   = $record->{sid} || die;
   my $sql    = $acis -> sql_object;
