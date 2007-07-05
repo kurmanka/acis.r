@@ -94,7 +94,7 @@ On the Document-to-document links screen users can review and delete
 the links they have previously created and they can create new ones.
 
 
-### Fulltext URLs
+<h3 id='fturls'>Fulltext URLs</h3>
 
 Another advanced and optional feature of RP.  If you have full-text
 links for your research works (articles, papers, etc.) but the data is
@@ -170,18 +170,47 @@ has a simple structure; a self-explanatory example file is supplied in
 <f>doclinks.conf.xml.eg</f>.
 
 
-### Full-text URLs 
+<h3 id='fturls-conf'>Full-text URLs</h3>
 
 The whole feature won't be there unless you have enabled it with a
 <c>full-text-urls-recognition</c> parameter.
 
-If you have full-text URLs data in AMF format, separate from the
-document data, configure it as a special metadata collection in
-main.conf.  Use <co>FullTextUrlsAMF</co> as its type.
+The input data format is AMF-based.  The authoritative URLs:
 
-The data format is:
+    <text id=".."> 
+     <file>
+      <url>url</url>
+     </file>
+    </text>
 
-XXXXX
+Automatically found URLs:
+
+    <text id=".."> 
+     <hasversion>
+      <text>
+       <file>
+        <url>url</url>
+       </file>
+      </text>
+     </hasversion>
+    </text>
+
+If you have full-text URLs data separate from the document data,
+configure it as a special metadata collection in main.conf.  Use
+<co>FullTextUrlsAMF</co> as its type.  E.g. this collection is named
+'URLs':
+
+    metadata-collections="Papers URLs ..."
+    metadata-Papers-home=/path/to/Papers
+    metadata-Papers-type=AMF
+    metadata-URLs-home=/path/to/URLs/data
+    metadata-URLs-type=FullTextUrlsAMF
+    ...
+
+Before this data becomes available to users, it has to be processed
+with the update daemon.  You have to explicitly request an update (see
+<c>bin/updareq</c>).
+
 
 ### Fuzzy search
 
@@ -204,6 +233,6 @@ XXXXX
 
 
 
-<id>$Id: researchprofile.text,v 2.5 2007/05/02 20:28:24 ivan Exp $</id>
+<id>$Id: researchprofile.text,v 2.6 2007/07/05 12:35:48 ivan Exp $</id>
 
 

@@ -222,7 +222,11 @@ Optional.</dd>
 <dt><C>metadata-<i>X</i>-type</C></dt>
 
 <dd>Type of data collection <i>X</i>.  Useful possible
-values: "<co>RePEcRec</co>" or "<co>AMF</co>".</dd>
+values: "<co>RePEcRec</co>", "<co>AMF</co>",
+"<co>CitationsAMF</co>" (for <a
+href='citations.html'>citations</a> data) and
+"<co>FullTextUrlsAMF</co>" (for <a
+ref='fturls'>full-text URLs</a> data).</dd>
 
 
 <dt><C>metadata-<i>X</i>-home</C></dt>
