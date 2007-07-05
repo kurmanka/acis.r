@@ -483,7 +483,7 @@ through a large list of citations easier for the user.</p>
 <dt><C>citations-by-document-search-at-profile-load</C></dt>
 
 <dd><p>Boolean.  If true, enables one additional online
-search.  When user first enters into citations profile (in a
+search.  When user first enters into citation profile (in a
 session), immediately execute a search for citations by his
 document ids.  Default: false.</p></dd>
 

@@ -46,10 +46,6 @@ doc/overview.html
 doc/overview.text
 doc/researchprofile.html
 doc/researchprofile.text
-doc/roman-todo.html
-doc/roman-todo.text
-doc/stage3-todo.html
-doc/stage3-todo.text
 doc/stageD.html
 doc/stageD.text
 doc/style.css
@@ -93,9 +89,7 @@ home/bin/templates/clean-up.pl
 home/bin/templates/create_tables.pl
 home/bin/templates/dump_email_handle_table.pl
 home/bin/templates/events_archiving.pl
-home/bin/templates/export_authorcites.pl
 home/bin/templates/export_cit_events.pl
-home/bin/templates/export_citations_events.pl
 home/bin/templates/export_name_variations.pl
 home/bin/templates/fuzzy_search_table.pl
 home/bin/templates/mvrec.pl
