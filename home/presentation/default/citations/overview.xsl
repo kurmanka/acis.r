@@ -14,7 +14,7 @@
   <xsl:variable name='refused' select='number($response-data/refused-number)'/>
 
   <xsl:template name='overview'>
-    <h1>Citations Profile</h1>
+    <h1>Citation Profile</h1>
 
     <!-- intro -->
     <p><big>Here you deal with citations to your works by
@@ -115,7 +115,7 @@
 
   <xsl:template match='/'>
     <xsl:call-template name='cit-page'>
-      <xsl:with-param name='title'>citations profile</xsl:with-param>
+      <xsl:with-param name='title'>citation profile</xsl:with-param>
       <xsl:with-param name='content'>
         <xsl:call-template name='overview'/>
       </xsl:with-param>

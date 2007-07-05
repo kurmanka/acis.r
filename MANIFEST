@@ -209,7 +209,6 @@ home/presentation/default/person/contact.xsl
 home/presentation/default/person/generic.xsl
 home/presentation/default/person/interests.xsl
 home/presentation/default/person/name.xsl
-home/presentation/default/person/page-wo-citations.xsl
 home/presentation/default/person/page.xsl
 home/presentation/default/person/photo.xsl
 home/presentation/default/person/profile-overview.xsl

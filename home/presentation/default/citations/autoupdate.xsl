@@ -19,7 +19,7 @@
 
       <xsl:with-param name='content'>
 
-<h1>Automatic citations profile update</h1>
+<h1>Automatic citation profile update</h1>
 
     <xsl:call-template name='show-status'/>
 

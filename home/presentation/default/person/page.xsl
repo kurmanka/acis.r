@@ -62,7 +62,7 @@
     <xsl:text> </xsl:text>
     <hl screen='citations'>
       <xsl:text>&#160;</xsl:text>
-      <a ref='@citations' title='citations profile' >citations</a>
+      <a ref='@citations' title='citation profile' >citations</a>
       <xsl:text>&#160;</xsl:text>
     </hl>
     <!--[end-if]-->

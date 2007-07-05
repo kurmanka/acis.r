@@ -92,7 +92,7 @@
       <xsl:with-param name='title'>
         <xsl:choose>
           <xsl:when test='not(string-length( $title ))'>
-            <xsl:text>citations profile</xsl:text>
+            <xsl:text>citation profile</xsl:text>
           </xsl:when>
           <xsl:otherwise>
             <xsl:value-of select='$title'/>
