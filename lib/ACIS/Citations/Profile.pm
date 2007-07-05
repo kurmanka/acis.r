@@ -34,6 +34,8 @@ sub profile_check_and_cleanup () {
     }
   }
 
+  $sql -> prepare_cached( 'select cnid from citations where cnid=?' );
+
   # make sure the document is still in research accepted and the citation is still in the citations table
   foreach ( keys %$identified ) {
     if ( not $dsids->{$_} ) {
@@ -43,36 +45,19 @@ sub profile_check_and_cleanup () {
       next;
     }
 
-    # XXX this is a backwards-compatible upgrade code; should be
-    # removed after a while
-    my $s2 = $sql->other;
-    $sql -> prepare_cached( 'select cnid from citations where cnid=?' );
-    $s2  -> prepare( 'select cnid from citations where clid=?' );
-
     my $cits = $identified->{$_};
     foreach (@$cits) {
-      my $id;
-      my $r;
-
-      # XXX this is a backwards-compatible upgrade code; should be
-      # removed after a while
-      if ( $_->{srcdocsid} and $_->{checksum} ) {
-        $id = $_->{srcdocsid}. '-'. $_->{checksum};
-        $r = $s2->execute( $id );
-
-      } elsif ( $_->{cnid} ) {
-        $id = $_->{cnid};
-        $r = $sql->execute( $id );
-
-      } else {
+      if ( not $_->{cnid} ) {
         undef $_;
-        debug "no citation id";
+        debug "citation with no id; delete";
         next;
       }
+      
+      my $id = $_->{cnid};
+      my $r = $sql->execute( $id );
   
       if ( $r and $r->{row} and $r->{row}{cnid} ) {
-        # ok; update cnid
-        $_->{cnid} = $r->{row}{cnid};
+        # ok 
       } elsif ( $r )  {
         undef $_;
         debug "citation $id is not found anymore";
@@ -137,29 +122,19 @@ sub update_refused {
   my $research_accepted = $record ->{contributions}{accepted} || [];
   my $refused = $citations ->{refused} || [];
 
-  my $s2 = $sql->other;
   $sql -> prepare_cached( 'select cnid from citations where cnid=?' );
-  $s2  -> prepare( 'select cnid from citations where clid=?' );
 
   foreach (@$refused) {
-    # XXX this is a backwards-compatible citation upgrade code; should
-    # be simplified after it is ran for every existing profile; then
-    # only cnid should be expected and used.
-    my $r;
-    my $id;
-    if ( $_->{srcdocsid} and $_->{checksum} ) {
-      $id = $_->{srcdocsid}. '-'. $_->{checksum};
-      $r = $s2->execute($id);
-    } elsif ( $_->{cnid} ) {
-      $r = $sql->execute($id=$_->{cnid});
-    } else {
+    if (not $_->{cnid}) {
       undef $_;
       next;
-    } 
+    }
+
+    my $id = $_->{cnid};
+    my $r = $sql->execute($id);
 
     if ( $r and $r->{row} and $r->{row}{cnid} ) {
-      # ok; update cnid
-      $_->{cnid} = $r->{row}{cnid};
+      # ok
     } elsif ( $r )  {
       undef $_;
       debug "delete refused citation $id (it is gone)";
@@ -168,14 +143,6 @@ sub update_refused {
       die "can't check a citation: no result from execute()";
     }
     
-    if ( not $_->{srcdoctitle} or not $_->{srcdocid} ) {
-      if ( not load_citation_details( $_ ) ) {
-        undef $_;
-        debug "delete citation $id (can't find source doc details)";
-        next;
-      }
-    }
-
     delete $_->{srcdocsid};
     delete $_->{checksum};
     delete $_->{nstring};
