@@ -108,35 +108,42 @@ export is configured with <c>metadata-amf-output-dir</c>).  It may look like thi
     </text>
 
 
-<h3 id='fturls'>Fulltext URLs</h3>
+<h3 id='fturls'>Full-text URLs</h3>
 
 Another advanced and optional feature of RP.  If you have full-text
 links for your research works (articles, papers, etc.) but the data is
 not 100% authoritative, you may ask the authors to review and flag
 right and wrong links.  At the same time, you may ask them for their
 permission to archive the full-text file (if it is correct).  Please
-refer to <a
+refer to the <a
 href='http://acis.openlib.org/documents/textilshchiki.html'>Textilshchiki</a>
 document, section <i>Full-text file recognition</i> for a better
 description of the rationale for this feature.
 
-Anyway, the screen shows the currently known full-text URLs for each of
+The Full-text URLs screen shows the currently known URLs for each of
 the RP items.  (There may be several URLs per item.)  And for each URL
-it shows the assumed default status or the user-made decision about the
-URL.  User can review his or her previous decisions and change them.
+it shows its current status.  If user made no decision about it yet,
+then the assumed default status is shown.  Otherwise it shows the
+latest user-made decision.  Thus user can review his or her previous
+decisions and change them.
 
+The resulting data can then be exported out of ACIS in a simple
+format.  See <c>bin/export\_fturls\_choices</c> for details.
 
 
 ### Main Research Profile screen
 
-General
-
+Displays a menu of all the screens with a brief introduction into each.
 
 
 <h2 id='rp-autosearch'>Automatic research search</h2>
 
 
 ### Exact searches
+
+This is search by the person's name variations in the names of the
+document authors (and editors).  Looks for exact matches only.
+
 
 ### Additional searches
 
@@ -236,17 +243,99 @@ with the update daemon.  You have to explicitly request an update (see
 - <c>fuzzy-name-search-via-web</c>
 
 
+<h2 id='rp-scripts'>Admin tools</h2>
+
+### <C>bin/export\_fturls\_choices</C> 
+
+The script is for exporting data from the ft\_urls\_choices table (and
+some related fields in other tables).  It outputs data on the standard
+output in a simple tab-delimited one-record-per-line format.  The
+following fields are included: 
+
+- document id
+- URL
+- nature of the URL: <co>authoritative</co> (supplied in the primary metadata
+  for the document) or <co>automatic</co> (automatically found via third-party
+  tools)
+- personal id (of the user who made the decision)
+- the user's choice in the recognition menu, one of: <co>correct</co>,
+  <co>abstractpage</co>, <co>wrong</co>, <co>anotherversion</co>
+- the user's choice in the permission menu, one of: <co>mayarchive</co>,
+  <co>checkupdates</co>, <co>notarchive</co> or an empty string
+- the time when the decision was made (i.e. recordered by ACIS) in a
+  simple YYYY-MM-DD HH:MM:SS format
+
+The script may optinally accept one or two date parameters on the
+command line.  With such parameters, script would only output decisions
+taken in the given period.  If only one date is supplied, script
+outputs all data from that day on.  The dates are expected in the
+YYYY-MM-DD format.
+
+
 
 <h2 id='rp-tech'>Research Profile technical details</h2>
 
 ### Technical: Resources database
 
+The <co>resources</co> table:
+
+    +----------+--------------+------+-----+---------+-------+
+    | Field    | Type         | Null | Key | Default | Extra |
+    +----------+--------------+------+-----+---------+-------+
+    | id       | varchar(255) |      | PRI |         |       |
+    | sid      | varchar(15)  |      | MUL |         |       |
+    | type     | varchar(20)  |      |     |         |       |
+    | title    | varchar(255) |      | MUL |         |       |
+    | classif  | varchar(50)  | YES  |     | NULL    |       |
+    | location | text         | YES  |     | NULL    |       |
+    | authors  | text         | YES  |     | NULL    |       |
+    | urlabout | text         | YES  |     | NULL    |       |
+    +----------+--------------+------+-----+---------+-------+
+
+
 ### Technical: Suggestions storage
 
+The <co>rp_suggestions</co> table:
+
+    +--------+----------+------+-----+---------------------+-------+
+    | Field  | Type     | Null | Key | Default             | Extra |
+    +--------+----------+------+-----+---------------------+-------+
+    | psid   | char(15) |      | PRI |                     |       |
+    | dsid   | char(15) |      | PRI |                     |       |
+    | role   | char(15) |      |     |                     |       |
+    | reason | char(30) |      |     |                     |       |
+    | time   | datetime |      |     | 0000-00-00 00:00:00 |       |
+    +--------+----------+------+-----+---------------------+-------+
+ 
 ### Technical: Code structure
 
+Core modules:
+
+- ACIS::Resources
+- ACIS::Resources::Search
+- ACIS::Resources::AutoSearch
+- ACIS::Resources::Suggestions
+- ACIS::Resources::SearchFuzzy
+- ACIS::Web::Contributions
+
+<a href='apu.html'>APU</a> modules:
+
+- ACIS::APU
+- ACIS::APU::Queue
+- ACIS::APU::RP
+
+Document to document links:
+
+- ACIS::DocLinks
+- ACIS::Web::DocLinks
+
+Full-text URLs:
+
+- ACIS::FullTextURLs
+- ACIS::FullTextURLs::Input
 
 
-<id>$Id: researchprofile.text,v 2.8 2007/07/06 17:29:05 ivan Exp $</id>
+
+<id>$Id: researchprofile.text,v 2.9 2007/07/06 20:07:26 ivan Exp $</id>
 
 
