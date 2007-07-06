@@ -25,7 +25,7 @@ package Web::App;   ### -*-perl-*-
 #  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 #
 #  ---
-#  $Id: App.pm,v 2.32 2007/07/04 08:13:26 ivan Exp $
+#  $Id: App.pm,v 2.33 2007/07/06 11:01:46 ivan Exp $
 #  ---
 
 
@@ -990,9 +990,10 @@ sub handle_request {
 sub critical_handler_error {
   my ($self,$message) = @_;
   $self -> set_presenter( 'application-error' );
+  $self -> response_status( '500' );
   $self -> variables ->{handlererror} = $message;
-  $self -> errlog( "application error: $message" );
   warn "application error:\n$message\ndebug log:\n$Web::App::Common::LOGCONTENTS------\n";
+  $self -> errlog( "application error: $message" );
 }
 
 
