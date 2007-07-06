@@ -30,7 +30,7 @@
     
     <xsl:for-each select='$list/list-item[id and title]' xml:space='preserve'>
       <xsl:variable name="sid"  select='generate-id(.)'/>
-      <xsl:variable name="dsid" select='sid'/>
+      <xsl:variable name="dsid" select='sid/text()'/>
       <xsl:variable name="id"   select='id'/>
       <xsl:variable name='role' select='role/text()'/>
 
@@ -99,19 +99,19 @@
           <xsl:variable name='cidentified' select='$citations/identified'/>
           <xsl:variable name='cpotential'  select='$citations/potential'/>
 
-          <xsl:if test='$citations//*[name()=$dsid]'>
+          <xsl:if test='$dsid and $citations//*[name()=$dsid]'>
             <br/><small>citations: 
-            <xsl:if test='$citations/identified/*[name()=$dsid]'>
+            <xsl:if test='$cidentified/*[name()=$dsid]'>
               <a ref='@citations/identified/{$dsid}' ><xsl:value-of
-              select='$citations/identified/*[name()=$dsid]/text()' />
+              select='$cidentified/*[name()=$dsid]/text()' />
               identified</a >
             </xsl:if>
 
             <xsl:if test='count($citations/*/*[name()=$dsid])&gt;1'>|</xsl:if> 
             
-            <xsl:if test='$citations/potential/*[name()=$dsid]'>
+            <xsl:if test='$cpotential/*[name()=$dsid]'>
               <a ref='@citations/potential/{$dsid}'><xsl:value-of
-              select='$citations/potential/*[name()=$dsid]/text()'/>
+              select='$cpotential/*[name()=$dsid]/text()'/>
               potential</a>
             </xsl:if>
 
