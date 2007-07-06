@@ -94,7 +94,18 @@ On the Document-to-document links screen users can review and delete
 the links they have previously created and they can create new ones.
 
 The links data are then exported in AMF with the user profile (if AMF
-export is configured with <c>metadata-amf-output-dir</c>).
+export is configured with <c>metadata-amf-output-dir</c>).  It may look like this
+
+    <text ref="repec:wop:cirano:96s14">
+      <follow-up xmlns="http://acis.openlib.org/2007/doclinks-relations">
+        <text xmlns="http://amf.openlib.org" ref="repec:mit:worpap:382"/>
+      </follow-up>
+    </text>
+    <text ref="repec:wop:epruwp:9701">
+      <isreferencedby>
+        <text ref="repec:wop:cirano:97s41"/>
+      </isreferencedby>
+    </text>
 
 
 <h3 id='fturls'>Fulltext URLs</h3>
@@ -236,6 +247,6 @@ with the update daemon.  You have to explicitly request an update (see
 
 
 
-<id>$Id: researchprofile.text,v 2.7 2007/07/06 17:18:33 ivan Exp $</id>
+<id>$Id: researchprofile.text,v 2.8 2007/07/06 17:29:05 ivan Exp $</id>
 
 

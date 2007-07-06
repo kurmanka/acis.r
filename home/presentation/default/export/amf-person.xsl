@@ -144,7 +144,7 @@
         </xsl:choose>
       </text>
       <xsl:text>
-</xsl:text>
+   </xsl:text>
     </xsl:for-each>
 
 </xsl:template>
