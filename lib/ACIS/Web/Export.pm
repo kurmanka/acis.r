@@ -23,7 +23,7 @@ package ACIS::Web::Export; ### -*-perl-*-
 #  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 #
 #  ---
-#  $Id: Export.pm,v 2.4 2007/03/27 11:37:37 ivan Exp $
+#  $Id: Export.pm,v 2.5 2007/07/06 17:18:33 ivan Exp $
 #  ---
 
 use strict;
@@ -171,7 +171,11 @@ sub make_amf_record {
   $variables ->{affiliations} = undef;
   require ACIS::Web::Affiliations;
   ACIS::Web::Affiliations::prepare( $acis );
-  
+
+  ### prepare doclinks
+  require ACIS::Web::DocLinks;
+  ACIS::Web::DocLinks::prepare( $acis );
+
   my $page = $acis -> run_presenter( $stylesheet, -hideemails => 1 );   
 
   delete $variables ->{record};

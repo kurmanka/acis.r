@@ -16,7 +16,7 @@ sub prepare {
   $record = $session->current_record;
   $vars  = $acis->variables;
   $input = $acis->form_input();
-  $rp   = $vars ->{contributions}{accepted} or die;
+  $rp    = $record->{contributions}{accepted} || die;
   $links = $session->{doclinks_o} ||= get_doclinks( $record );
 
   prepare_current_links();

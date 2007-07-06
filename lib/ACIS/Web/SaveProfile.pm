@@ -23,7 +23,7 @@ package ACIS::Web::SaveProfile;   ### -*-perl-*-
 #  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 #
 #  ---
-#  $Id: SaveProfile.pm,v 2.3 2007/03/06 22:37:09 ivan Exp $
+#  $Id: SaveProfile.pm,v 2.4 2007/07/06 17:18:33 ivan Exp $
 #  ---
 
 use strict;
@@ -114,28 +114,17 @@ sub write_outside_personal_profile {
   my $record    = $session ->current_record;
 
   assert( $record ->{type} eq 'person' );
-
   debug 'preparing the profile to write';
-
   $variables ->{record} = $record;
 
 
   ###  prepare affiliations 
   $variables ->{affiliations} = undef;
-
   require ACIS::Web::Affiliations;
-
   ACIS::Web::Affiliations::prepare( $app );
-
-  ###  prepare photo
-  if ( $record ->{photo} ) {
-    $variables ->{photo}     = $record ->{photo} {url};
-  }
-
 
   ###  prepare contributions 
   require ACIS::Web::Contributions;
-
   ACIS::Web::Contributions::prepare_the_role_list( $app );
 #  ACIS::Web::Contributions::prepare( $app );
   $variables ->{contributions} = undef;

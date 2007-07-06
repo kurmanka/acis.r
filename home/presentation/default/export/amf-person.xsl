@@ -34,7 +34,7 @@
 
   <xsl:template match='//record[id and type="person"]' 
                 xml:space='preserve'
-    ><xsl:variable name='citations' select='citations/identified'/>
+    ><xsl:variable name='record' select='.'/><xsl:variable name='citations' select='citations/identified'/>
     <person xmlns='http://amf.openlib.org' id='{id}'>
       <name><xsl:value-of select='name/full'/></name>
 <xsl:if test='name/prefix/text()'
@@ -123,6 +123,30 @@
 >
       <acis:shortid><xsl:value-of select='sid'/></acis:shortid>
     </person>
+    <!-- doclinks 
+    --><xsl:variable name='doclinks-conf' select='$response-data/doclinks-conf'/>
+    <xsl:comment> doclinks </xsl:comment>
+    <xsl:for-each select='doclinks/list-item' xml:space='default'>
+      <xsl:variable name='srcdocsid' select='list-item[1]/text()'/>
+      <xsl:variable name='relation'  select='list-item[2]/text()'/>
+      <xsl:variable name='trgdocsid' select='list-item[3]/text()'/>
+      <xsl:variable name='srcdocid' select='$record/contributions/accepted/list-item[sid=$srcdocsid]/id'/>
+      <xsl:variable name='trgdocid' select='$record/contributions/accepted/list-item[sid=$trgdocsid]/id'/>
+      <xsl:variable name='relation-amf'  select='$doclinks-conf/*[name()=$relation]/amf-verb/text()'/>
+      <text xmlns='http://amf.openlib.org' ref='{$srcdocid}'>
+        <xsl:choose>
+          <xsl:when test='$relation-amf'>
+            <xsl:element name='{$relation-amf}'><text ref='{$trgdocid}'/></xsl:element>
+          </xsl:when>
+          <xsl:otherwise>
+            <xsl:element name='{$relation}' namespace='http://acis.openlib.org/2007/doclinks-relations'><text ref='{$trgdocid}'/></xsl:element>
+          </xsl:otherwise>
+        </xsl:choose>
+      </text>
+      <xsl:text>
+</xsl:text>
+    </xsl:for-each>
+
 </xsl:template>
 
 
