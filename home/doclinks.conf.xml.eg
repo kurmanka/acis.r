@@ -12,10 +12,12 @@
     <previous-version>
       <label>is an earlier version of</label>
       <reverse>follow-up</reverse>
+      <amf-verb>hasversion</amf-verb>
     </previous-version>
     <follow-up>
       <label>is a follow-up to</label>
       <reverse>previous-version</reverse>
+      <amf-verb>isversionof</amf-verb>
     </follow-up>
     <related>
       <label>is related to</label>
