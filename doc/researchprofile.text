@@ -250,7 +250,7 @@ with the update daemon.  You have to explicitly request an update (see
 The script is for exporting data from the ft\_urls\_choices table (and
 some related fields in other tables).  It outputs data on the standard
 output in a simple tab-delimited one-record-per-line format.  The
-following fields are included: 
+following fields are included (in this order): 
 
 - document id
 - URL
@@ -336,6 +336,6 @@ Full-text URLs:
 
 
 
-<id>$Id: researchprofile.text,v 2.9 2007/07/06 20:07:26 ivan Exp $</id>
+<id>$Id: researchprofile.text,v 2.10 2007/07/06 20:08:40 ivan Exp $</id>
 
 
