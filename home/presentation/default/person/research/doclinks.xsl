@@ -41,7 +41,7 @@
   <xsl:template name='doc-by-sid'>
     <xsl:param name='dsid'/>
     <xsl:variable name='doc' select='$current/list-item[sid=$dsid]'/>
-    <a href='{$doc/url-about}'><xsl:value-of select='$doc/title'/></a>    
+    <a href='{$doc/url-about}' title='{$doc/type} by {$doc/authors}'><xsl:value-of select='$doc/title'/></a>    
   </xsl:template>
 
 
@@ -91,16 +91,9 @@
           <xsl:for-each select='$accepted/*'>
             <xsl:sort select='title/text()'/>
             <input type='radio' name='trg' id='trg{sid}' value='{sid}' />
-            <label for='trg{sid}'><xsl:text> </xsl:text><xsl:value-of
-            select='title'/></label> <xsl:if test='url-about'> (<a href='{url-about}'>details</a>)</xsl:if><br/>
+            <label for='trg{sid}' title='{type} by {authors}'><xsl:text> </xsl:text><xsl:value-of
+            select='title'/></label> <xsl:if test='url-about'> (<a href='{url-about}' title='{type} by {authors}'>details</a>)</xsl:if><br/>
           </xsl:for-each>
-<!--
-        <select name='trg'>
-          <xsl:for-each select='$accepted/*'>
-            <option value='{sid}'><xsl:value-of select='title'/></option>
-          </xsl:for-each>
-        </select>
--->
         </td></tr></table>
         
         <input type='hidden' name='src' value=''/>
@@ -119,7 +112,8 @@
       <th class='desc'> item description </th>
     </tr>
     
-    <xsl:for-each select='$list/list-item[id and title]' xml:space='preserve'>
+    <xsl:for-each select='$list/list-item[id and title]' xml:space='preserve'
+      ><xsl:sort select='title/text()'/>
       <xsl:variable name="sid"  select='generate-id(.)'/>
       <xsl:variable name="dsid" select='sid'/>
       <xsl:variable name="id"   select='id'/>

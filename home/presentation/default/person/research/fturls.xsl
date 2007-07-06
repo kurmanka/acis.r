@@ -16,9 +16,6 @@
   <xsl:variable name='config-object-types' select='$contributions/config/types'/> 
   <xsl:variable name='fturls'      select='//fturls'/>
 
-  <xsl:variable name='doclinks' select='//doclinks'/>
-  <xsl:variable name='doclinks-conf' select='//doclinks-conf'/>
-
 
   <xsl:variable name='recognition-menu-items'>
     <item code='n'>wrong</item>
@@ -276,7 +273,7 @@ function make_choice_text(choice) {
       <xsl:if test='$fturls/list-item/*[name()=$dsid]'>
 
       <xsl:variable name='alternate'><xsl:if test='position() mod 2'> alternate</xsl:if></xsl:variable>
-      <tr class='{$alternate}' id='row_{$sid}'>
+      <tr class='resource{$alternate}' id='row_{$sid}'>
         
         <td>
           <xsl:call-template name='present-resource' xml:space='default'>
