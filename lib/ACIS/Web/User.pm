@@ -26,7 +26,7 @@ package ACIS::Web::User; ### -*-perl-*-
 #  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 #
 #  ---
-#  $Id: User.pm,v 2.7 2007/02/13 14:24:37 ivan Exp $
+#  $Id: User.pm,v 2.8 2007/07/06 13:13:55 ivan Exp $
 #  ---
 
 
@@ -51,7 +51,7 @@ sub login {
 
 sub welcome {  
   my $app = shift;
-  my $session  = $app -> session;
+  my $session  = $app -> session || die 'must have a session';
   my $userdata = $session -> object;
   my $records  = $userdata -> {records};
   
@@ -395,7 +395,7 @@ sub normal_login {
 sub check_session_type {
   my $app = shift;
   
-  my $session = $app -> session;
+  my $session = $app -> session || die 'must have a session';
   
   if ( $session -> type ne 'user' ) {
     $app -> error( 'session-wrong-type' );

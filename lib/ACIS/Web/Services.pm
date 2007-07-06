@@ -28,7 +28,7 @@ package ACIS::Web;   ### -*-perl-*-
 #  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 #
 #  ---
-#  $Id: Services.pm,v 2.26 2007/07/06 11:02:18 ivan Exp $
+#  $Id: Services.pm,v 2.27 2007/07/06 13:13:55 ivan Exp $
 #  ---
 
 use strict;
@@ -149,7 +149,7 @@ sub load_session {
     my $pass = $app -> request_input( "pass" );
 
     if ( $pass ) {
-      if ( equal_passwords $pass, $session -> owner ->{password} ) {
+      if ( equal_passwords( $pass, $session -> owner ->{password} ) ) {
         ###  Override ip address
         debug "but a valid password were given";
         $session -> owner ->{IP} = $IP;
