@@ -28,7 +28,7 @@ package ACIS::Web;   ### -*-perl-*-
 #  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 #
 #  ---
-#  $Id: Services.pm,v 2.25 2007/06/24 13:49:48 ivan Exp $
+#  $Id: Services.pm,v 2.26 2007/07/06 11:02:18 ivan Exp $
 #  ---
 
 use strict;
@@ -138,7 +138,7 @@ sub load_session {
     
   } else {
     # IPs don't match -- should not continue
-    debug "can't load the session, the user IP addresses don't match";
+    debug "the user IP addresses don't match";
 
     ###  may be it is better to check the session validity by checking
     ###  the user-agent string?  Probably it will be more comfortable
@@ -149,11 +149,10 @@ sub load_session {
     my $pass = $app -> request_input( "pass" );
 
     if ( $pass ) {
-
-      if ( $session -> owner -> {password} eq $pass ) {
-        ###  Override
+      if ( equal_passwords $pass, $session -> owner ->{password} ) {
+        ###  Override ip address
+        debug "but a valid password were given";
         $session -> owner ->{IP} = $IP;
-        $override = 1;
       
       } else {
         my $login = $session ->owner ->{login};
@@ -190,13 +189,6 @@ sub load_session {
   }
 
   $app -> session( $session );
-
-  if ( $override and not $just_try ) {
-    $app -> userlog ( "session $seid IP override (new: $IP)" );
-    my $screen = $app ->request ->{screen};
-    $app -> redirect_to_screen( $screen );
-  }
-
   return $session;
 }
 
