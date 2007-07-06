@@ -5,7 +5,7 @@ Research Profile
 
 
 
-Introduction & Overview
+Introduction & overview
 -----------------------
 
 Research profile is one of the main parts of a personal record in ACIS.
@@ -29,7 +29,7 @@ already present in the resource database.
 
 
 
-Research Profile Screens
+Research Profile screens
 ------------------------
 
 ### Identified Items
@@ -76,7 +76,7 @@ ACIS provides <a href='apu.html'>APU</a> -- automatic profile update
 service, which executes automatic research searches for a person even
 when user is not directly asking that.  It may automatically add
 closely matching items to the person's RP.  But if user doesn't want
-that service, he can disable it on the Auto Update preferences screen.
+that service, he can disable it on the Auto Update Preferences screen.
 
 
 <h3 id='doclinks'>Document-to-Document Links</h3>
@@ -127,13 +127,47 @@ then the assumed default status is shown.  Otherwise it shows the
 latest user-made decision.  Thus user can review his or her previous
 decisions and change them.
 
-The resulting data can then be exported out of ACIS in a simple
-format.  See <c>bin/export\_fturls\_choices</c> for details.
+See <a ref='fturls-conf'>below</a> instructions on how to configure
+the feature and on its input data format.
+
+The collected data of users' decisions can then be exported out of ACIS
+in a simple format:
+
+
+#### <C>bin/export\_fturls\_choices</C> script
+
+The script is for exporting data from the ft\_urls\_choices table (and
+some related fields in other tables).  It outputs data on the standard
+output in a simple tab-delimited one-record-per-line format.  The
+following fields are included (in this order): 
+
+- document id
+- URL
+- nature of the URL: <co>authoritative</co> (supplied in the primary metadata
+  for the document) or <co>automatic</co> (automatically found via third-party
+  tools)
+- personal id (of the user who made the decision)
+- the user's choice in the recognition menu, one of: <co>correct</co>,
+  <co>abstractpage</co>, <co>wrong</co>, <co>anotherversion</co>
+- the user's choice in the permission menu, one of: <co>mayarchive</co>,
+  <co>checkupdates</co>, <co>notarchive</co> or an empty string
+- the time when the decision was made (i.e. recordered by ACIS) in a
+  simple YYYY-MM-DD HH:MM:SS format
+
+The script may optinally accept one or two date parameters on the
+command line.  With such parameters, script would only output decisions
+taken in the given period.  If only one date is supplied, script
+outputs all data from that day on.  The dates are expected in the
+YYYY-MM-DD format.
+
+
 
 
 ### Main Research Profile screen
 
-Displays a menu of all the screens with a brief introduction into each.
+Displays a menu of all the screens with a brief introduction into each
+and some general status information.  Provides a button to force
+automatic search for the person with her current name variations.
 
 
 <h2 id='rp-autosearch'>Automatic research search</h2>
@@ -142,7 +176,8 @@ Displays a menu of all the screens with a brief introduction into each.
 ### Exact searches
 
 This is search by the person's name variations in the names of the
-document authors (and editors).  Looks for exact matches only.
+document authors (and editors).  As its name states, it finds exact
+matches only.
 
 
 ### Additional searches
@@ -169,7 +204,7 @@ Takes no arguments and prints out its progress (the executed database
 statements) to standard output.
 
 
-<h2 id='rp-conf'>Research profile configuration</h2>
+<h2 id='rp-conf'>Configuration of the Research Profile and its screens</h2>
 
 See all <a ref='conf-research'>research profile parameters</a>.
 
@@ -180,7 +215,7 @@ See all <a ref='conf-research'>research profile parameters</a>.
 
 
 
-<h3 id='research-doclinks'>Document-to-document links</h3>
+<h3 id='research-doclinks'>Document-to-document links configuration</h3>
 
 The whole feature has to be enabled with a
 <c>document-document-links-profile</c> parameter.
@@ -191,7 +226,7 @@ has a simple structure; a self-explanatory example file is supplied in
 <f>doclinks.conf.xml.eg</f>.
 
 
-<h3 id='fturls-conf'>Full-text URLs</h3>
+<h3 id='fturls-conf'>Full-text URLs configuration</h3>
 
 The whole feature won't be there unless you have enabled it with a
 <c>full-text-urls-recognition</c> parameter.
@@ -243,41 +278,11 @@ with the update daemon.  You have to explicitly request an update (see
 - <c>fuzzy-name-search-via-web</c>
 
 
-<h2 id='rp-scripts'>Admin tools</h2>
+<h2 id='rp-tech'>Selected technical details</h2>
 
-### <C>bin/export\_fturls\_choices</C> 
+### Technical: database tables
 
-The script is for exporting data from the ft\_urls\_choices table (and
-some related fields in other tables).  It outputs data on the standard
-output in a simple tab-delimited one-record-per-line format.  The
-following fields are included (in this order): 
-
-- document id
-- URL
-- nature of the URL: <co>authoritative</co> (supplied in the primary metadata
-  for the document) or <co>automatic</co> (automatically found via third-party
-  tools)
-- personal id (of the user who made the decision)
-- the user's choice in the recognition menu, one of: <co>correct</co>,
-  <co>abstractpage</co>, <co>wrong</co>, <co>anotherversion</co>
-- the user's choice in the permission menu, one of: <co>mayarchive</co>,
-  <co>checkupdates</co>, <co>notarchive</co> or an empty string
-- the time when the decision was made (i.e. recordered by ACIS) in a
-  simple YYYY-MM-DD HH:MM:SS format
-
-The script may optinally accept one or two date parameters on the
-command line.  With such parameters, script would only output decisions
-taken in the given period.  If only one date is supplied, script
-outputs all data from that day on.  The dates are expected in the
-YYYY-MM-DD format.
-
-
-
-<h2 id='rp-tech'>Research Profile technical details</h2>
-
-### Technical: Resources database
-
-The <co>resources</co> table:
+#### <co>resources</co>
 
     +----------+--------------+------+-----+---------+-------+
     | Field    | Type         | Null | Key | Default | Extra |
@@ -293,9 +298,7 @@ The <co>resources</co> table:
     +----------+--------------+------+-----+---------+-------+
 
 
-### Technical: Suggestions storage
-
-The <co>rp_suggestions</co> table:
+#### <co>rp_suggestions</co>
 
     +--------+----------+------+-----+---------------------+-------+
     | Field  | Type     | Null | Key | Default             | Extra |
@@ -307,7 +310,35 @@ The <co>rp_suggestions</co> table:
     | time   | datetime |      |     | 0000-00-00 00:00:00 |       |
     +--------+----------+------+-----+---------------------+-------+
  
-### Technical: Code structure
+
+#### <co>ft_urls</co>
+
+- dsid char(15) not null
+- url blob not null 
+- checksum char(16) binary not null
+- nature ENUM(\'authoritative\',\'automatic\') not null
+- source varchar(255) not null
+
+<co>PRIMARY KEY( dsid, checksum ), index url\_i(url(30)), index
+source\_i(source(50))</co>
+
+
+#### <co>ft_urls\_choices</co>
+
+- dsid char(15) not null
+- checksum char(16) binary not null
+- psid char(15) not null
+- choice char(2) not null -- first char: d|y|r|n (corresponding menu items:
+   2|4|3|1); second char: y|c|n (1|2|3) 
+- time datetime not null
+
+<co>primary key prim(dsid, checksum, psid), index t\_i(time), index psid\_i(psid)</co>
+
+
+
+
+
+### Technical: code structure
 
 Core modules:
 
@@ -336,6 +367,9 @@ Full-text URLs:
 
 
 
-<id>$Id: researchprofile.text,v 2.10 2007/07/06 20:08:40 ivan Exp $</id>
+
+
+
+<id>$Id: researchprofile.text,v 2.11 2007/07/06 21:57:00 ivan Exp $</id>
 
 
