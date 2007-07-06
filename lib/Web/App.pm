@@ -25,7 +25,7 @@ package Web::App;   ### -*-perl-*-
 #  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 #
 #  ---
-#  $Id: App.pm,v 2.33 2007/07/06 11:01:46 ivan Exp $
+#  $Id: App.pm,v 2.34 2007/07/06 13:13:30 ivan Exp $
 #  ---
 
 
@@ -678,11 +678,8 @@ sub clear_after_request {
   my $self = shift;
 
   debug "clearing";
-
-#  use Devel::DumpSizes qw/dump_sizes/;
-#  dump_sizes("/tmp/acis_var_dump");
   foreach ( qw( request response username session http_headers content_type 
-                presenter presenter_data_string
+                presenter presenter_data_string processors
               ) ) {
     undef $self -> {$_};
   }
@@ -692,7 +689,6 @@ sub clear_after_request {
   $self -> init_presenter_data; 
   
   my $paths = $self -> {paths};
-  
   foreach ( qw( personal-path session user-data 
                 personal-url user-data-lock user-data-old
               ) ) {
@@ -922,6 +918,7 @@ sub handle_request {
   if ( $@ ) {
     debug "processors aborted with an error: $@";
     $handler_error = $@;
+    $self->clear_process_queue;
   } else {
     debug "processors finished";
   }
@@ -1241,7 +1238,8 @@ sub add_to_process_queue {
     $processors = $screen -> {'init-calls'};
   }
 
-  push @{ $self -> {processors} }, @$processors;
+  $self ->{processors} ||= [];
+  push @{ $self ->{processors} }, @$processors;
 
   ###  load screen's modules
   my @modules = @{ $screen -> {'use-modules'} };
