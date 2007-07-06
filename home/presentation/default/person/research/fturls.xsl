@@ -275,7 +275,7 @@ function make_choice_text(choice) {
       <xsl:variable name='alternate'><xsl:if test='position() mod 2'> alternate</xsl:if></xsl:variable>
       <tr class='resource{$alternate}' id='row_{$sid}'>
         
-        <td>
+        <td class='description'>
           <xsl:call-template name='present-resource' xml:space='default'>
             <xsl:with-param name='resource' select='.'/>
           </xsl:call-template>
@@ -372,7 +372,7 @@ $("ul.menu a").click( choice );
 
           <p><small>This page requires JavaScript in your browser to work.</small></p>
           
-          <table id='resources-ft'>
+          <table id='resources-ft' class='resources'>
             <xsl:call-template name='table-resources-for-ftlinks'>
               <xsl:with-param name='list' select='$current'/>
             </xsl:call-template>
