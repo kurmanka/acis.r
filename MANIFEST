@@ -90,7 +90,7 @@ home/bin/templates/create_tables.pl
 home/bin/templates/dump_email_handle_table.pl
 home/bin/templates/events_archiving.pl
 home/bin/templates/export_cit_events.pl
-home/bin/templates/export_fturl_choices.pl
+home/bin/templates/export_fturls_choices.pl
 home/bin/templates/export_name_variations.pl
 home/bin/templates/fuzzy_search_table.pl
 home/bin/templates/mvrec.pl
@@ -288,9 +288,6 @@ lib/ACIS/Web/CGI/Untaint/url.pm
 lib/ACIS/Web/Citations.pm
 lib/ACIS/Web/Config.pm
 lib/ACIS/Web/Contributions.pm
-lib/ACIS/Web/Contributions/Back.pm
-lib/ACIS/Web/Contributions/Fuzzy.pm
-lib/ACIS/Web/Contributions/Glimpse.pm
 lib/ACIS/Web/DocLinks.pm
 lib/ACIS/Web/Events.pm
 lib/ACIS/Web/Export.pm
