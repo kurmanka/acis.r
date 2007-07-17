@@ -29,6 +29,8 @@ Required Perl modules:
 -  Proc::Daemon 0.03
 -  DBI 1.18
 -  DBD::mysql
+-  String::Similarity 1.0+
+-  String::Approx
 
 Versions indicated are the ones we succesfully used with
 ACIS.  Probably newer versions will work just as well.
