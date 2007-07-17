@@ -25,7 +25,7 @@ package Web::App::Common;   ### -*-perl-*-
 #  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 #
 #  ---
-#  $Id: Common.pm,v 2.9 2007/03/06 22:36:25 ivan Exp $
+#  $Id: Common.pm,v 2.10 2007/07/17 11:21:52 ivan Exp $
 #  ---
 
 
@@ -53,9 +53,9 @@ sub clear_undefined ($);
 
 ###  enable debugging mode
 
-$Web::App::DEBUG            = $ENV{WEBAPPDEBUG};
-$Web::App::DEBUGLOGFILE     = $ENV{WEBAPPDEBUGLOGFILE};
-$Web::App::DEBUGIMMEDIATELY = $ENV{WEBAPPDEBUGIMM};
+$Web::App::DEBUG            ||= $ENV{WEBAPPDEBUG};
+$Web::App::DEBUGLOGFILE     ||= $ENV{WEBAPPDEBUGLOGFILE};
+$Web::App::DEBUGIMMEDIATELY ||= $ENV{WEBAPPDEBUGIMM};
 
 foreach ( @::ARGV ) {
   if ( m/^--debug$/ ) {
@@ -135,7 +135,7 @@ sub debug {
 #    print DEBUGLOG "[$subroutine($line)] $message\n";
 #  }
 
-  print $message
+  print $message, "<br/>\n"
     if $Web::App::DEBUGIMMEDIATELY;
 
   $LOGCONTENTS .= $message;

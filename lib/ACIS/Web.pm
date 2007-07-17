@@ -23,7 +23,7 @@ package ACIS::Web;   ### -*-perl-*-
 #  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 #
 #  ---
-#  $Id: Web.pm,v 2.21 2007/04/02 12:17:20 ivan Exp $
+#  $Id: Web.pm,v 2.22 2007/07/17 11:21:51 ivan Exp $
 #  ---
 
 use strict;
@@ -106,6 +106,39 @@ sub config {
   }
   $self->{config};
 }
+
+
+sub sql_object {
+  my $self = shift;
+  
+  return $self -> {'sql-object'}
+    if defined $self -> {'sql-object'};
+
+
+  ### sql helper / driver module name
+  my $class = 'sql_helper';
+
+  $class -> set_log_filename ( $self ->{home} . '/sql.log' );
+
+  my $config = $self -> config;
+
+  my $sql = $class ->
+    new( $config -> {'db-name'}, 
+         $config -> {'db-user'}, 
+         $config -> {'db-pass'} )
+      or return undef;
+
+  $self -> {'sql-object'} = $sql;
+
+#  $sql -> do( "SET CHARACTER SET utf8" );  ###  Set UTF8 as Perl<->Mysql
+                                            ###  exchange charset.  Only works
+                                            ###  for Mysql 4+
+  
+  return $self -> {'sql-object'};
+}
+
+
+
 
 
 
@@ -315,6 +348,14 @@ sub get_url_of_a_screen {
   return $self -> SUPER::get_url_of_a_screen( $screen );
 }
 
+
+sub record {
+  my $self = shift;
+  if ( $self -> {session} ) {
+    $self -> {session} -> current_record;
+  }
+}
+ 
 
 sub userdata_dir {  
   my $self = shift;
@@ -601,47 +642,6 @@ sub send_mail {
 }
 
 
-
-#use Devel::LeakTrace;
-sub _debug_leaks_after_processing__DISABLED {
-  my $self = shift;
-  
-  use ACIS::Debug::MLeakDetect;
-  $self->log( my_vars_report );
- 
-  use Data::Dump::Streamer;
-  $self->log( Dump($self)->Out );
-#  print "<p>", Dump( $r )->Out(), "</p>";
-  return;
-
-  require Devel::Symdump;
-  my $dsd = Devel::Symdump->rnew;
-  my @packages = $dsd->packages;
-  my @scalars  = $dsd->scalars;
-
-#  print "Symbol dump:\n";
-#  print "<p>Packages: ";
-#  foreach (@packages) {
-#    print "$_ ";
-#  }
-#  print "</p>";
-
-  print "<p>Scalars: ";
-  foreach (@scalars) {
-    my $d;
-    my $r;
-    my $l = 0;
-    eval qq! \$d = defined \$$_; \$r = ref \$$_; \$l = length( \$$_ );!;
-    if ( $d ) {
-      print $_, "($r,$l) ";
-    }
-  }
-  print "</p>";
-
-  use Data::Structure::Util qw( has_circular_ref );
-  my $r = has_circular_ref( $self );
-  if ( $r ) {}
-}
  
 1;
 

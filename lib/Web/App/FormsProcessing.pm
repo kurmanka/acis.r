@@ -1,5 +1,6 @@
 package Web::App;
 
+use CGI::Untaint;
 
 use strict;
 

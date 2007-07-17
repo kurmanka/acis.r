@@ -25,7 +25,7 @@ package Web::App;   ### -*-perl-*-
 #  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 #
 #  ---
-#  $Id: App.pm,v 2.34 2007/07/06 13:13:30 ivan Exp $
+#  $Id: App.pm,v 2.35 2007/07/17 11:21:52 ivan Exp $
 #  ---
 
 
@@ -39,15 +39,11 @@ use Carp qw( cluck );
 
 use Carp::Assert;
 use CGI;
-use CGI::Untaint;
 use Data::Dumper;
 use Encode;
 use Storable;
 
 # use CGI::Carp qw( fatalsToBrowser set_message carpout );
-
-
-use sql_helper;
 
 
 #BEGIN { set_message( \&Web::App::Common::critical_message ); }
@@ -57,7 +53,7 @@ use sql_helper;
 BEGIN { 
   use Web::App::Common qw( debug debug_as_is );
   if ( $ENV{HTTP_HOST} ) {
-    eval " use CGI::Carp qw( fatalsToBrowser set_message ); ";
+#    eval " use CGI::Carp qw( fatalsToBrowser set_message ); ";
 #  set_message( sub { print '<h1>fuck!</h1><p>', \$_[0], '</p>'; } ); ";
 #  set_message( \&Web::App::Common::critical_message ); ";
     if ( $@ ) { 
@@ -526,14 +522,6 @@ sub request_input {
 
 
 
-###  helper 2004-07-08 11:55
-sub record {
-  my $self = shift;
-  if ( $self -> {session} ) {
-    $self -> {session} -> current_record;
-  }
-}
- 
 
 sub session {
   my $self    = shift;
@@ -566,37 +554,6 @@ sub session {
   return $self -> {session};
 }
 
-
-
-
-sub sql_object {
-  my $self = shift;
-  
-  return $self -> {'sql-object'}
-    if defined $self -> {'sql-object'};
-
-
-  ### sql helper / driver module name
-  my $class = 'sql_helper';
-
-  $class -> set_log_filename ( $self ->{home} . '/sql.log' );
-
-  my $config = $self -> config;
-
-  my $sql = $class ->
-    new( $config -> {'db-name'}, 
-         $config -> {'db-user'}, 
-         $config -> {'db-pass'} )
-      or return undef;
-
-  $self -> {'sql-object'} = $sql;
-
-#  $sql -> do( "SET CHARACTER SET utf8" );  ###  Set UTF8 as Perl<->Mysql
-                                            ###  exchange charset.  Only works
-                                            ###  for Mysql 4+
-  
-  return $self -> {'sql-object'};
-}
 
 
 
@@ -642,6 +599,7 @@ sub find_right_screen {
   
   $screen =~ s!^/!!g; ### just to be sure
   $screen =~ s!/$!!g;
+  die if not $screen;
 
   if ( $self -> get_screen( $screen ) ) { 
     return $screen; 
@@ -749,7 +707,6 @@ sub handle_request {
   };
   debug "REQUEST_METHOD: ", $request->{method} || '';
 
-
   ### some mode settings
   my $charset = lc $config->{'character-encoding'};
   my $debug_mode = $config->{debug};
@@ -787,7 +744,6 @@ sub handle_request {
   $request -> {CGI} = $query;
   debug "CGI object: $query";
 
-
   ### parse the request
   my ( $screen_name, $session_id ) = $self ->parse_request_url( $requested_url );
 
@@ -810,7 +766,7 @@ sub handle_request {
 
   ### default screen name
   $screen_name ||= $config ->{'default-screen-name'};
-  debug "this is request for screen: $screen_name";
+  debug "this is request for screen: $screen_name";  
   die if not $screen_name;
   
   my @event = ( -class  => 'request', 
@@ -890,11 +846,10 @@ sub handle_request {
   if ( $request -> {responsibility_of} ) {
     $responsible = $request -> {responsibility_of};
   }
-  die if not $responsible;
+  die "can't find screen '$screen_name'" if not $responsible;
   $self -> add_to_process_queue( $responsible );
   $self -> set_presenter( $responsible );
 
-  
   ###  handle the request by running the processors
   my $handler_error;
   $self -> time_checkpoint( 'before_processors' );
@@ -924,7 +879,6 @@ sub handle_request {
   }
 
   $self-> _debug_leaks_after_processing;
-
   $self -> time_checkpoint( 'processors' );
 
   {
@@ -1184,7 +1138,7 @@ sub parse_request_url {
 
   my $base_url  = $self -> config( 'base-url' );
 
-  my ( $the_request ) = ( $url =~ /^$base_url\/?(.*?)(?:\?|$)/ );
+  my ( $the_request ) = ( $url =~ m[^$base_url/*(.*?)(?:\?|$)] );
   if ( not defined $the_request ) {
     $the_request = '';
   }

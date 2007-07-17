@@ -28,7 +28,7 @@ package ACIS::Web;   ### -*-perl-*-
 #  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 #
 #  ---
-#  $Id: Services.pm,v 2.27 2007/07/06 13:13:55 ivan Exp $
+#  $Id: Services.pm,v 2.28 2007/07/17 11:21:51 ivan Exp $
 #  ---
 
 use strict;
@@ -36,6 +36,7 @@ use strict;
 use Carp;
 use Carp::Assert;
 use Data::Dumper;
+use CGI::Untaint;
 
 use Web::App::Common    qw( date_now debug convert_date_to_ISO );
 use ACIS::Data::DumpXML qw( dump_xml );
@@ -147,7 +148,6 @@ sub load_session {
     ###  may in fact be the same with high probability.
 
     my $pass = $app -> request_input( "pass" );
-
     if ( $pass ) {
       if ( equal_passwords( $pass, $session -> owner ->{password} ) ) {
         ###  Override ip address
