@@ -14,15 +14,15 @@ ACIS Software Documentation
 
    - <a href='apache-conf.html'>Configuring Apache for ACIS</a>
    
-4. <a href='researchprofile.html'>Research Profile</a>
+4. <a href='researchprofile.html'>Research profile</a>
 
-5. <a href='apu.html'>Automatic Profile Update -- APU</a>
+5. <a href='apu.html'>Automatic profile update -- APU</a>
 
 4. <a href='daemon.html'>Update daemon</a>
 
-5. <a href='internal.html'>Programmer's guide (ACIS Internals)</a>
+5. <a href='internal.html'>Programmer's guide (ACIS internals)</a>
 
-5. <a href='db.html' >Selected Database tables</a>
+5. <a href='db.html' >Selected database tables</a>
 
 6. <a href='cooperate.html' >Interoperability with document
 submission services</a>

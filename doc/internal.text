@@ -3,8 +3,6 @@ Programmer's guide (Internals)
 
 <toc/>
 
-*** 2007-04-24 18:32: portions of this document may be
-    significatly out of date.***
 
 Overview
 --------
@@ -12,11 +10,11 @@ Overview
 Internally, ACIS consists of two main subsystems and a
 number of smaller tools.  These two main parts are very
 different and do not know much about each other; they work
-or can work pretty independently.  The first is data
-processing subsystem.  Second is web interface subsystem.
+or can work pretty independently.  First is the data
+processing subsystem.  Second is the web interface subsystem.
 The glue that makes them perform together as a single
-application is predefined and coordinated configuration and
-a bunch of scripts.
+application is predefined and coordinated configuration, some
+shared modules and a bunch of scripts.
 
 The data processing subsystem processes input metadata.  It
 puts the data into database tables for the web interface to
@@ -70,9 +68,8 @@ database</b> respectively -- removes the data, which
 originated from that record.
 
 ARDB's work is governed by an elaborate <b>configuration</b>
-(<f>configuration.xml</f> +
-<f>plugins/Processing/ACIS_UD/configuration.xml</f> in home
-dir).  ARDB configuration specifies what it has to do when
+(<f>configuration.xml</f> in home dir).  
+Configuration specifies what ARDB has to do when
 processing a <b>record of a specific type</b>.  Possible
 kinds of actions: store some of the record's data into a
 database table, execute certain perl code, extract a
@@ -83,8 +80,8 @@ or call perl code.
 ARDB's configuration also defines <b>database tables</b>.  Those may
 be tables, which other parts of configuration refer to, but they don't
 have to.  Either way, ARDB can create those tables for you; there is a
-script for that (<c>bin/create_tables</c>).  ACIS uses this capability
-of ARDB to create tables which only web interface needs.
+script for that (<c>bin/create_tables</c>).  ACIS relies on this capability
+of ARDB to create tables which are needed.
  
 <!-- This partially repeats some of the above. -->
 
@@ -95,20 +92,21 @@ RePEc-Index finds that a record has been removed from a data file, it
 asks ARDB to remove the record's data.  Also, when there is an id
 conflict, RePEc-Index will request ARDB to clean up the conflicting
 record's data.  Connection between RePEc-Index and ARDB is not
-intrinsic; it is the way ACIS configures RI to process the metadata.
+intrinsic; it is just in the way of how ACIS configures RI to 
+process the metadata.
 
 
 ### Summary
 
 - ACIS consists of data processing part and web-interface
-  part.  There are also some smaller tools, which serve as glue.
+  part.  There are also some other smaller tools, which serve as glue.
 
 - Data processing system is RePEc-Index and ARDB.  RePEc-Index 
   monitors data files for changes and checks records for id 
   uniqueness.  
 
-- ARDB stores data in database tables and cleans it when
-  necessary.  The work it does is specified in elaborate
+- ARDB stores data in database tables and cleans it up when
+  necessary.  The work it does is specified in an elaborate
   configuration.
 
 - In ACIS, RePEc-Index is configured to call ARDB for the actual 
@@ -131,7 +129,7 @@ Web interface part of ACIS is:
 
 
 There are two main parts in the set of perl modules that
-make ACIS web interface work.  First is the framework.  It
+make ACIS web interface work.  First is the framework. It 
 contains general code for analysing a user's request,
 deciding how to treat that request and generating a
 response.  It helps ACIS to store and load user sessions and
@@ -156,12 +154,12 @@ These two parts are tied together by:
 
 
 The application configuration, the <f>screens.xml</f> file,
-is build around the notion of a screen.  Screens are basic
+is built around the notion of a screen.  Screens are basic
 units of the web interface; they handle incoming requests
 and generate responses.  Each screen represents a certain
 piece of web-accessible functionality of the system.
 
-<c>Web::App</c> looks at addresses of the requests that
+<c>Web::App</c> looks at addresses (URLs) of the requests that
 arrive.  For each request it decides which screen it is for.
 Each screen definition in <f>screens.xml</f> configuration
 specifies which modules and which functions will
@@ -171,21 +169,21 @@ a 404 error and display a "Sorry" screen.
 
 Another thing that the screens configuration brings into the
 mix is presenters.  For each screen it defines an XSLT file,
-which is used to generate a response.  This means the
+which is used to generate a response page.  This means the
 application presentation is strictly separate from the main
 application logic.
 
 All this separation between web-application general and
 ACIS-specific, between presentation and application logic
-works for flexibility and extensibility of the system, and
-follows the "<a
+works for flexibility and extensibility of the system.  It is
+an attempt to follow the "<a
 href='http://google.com/search?q=separation+of+concerns'>separation
 of concerns</a>" principle.
 
 
 At the same time, the CGI script in ACIS is so simple that I
 could have left it unmentioned without harm.  Basically it
-creates an object and calls a method on it and there it
+creates an object and calls a method on it (or two) and there it
 ends.  The other web-interface-related scripts mostly act in
 a similar way: they involve a certain part of the
 <c>ACIS::Web</c> and it does the rest.
@@ -197,7 +195,7 @@ a similar way: they involve a certain part of the
   framework.
 
 - <c>ACIS::Web</c> module and many other modules in
-  <co>ACIS::Web::</co> hierarchy encapsulate all what's
+  the <co>ACIS::*</co> hierarchy encapsulate all what's
   essentially ACIS-specific.
 
 - All of the user interface is coded in XSLT stylesheets
@@ -294,23 +292,81 @@ generated by XSLT stylesheets.
 -->
 
 
-## A guide to ACIS source files
+## A brief guide to the ACIS source files
 
-This is an annotated list of files of an ACIS distribution.
-As of 2005-11-09 15:21 it is not complete, because of many
-changes in ACIS that took place since this list was last
-updated.
+Main parts and some key files
+
+<dl>
+<dt>home/</dt>
+<dd>the files and directories here are copied into the
+ACIS home directory during installation.</dd>
+
+<dt>home/bin/</dt>
+<dd>some scripts used during installation and afterwards</dd>
+
+<dt>home/bin/setup</dt>
+<dd><c>bin/setup</c> script source</dd>
+
+<dt>home/bin/templates/</dt>
+<dd>each *.pl file here is slightly transformed and then saved
+into a script in $home/bin/ during installation</dd>
+
+<dt>home/presentation/</dt> <dd>All XSLT templates for screens
+and emails are there.  And some other presentation-related
+files (like CSS and JS).</dd>
+
+<dt>home/configuration.xml</dt>
+<dd>This is configuration for ARDB; it defines database tables
+and how to process certain types of input data.</dd>
+
+<dt>home/screens.xml</dt>
+<dd>Screens definition file for <c>ACIS::Web</c> (and <c>Web::App</c>)</dd>
+
+<dt>doc/</dt>
+<dd>Documentation and files needed to regenerate it from its
+sources.</dd>
+
+<dt>doc/*.text</dt> <dd>documentation source files in Markup format.</dd>
+<dt>doc/*.html</dt> <dd>ready to read documentation files in HTML</dd>
+<dt>doc/xslt/</dt> <dd>XSLT templates used to generate HTML</dd>
+
+<dt>lib/</dt>
+<dd>most of the perl code is here</dd>
+
+<dt>lib/ARDB/</dt>
+<dd>abstract RePEc database system, which helps in metadata processing</dd>
+
+<dt>lib/ACIS/</dt>
+<dd>most of the ACIS-specific code is here</dd>
+
+<dt>lib/ACIS/Web/</dt> <dd>Assorted modules which handle ACIS
+screens via <c>ACIS::Web</c> and <c>Web::App</c></dd>
+
+<dt>lib/Web/App.pm</dt>
+<dt>lib/Web/App/</dt>
+<dd>Web::App framework and related files</dd>
+
+<dt>EPrints/</dt>
+<dd>Stuff for EPrints, see <a href='eprints.html'>this doc</a>
+for details</dd>
+
+<dt>sql_helper/</dt>
+<dd>A couple of modules which help ACIS deal with SQL database.</dd>
+
+<dt>install.sh</dt>
+<dd>Installation script</dd>
+</dl>
+
+
+## A detailed guide to the ACIS source files
+
+This is an annotated list of most files of an ACIS
+distribution. 
 
 
 ### Traditional meta files
 
 <dl>
-
-<dt><F>BUGS</F></dt>
-<dd></dd>
-
-<dt><F>CHANGES</F></dt>
-<dd>An attempt to keep a development log</dd>
 
 <dt><F>COPYING</F></dt>
 <dd>GNU General Public License, version 2
@@ -334,7 +390,7 @@ installation, but useful for re-packaging a distribution
 novel.  Serious.</dd>
 
 <dt><F>TODO</F></dt>
-<dd>The development plan and a bug/issue tracking tool
+<dd>The development plan and a bug/issue list
 </dd>
 </dl>
 
@@ -349,18 +405,18 @@ novel.  Serious.</dd>
 table of contents, with indirect links between the pages...
 Requires <a
 href='http://daringfireball.net/projects/markdown/'
->Markdown</a>.pl and <co>xsltproc</co> in path.
+>Markdown</a>.pl and <co>xsltproc</co> in PATH.
 </dd>
 
 <dt><F>doc/make.simple.pl</F></dt>
 <dd>Quickly generates HTML from the *.text files; requires 
 <a
 href='http://daringfireball.net/projects/markdown/'
->Markdown</a>.pl in path.
+>Markdown</a>.pl in PATH.
 </dd>
 
 <dt><F>doc/check-filelist.pl</F></dt> <dd>Compares lists of
-files in <f>doc/internal.text</f> and in <f>MANIFEST</f>.
+files in <f>doc/internal.text</f> and in <f>MANIFEST</f>.  Obsolete.
 </dd>
 
 <dt><F>doc/style.css</F></dt>
@@ -379,28 +435,31 @@ docs, used by <f>doc/make.linked.pl</f> </dd>
 <dt><F>doc/apache-conf.html</F></dt>
 <dt><F>doc/conf.html</F></dt>
 <dt><F>doc/install.html</F></dt>
-<dt><F>doc/internal.html</F></dt>
+<dt><F>doc/bdb-private.html</F></dt>
 <dt><F>doc/overview.html</F></dt>
+<dt><F>doc/researchprofile.html</F></dt>
+<dt><F>doc/apu.html</F></dt>
+<dt><F>doc/cooperate.html</F></dt>
+<dt><F>doc/eprints.html</F></dt>
+<dt><F>doc/eprints-install.html</F></dt>
+<dt><F>doc/overview.html</F></dt>
+<dt><F>doc/citations.html</F></dt>
+<dt><F>doc/db.html</F></dt>
+<dt><F>doc/daemon.html</F></dt>
+<dt><F>doc/internal.html</F></dt>
 
 <dd>Documentation in HTML
 </dd>
 
-<dt><F>doc/index.text</F></dt>
-<dt><F>doc/adm.text</F></dt>
-<dt><F>doc/apache-conf.text</F></dt>
-<dt><F>doc/conf.text</F></dt>
-<dt><F>doc/install.text</F></dt>
-<dt><F>doc/internal.text</F></dt>
-<dt><F>doc/overview.text</F></dt>
+<dt><F>doc/*.text</F></dt>
 
 <dd>
 
-Documentation sources in <a
+Corresponding documentation sources in <a
 href='http://daringfireball.net/projects/markdown/'
->Markdown</a> syntax with some custom markup.
+>Markdown</a> syntax with some additional custom markup.
 
 </dd>
-
 
 </dl>
 
@@ -445,14 +504,15 @@ title='automatic profile update'>APU</abbr></a>
 <dd>Template for <c>bin/create_tables</c> script
 </dd>
 
-<dt><F>home/bin/templates/dump_email_handle_table.pl</F></dt>
-<dt><F>home/bin/templates/offline_maintain.pl</F></dt>
-<dt><F>home/bin/templates/reparse_config.pl</F></dt>
-<dt><F>home/bin/templates/setup_ardb.pl</F></dt>
-<dt><F>home/bin/templates/sid_base.pl</F></dt>
-<dt><F>home/bin/templates/updareq.pl</F></dt>
+<dt><co>home/bin/templates/upgrade_to_*.pl</co></dt>
+
+<dd>Templates for the version-specific upgrade scripts.
+</dd>
+
+<dt><co>home/bin/templates/*.pl</co></dt>
 
 <dd>Templates for other <a ref='utils'>utilities</a>
+and scripts.
 </dd>
 
 <dt><F>home/configuration.xml</F></dt>
@@ -464,21 +524,9 @@ processing ReDIF and AMF
 <dd>ACIS research item types and personal roles configuration
 </dd>
 
-<dt><F>home/plugins/Processing/ACIS_UD/configuration.xml</F></dt>
-<dd>
-ARDB configuration for ACIS' own tables and data files (userdata)
-
-</dd>
-
 <dt><F>main.conf.eg</F></dt>
 <dd>
 Example file for <c>main.conf</c>.
-
-</dd>
-
-
-<dt><F>home/ardb.conf</F></dt>
-<dd>Legacy local testing configuration for ARDB
 </dd>
 
 
@@ -575,7 +623,7 @@ in case of the <co>new-institution</co> screen.</dd>
 <dd>Asks login and password.</dd>
 
 <dt><F>home/presentation/default/misc/sorry.xsl</F></dt>
-<dd>Displayed on a wrong page address or when access denied.</dd>
+<dd>Displayed in case of a 404 page not found error or when access denied.</dd>
 
 <dt><F>home/presentation/default/misc/local-document.xsl</F></dt>
 <dd>See <c>ACIS::Web::Site</c>.</dd>
@@ -591,6 +639,9 @@ content from this file or its installation-local equivalent
 
 <dt><F>home/presentation/default/script/main.js</F></dt>
 <dd>JavaScript</dd>
+
+<dt><F>home/presentation/default/script/jquery.js</F></dt>
+<dd><a href='http://jquery.com/'>jQuery</a> JavaScript library</dd>
 
 <dt><F>home/presentation/default/style/brownish.css.add</F></dt>
 <dd>This is joined with main.css to get brownish.css -- the
@@ -677,21 +728,12 @@ pictures of the users.  Not in use anymore.</dd>
 <f>profile-overview.xsl</f> and <f>profile-static.xsl</f></dd>
 
 
-<dt><F>home/presentation/default/person/research/arpu-email.xsl</F></dt>
-<dd>testing/experimenting; not in use</dd>
-
-<dt><F>home/presentation/default/person/research/main.xsl</F></dt>
-<dt><F>home/presentation/default/person/research/listings.xsl</F></dt>
-<dt><F>home/presentation/default/person/research/identified.xsl</F></dt>
-<dt><F>home/presentation/default/person/research/autosuggest-chunk.xsl</F></dt>
-<dt><F>home/presentation/default/person/research/autosuggest-1by1.xsl</F></dt>
-<dt><F>home/presentation/default/person/research/autosuggest-all.xsl</F></dt>
-<dt><F>home/presentation/default/person/research/search.xsl</F></dt>
-<dt><F>home/presentation/default/person/research/auto-status.xsl</F></dt>
-<dt><F>home/presentation/default/person/research/autoupdate.xsl</F></dt>
-<dt><F>home/presentation/default/person/research/ir-guide.xsl</F></dt>
-<dt><F>home/presentation/default/person/research/old-table.xsl</F></dt>
+<dt><F>home/presentation/default/person/research/*.xsl</F></dt>
 <dd>Research profile screens and utilities.</dd>
+
+
+<dt><F>home/presentation/default/citations/*.xsl</F></dt>
+<dd>Citations-related screens</dd>
 
 
 <dt><F>home/presentation/default/person/generic.xsl</F></dt>
@@ -774,15 +816,7 @@ useful in the future or will be thrown away.</dd>
 <dd>Email message generation general template and utilities.
 </dd>
 
-<dt><F>home/presentation/default/email/account-deleted.xsl</F></dt>
-<dt><F>home/presentation/default/email/arpm-notice.xsl</F></dt>
-<dt><F>home/presentation/default/email/confirmation.xsl</F></dt>
-<dt><F>home/presentation/default/email/forgotten-password.xsl</F></dt>
-<dt><F>home/presentation/default/email/import/new-account-record.xsl</F></dt>
-<dt><F>home/presentation/default/email/import/new-record.xsl</F></dt>
-<dt><F>home/presentation/default/email/new-institution.xsl</F></dt>
-<dt><F>home/presentation/default/email/user-data-changed.xsl</F></dt>
-<dt><F>home/presentation/default/email/user-login-changed.xsl</F></dt>
+<dt><F>home/presentation/default/email/*.xsl</F></dt>
 
 <dd>Templates for email messages for different occasions
 
@@ -839,30 +873,13 @@ phrase.</dd>
 
 <h4 id='ACIS::Web'>ACIS::Web -- Web interface of ACIS</h4>
 
-*** 2007-04-24 18:27: some of these modules are now renamed
-    and re-organized significantly.***
-
 <dl>
 
-<dt><F>lib/ACIS/Web.pm</F></dt>
-<dd>
-<c>ACIS::Web</c> module; inherits from <c>Web::App</c>.
-The core of ACIS' web interface -- the application
-framework.
-
+<dt><F>lib/ACIS/Web.pm</F></dt> <dd> <c>ACIS::Web</c> module;
+inherits from <c>Web::App</c> and specifies some important
+details of how exactly the <c>Web::App</c> is used for ACIS.
 </dd>
 
-<dt><F>lib/ACIS/Web/ARPM.pm</F></dt>
-<dd>
-Automatic Research Profile Update system, the core
-
-</dd>
-
-<dt><F>lib/ACIS/Web/ARPM/Queue.pm</F></dt>
-<dd>
-Interface and queue management part of the ARPU
-
-</dd>
 
 <dt><F>lib/ACIS/Web/Admin.pm</F></dt>
 <dd>
@@ -905,15 +922,7 @@ a process and keeping track of the forked threads.
 <dd>List of local configuration parameters and their defaults.</dd>
 
 <dt><F>lib/ACIS/Web/Contributions.pm</F></dt>
-<dd>Research profile</dd>
-
-<dt><F>lib/ACIS/Web/Contributions/Back.pm</F></dt>
-<dd>Research profile's fork-background automatic search,
-uses <c>ACIS::Web::Background</c>.</dd>
-
-<dt><F>lib/ACIS/Web/Contributions/Glimpse.pm</F></dt>
-<dd>Not finished attempt to use Glimpse for approximate
-searches in research profile.</dd>
+<dd>Research profile screens</dd>
 
 <dt><F>lib/ACIS/Web/Export.pm</F></dt>
 <dd>
@@ -980,15 +989,86 @@ Registered users' screens: name, settings, et cetera.
 
 <dt><F>lib/ACIS/Web/UserData.pm</F></dt>
 <dd>
-User account storage class.  Reads and writes <a
+User account storage module.  Reads and writes <a
 href='adm.html#userdata'>userdata files</a>.
-
 </dd>
+
+<dt><F>lib/ACIS/Web/Citations.pm</F></dt>
+<dd>Citations-related screens</dd>
+
+</dl>
+
+
+#### Research Profile underlying modules
+
+<dl> 
+<dt><F>lib/ACIS/Resources/Search.pm</F></dt>
+<dd>General tools for reserch database search.  Used for the
+manual search screen.</dd>
+
+<dt><F>lib/ACIS/Resources/AutoSearch.pm</F></dt> <dd>Research
+profile's automatic search, based on the user's name
+variations.  May be called in a forked background process (via
+<c>ACIS::Web::Background</c>).</dd>
+
+<dt><F>lib/ACIS/Resources/Suggestions.pm</F></dt>
+<dd>Management of the <co>rp_suggestions</co> table.</dd>
+
+<dt><F>lib/ACIS/Resources/SearchFuzzy.pm</F></dt>
+<dd>Fuzzy name-variation-based search for documents.</dd>
+</dl>
+
+
+#### APU
+
+<dl>
+<dt><F>lib/ACIS/APU.pm</F></dt>
+<dd><a href='apu.html'>Automatic Profile Update</a> system, the core</dd>
+
+<dt><F>lib/ACIS/APU/Queue.pm</F></dt>
+<dd>Queue management part</dd>
+
+<dt><F>lib/ACIS/APU/RP.pm</F></dt>
+<dd>APU for research profile</dd>
+</dl>
+
+
+#### Citations
+
+<dl><dt><F>lib/ACIS/Citations/Input.pm</F></dt>
+<dd>citations input processing, maintenance of the
+<co>citations</co> table (and <co>citations\_deleted</co>)</dd>
+
+<dt><F>lib/ACIS/Citations/Profile.pm</F></dt>
+<dd>maintenance of the citations profile in the userdata</dd>
+
+<dt><F>lib/ACIS/Citations/Search.pm</F></dt>
+<dd>search for citations</dd>
+
+<dt><F>lib/ACIS/Citations/SimMatrix.pm</F></dt>
+<dd>citations-documents similarity matrix class</dd>
+
+<dt><F>lib/ACIS/Citations/CitDocSim.pm</F></dt>
+<dd>citation-document matching</dd>
+
+<dt><F>lib/ACIS/Citations/Utils.pm</F></dt>
+<dd>assorted utilities, used by the other modules</dd>
+
+<dt><F>lib/ACIS/Citations/Suggestions.pm</F></dt>
+<dd>citation suggestions storage, management of the
+<co>cit\_sug</co> and <co>cit\_old\_sug</co> tables</dd>
+
+<dt><F>lib/ACIS/Citations/AutoUpdate.pm</F></dt>
+<dd>APU for citations profile</dd>
+
+<dt><F>lib/ACIS/Citations/Events.pm</F></dt>
+<dd><co>citations\_events</co> table maintenance</dd>
 
 </dl>
 
 
 #### Other ACIS:: modules
+
 
 <dl>
 
@@ -1027,34 +1107,39 @@ ARDB::Record interface.
 <dl>
 
 <dt><F>lib/Web/App.pm</F></dt>
-<dd>
-<C>Web::App</C> -- the core of the web applications
-framework.  Designed to be generic, although some
-project-specific stuff is still there.
 
-</dd>
+<dd><C>Web::App</C> -- the core of the web applications
+framework.  Designed to be generic, although some
+project-specific stuff is still there.</dd>
 
 <dt><F>lib/Web/App/Common.pm</F></dt>
 <dd>Some utilities for general consumption.</dd>
 
+<dt><F>lib/Web/App/XSLT.pm</F></dt>
+<dd>Add-on to Web::App for XSLT presentation building (using XML::LibXSLT)</dd>
+
+<dt><F>lib/Web/App/FormsProcessing.pm</F></dt> <dd>checking
+and processing form parameters, preparing input values for the
+forms</dd>
+
 <dt><F>lib/Web/App/Config.pm</F></dt>
 <dd>placeholder</dd>
 
-<dt><F>lib/Web/App/Config/Parse.pm</F></dt>
-<dd>Parses <f>screens.xml</f> and site-local configuration
-(e.g. <f>acis.conf</f>).  Not used normally, because
-normally configuration is stored in <f>config.bin</f>.  Used
-by <co>parse_config()</co> method of <c>Web::App</c>.</dd>
+<dt><F>lib/Web/App/Config/Parse.pm</F></dt> <dd>Parses
+<f>screens.xml</f> and site-local configuration
+(e.g. <f>acis.conf</f>).  This is used to make
+<f>config.bin</f> file during ACIS setup.  That file is then
+reused every time ACIS::Web object is created.  The module is
+loaded by <co>parse_config()</co> method of
+<c>Web::App</c>.</dd>
 
 <dt><F>lib/Web/App/Email.pm</F></dt><dd>
 
 <C>Web::App::Email</C>, provides email-sending services to
 other modules. </dd>
 
-<dt><F>lib/Web/App/EmailFormat.pm</F></dt> <dd>
-
-Used by <c>Web::App::Email</c> to format messages.  </dd>
-
+<dt><F>lib/Web/App/EmailFormat.pm</F></dt> 
+<dd>Used by <c>Web::App::Email</c> to format messages.</dd>
 
 <dt><F>lib/Web/App/Screen.pm</F></dt>
 <dd>A screen configuration container class, very simple.
@@ -1063,30 +1148,25 @@ Used by <c>Web::App::Email</c> to format messages.  </dd>
 <dt><F>lib/Web/App/Session.pm</F></dt>
 <dd><C>Web::App::Session</C> -- session class.</dd>
 
-
 </dl>
 
 
 #### ACIS::Data::DumpXML
 
-ACIS::Data::DumpXML is an XML-serializer, used by <c>Web::App</c>.
+ACIS::Data::DumpXML is an XML-serializer, used by
+<c>ACIS::Web</c> (and <c>Web::App</c>).
 ACIS::Data::DumpXML::Parser is the de-serializer.  Technically they
 are in ACIS:: hierarchy, but logically they belong to Web::App::.
-
 
 <dl>
 
 <dt><F>lib/ACIS/Data/DumpXML.pm</F></dt>
-<dd>
-<C>ACIS::Data::DumpXML</C> module.  Converts a perl data structure into XML.
-
+<dd><C>ACIS::Data::DumpXML</C> module.  Converts a perl data structure into XML.
 </dd>
 
-<dt><F>lib/ACIS/Data/DumpXML/Parser.pm</F></dt> <dd>
-Converts XML, created by <c>ACIS::Data::DumpXML</c>, into a
-perl data structure.
-
-</dd>
+<dt><F>lib/ACIS/Data/DumpXML/Parser.pm</F></dt> 
+<dd>Converts XML, created by <c>ACIS::Data::DumpXML</c>, into a
+perl data structure.</dd>
 
 </dl>
 
@@ -1098,7 +1178,6 @@ Abstract metadata database system.  Analyses independent
 metadata records and stores them in a database according to
 a configuration.  Extracts and stores relations between
 records.  Can retrieve records back, if necessary.
-
 
 <dl>
 
@@ -1117,22 +1196,17 @@ use.</dd>
 and provides table-related methods, like create, delete,
 store a record, et cetera.</dd>
 
-
 <dt><F>lib/ARDB/Common.pm</F></dt>
 <dd>General utilities, logging and diagnostics.</dd>
-
 
 <dt><F>lib/ARDB/Plugins.pm</F></dt>
 <dd></dd>
 
-
 <dt><F>lib/ARDB/Record.pm</F></dt>
-
 <dd><C>ARDB::Record</C>, abstract class for metadata
 objects, that ARDB can store and process.</dd>
 
 <dt><F>lib/ARDB/Record/ReDIF.pm</F></dt> <dd>
-
 Implementation of <c>ARDB::Record</c> for ReDIF
 templates.</dd>
 
@@ -1140,20 +1214,16 @@ templates.</dd>
 implementation of <c>ARDB::Record</c> for a simple one-level
 hash.  Currently not used anywhere in ACIS.</dd>
 
-
 <dt><F>lib/ARDB/RelationType.pm</F></dt><dd>
-
 Container class for relation type objects, which are
 specified in an <c>ARDB</c> configuration.</dd>
 
 <dt><F>lib/ARDB/Relations.pm</F></dt> <dd>
-
 <C>ARDB::Relations</C> class.  Manages <co>relations</co>
 table; stores and retrieves relations between records
 (objects).</dd>
 
 <dt><F>lib/ARDB/Relations/Transaction.pm</F></dt><dd>
-
 A transaction level on top of <c>ARDB::Relations</c>.
 Changes to a transaction are not saved until the transaction
 is committed.  </dd>
@@ -1162,7 +1232,6 @@ is committed.  </dd>
 configuration (both local and application-specific) and
 stores it into a <co>ARDB::Local</co> perl-module file to
 avoid re-parsing and re-checking it every time. </dd>
-
 
 <dt><F>lib/ARDB/Plugin/Processing.pm</F></dt>
 <dd></dd>
@@ -1176,9 +1245,6 @@ avoid re-parsing and re-checking it every time. </dd>
 <dt><F>lib/ARDB/Plugin/Processing/ShortIDs.pm</F></dt>
 <dd></dd>
 
-<dt><F>lib/ARDB/Plugin/Processing/Test.pm</F></dt>
-<dd></dd>
-
 <dt><F>lib/ARDB/SiteConfig.pm</F></dt><dd>
 Container class for local site's configuration, such as DB
 access parameters.</dd>
@@ -1186,18 +1252,14 @@ access parameters.</dd>
 <dt><F>lib/ARDB/Test.pm</F></dt> <dd>A simple testing
 framework.  It is for ARDB test scripts in <f>t/</f>.</dd>
 
-
 <dt><F>lib/ARDB/ReDIF/Processing.pm</F></dt>
 <dd>ReDIF metadata processing code</dd>
 
 <dt><F>lib/ARDB/AMF/Processing.pm</F></dt>
 <dd>AMF metadata processing code</dd>
 
-
 <dt><F>lib/ARDB/RI.pm</F></dt>
 <dd>Interface module, from RePEc::Index to ARDB</dd>
-
-
 
 </dl>
 
@@ -1209,7 +1271,6 @@ conveniently-wrapped interface to MySQL with problem
 logging.
 
 sql_result is the class for SQL query results.
-
 
 <dl>
 
@@ -1232,10 +1293,16 @@ sql_result is the class for SQL query results.
 
 <dt><F>lib/RePEc/Index/Collection/ACIS_UD.pm</F></dt>
 <dd>Implementation of the "<co>ACIS_UD</co>" collection type
-for RePEc-Index.  <co>ACIS_UD</co> is ACIS userdata files
-collection.</dd>
+for RePEc-Index (<a href='daemon.html'>update daemon</a>).
+<co>ACIS_UD</co> is ACIS userdata files collection.</dd>
+
+<dt><F>lib/RePEc/Index/Collection/CitationsAMF.pm</F></dt>
+<dd>Implementation of the "<co>CitationsAMF</co>" collection type
+for RePEc-Index.</dd>
+
+<dt><F>lib/RePEc/Index/Collection/FullTextUrlsAMF.pm</F></dt>
+<dd>Implementation of the "<co>FullTextUrlsAMF</co>"
+collection type for RePEc-Index.  This is for the <a
+ref='fturls'>FullText URLs</a> input data.</dd>
 
 </dl>
-
-
-

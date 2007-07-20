@@ -44,8 +44,8 @@ foreach ( keys %$files_hash ) {
 }
 
 pr " listed: $listed_count";
-pr " not documented: \n\t", join ( "\n\t", @$missing );
-pr " listed unknown: \n\t", join ( "\n\t", @$unknown );
+pr " not documented: \n\t", join ( "\n\t", sort @$missing );
+pr " listed unknown: \n\t", join ( "\n\t", sort @$unknown );
 
 
 __END__ 
