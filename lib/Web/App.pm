@@ -7,9 +7,8 @@ package Web::App;   ### -*-perl-*-
 #    Core of the web application framework, the Web::App module
 #
 #
-#  Copyright (C) 2003 Ivan Baktcheev, Ivan Kurmanov for ACIS project,
-#  http://acis.openlib.org/
-#
+#  Copyright (C) 2003 Ivan Baktcheev, Ivan Kurmanov
+#  Copyright (C) 2004-7 Ivan Kurmanov
 #
 #  This program is free software; you can redistribute it and/or modify
 #  it under the terms of the GNU General Public License, version 2, as
@@ -25,7 +24,7 @@ package Web::App;   ### -*-perl-*-
 #  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 #
 #  ---
-#  $Id: App.pm,v 2.35 2007/07/17 11:21:52 ivan Exp $
+#  $Id: App.pm,v 2.36 2007/07/20 17:42:08 ivan Exp $
 #  ---
 
 
