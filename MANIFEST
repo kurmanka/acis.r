@@ -1,4 +1,6 @@
 BUGS
+build/dist.pl
+build/get_latest_extra.pl
 CHANGES
 COPYING
 doc/adm.html
@@ -69,7 +71,6 @@ EPrints/plugins/output/amf
 EPrints/prototype-menutable.html
 EPrints/prototype-page.html
 EPrints/README
-home/ardb.conf
 home/bin/cit_test.pl
 home/bin/conf.pl
 home/bin/rid
@@ -207,7 +208,6 @@ home/presentation/default/person/photo.xsl
 home/presentation/default/person/profile-overview.xsl
 home/presentation/default/person/profile-show.xsl
 home/presentation/default/person/profile-static.xsl
-home/presentation/default/person/research/arpu-email.xsl
 home/presentation/default/person/research/auto-status.xsl
 home/presentation/default/person/research/autosuggest-1by1.xsl
 home/presentation/default/person/research/autosuggest-all.xsl
