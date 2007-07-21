@@ -114,5 +114,8 @@ if ( $fullrelease ) {
 
 system "perl Makefile.PL";
 system "make dist VERSION=$version";
-system "cvs commit -m 'release $version' VERSION";
+system "cvs commit -m 'release $version' VERSION" 
+  if -d 'CVS';
+system "darcs record -a -m 'release $version' VERSION" 
+  if -d '_darcs';
 print "$name-$version.tar.gz\n";
