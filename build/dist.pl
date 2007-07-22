@@ -112,10 +112,14 @@ if ( $fullrelease ) {
 }
 
 
-system "perl Makefile.PL";
-system "make dist VERSION=$version";
-system "cvs commit -m 'release $version' VERSION" 
-  if -d 'CVS';
-system "darcs record -a -m 'release $version' VERSION" 
-  if -d '_darcs';
+system("MAKEMAKEFILE=1 perl Makefile.PL")==0 or die "perl Makefile.PL failed";
+system("make dist VERSION=$version")==0 or die "make dist failed";
+if(-d 'CVS') {
+  system("cvs commit -m 'release $version' VERSION")==0 
+    or die "cvs commit failed";
+}
+elsif(-d '_darcs') {
+  system( "darcs record -a -m 'release $version' VERSION")==0
+    or die "darcs record failed";
+}
 print "$name-$version.tar.gz\n";
