@@ -90,18 +90,17 @@ if ( $fine ) {
 }
 
 die "to install ACIS, use install.sh script\n"
-  unless $ENV{ACIS_INSTALL} or $ENV{ACIS_DEV};
+  unless $ENV{MAKEMAKEFILE} or $ENV{ACIS_INSTALL};
 
 WriteMakefile(
               NAME       => 'ACIS',
-              VERSION    => '0.1',
+              VERSION    => '0.1', # this is a bogus version, just a placeholder, but it is needed
               PREREQ_PM  => $modules,
               DIR        => [ @dirs ],
               ABSTRACT   => 'Academic Contributor Information System',
               AUTHOR     => 'Ivan Bahcheyev & Ivan Kurmanov',
              )
-  if $ENV{ACIS_DEV};
-
+  if $ENV{MAKEMAKEFILE};
 
 
 # copied from AxKit's Makefile.PL, http://axkit.org
