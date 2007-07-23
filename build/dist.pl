@@ -108,6 +108,7 @@ if ( open VER, '>', 'VERSION' ) {
 
 system 'rm -rf extra/*';
 if ( $fullrelease ) {
+  mkdir 'extra';
   require 'build/get_latest_extra.pl';
 }
 
