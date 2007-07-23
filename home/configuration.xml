@@ -4,7 +4,7 @@
     That is a working ARDB core configuration file.  Produces:
     documents table, collections table, authors table.
 
-    $Id: configuration.xml,v 2.21 2007/06/24 13:52:04 ivan Exp $
+    $Id$
 
 -->
 <configuration>

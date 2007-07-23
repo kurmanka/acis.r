@@ -21,7 +21,7 @@ package ACIS::Web::Session;   ### -*-perl-*-
 #  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 #
 #  ---
-#  $Id: Session.pm,v 2.6 2007/03/27 22:11:49 ivan Exp $
+#  $Id$
 #  ---
 
 use strict;

@@ -24,7 +24,7 @@ package Web::App;   ### -*-perl-*-
 #  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 #
 #  ---
-#  $Id: App.pm,v 2.36 2007/07/20 17:42:08 ivan Exp $
+#  $Id$
 #  ---
 
 

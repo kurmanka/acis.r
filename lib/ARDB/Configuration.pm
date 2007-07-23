@@ -27,13 +27,13 @@ package ARDB::Configuration;  ### -*-perl-*-
 #  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 #
 #  ---
-#  $Id: Configuration.pm,v 2.0 2005/12/27 19:47:40 ivan Exp $
+#  $Id$
 #  ---
 
 
 BEGIN {
   $VERSION = '0.07';
-  #$VERSION = do{ my @r=(q$Revision: 2.0 $=~/\d+/g); sprintf "%d."."%02d"x$#r,@r };
+  #$VERSION = do{ my @r=(q$Revision$=~/\d+/g); sprintf "%d."."%02d"x$#r,@r };
 }
 
 use strict;

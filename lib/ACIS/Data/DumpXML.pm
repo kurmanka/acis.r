@@ -36,7 +36,7 @@ package ACIS::Data::DumpXML;   ### -*-perl-*-
 #  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 #
 #  ---
-#  $Id: DumpXML.pm,v 2.0 2005/12/27 19:47:39 ivan Exp $
+#  $Id$
 #  ---
 
 
@@ -48,7 +48,7 @@ require Exporter;
 *import = \&Exporter::import;
 @EXPORT_OK=qw(dump_xml dump_wo_refs dump);
 
-$VERSION = "0.03";  # $Date: 2005/12/27 19:47:39 $
+$VERSION = "0.03";  # $Date$
 
 # configuration
 use vars qw($INDENT $INDENT_STYLE $XML_DECL $NAMESPACE $NS_PREFIX

@@ -1,15 +1,13 @@
 package ACIS::Web::CGI::Untaint::url;
 
+# based on package ReDIF::URL_Syntax
+
 use strict;
 use base qw(CGI::Untaint::printable);
 
-use vars qw/$VERSION/;
-
-#taken from package ReDIF::URL_Syntax;
-
-#   $Id: url.pm,v 2.0 2005/12/27 19:47:40 ivan Exp $
-$VERSION = do { my @r=(q$Revision: 2.0 $=~/\d+/g); sprintf "%d."."%02d"x$#r,@r }; 
-
+#use vars qw/$VERSION/;
+#   $Id$
+#$VERSION = do { my @r=(q$Revision$=~/\d+/g); sprintf "%d."."%02d"x$#r,@r }; 
 
 ###  Loosely aim to comply with RFC2396
 

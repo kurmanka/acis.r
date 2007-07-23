@@ -28,7 +28,7 @@ package Web::App::Config;   ### -*-perl-*-
 #  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 #
 #  ---
-#  $Id: Config.pm,v 2.0 2005/12/27 19:47:40 ivan Exp $
+#  $Id$
 #  ---
 
 use Web::App::Screen;

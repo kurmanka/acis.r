@@ -23,7 +23,7 @@ package ACIS::APU::RP;        ### -*-perl-*-
 #  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 #
 #  ---
-#  $Id: RP.pm,v 1.3 2007/04/24 15:38:03 ivan Exp $
+#  $Id$
 #  ---
 
 use strict;

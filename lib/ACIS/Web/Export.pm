@@ -23,7 +23,7 @@ package ACIS::Web::Export; ### -*-perl-*-
 #  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 #
 #  ---
-#  $Id: Export.pm,v 2.5 2007/07/06 17:18:33 ivan Exp $
+#  $Id$
 #  ---
 
 use strict;

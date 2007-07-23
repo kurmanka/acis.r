@@ -26,7 +26,7 @@ package ACIS::EPrints::MetadataExport::ReDIF; # -*-perl-*-
 #  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 #
 #  ---
-#  $Id: ReDIF.pm,v 2.3 2006/06/07 07:36:59 ivan Exp $
+#  $Id$
 #  ---
 
 

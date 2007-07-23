@@ -24,7 +24,7 @@ package ACIS::Misc;   ### -*-perl-*-
 #  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 #
 #  ---
-#  $Id: Misc.pm,v 2.1 2007/03/05 17:00:34 ivan Exp $
+#  $Id$
 #  ---
 
 

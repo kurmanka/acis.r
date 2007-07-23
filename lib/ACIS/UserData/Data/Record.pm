@@ -27,7 +27,7 @@ package ACIS::UserData::Data::Record;    ### -*-perl-*-
 #  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 #
 #  ---
-#  $Id: Record.pm,v 2.1 2007/02/04 02:42:23 ivan Exp $
+#  $Id$
 #  ---
 
 

@@ -31,7 +31,7 @@ package ACIS::Data::DumpXML::Parser;   ### -*-perl-*-
 #  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 #
 #  ---
-#  $Id: Parser.pm,v 2.0 2005/12/27 19:47:39 ivan Exp $
+#  $Id$
 #  ---
 
 

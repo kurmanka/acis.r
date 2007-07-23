@@ -25,7 +25,7 @@ package ACIS::Web::Site;  ### -*-perl-*-
 #  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 #
 #  ---
-#  $Id: Site.pm,v 2.1 2006/01/25 14:19:38 ivan Exp $
+#  $Id$
 #  ---
 
 

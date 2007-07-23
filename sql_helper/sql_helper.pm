@@ -1,12 +1,12 @@
 package sql_helper;
-# $Id: sql_helper.pm,v 2.7 2007/06/30 00:33:37 ivan Exp $
+# $Id$
 
 use DBI;
 # ? just for early detection of DBD::mysql absence
 use DBD::mysql; # unportable (sql-wise)
 
 
-$VERSION = "0.2";
+$VERSION = "0.3";
 
 use Exporter;
 

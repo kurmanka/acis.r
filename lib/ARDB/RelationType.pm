@@ -1,6 +1,6 @@
 package ARDB::RelationType;
 
-# $Id: RelationType.pm,v 2.0 2005/12/27 19:47:40 ivan Exp $
+# $Id$
 
 use strict;
 use warnings;

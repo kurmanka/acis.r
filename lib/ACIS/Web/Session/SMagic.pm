@@ -24,7 +24,7 @@ package ACIS::Web::Session::SMagic;   ### -*-perl-*-
 #  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 #
 #  ---
-#  $Id: SMagic.pm,v 2.1 2007/03/14 21:22:56 ivan Exp $
+#  $Id$
 #  ---
 
 use strict;

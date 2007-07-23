@@ -26,7 +26,7 @@ package ACIS::Web::UserData;   ### -*-perl-*-
 #  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 #
 #  ---
-#  $Id: UserData.pm,v 2.1 2007/02/28 21:45:06 ivan Exp $
+#  $Id$
 #  ---
 
 

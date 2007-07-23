@@ -24,7 +24,7 @@ package ACIS::Web::Session::SOldUser;   ### -*-perl-*-
 #  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 #
 #  ---
-#  $Id: SOldUser.pm,v 2.4 2007/03/27 12:16:49 ivan Exp $
+#  $Id$
 #  ---
 
 use strict;

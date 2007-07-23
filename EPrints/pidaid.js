@@ -1,6 +1,6 @@
 /* -*- mode:java -*- */
 /* my emacs has no javascript mode, but this mode works well enough */
-/* $Id: pidaid.js,v 2.0 2005/12/27 19:47:36 ivan Exp $ */
+/* $Id$ */
 
 
 var textMenuPrompt = 'Is this someone we know?';

@@ -22,8 +22,8 @@ use ARDB::Relations::Transaction;
 
 use vars qw( $VERSION );
 
-$VERSION = do { my @r=(q$Revision: 2.0 $=~/\d+/g); sprintf "%d."."%02d"x$#r,@r };
-# $Id: ARDB.pm,v 2.0 2005/12/27 19:47:39 ivan Exp $;
+# $VERSION = do { my @r=(q$Revision$=~/\d+/g); sprintf "%d."."%02d"x$#r,@r };
+# $Id$;
 
 use vars qw( $ARDB );
 

@@ -24,7 +24,7 @@ package ACIS::Web::Session::SNewUser;   ### -*-perl-*-
 #  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 #
 #  ---
-#  $Id: SNewUser.pm,v 2.5 2007/04/18 17:00:51 ivan Exp $
+#  $Id$
 #  ---
 
 use strict;

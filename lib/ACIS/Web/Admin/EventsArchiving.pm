@@ -25,7 +25,7 @@ package ACIS::Web::Admin::EventsArchiving;  ### -*-perl-*-
 #  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 #
 #  ---
-#  $Id: EventsArchiving.pm,v 2.1 2006/06/12 07:44:06 ivan Exp $
+#  $Id$
 #  ---
 
 
