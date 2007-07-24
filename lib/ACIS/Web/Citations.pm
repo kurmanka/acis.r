@@ -163,7 +163,8 @@ sub prepare_potential {
 
 sub process_potential {
   shift;
-  die "no document sid to process citations for" if not $dsid;
+  return if not $dsid;
+  #die "no document sid to process citations for" if not $dsid;
   die "can't find that document: $dsid" if not $document;
 
   my %cids = ();
