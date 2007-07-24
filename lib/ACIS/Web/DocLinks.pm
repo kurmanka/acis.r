@@ -12,6 +12,7 @@ my ($acis,$session,$record,$input,$vars,$rp,$links);
 
 sub prepare {
   $acis = $ACIS::Web::ACIS;
+  if (not $acis->config('document-document-links-profile')) {return;}
   $session = $acis->session;
   $record = $session->current_record;
   $vars  = $acis->variables;
