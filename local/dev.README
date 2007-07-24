@@ -1,0 +1,154 @@
+ACIS SOURCE CODE
+================
+
+
+ABOUT THIS DOCUMENT
+
+Find the latest version of this document at
+aacis@nebka.openlib.org:dev/acis/local/dev.README
+
+
+
+SEPARATE COMPONENTS
+
+ACIS is not a monolithic program.  It is a large collection of modules,
+scripts, configuration files and templates.  And there are several
+components which are closely related to ACIS and are required to use
+it.  But these components may be used without ACIS, completely
+independently.  Therefore their source code is managed separately.
+
+So here, in aacis@nebka:dev/, we have four directories, which
+correspond to four projects:
+
+  ReDIF-perl/
+  AMF-perl/
+  RePEc-Index/
+  acis/
+
+Each project contains a separate source tree, managed with darcs
+(http://darcs.net/) revision control system.
+
+
+DARCS
+
+Darcs is an easy to use system.  It currently lacks some nice-to-have
+features, if compared to SVN or CVS.  It's core advantage is that it
+supports purely distributed development.
+
+These component projects and main ACIS source code may be developed
+right here in aacis@nebka.  If editing files remotely is not a problem
+for you, just edit the needed source files.  After a change is done,
+you need to submit it to the repository.  (Repository is where the
+source code revisions are stored.)  
+
+You will have to study the userguide of darcs, http://darcs.net/
+but you don't have to do it immediately.
+
+
+BASIC CODE EDITING PROCEDURE WITH DARCS
+
+For example, let's imagine I had to make a change to the ReDIF-perl
+project.  Here are the first steps of the procedure:
+
+   aacis@nebka:~ $ cd dev/ReDIF-perl
+   aacis@nebka:~/dev/ReDIF-perl/ $ emacs lib/ReDIF/Parser.pm
+
+(for example) Then you may want to review the changes that you have
+made to the code.  Darcs would show it to you in a format similar to
+diff:
+
+   aacis@nebka:~/dev/ReDIF-perl/ $ darcs whatsnew
+
+Then you may want to make sure the change didn't break any tests:
+
+   aacis@nebka:~/dev/ReDIF-perl/ $ make tests
+
+Then let's assume the tests passed fine and you want to submit your change:
+
+   aacis@nebka:~/dev/ReDIF-perl/ $ darcs record -am "an improvement to the parsing algorithm"  
+
+The text in quotes is the name of your patch.  It should briefly
+explain the substance of the change, or at least it's character.
+
+
+
+
+RELEASING A PACKAGED VERSION
+
+If darcs record worked fine and didn't complain, you may now want to
+release a new version package to the public.  Then you do the
+following:
+
+   aacis@nebka:~/dev/ReDIF-perl/ $ perl release.pl
+
+That should make a new version number for you and pack a distribution.
+The version number would be generated automatically, by incrementing
+the previous one by one.  (If it was 0.4 the new version would be 0.5;
+if it was 4.44.4 then the new one would be 4.44.5.)  Current version
+number is stored in Makefile.PL file.  See release.pl file for details.
+
+The release file is generated in the current directory and its full
+name is printed on the standard output.  You may grab it and upload to
+http://all.repec.org/ReDIF-perl/ for everyone to use.
+
+This is the most basic development scenario for these three auxilary
+projects.  For ACIS itself the darcs part is the same, but it has a
+separate package building script.
+
+
+IF release.pl SCRIPT FAILS
+
+    $ MAKEMAKEFILE=1 perl Makefile.PL
+    $ perl release.pl
+
+
+WORKING ON A LOCAL WORKING COPY OF A PROJECT
+
+ - installing darcs
+ - setting local darcs preferences
+    - .bashrc: export DARCS_EMAIL=user@machine 
+    - .bashrc: export DARCS_DONT_ESCAPE_8BIT=1
+ - getting a local copy:
+    $ darcs get --set-scripts-executable aacis@nebka.openlib.org:dev/project 
+
+
+
+SYNCING YOUR LOCAL CHANGES WITH THE CENTRAL REPOSITORY
+
+When starting a change:
+    $ darcs pull -a
+
+After doing a change:
+    $ darcs push 
+or 
+    $ darcs push -a
+
+
+
+BUILDING AN ACIS PACKAGE
+
+perl build/dist.pl [VERSION]
+perl build/dist.pl -f [VERSION]
+
+Some more details are in the build/dist.pl script.
+
+
+
+TESTING ACIS
+
+Latest ACIS can be installed on test.acis.openlib.org right from the
+development tree.  
+
+   aacis@nebka:~/dev/acis $ install.sh ~/acis
+
+Should upgrade test.acis to the current version in development.
+
+
+ReDIF-perl, AMF-perl and RePEc-Index may be packaged in their
+respective separate release files.  An ACIS distribution may or may not
+include these components as well.  (In the extra/ subdir.)
+
+
+
+
+
