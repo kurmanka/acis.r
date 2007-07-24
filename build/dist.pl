@@ -112,6 +112,7 @@ if ( $fullrelease ) {
   require 'build/get_latest_extra.pl';
 }
 
+system("chmod +x install.sh"); # this is because darcs does not manage file permissions, unfortunately
 
 system("MAKEMAKEFILE=1 perl Makefile.PL")==0 or die "perl Makefile.PL failed";
 system("make dist VERSION=$version")==0 or die "make dist failed";
