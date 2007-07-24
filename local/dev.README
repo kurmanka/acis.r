@@ -7,6 +7,24 @@ ABOUT THIS DOCUMENT
 Find the latest version of this document at
 aacis@nebka.openlib.org:dev/acis/local/dev.README
 
+This document is number 1 source for answers to your questions
+concerning ACIS development and maintenance.  Or for hints to these
+answers.
+
+Ideally, we should be writing this in a wiki, but I don't have time to
+install and maintain it.  If you install a wiki and maintain it, and
+import this document in it, I'll be happy to keep it there instead.
+
+
+OTHER SOURCES OF HELP
+
+Your number 2 source is ACIS documentation (if the question is about
+ACIS iteself).
+
+Your number 3 source is source code.  Source code is your most
+important helper.  Do not forget you have grep.  It is very useful to
+search through the source code.
+
 
 
 SEPARATE COMPONENTS
@@ -15,7 +33,8 @@ ACIS is not a monolithic program.  It is a large collection of modules,
 scripts, configuration files and templates.  And there are several
 components which are closely related to ACIS and are required to use
 it.  But these components may be used without ACIS, completely
-independently.  Therefore their source code is managed separately.
+independently.  Therefore their source code is managed and packaged
+separately.
 
 So here, in aacis@nebka:dev/, we have four directories, which
 correspond to four projects:
@@ -42,7 +61,7 @@ you need to submit it to the repository.  (Repository is where the
 source code revisions are stored.)  
 
 You will have to study the userguide of darcs, http://darcs.net/
-but you don't have to do it immediately.
+but you don't have to do it now.
 
 
 BASIC CODE EDITING PROCEDURE WITH DARCS
@@ -69,7 +88,6 @@ Then let's assume the tests passed fine and you want to submit your change:
 
 The text in quotes is the name of your patch.  It should briefly
 explain the substance of the change, or at least it's character.
-
 
 
 
@@ -110,7 +128,13 @@ WORKING ON A LOCAL WORKING COPY OF A PROJECT
     - .bashrc: export DARCS_DONT_ESCAPE_8BIT=1
  - getting a local copy:
     $ darcs get --set-scripts-executable aacis@nebka.openlib.org:dev/project 
+   this would make you a local directory "project" in your current
+   dir.
 
+   Replace "project" with 'acis', 'ReDIF-perl' and so on.  (See above)
+
+   Your local copy of a project's source code is called a working
+   copy.  
 
 
 SYNCING YOUR LOCAL CHANGES WITH THE CENTRAL REPOSITORY
@@ -122,6 +146,35 @@ After doing a change:
     $ darcs push 
 or 
     $ darcs push -a
+
+
+
+ADDING FILES TO A PACKAGE 
+
+If you create a new module, script or some other file, you may want to
+do two things:
+
+  - add it to the darcs repository. 
+        $ darcs add path/file.ext
+
+  - add it to the MANIFEST file
+        - see below
+        - $ make manifest
+        - or add it manually
+
+
+
+MANIFEST FILE
+
+There is a MANIFEST file in each of the project directories.  It lists
+all files to be packaged in a release of the project.
+
+A useful command: 
+   $ make manifest
+
+See also: MANIFEST.SKIP, google for "MANIFEST.SKIP file" or look it up
+in the perl camel book
+
 
 
 
@@ -141,14 +194,29 @@ development tree.
 
    aacis@nebka:~/dev/acis $ install.sh ~/acis
 
-Should upgrade test.acis to the current version in development.
+Should upgrade test.acis to the current version in ~/dev/acis.
 
+
+
+
+ACIS PACKAGES: UPGRADE AND FULL
 
 ReDIF-perl, AMF-perl and RePEc-Index may be packaged in their
 respective separate release files.  An ACIS distribution may or may not
 include these components as well.  (In the extra/ subdir.)
 
+See also: dev/acis/build/dist.pl
 
 
+
+
+SOME OTHER FEATURES OF A REVISION CONTROL SYSTEM
+
+You may roll back the changes submitted recently.  You may view history
+of changes (done by you and others).  You may get some previous
+revision of a file.  (not very easy with darcs, unfortunately.)  You
+may branch the development into stable and unstable tracks, and then
+merge after a while.  Several people can work on the same project
+independently and concurrently.
 
 
