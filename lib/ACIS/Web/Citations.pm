@@ -91,7 +91,6 @@ sub prepare() {
   if ( $dsid ) {
     $document = get_doc_by_sid $dsid;
   }
-
 }
 
 
@@ -131,6 +130,27 @@ sub count_significant_potential ($) {
     $count++;
   }
   return $count;
+}
+
+
+
+sub handle_document_removal {
+  my $dsid = shift;
+  debug "handle_document_removal($dsid)";
+  $acis = $ACIS::Web::ACIS;
+  $session = $acis -> session;
+  if ($session->{simmatrix}) {
+    $session->{simmatrix} ->delete_document($dsid);
+  }
+}
+
+sub handle_document_addition {
+  debug "handle_document_addition()";
+  $acis = $ACIS::Web::ACIS;
+  $session = $acis -> session;
+  if ($session->{simmatrix}) {
+    delete $session->{simmatrix};
+  }
 }
 
 

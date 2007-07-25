@@ -37,6 +37,7 @@ require ACIS::Data::DumpXML::Parser;
 use ACIS::Resources::Search;
 use ACIS::Resources::Suggestions;
 use ACIS::Resources::AutoSearch;
+use ACIS::Web::Citations;
 
 my $Conf;
 
@@ -197,8 +198,7 @@ sub prepare_identified {
   my $rec = $app -> session -> current_record;
   my $vars = $app-> variables;
   # prepare citations data, if citations are enabled in configuration and if there are some
-  if ( $app -> config( 'citations-profile' ) or $app->session->owner->{type}{citations} ) {
-    require ACIS::Web::Citations;
+  if ( $app ->config( 'citations-profile' ) or $app->session->owner->{type}{citations} ) {
     ACIS::Web::Citations::prepare();
     ACIS::Web::Citations::prepare_research_identified();
   }
@@ -494,11 +494,11 @@ sub accept_item {
     push @$accepted, $item;
     $acis -> userlog( "added contribution: id $id, role $role" );
     $acis -> userlog( "work title: '$item->{title}' (type: $item->{type})" );
-
     $action = "accepted";
+    require ACIS::Web::Citations;
+    ACIS::Web::Citations::handle_document_addition( $item );
 
   } else {
-
     ### do a replace, even though it might be unnecessary
     foreach ( @$accepted ) {
       if ( $_ ->{id} eq $id ) {
@@ -513,7 +513,6 @@ sub accept_item {
 
   $item -> {role}           = $role;
   $already_accepted ->{$id} = $role;
-
 
   if ( $action ) {
     $acis -> sevent(   -class => 'contrib',
@@ -532,13 +531,11 @@ sub accept_item {
 
 sub remove_item {
   my $id   = shift;
-  
   assert( $contributions );
   assert( $accepted );
   assert( $acis );
   my $already_accepted = $contributions -> {'already-accepted'};
   my $action;
-
 
   ### find it
   my $item;
@@ -557,18 +554,20 @@ sub remove_item {
   
   if ( defined $index 
        and $item ) {
-
     my $role  = $item ->{role};
     my $title = $item ->{title};
     my $type  = $item ->{type};
 
     $acis -> userlog( "deleting a contribution: id $id, role $role" );
     $acis -> userlog( "contribution title: '$title' (type: $item->{type})" );
-    
     splice @$accepted, $index, 1;
 
-    $action = 'removed';
+    if ($item->{sid}) {
+      require ACIS::Web::Citations;
+      ACIS::Web::Citations::handle_document_removal( $item->{sid} );
+    }
 
+    $action = 'removed';
     $acis -> sevent( -class  => 'contrib',
                      -action => 'removed',
                      -descr  => $title . " ($type, $id)",
@@ -582,7 +581,6 @@ sub remove_item {
   }
   
   delete $already_accepted ->{$id};
-
   return $action;
 }
 
@@ -598,19 +596,18 @@ sub refuse_item {
   assert( $acis );
   my $already_refused = $contributions -> {'already-refused'};
 
-
   if ( not $already_refused ->{$id} ) {
-
     if ( not $item ) {
       $item = { id => $id };
     }
     
     push @$refused, $item;
-
     $already_refused ->{$id} = 1;
-
     $acis -> userlog ( "refuse a contribution: id: $id" );
-    
+    if ($item->{sid}) {
+      ACIS::Web::Citations::handle_document_removal( $item->{sid} );
+    }
+   
     my $title = $item -> {title} || '';
     my $type  = $item -> {type}  || '';
     my $url   = $item -> {'url-about'} || '';
