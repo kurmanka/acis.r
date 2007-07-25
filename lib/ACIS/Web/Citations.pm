@@ -342,7 +342,11 @@ sub prepare_doclist {
   my $ind = {};
   foreach ( @$docsidlist ) {
     my $d = get_doc_by_sid $_;
-    confess "document not found: $_" if not $d;
+    #confess "document not found: $_" if not $d;
+    if (not $d) {
+      $mat->delete_document($_);
+      next;
+    }
     my $new = prepare_citations_list $mat->{new}{$_};
     my $old = prepare_citations_list $mat->{old}{$_};
     my $id  = $citations->{identified}{$_} || [];

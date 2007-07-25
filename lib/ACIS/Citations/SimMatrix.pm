@@ -173,6 +173,29 @@ sub _calculate_totals {
 }
 
 
+sub delete_document {
+  my $self = shift;
+  my $dsid = shift || die;
+  debug "delete document $dsid from matrix for $self->{psid}";
+  my $new = $self->{new};
+  my $old = $self->{old};
+  delete $new->{$dsid};
+  delete $old->{$dsid};
+  my $cits = $self->{citations};
+  foreach my $cnid ( keys %$cits ) {
+    my $hash = $cits->{$cnid};
+    delete $hash->{$dsid};
+    debug "delete $cnid \-> $dsid";
+    if (not scalar keys %$hash ) {
+      # clear $cits
+      delete $cits->{$cnid};
+      debug "clear cit $cnid";
+    }
+  }
+  $self->_calculate_totals;
+}
+
+
 sub most_interesting_doc {
   my $self = shift;
   my $doclist = $self->{doclist};
