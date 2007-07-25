@@ -296,7 +296,10 @@ sub process_identified {
     my $cnid = $cids{$_}; 
     my $cit = unidentify_citation_from_doc_by_cnid( $record, $dsid, $cnid );
 
-    assert( $cit->{ostring} );
+    if(not $cit->{ostring}) { 
+      warn "a citation with no ostring: $cnid (removed)"; 
+      next;
+    }
     $cit->{nstring} = make_citation_nstring $cit->{ostring};
     assert( $cit->{nstring} );
     assert( $cit->{cnid} );
