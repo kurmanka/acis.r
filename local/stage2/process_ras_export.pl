@@ -39,6 +39,8 @@ while( <INPUT> ) {
        or not $srcdocid 
        or not $trgdocid ) { next; }
   $count_all++;
+  $srcdocid =~ s/^repec/RePEc/;
+  $trgdocid =~ s/^repec/RePEc/;
 
   my $r = $findref_st->execute( $srcdocid, $md5 );
   my $array = $findref_st->fetchrow_arrayref
