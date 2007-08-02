@@ -20,15 +20,26 @@ sub cleanup {
   
   foreach ( @list ) {
     my $sfile = $sessions_dir . '/' . $_ ;
+    next if m/\.bad$/;
     next if not -f $sfile;
     print "session file: $sfile\n";
 
     my $session = ACIS::Web::Session -> load( $acis, $sfile );
 
     if ( not $session ) {
-      $acis -> errlog( "cleanup: bad session file $sfile" );
-      print "   bad session file\n";
-      unlink $sfile;
+      my ($dev,$ino,$mode,$nlink,$uid,$gid,$rdev,$size,$atime,$mtime,$ctime,$blksize,$blocks)
+        = stat($sfile);
+      my $now = time;
+      my $recent = $now - 10*60;
+      if ($mtime < $recent) {
+        # the file is old, and not likely to be updated
+        $acis -> errlog( "cleanup: bad session file $sfile" );
+        print "   bad session file\n";
+#        unlink $sfile;
+        rename $sfile, "$sfile.bad";
+      } else {
+        print "   unreadable session file, may be in use\n";
+      }
       next;
     }
 
