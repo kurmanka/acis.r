@@ -45,12 +45,10 @@
   
   <li><a ref='settings' title='email, password, etc.' >account settings</a></li>
 
-  <li><a ref='new-person' title='does not work'>create new personal record</a>
-
-  <!-- XXX -->
+<!-- YYY <li><a ref='new-person' title='does not work'>create new personal record</a> 
   <xsl:text> </xsl:text>
   <i>(Does not yet work)</i>
-  </li>
+  </li> -->
 
   <li><a ref='off'>log off</a></li>
 
@@ -72,7 +70,6 @@
 
     <xsl:variable name='id'  select='$rec/id/text()'/>
     <xsl:variable name='sid' select='$rec/sid/text()'/>
-    
 
     <xsl:choose>
       <xsl:when test='$rec/type="person"'>
@@ -84,13 +81,10 @@
         | <a ref='@({$sid})/contact'>contact</a>
         | <a ref='@({$sid})/affiliations'>affiliations</a>
         | <a ref='@({$sid})/research'>research</a>
-<!--        | <a ref='{$sid}/photo'>photo</a>
-        | <a ref='{$sid}/interests'>interests</a>
--->
-<!--        | <a ref='{$sid}/'></a> -->
-
+    <!--[if-config(citations-profile)]-->
+        | <a ref='@({$sid})/citations'>citations</a>
+    <!--[end-if]-->
         </small>
-        <!-- XXX remove the record -->
       </xsl:when>
       <xsl:otherwise>
 

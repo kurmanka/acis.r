@@ -10,6 +10,7 @@ my $acis = ACIS::Web -> new ( home => $homedir )
 my @f = grep {$_} split m/\s+/, qq( 
   $homedir/presentation/default/person/page.xsl
   $homedir/presentation/default/person/research/main.xsl
+  $homedir/presentation/default/user/records-menu.xsl
 );
 
 foreach my $file ( @f ) {
