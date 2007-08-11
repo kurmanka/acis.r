@@ -40,7 +40,7 @@ my $ardbconf = [
    "format:AppConfig",
   { copy_careful => "db-name db-user db-pass" },
   { rename_careful => "db-name<metadata-db-name" },
-  { set    => [ "db-aliases", "'acis=[[acis-db-name]] sid=[[sid-db-name]] rdb=[[metadata-db-name]]'" ] }
+  { set    => [ "db-aliases", "'acis=[[acis-db-name]][[db-name]] sid=[[sid-db-name]][[db-name]] rdb=[[metadata-db-name]][[db-name]]'" ] }
 ];
 
 my $shell = [
@@ -198,7 +198,7 @@ sub make_conf {
       $op = ( keys( %$_ ) ) [0];
 
     } else {
-      my ( $param, $value ) = split /:/, $_;
+      my ( $param, $value ) = split /:/, $_; #./
       $context -> {$param} = $value;
       next;
     }
