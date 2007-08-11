@@ -15,10 +15,10 @@ use vars qw(@EXPORT_OK);
 @EXPORT_OK=qw( process_urls_for_resource store_urls_for_dsid clear_urls_for_dsid clear_urls_from_source);
 
 
-require ARDB::Local;
 my ($ardb);
 sub prepare() {
   if ( not $ardb ) { 
+    require ARDB::Local;
     $ardb = ARDB -> new();
   }
 }

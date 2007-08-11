@@ -14,4 +14,3 @@ eval {
 my $ardb = ARDB -> new_bootstrap( $homedir );
 
 $ardb -> write_local( $ardb_local );
-
