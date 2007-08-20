@@ -116,6 +116,18 @@ if ( get 'metadata-db-name'
   @dbrequired = ();
 }
 
+#
+# ToK 2007-08-20
+# if sid-db-name is not defined, set it to db-name
+# 
+if(not $conf->get('sid-db-name')) {
+    $conf->set('sid-db-name',$conf->get('db-name'));
+}
+#
+# /ToK
+#
+
+
 my @absent = ();
 foreach ( @required, @dbrequired ) {
   if ( not $conf->get( $_ ) 
