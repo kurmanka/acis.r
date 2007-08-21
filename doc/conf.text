@@ -11,7 +11,7 @@ The <C>main.conf</C> file
 The primary configuration file of an ACIS installation is
 <co>main.conf</co>.  This file is an AppConfig file, which
 means it has a simple parameter=value syntax, described in
-detail in [AppConfig
+detail in [AppConfig 
 manpage](http://search.cpan.org/~abw/AppConfig/lib/AppConfig.pm).
 There is an example of such file in <f>main.conf.eg</f> in
 ACIS home directory.
@@ -148,6 +148,24 @@ ACIS will send.  Required.</dd>
 taken from <co>`which perl`</co> during
 <c>bin/setup</c>.</dd>
 
+
+<dt><C>perlbin</C></dt>
+
+<dd>Perl binary to use for ACIS and its utilities.  Default:
+taken from <co>`which perl`</co> during
+<c>bin/setup</c>.</dd>
+
+<dt><C>perllibprepend</C></dt>
+
+<dd>Type: string. The prepends a Perl library directory <i>directory</i>
+into the main CGI file <c>a.cgi</c>, right after <c>use lib qw(
+/home/awho/acis/lib );</c> it says <c>use lib qw( <i>directory</i> );</c>.
+
+<dt><C>perllibadd</C></dt>
+
+<dd>Type: string. The appends Perl library directory <i>directory</i>
+into the main CGI file <c>a.cgi</c>, by saying <c>BEGIN{ push @INC,
+'</c><i>directory</i><c>'; }</c>
 
 <dt><C>cgi-pperl-binary</C></dt>
 
