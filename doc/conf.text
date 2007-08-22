@@ -149,23 +149,26 @@ taken from <co>`which perl`</co> during
 <c>bin/setup</c>.</dd>
 
 
-<dt><C>perlbin</C></dt>
-
-<dd>Perl binary to use for ACIS and its utilities.  Default:
-taken from <co>`which perl`</co> during
-<c>bin/setup</c>.</dd>
-
 <dt><C>perllibprepend</C></dt>
 
-<dd>Type: string. The prepends a Perl library directory <i>directory</i>
-into the main CGI file <c>a.cgi</c>, right after <c>use lib qw(
-/home/awho/acis/lib );</c> it says <c>use lib qw( <i>directory</i> );</c>.
+<dd>Type: string. Additional directory for Perl libraries. This option
+prepends a Perl library directory <i>directory</i> into the main CGI
+file <c>a.cgi</c>.  It should be used to instruct perl about where to
+look for modules (in addition to standard perl library directories).
+See also: <c>@INC</c> entry in the <a
+href='http://perldoc.perl.org/perlvar.html'>perlvar</a> manpage and
+the <a href='http://perldoc.perl.org/functions/require.html'> require
+function</a> manpage.
+
 
 <dt><C>perllibadd</C></dt>
 
-<dd>Type: string. The appends Perl library directory <i>directory</i>
+<dd>Type: string. Additional directory
+for Perl libraries. This option appends 
+a Perl library directory <i>directory</i>
 into the main CGI file <c>a.cgi</c>, by saying <c>BEGIN{ push @INC,
-'</c><i>directory</i><c>'; }</c>
+'</c><i>directory</i><c>'; }</c>.
+
 
 <dt><C>cgi-pperl-binary</C></dt>
 
