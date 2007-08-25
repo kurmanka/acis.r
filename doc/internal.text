@@ -187,7 +187,7 @@ could have left it unmentioned without harm.  Basically it
 creates an object and calls a method on it (or two) and there it
 ends.  The other web-interface-related scripts mostly act in
 a similar way: they involve a certain part of the
-<c>ACIS::Web</c> and it does the rest.
+<co>ACIS::Web</co> and it does the rest.
 
 
 ### Summary
@@ -470,8 +470,8 @@ href='http://daringfireball.net/projects/markdown/'
 <dl>
 
 <dt><F>home/bin/conf.pl</F></dt>
-<dd>Reads <c>main.conf</c> and creates <c>thisconf.sh</c>,
-<c>ardb.conf</c>, <c>acis.conf</c>
+<dd>Reads <co>main.conf</co> and creates <co>thisconf.sh</co>,
+<co>ardb.conf</co>, <co>acis.conf</co>
 </dd>
 
 <dt><F>home/bin/rid</F></dt> <dd><a ref='ri-daemon'>Update
@@ -627,7 +627,7 @@ in case of the <co>new-institution</co> screen.</dd>
 <dd>Displayed in case of a 404 page not found error or when access denied.</dd>
 
 <dt><F>home/presentation/default/misc/local-document.xsl</F></dt>
-<dd>See <c>ACIS::Web::Site</c>.</dd>
+<dd>See <co>ACIS::Web::Site</co>.</dd>
 
 
 <dt><F>home/presentation/default/phrase.xml</F></dt><dd>
@@ -768,11 +768,11 @@ pictures of the users.  Not in use anymore.</dd>
 <dl>
 
 <dt><F>home/presentation/default/adm/events-decode.xsl</F></dt>
-<dd><c>/adm/events/decode</c> screen
+<dd><co>/adm/events/decode</co> screen
 </dd>
 
 <dt><F>home/presentation/default/adm/events-raw.xsl</F></dt>
-<dd><c>/adm/events/raw</c> screen
+<dd><co>/adm/events/raw</co> screen
 </dd>
 
 <dt><F>home/presentation/default/adm/events.xsl</F></dt>
@@ -892,7 +892,7 @@ Also: provides tools for some other modules.
 
 <dt><F>lib/ACIS/Web/Admin/Events.pm</F></dt>
 <dd>
-Powers <c>/adm/events/decode</c> and <c>/adm/events/raw</c>. 
+Powers <co>/adm/events/decode</co> and <co>/adm/events/raw</co>. 
 
 </dd>
 

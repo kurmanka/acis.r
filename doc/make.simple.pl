@@ -1,9 +1,13 @@
 #!/usr/bin/perl
 
 use strict;
-my $md = `which Markdown.pl`;
 
-if ( not $md ) { die "Markdown.pl not found"; }
+my $md = `which Markdown.pl`;
+chomp $md;
+$md ||= `which markdown`;
+chomp $md;
+
+if ( not $md ) { die "Markdown executable not found"; }
 
 chomp $md;
 

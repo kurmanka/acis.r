@@ -7,39 +7,39 @@
 <body>
       
 
-   <h1 id="id2261103">Programmer's guide (Internals)</h1>
+   <h1 id="id2252992">Programmer's guide (Internals)</h1>
 
 <h3><i>Table of contents</i></h3>
-<p class="toc">   <a href="#id2261110">Overview</a><br>   <a href="#id2261134">Data processing</a><br>      <a href="#id2261292">Summary</a><br>   <a href="#webinterface">Web interface</a><br>      <a href="#id2261482">Summary</a><br>   <a href="#id2261523">A brief guide to the ACIS source files</a><br>   <a href="#id2261755">A detailed guide to the ACIS source files</a><br>      <a href="#id2261763">Traditional meta files</a><br>      <a href="#id2261822">Documentation</a><br>      <a href="#id2262010">Installation and configuration</a><br>      <a href="#id2262235">Presenters and other presentation-related files</a><br>         <a href="#id2262239">General</a><br>         <a href="#id2262491">Users' screens</a><br>         <a href="#id2262562">Person-profile editing screens</a><br>         <a href="#id2262704">New user (initial registration) screens</a><br>         <a href="#id2262745">Administrative screens</a><br>         <a href="#id2262871">Email generation</a><br>         <a href="#id2262897">Other</a><br>      <a href="#id2262984">ACIS:: hierarchy</a><br>         <a href="#ACIS::Web">ACIS::Web -- Web interface of ACIS</a><br>         <a href="#id2263267">Research Profile underlying modules</a><br>         <a href="#id2263320">APU</a><br>         <a href="#id2263356">Citations</a><br>         <a href="#id2263459">Other ACIS:: modules</a><br>      <a href="#id2263515">Web::App -- the web application framework</a><br>         <a href="#id2263645">ACIS::Data::DumpXML</a><br>      <a href="#id2263690">ARDB -- the data-processing</a><br>      <a href="#id2263936">SQL helper</a><br>      <a href="#id2263976">Other</a><br></p>
+<p class="toc">   <a href="#id2252999">Overview</a><br>   <a href="#id2253024">Data processing</a><br>      <a href="#id2253182">Summary</a><br>   <a href="#webinterface">Web interface</a><br>      <a href="#id2253373">Summary</a><br>   <a href="#id2253414">A brief guide to the ACIS source files</a><br>   <a href="#id2253645">A detailed guide to the ACIS source files</a><br>      <a href="#id2253653">Traditional meta files</a><br>      <a href="#id2253712">Documentation</a><br>      <a href="#id2253901">Installation and configuration</a><br>      <a href="#id2254125">Presenters and other presentation-related files</a><br>         <a href="#id2254130">General</a><br>         <a href="#id2254381">Users' screens</a><br>         <a href="#id2254453">Person-profile editing screens</a><br>         <a href="#id2254595">New user (initial registration) screens</a><br>         <a href="#id2254635">Administrative screens</a><br>         <a href="#id2254762">Email generation</a><br>         <a href="#id2254787">Other</a><br>      <a href="#id2254875">ACIS:: hierarchy</a><br>         <a href="#ACIS::Web">ACIS::Web -- Web interface of ACIS</a><br>         <a href="#id2255158">Research Profile underlying modules</a><br>         <a href="#id2255210">APU</a><br>         <a href="#id2255246">Citations</a><br>         <a href="#id2255349">Other ACIS:: modules</a><br>      <a href="#id2255406">Web::App -- the web application framework</a><br>         <a href="#id2255535">ACIS::Data::DumpXML</a><br>      <a href="#id2255580">ARDB -- the data-processing</a><br>      <a href="#id2255826">SQL helper</a><br>      <a href="#id2255866">Other</a><br></p>
 
 
-   <h2 id="id2261110">Overview</h2>
+   <h2 id="id2252999">Overview</h2>
 
 <p>Internally, ACIS consists of two main subsystems and a
 number of smaller tools.  These two main parts are very
 different and do not know much about each other; they work
-or can work pretty independently.  First is the data
-processing subsystem.  Second is the web interface subsystem.
+or can work pretty independently.  First there is the data
+processing subsystem.  Second there is the web interface subsystem.
 The glue that makes them perform together as a single
-application is predefined and coordinated configuration, some
+application is the predefined and coordinated configuration, some
 shared modules and a bunch of scripts.</p>
 
-<p>The data processing subsystem processes input metadata.  It
-puts the data into database tables for the web interface to
-use.  Web interface handles user requests arriving through
-the web server.  Sometimes it creates data files, which data
-processing subsystem will process.  The system is complex,
-but consists of simple parts; each part has distinct
-responsibilities.</p>
+<p>The data processing subsystem processes input metadata.  It puts the
+data into database tables for the web interface to use.  The web
+interface subsystem handles user requests arriving through the web
+server.  Sometimes it creates data files, which data processing
+subsystem will process.  The system is complex, but consists of simple
+parts; each part has distinct responsibilities.</p>
 
 
-   <h2 id="id2261134">Data processing</h2>
+   <h2 id="id2253024">Data processing</h2>
 
 <p>The data processing subsystem, in its turn, consists of two loosely
 coupled parts.  The first part monitors data files, tracks their
 modifications, keeps records about data which is found in those files
 and filters out data records, which have bad identifiers.  For
-historical reasons, it has <b>RePEc-Index</b> name; RI for short.</p>
+historical reasons, it is called
+<b>RePEc-Index</b>, RI for short.</p>
 
 <p>The RePEc-Index is built around a simple idea that metadata comes from
 <b>collections</b>.  Each collection has a <b>name</b> (identifier), a
@@ -48,11 +48,11 @@ filesystem</b>.  Metadata is only useful when someone processes it for
 something.  So each collection may have <b>further processing</b>
 defined for it.  All these things are specified in the collections
 configuration.  ACIS creates this configuration for RePEc-Index
-(<code class="f BROKEN">RI/collections</code> file).</p>
+in the file <code class="f BROKEN">RI/collections</code>.</p>
 
 <p>In a collection, each file may contain zero, one or many <b>data
 records</b>.  Each data record must have a unique identifier.  If two
-or more records in a collection have the same identifier, it is a
+or more records in a collection have the same identifier, there is a
 <b>conflict</b>.  RePEc-Index excludes the conflicting records from
 further processing, until there's only one record left with a
 particular id.  When a data record is successfully read from a data
@@ -68,12 +68,13 @@ of information from it, run arbitrary perl code on it, store
 it in a database table.  Similarly, RePEc-Index calls ARDB
 when a <b>record disappears</b> (or when RI discovers an
 identifier conflict).  ARDB then <b>cleans up the
-database</b> respectively -- removes the data, which
+database</b>. It removes the data which
 originated from that record.</p>
 
-<p>ARDB's work is governed by an elaborate <b>configuration</b>
-(<code class="f BROKEN">configuration.xml</code> in home dir). <br>
-Configuration specifies what ARDB has to do when
+<p>ARDB's work is governed by an elaborate <b>configuration</b>.
+The configuration is stored in 
+(<code class="f BROKEN">configuration.xml</code> in the ACIS home directory. The <br>
+configuration specifies what ARDB has to do when
 processing a <b>record of a specific type</b>.  Possible
 kinds of actions: store some of the record's data into a
 database table, execute certain perl code, extract a
@@ -82,7 +83,7 @@ cleaning up a record, ARDB can remove database table records
 or call perl code.</p>
 
 <p>ARDB's configuration also defines <b>database tables</b>.  Those may
-be tables, which other parts of configuration refer to, but they don't
+be tables, which other parts of the configuration refer to, but they don't
 have to.  Either way, ARDB can create those tables for you; there is a
 script for that (<a class="c" href="adm.html#bincreate_tables">bin/create_tables</a>).  ACIS relies on this capability
 of ARDB to create tables which are needed.</p>
@@ -95,12 +96,12 @@ has a valid unique identifier, it asks ARDB to process it.  When
 RePEc-Index finds that a record has been removed from a data file, it
 asks ARDB to remove the record's data.  Also, when there is an id
 conflict, RePEc-Index will request ARDB to clean up the conflicting
-record's data.  Connection between RePEc-Index and ARDB is not
+record's data.  The connection between RePEc-Index and ARDB is not
 intrinsic; it is just in the way of how ACIS configures RI to 
 process the metadata.</p>
 
 
-   <h3 id="id2261292">Summary</h3>
+   <h3 id="id2253182">Summary</h3>
 
 <ul>
 <li><p>ACIS consists of data processing part and web-interface
@@ -118,7 +119,7 @@ data processing.</p></li>
 
    <h2 id="webinterface">Web interface</h2>
 
-<p>Web interface part of ACIS is:</p>
+<p>The web interface part of ACIS is:</p>
 
 <ul>
 <li><p>Perl code: CGI script + framework modules + ACIS-specific
@@ -134,8 +135,8 @@ contains general code for analysing a user's request,
 deciding how to treat that request and generating a
 response.  It helps ACIS to store and load user sessions and
 does a bunch of other little things for a web application.
-That's why I call it a web application framework and it's
-core is in <code>Web::App</code> module.</p>
+That's why I call it the web application framework. It's
+core is in the <code>Web::App</code> module.</p>
 
 <p>The second part contains the specifics of ACIS.  There lives
 code about ACIS user accounts, searching for research items
@@ -184,10 +185,10 @@ could have left it unmentioned without harm.  Basically it
 creates an object and calls a method on it (or two) and there it
 ends.  The other web-interface-related scripts mostly act in
 a similar way: they involve a certain part of the
-<a class="c" href="internal.html#ACIS::Web">ACIS::Web</a> and it does the rest.</p>
+<code>ACIS::Web</code> and it does the rest.</p>
 
 
-   <h3 id="id2261482">Summary</h3>
+   <h3 id="id2253373">Summary</h3>
 
 <ul>
 <li><p>ACIS is built on top of a generic web-application
@@ -205,7 +206,7 @@ single solid application.</p></li>
 
 
 
-   <h2 id="id2261523">A brief guide to the ACIS source files</h2>
+   <h2 id="id2253414">A brief guide to the ACIS source files</h2>
 
 <p>Main parts and some key files</p>
 
@@ -273,13 +274,13 @@ for details</dd>
 </dl>
 
 
-   <h2 id="id2261755">A detailed guide to the ACIS source files</h2>
+   <h2 id="id2253645">A detailed guide to the ACIS source files</h2>
 
 <p>This is an annotated list of most files of an ACIS
 distribution. </p>
 
 
-   <h3 id="id2261763">Traditional meta files</h3>
+   <h3 id="id2253653">Traditional meta files</h3>
 
 <dl>
 
@@ -310,7 +311,7 @@ novel.  Serious.</dd>
 </dl>
 
 
-   <h3 id="id2261822">Documentation</h3>
+   <h3 id="id2253712">Documentation</h3>
 
 <dl>
 
@@ -371,13 +372,13 @@ Corresponding documentation sources in <a href="http://daringfireball.net/projec
 </dl>
 
 
-   <h3 id="id2262010">Installation and configuration</h3>
+   <h3 id="id2253901">Installation and configuration</h3>
 
 <dl>
 
 <dt id="homebinconfpl"><code class="F">home/bin/conf.pl</code></dt>
-<dd>Reads <a class="c" href="conf.html#mainconf">main.conf</a> and creates <code class="c BROKEN">thisconf.sh</code>,
-<code class="c BROKEN">ardb.conf</code>, <code class="c BROKEN">acis.conf</code>
+<dd>Reads <code>main.conf</code> and creates <code>thisconf.sh</code>,
+<code>ardb.conf</code>, <code>acis.conf</code>
 </dd>
 
 <dt id="homebinrid"><code class="F">home/bin/rid</code></dt> <dd>
@@ -457,10 +458,10 @@ if necessary.  Copies all the files.  Runs
 </dl>
 
 
-   <h3 id="id2262235">Presenters and other presentation-related files</h3>
+   <h3 id="id2254125">Presenters and other presentation-related files</h3>
 
 
-   <h4 id="id2262239">General</h4>
+   <h4 id="id2254130">General</h4>
 
 <dl>
 
@@ -535,7 +536,7 @@ in case of the <code>new-institution</code> screen.</dd>
 <dd>Displayed in case of a 404 page not found error or when access denied.</dd>
 
 <dt id="homepresentationdefaultmisclocal-documentxsl"><code class="F">home/presentation/default/misc/local-document.xsl</code></dt>
-<dd>See <code class="c BROKEN">ACIS::Web::Site</code>.</dd>
+<dd>See <code>ACIS::Web::Site</code>.</dd>
 
 
 <dt id="homepresentationdefaultphrasexml"><code class="F">home/presentation/default/phrase.xml</code></dt>
@@ -572,7 +573,7 @@ problem in IE 6/Win and IE 5.5/Win.
 </dl>
 
 
-   <h4 id="id2262491">Users' screens</h4>
+   <h4 id="id2254381">Users' screens</h4>
 
 <dl>
 
@@ -601,7 +602,7 @@ problem in IE 6/Win and IE 5.5/Win.
 </dl>
 
 
-   <h4 id="id2262562">Person-profile editing screens</h4>
+   <h4 id="id2254453">Person-profile editing screens</h4>
 
 <dl>
 
@@ -656,7 +657,7 @@ pictures of the users.  Not in use anymore.</dd>
 </dl>
 
 
-   <h4 id="id2262704">New user (initial registration) screens</h4>
+   <h4 id="id2254595">New user (initial registration) screens</h4>
 
 <dl>
 
@@ -675,18 +676,18 @@ pictures of the users.  Not in use anymore.</dd>
 </dl>
 
 
-   <h4 id="id2262745">Administrative screens</h4>
+   <h4 id="id2254635">Administrative screens</h4>
 
 <dl>
 
 <dt id="homepresentationdefaultadmevents-decodexsl"><code class="F">home/presentation/default/adm/events-decode.xsl</code></dt>
 <dd>
-<code class="c BROKEN">/adm/events/decode</code> screen
+<code>/adm/events/decode</code> screen
 </dd>
 
 <dt id="homepresentationdefaultadmevents-rawxsl"><code class="F">home/presentation/default/adm/events-raw.xsl</code></dt>
 <dd>
-<code class="c BROKEN">/adm/events/raw</code> screen
+<code>/adm/events/raw</code> screen
 </dd>
 
 <dt id="homepresentationdefaultadmeventsxsl"><code class="F">home/presentation/default/adm/events.xsl</code></dt>
@@ -727,7 +728,7 @@ useful in the future or will be thrown away.</dd>
 </dl>
 
 
-   <h4 id="id2262871">Email generation</h4>
+   <h4 id="id2254762">Email generation</h4>
 
 <dl>
 
@@ -744,7 +745,7 @@ useful in the future or will be thrown away.</dd>
 </dl>
 
 
-   <h4 id="id2262897">Other</h4>
+   <h4 id="id2254787">Other</h4>
 
 <dl>
 
@@ -788,7 +789,7 @@ phrase.</dd>
 </dl>
 
 
-   <h3 id="id2262984">ACIS:: hierarchy</h3>
+   <h3 id="id2254875">ACIS:: hierarchy</h3>
 
 
    <h4 id="ACIS::Web">ACIS::Web -- Web interface of ACIS</h4>
@@ -810,7 +811,7 @@ Also: provides tools for some other modules.
 
 <dt id="libACISWebAdminEventspm"><code class="F">lib/ACIS/Web/Admin/Events.pm</code></dt>
 <dd>
-Powers <code class="c BROKEN">/adm/events/decode</code> and <code class="c BROKEN">/adm/events/raw</code>. 
+Powers <code>/adm/events/decode</code> and <code>/adm/events/raw</code>. 
 
 </dd>
 
@@ -917,7 +918,7 @@ User account storage module.  Reads and writes <a href="adm.html#userdata">userd
 </dl>
 
 
-   <h4 id="id2263267">Research Profile underlying modules</h4>
+   <h4 id="id2255158">Research Profile underlying modules</h4>
 
 <dl> 
 <dt id="libACISResourcesSearchpm"><code class="F">lib/ACIS/Resources/Search.pm</code></dt>
@@ -937,7 +938,7 @@ variations.  May be called in a forked background process (via
 </dl>
 
 
-   <h4 id="id2263320">APU</h4>
+   <h4 id="id2255210">APU</h4>
 
 <dl>
 <dt id="libACISAPUpm"><code class="F">lib/ACIS/APU.pm</code></dt>
@@ -952,7 +953,7 @@ variations.  May be called in a forked background process (via
 </dl>
 
 
-   <h4 id="id2263356">Citations</h4>
+   <h4 id="id2255246">Citations</h4>
 
 <dl>
 <dt id="libACISCitationsInputpm"><code class="F">lib/ACIS/Citations/Input.pm</code></dt>
@@ -988,7 +989,7 @@ variations.  May be called in a forked background process (via
 </dl>
 
 
-   <h4 id="id2263459">Other ACIS:: modules</h4>
+   <h4 id="id2255349">Other ACIS:: modules</h4>
 
 <dl>
 
@@ -1022,7 +1023,7 @@ ARDB::Record interface.
 </dl>
 
 
-   <h3 id="id2263515">Web::App -- the web application framework</h3>
+   <h3 id="id2255406">Web::App -- the web application framework</h3>
 
 <dl>
 
@@ -1074,7 +1075,7 @@ other modules. </dd>
 </dl>
 
 
-   <h4 id="id2263645">ACIS::Data::DumpXML</h4>
+   <h4 id="id2255535">ACIS::Data::DumpXML</h4>
 
 <p>ACIS::Data::DumpXML is an XML-serializer, used by
 <a class="c" href="internal.html#ACIS::Web">ACIS::Web</a> (and <a class="c" href="internal.html#WebApp">Web::App</a>).
@@ -1095,7 +1096,7 @@ perl data structure.</dd>
 </dl>
 
 
-   <h3 id="id2263690">ARDB -- the data-processing</h3>
+   <h3 id="id2255580">ARDB -- the data-processing</h3>
 
 <p>Abstract metadata database system.  Analyses independent
 metadata records and stores them in a database according to
@@ -1193,7 +1194,7 @@ framework.  It is for ARDB test scripts in <code class="f BROKEN">t/</code>.</dd
 </dl>
 
 
-   <h3 id="id2263936">SQL helper</h3>
+   <h3 id="id2255826">SQL helper</h3>
 
 <p>SQL helper module, used throughout ACIS.  Provides a
 conveniently-wrapped interface to MySQL with problem
@@ -1216,7 +1217,7 @@ logging.</p>
 </dl>
 
 
-   <h3 id="id2263976">Other</h3>
+   <h3 id="id2255866">Other</h3>
 
 <dl>
 
@@ -1237,7 +1238,7 @@ collection type for RePEc-Index.  This is for the <a href="stageD.html#fturls">F
 
   
 <address class="footer">
-<p>Generated: Sun Jul 22 09:22:36 2007</p>
+<p>Generated: Sun Aug 26 00:01:45 2007</p>
 <p><a href="http://acis.openlib.org/">ACIS project</a>,
           acis<i>@</i>openlib<span>.org</span></p>
 </address>

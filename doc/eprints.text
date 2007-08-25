@@ -274,7 +274,7 @@ number 2.
 #### From eprint's personal data to AMF *person* noun
 
 
-That is made in a separate function <c>decode_person()</c>.
+That is made in a separate function <co>decode_person()</co>.
 First, we create an empty AMF *person* noun.
 
 We populate the person noun with the <co>givenname</co> and

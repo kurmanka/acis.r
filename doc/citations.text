@@ -664,7 +664,7 @@ It may look like this:
     metadata-CitEc-home=/data/CitEc/amf
     metadata-CitEc-type=CitationsAMF
 
-The data files **must** have **<c>.amf.xml</c>** name
+The data files **must** have **<co>.amf.xml</co>** name
 extension to be processed by ACIS.
 
 

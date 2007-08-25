@@ -3,10 +3,9 @@
 use strict;
 use Carp::Assert;
 
-#my $md = './Markdown.pl';
-my $md = `which Markdown.pl`;
+my $md = `which markdown` || `which Markdown.pl`;
 chomp $md;
-if ( not $md ) { die "Markdown.pl not found"; }
+if ( not $md ) { die "markdown executable not found"; }
 
 #my $sp = './SmartyPants.pl';
 my $sp = `which SmartyPants.pl`;

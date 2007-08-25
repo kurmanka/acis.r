@@ -153,22 +153,22 @@ taken from <co>`which perl`</co> during
 
 <dd>Type: string. Additional directory for Perl libraries. This option
 prepends a Perl library directory <i>directory</i> into the main CGI
-file <c>a.cgi</c>.  It should be used to instruct perl about where to
+file <co>a.cgi</co>.  It should be used to instruct perl about where to
 look for modules (in addition to standard perl library directories).
-See also: <c>@INC</c> entry in the <a
+See also: <co>@INC</co> entry in the <a
 href='http://perldoc.perl.org/perlvar.html'>perlvar</a> manpage and
 the <a href='http://perldoc.perl.org/functions/require.html'> require
 function</a> manpage.
-
+</dd>
 
 <dt><C>perllibadd</C></dt>
 
 <dd>Type: string. Additional directory
 for Perl libraries. This option appends 
 a Perl library directory <i>directory</i>
-into the main CGI file <c>a.cgi</c>, by saying <c>BEGIN{ push @INC,
-'</c><i>directory</i><c>'; }</c>.
-
+into the main CGI file <co>a.cgi</co>, by saying <co>BEGIN{ push @INC,
+'</co><i>directory</i><co>'; }</co>.
+</dd>
 
 <dt><C>cgi-pperl-binary</C></dt>
 
