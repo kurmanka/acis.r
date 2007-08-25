@@ -10,19 +10,18 @@ Overview
 Internally, ACIS consists of two main subsystems and a
 number of smaller tools.  These two main parts are very
 different and do not know much about each other; they work
-or can work pretty independently.  First is the data
-processing subsystem.  Second is the web interface subsystem.
+or can work pretty independently.  First there is the data
+processing subsystem.  Second there is the web interface subsystem.
 The glue that makes them perform together as a single
-application is predefined and coordinated configuration, some
+application is the predefined and coordinated configuration, some
 shared modules and a bunch of scripts.
 
-The data processing subsystem processes input metadata.  It
-puts the data into database tables for the web interface to
-use.  Web interface handles user requests arriving through
-the web server.  Sometimes it creates data files, which data
-processing subsystem will process.  The system is complex,
-but consists of simple parts; each part has distinct
-responsibilities.
+The data processing subsystem processes input metadata.  It puts the
+data into database tables for the web interface to use.  The web
+interface subsystem handles user requests arriving through the web
+server.  Sometimes it creates data files, which data processing
+subsystem will process.  The system is complex, but consists of simple
+parts; each part has distinct responsibilities.
 
 
 
@@ -33,7 +32,8 @@ The data processing subsystem, in its turn, consists of two loosely
 coupled parts.  The first part monitors data files, tracks their
 modifications, keeps records about data which is found in those files
 and filters out data records, which have bad identifiers.  For
-historical reasons, it has <b>RePEc-Index</b> name; RI for short.
+historical reasons, it is called
+<b>RePEc-Index</b>, RI for short.
 
 The RePEc-Index is built around a simple idea that metadata comes from
 <b>collections</b>.  Each collection has a <b>name</b> (identifier), a
@@ -42,11 +42,11 @@ filesystem</b>.  Metadata is only useful when someone processes it for
 something.  So each collection may have <b>further processing</b>
 defined for it.  All these things are specified in the collections
 configuration.  ACIS creates this configuration for RePEc-Index
-(<f>RI/collections</f> file).
+in the file <f>RI/collections</f>.
 
 In a collection, each file may contain zero, one or many <b>data
 records</b>.  Each data record must have a unique identifier.  If two
-or more records in a collection have the same identifier, it is a
+or more records in a collection have the same identifier, there is a
 <b>conflict</b>.  RePEc-Index excludes the conflicting records from
 further processing, until there's only one record left with a
 particular id.  When a data record is successfully read from a data
@@ -64,12 +64,13 @@ of information from it, run arbitrary perl code on it, store
 it in a database table.  Similarly, RePEc-Index calls ARDB
 when a <b>record disappears</b> (or when RI discovers an
 identifier conflict).  ARDB then <b>cleans up the
-database</b> respectively -- removes the data, which
+database</b>. It removes the data which
 originated from that record.
 
-ARDB's work is governed by an elaborate <b>configuration</b>
-(<f>configuration.xml</f> in home dir).  
-Configuration specifies what ARDB has to do when
+ARDB's work is governed by an elaborate <b>configuration</b>.
+The configuration is stored in 
+(<f>configuration.xml</f> in the ACIS home directory. The  
+configuration specifies what ARDB has to do when
 processing a <b>record of a specific type</b>.  Possible
 kinds of actions: store some of the record's data into a
 database table, execute certain perl code, extract a
@@ -78,7 +79,7 @@ cleaning up a record, ARDB can remove database table records
 or call perl code.
 
 ARDB's configuration also defines <b>database tables</b>.  Those may
-be tables, which other parts of configuration refer to, but they don't
+be tables, which other parts of the configuration refer to, but they don't
 have to.  Either way, ARDB can create those tables for you; there is a
 script for that (<c>bin/create_tables</c>).  ACIS relies on this capability
 of ARDB to create tables which are needed.
@@ -91,7 +92,7 @@ has a valid unique identifier, it asks ARDB to process it.  When
 RePEc-Index finds that a record has been removed from a data file, it
 asks ARDB to remove the record's data.  Also, when there is an id
 conflict, RePEc-Index will request ARDB to clean up the conflicting
-record's data.  Connection between RePEc-Index and ARDB is not
+record's data.  The connection between RePEc-Index and ARDB is not
 intrinsic; it is just in the way of how ACIS configures RI to 
 process the metadata.
 
@@ -116,7 +117,7 @@ process the metadata.
 <h2 id='webinterface'>Web interface</h2>
 
 
-Web interface part of ACIS is:
+The web interface part of ACIS is:
 
 - Perl code: CGI script + framework modules + ACIS-specific
   modules + helper scripts
@@ -134,8 +135,8 @@ contains general code for analysing a user's request,
 deciding how to treat that request and generating a
 response.  It helps ACIS to store and load user sessions and
 does a bunch of other little things for a web application.
-That's why I call it a web application framework and it's
-core is in <co>Web::App</co> module.
+That's why I call it the web application framework. It's
+core is in the <co>Web::App</co> module.
 
 The second part contains the specifics of ACIS.  There lives
 code about ACIS user accounts, searching for research items
