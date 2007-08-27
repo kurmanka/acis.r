@@ -1,16 +1,16 @@
 <html>
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-<title>ACIS administrator's guide / ACIS documentation</title>
+<title>ACIS administrator’s guide / ACIS documentation</title>
 <link rel="stylesheet" href="style.css">
 </head>
 <body>
       
 
-   <h1 id="id2261460">ACIS administrator's guide</h1>
+   <h1 id="id2262364">ACIS administrator’s guide</h1>
 
 <h3><i>Table of contents</i></h3>
-<p class="toc">   <a href="#utils">Utilities in <code class="f BROKEN">{HOME}/bin/</code></a><br>      <a href="#bincreate_tables"><code class="C">bin/create_tables</code> script</a><br>      <a href="#binbackup_tables"><code class="C">bin/backup_tables</code> script</a><br>      <a href="#binrestore_table_backup"><code class="C">bin/restore_table_backup</code> script</a><br>      <a href="#binrid"><code class="C">bin/rid</code> script</a><br>      <a href="#binupdareq"><code class="C">bin/updareq</code> script</a><br>      <a href="#binsid_base"><code class="C">bin/sid_base</code> script</a><br>      <a href="#binclean-up"><code class="C">bin/clean-up</code> script</a><br>      <a href="#id2261838"><code>bin/apu</code> script</a><br>      <a href="#binevents_archiving"><code class="C">bin/events_archiving</code> script</a><br>   <a href="#short-ids">The short-ids</a><br>   <a href="#id2261903">Logging.  Tracking and debugging problems</a><br>      <a href="#id2261923">Web interface and users' interactions</a><br>      <a href="#id2261991">Automatic profile update (APU)</a><br>      <a href="#id2262007">Background searches for documents and other resources</a><br>      <a href="#id2262025">Sessions</a><br>      <a href="#id2262056">Metadata processing</a><br>      <a href="#id2262118">The log of short-ids</a><br>      <a href="#id2262144">MySQL log</a><br>      <a href="#id2262158">Archiving and rotating the logs</a><br>      <a href="#events-database">The events database</a><br>   <a href="#id2262250">What to back up and how to restore</a><br>      <a href="#id2262253">Critical data</a><br>      <a href="#id2262350">Other data</a><br>         <a href="#id2262386">MySQL tables</a><br>         <a href="#id2262420">Update daemon database</a><br>      <a href="#id2262447">Restoring a service after a crash</a><br>   <a href="#userdata">Managing user accounts</a><br>      <a href="#userdata-owner">Userdata structure: owner branch</a><br>      <a href="#userdata-records-personal">Userdata structure: records branch. Personal record</a><br>   <a href="#adm-slash">Administrator's screens</a><br>      <a href="#adm-slash-access">Access</a><br>      <a href="#admsql"><code class="C">/adm/sql</code></a><br>      <a href="#admevents"><code class="C">/adm/events</code></a><br>         <a href="#id2263067">Checking a particular date</a><br>         <a href="#id2263104">Filters</a><br>         <a href="#admeventsrecent"><code class="C">/adm/events/recent</code></a><br>         <a href="#admeventspref"><code class="C">/adm/events/pref</code></a><br>      <a href="#admsearch"><code class="C">/adm/search</code></a><br>      <a href="#admsessions"><code class="C">/adm/sessions</code></a><br>   <a href="#id2263260">Customizing an ACIS installation</a><br>      <a href="#phrases">Phrases</a><br>      <a href="#site">Building a site around an ACIS installation</a><br>   <a href="#installation-files">Files in an ACIS installation</a><br></p>
+<p class="toc">   <a href="#utils">Utilities in <code class="f BROKEN">{HOME}/bin/</code></a><br>      <a href="#bincreate_tables"><code class="C">bin/create_tables</code> script</a><br>      <a href="#binbackup_tables"><code class="C">bin/backup_tables</code> script</a><br>      <a href="#binrestore_table_backup"><code class="C">bin/restore_table_backup</code> script</a><br>      <a href="#binrid"><code class="C">bin/rid</code> script</a><br>      <a href="#binupdareq"><code class="C">bin/updareq</code> script</a><br>      <a href="#binsid_base"><code class="C">bin/sid_base</code> script</a><br>      <a href="#binclean-up"><code class="C">bin/clean-up</code> script</a><br>      <a href="#id2262753"><code>bin/apu</code> script</a><br>      <a href="#binevents_archiving"><code class="C">bin/events_archiving</code> script</a><br>   <a href="#short-ids">The short-ids</a><br>   <a href="#id2262819">Logging.  Tracking and debugging problems</a><br>      <a href="#id2262839">Web interface and users’ interactions</a><br>      <a href="#id2262912">Automatic profile update (APU)</a><br>      <a href="#id2262928">Background searches for documents and other resources</a><br>      <a href="#id2262952">Sessions</a><br>      <a href="#id2262989">Metadata processing</a><br>      <a href="#id2263058">The log of short-ids</a><br>      <a href="#id2263084">MySQL log</a><br>      <a href="#id2263097">Archiving and rotating the logs</a><br>      <a href="#events-database">The events database</a><br>   <a href="#id2263194">What to back up and how to restore</a><br>      <a href="#id2263198">Critical data</a><br>      <a href="#id2263294">Other data</a><br>         <a href="#id2263330">MySQL tables</a><br>         <a href="#id2263364">Update daemon database</a><br>      <a href="#id2263391">Restoring a service after a crash</a><br>   <a href="#userdata">Managing user accounts</a><br>      <a href="#userdata-owner">Userdata structure: owner branch</a><br>      <a href="#userdata-records-personal">Userdata structure: records branch. Personal record</a><br>   <a href="#adm-slash">Administrator’s screens</a><br>      <a href="#adm-slash-access">Access</a><br>      <a href="#admsql"><code class="C">/adm/sql</code></a><br>      <a href="#admevents"><code class="C">/adm/events</code></a><br>         <a href="#id2264044">Checking a particular date</a><br>         <a href="#id2264085">Filters</a><br>         <a href="#admeventsrecent"><code class="C">/adm/events/recent</code></a><br>         <a href="#admeventspref"><code class="C">/adm/events/pref</code></a><br>      <a href="#admsearch"><code class="C">/adm/search</code></a><br>      <a href="#admsessions"><code class="C">/adm/sessions</code></a><br>   <a href="#id2264259">Customizing an ACIS installation</a><br>      <a href="#phrases">Phrases</a><br>      <a href="#site">Building a site around an ACIS installation</a><br>   <a href="#installation-files">Files in an ACIS installation</a><br></p>
 
 <p>Other related files:</p>
 
@@ -23,7 +23,7 @@
    <h2 id="utils">Utilities in <code class="f BROKEN">{HOME}/bin/</code>
 </h2>
 
-<p><a class="c" href="conf.html#binsetup">bin/setup</a> -- update system's configuration.</p>
+<p><a class="c" href="conf.html#binsetup">bin/setup</a> — update system’s configuration.</p>
 
 <h3 id="bincreate_tables" C="bin/create_tables">
 <code class="C">bin/create_tables</code> script</h3>
@@ -50,15 +50,15 @@ the ACIS database.  Currently these are:</p>
 sid.sid_id_to_handle sid.sid_last_numbers
 </code></pre>
 
-<p>"acis" and "sid" here stand for your configuration values
+<p>“acis” and “sid” here stand for your configuration values
 <a class="c" href="conf.html#acis-db-name">acis-db-name</a> and <a class="c" href="conf.html#sid-db-name">sid-db-name</a> respectively if they are
 defined, or <a class="c" href="conf.html#db-name">db-name</a> if they are not.</p>
 
 <p>A directory is created for the backup files, based on
 <a class="c" href="conf.html#backup-directory">backup-directory</a> and the current date.  For example,
-if <a class="c" href="conf.html#backup-directory">backup-directory</a> is set to "/opt/ACIS/backup", and
+if <a class="c" href="conf.html#backup-directory">backup-directory</a> is set to “/opt/ACIS/backup”, and
 executed on 1 September 2006, it would be:
-"/opt/ACIS/backup/2006/09/01/".  The <a class="c" href="conf.html#backup-directory">backup-directory</a>
+“/opt/ACIS/backup/2006/09/01/”.  The <a class="c" href="conf.html#backup-directory">backup-directory</a>
 must exist already, but its subdirectories will be created
 if the do not exist.</p>
 
@@ -66,7 +66,7 @@ if the do not exist.</p>
 <tt>FILE</tt> and <tt>LOCK TABLES</tt> privileges on the
 server. </p>
 
-<p>You don't have to shut down the service to create backups
+<p>You don’t have to shut down the service to create backups
 with this utility.</p>
 
 <h3 id="binrestore_table_backup" C="bin/restore_table_backup">
@@ -98,7 +98,7 @@ stops the <a href="daemon.html#ri-daemon">update daemon</a>.
 or dir <code>PATH</code> in collection <code>COLLECTION</code>.
 <code>TOO_OLD</code> is time in seconds.  If a file was last
 time processed more than <code>TOO_OLD</code> seconds ago, the
-daemon will process it again (even if it didn't change
+daemon will process it again (even if it didn’t change
 since).  By default, <code>TOO_OLD</code> is
 <code>86400*12</code> seconds, which means 12 days.  </dd>
 
@@ -149,10 +149,10 @@ itentifiers.</dd>
 how old it is and what session type it is and will close the
 session if its time has come.</p>
 
-<p>A new-user session's time has come if it is a week old.
+<p>A new-user session’s time has come if it is a week old.
 Such sessions are wiped out without regret.</p>
 
-<p>A regular user session's time has come if it is older than
+<p>A regular user session’s time has come if it is older than
 <a class="c" href="conf.html#session-lifetime">session-lifetime</a> seconds, as specified in
 configuration.  When closing a regular user session, her
 data (possibily changed) will be saved and her profile page
@@ -167,7 +167,7 @@ capture its output into a log file.  For example</p>
 </code></pre>
 
 
-   <h3 id="id2261838">
+   <h3 id="id2262753">
 <code>bin/apu</code> script</h3>
 
 <p>See <a class="c" href="apu.html#binapu">bin/apu</a>.</p>
@@ -200,20 +200,20 @@ and its longer counter-part.</p>
 logged into <code class="f BROKEN">SID/short-id.log</code>.</p>
 
 
-   <h2 id="id2261903">Logging.  Tracking and debugging problems</h2>
+   <h2 id="id2262819">Logging.  Tracking and debugging problems</h2>
 
 <p>ACIS is a complicated software and keeps a number of
 different logs.  Each subsystem maintains its own log, and
-sometimes -- several logs.  The logs give you capability to
+sometimes — several logs.  The logs give you capability to
 see what is going on and to track problems, if any.  <a href="adm.html#installation-files">Below in another section</a> there
 is a list of files in an installation of ACIS, including the
 logs.  Here is a description of what is logged and into
 which files.</p>
 
 
-   <h3 id="id2261923">Web interface and users' interactions</h3>
+   <h3 id="id2262839">Web interface and users’ interactions</h3>
 
-<p>The users' interactions with the system are logged into the
+<p>The users’ interactions with the system are logged into the
 <code class="f BROKEN">acis.log</code> file.  This is the main log, which shows
 what users were or are doing with the system.  Problems and
 errors that happen during these interactions are
@@ -230,14 +230,14 @@ brief log and it only contains the trailing URL part of the
 request, and it should give you an idea about which screen
 the request was for.</p>
 
-<p>Also, it is important to monitor the web-server's error log.
-If something doesn't work well in ACIS, and its code crashes
+<p>Also, it is important to monitor the web-server’s error log.
+If something doesn’t work well in ACIS, and its code crashes
 unexpectedly before even being able to handle the request or
-during that, only the web-server's logs will contain info
+during that, only the web-server’s logs will contain info
 and details about the problem.</p>
 
 <p>In case of real problems of ACIS web interface misbehaving,
-the "debuggings" log may get useful.  To enable it set the
+the “debuggings” log may get useful.  To enable it set the
 <a class="c" href="conf.html#debug-log">debug-log</a> parameter in main.conf to a file name.  For
 each incoming request handled by ACIS, it will contain a
 detailed trace of everything what happens internally.  One
@@ -247,46 +247,46 @@ it will slow things down considerably and will eat your
 diskspace quickly.</p>
 
 
-   <h3 id="id2261991">Automatic profile update (APU)</h3>
+   <h3 id="id2262912">Automatic profile update (APU)</h3>
 
 <p>APU-related activity (see <a class="c" href="apu.html#binapu">bin/apu</a>) is logged into the
 <code class="f BROKEN">autoprofileupdate.log</code> file.</p>
 
 
-   <h3 id="id2262007">Background searches for documents and other resources</h3>
+   <h3 id="id2262928">Background searches for documents and other resources</h3>
 
 <p>When a user enters hers research profile after a while or
 after she changes her name variations, ACIS runs an
 automatic search for research.  APU processing for a record
 also runs this search.  In both cases it is run in the
 background, not under the web-server process, as the CGI
-requests are.  So it is logged into a separate log--the
+requests are.  So it is logged into a separate log—the
 <code class="f BROKEN">back.log</code> file.  It shows which name variations where
 searched and how many matching items were found.</p>
 
 
-   <h3 id="id2262025">Sessions</h3>
+   <h3 id="id2262952">Sessions</h3>
 
 <p>Sessions are created by the web interface of ACIS, and so it
 is usually logged together with other events of the web
 interface.  But the abandoned or left sessions are taken
 care of by the <a class="c" href="adm.html#binclean-up">bin/clean-up</a> script.  It closes the
-expired sessions, saving the changes to the user's accounts,
+expired sessions, saving the changes to the user’s accounts,
 if necessary.  And while it does not itself write a log, we
 recommend that you configure the cronjob to redirect its
 output into the <code class="f BROKEN">clean-up.log</code> file.</p>
 
 <p>But if you need to check the currently active sessions and,
 possibly, to peek into one of them, use the
-<a class="c" href="adm.html#admsessions">/adm/sessions</a> administrator's screen.</p>
+<a class="c" href="adm.html#admsessions">/adm/sessions</a> administrator’s screen.</p>
 
 
-   <h3 id="id2262056">Metadata processing</h3>
+   <h3 id="id2262989">Metadata processing</h3>
 
 <p>Metadata is processed by the <a href="daemon.html">update
 daemon</a> and the update daemon writes several logs.  One
 log is general and covers the update requests coming from
-applications (including ACIS' web interface) and utilities
+applications (including ACIS’ web interface) and utilities
 (<a class="c" href="adm.html#binupdareq">bin/updareq</a>).  It documents the essential details of
 each request: the collection id, the path to update, the
 <code>TOO_OLD</code> parameter and, of course, time of the
@@ -301,17 +301,17 @@ channels becomes available.</p>
 
 <p>Each of the channels has its own logfile.  These are named
 from <code class="f BROKEN">RI/update_ch0.log</code> for channel no. 0 through
-<code class="f BROKEN">RI/update_ch4.log</code> for channel no. 4.  A channel's log
+<code class="f BROKEN">RI/update_ch4.log</code> for channel no. 4.  A channel’s log
 includes all the details of the requests taken and the
 processing details.  If any problems or errors happen during
-processing, they would normally be reported to the channel's
+processing, they would normally be reported to the channel’s
 log.</p>
 
 <p>The actual metadata processing also involves ARDB.  That
 work is logged into the <code class="f BROKEN">ardb.log</code> file.</p>
 
 
-   <h3 id="id2262118">The log of short-ids</h3>
+   <h3 id="id2263058">The log of short-ids</h3>
 
 <p>All created and assigned <a href="adm.html#short-ids">short-ids</a>
 are logged into the <code class="f BROKEN">SID/short-id.log</code>.</p>
@@ -320,7 +320,7 @@ are logged into the <code class="f BROKEN">SID/short-id.log</code>.</p>
 <a class="c" href="adm.html#binsid_base">bin/sid_base</a> script.</p>
 
 
-   <h3 id="id2262144">MySQL log</h3>
+   <h3 id="id2263084">MySQL log</h3>
 
 <p>If an SQL query or a statement fails, it is logged into the
 <code class="f BROKEN">sql.log</code> file, with all the details.  Normally this
@@ -328,7 +328,7 @@ log will only contain messages about database connections
 having been established or re-established.</p>
 
 
-   <h3 id="id2262158">Archiving and rotating the logs</h3>
+   <h3 id="id2263097">Archiving and rotating the logs</h3>
 
 <p>For an actively used service the amounts of logs generated
 is great and no matter how big your harddrive is, one day
@@ -352,7 +352,7 @@ logrotate tool.</p>
 <p>If the version of logrotate you have supports <code>dateext</code>
 directive, you may use that as well.</p>
 
-<p>You will probably want to rotate your web-server's logs in a
+<p>You will probably want to rotate your web-server’s logs in a
 similar fashion.</p>
 
 
@@ -365,7 +365,7 @@ the usual logs are, but it is a MySQL database table with a
 number of columns for capturing different kinds of events in
 detail.  You can browse that table with your favorite MySQL
 database management tool, like PHPMyAdmin (the table is
-surprisingly named "events"), but some details will be
+surprisingly named “events”), but some details will be
 hidden from you because of the data packing method used.  So
 we suggest to use the <a class="c" href="adm.html#admevents">/adm/events</a> screen instead,
 because it was designed for this purpose.</p>
@@ -385,10 +385,10 @@ occasionally).  It will pack parts of the database and make
 loading things from it quicker.</p>
 
 
-   <h2 id="id2262250">What to back up and how to restore</h2>
+   <h2 id="id2263194">What to back up and how to restore</h2>
 
 
-   <h3 id="id2262253">Critical data</h3>
+   <h3 id="id2263198">Critical data</h3>
 
 <p>There are two most critical things you should backup
 regularly in a service: the userdata files and the short-id
@@ -427,7 +427,7 @@ added to your ACIS installation or modified in it.</li>
 service with moderate effort in moderate time.</p>
 
 
-   <h3 id="id2262350">Other data</h3>
+   <h3 id="id2263294">Other data</h3>
 
 <p>To allow even faster and smoother recovery after a severe
 system failure with a data loss you may also keep backups of
@@ -447,7 +447,7 @@ enough space.  In that case additionally create copies of:</p>
 </ul>
 
 
-   <h4 id="id2262386">MySQL tables</h4>
+   <h4 id="id2263330">MySQL tables</h4>
 
 <p>See <a class="c" href="adm.html#binbackup_tables">bin/backup_tables</a> and <a class="c" href="adm.html#binrestore_table_backup">bin/restore_table_backup</a> scripts.</p>
 
@@ -456,7 +456,7 @@ and all the section <a href="http://dev.mysql.com/doc/refman/4.1/en/disaster-pre
 and Recovery</a>. (These links are for MySQL version 4.1.)</p>
 
 
-   <h4 id="id2262420">Update daemon database</h4>
+   <h4 id="id2263364">Update daemon database</h4>
 
 <p>The update daemon uses Berkeley DB for storing its data.  Consult its
 documentation for backup instructions: <a href="http://www.sleepycat.com/docs/ref/transapp/archival.html">Database and
@@ -466,11 +466,11 @@ log file archival</a>.</p>
 much easier then.</p>
 
 
-   <h3 id="id2262447">Restoring a service after a crash</h3>
+   <h3 id="id2263391">Restoring a service after a crash</h3>
 
 <p>Of course, how you are going to restore a service depends
 greatly on what damage happened.
-If you have lost the machine with all its setup, you'll
+If you have lost the machine with all its setup, you’ll
 have to recreate the installation and its configuration
 first.  Then restore from backups all the files that you can
 restore.</p>
@@ -483,10 +483,10 @@ structure or restore the databases from your backups if
 you have them.</p>
 
 <p>If you still have the tables after the crash, check and
-try to recover them with MySQL's table integrity checking
+try to recover them with MySQL’s table integrity checking
 utilities.</p>
 </li>
-<li><p>Restore the <code class="f BROKEN">userdata/</code> directory's contents from
+<li><p>Restore the <code class="f BROKEN">userdata/</code> directory’s contents from
 your backups.</p></li>
 <li><p>Restore the <code class="f BROKEN">SID/short-ids.log</code> log from your
 backups.</p></li>
@@ -513,19 +513,19 @@ files.  These files use <code>ACIS::Data::DumpXML</code> format,
 which means such a file represents a Perl data structure.
 Having it in XML means it is human-readable and -editable at
 the same time.  By editing an account (i.e. a userdata) file
-you directly edit the user's information, and so you have
+you directly edit the user’s information, and so you have
 power to change it in any way.</p>
 
 <p>The <code class="f BROKEN">userdata/</code> directory has two-level structure.
 Userdata file for account <code>vasya@pupkin.com</code> will be
 in <code class="f BROKEN">userdata/v/a/vasya@pupkin.com.xml</code>.
-"<code>v</code>" and "<code>a</code>" are the first two English
-letter-characters of the user's account name (email
+“<code>v</code>” and “<code>a</code>” are the first two English
+letter-characters of the user’s account name (email
 address).</p>
 
 <p>Userdata file for each account consists of two main parts:
-the user part -- <code>owner</code> element and and the records
-part -- <code>records</code> element.  In XML terms, both are
+the user part — <code>owner</code> element and and the records
+part — <code>records</code> element.  In XML terms, both are
 children of document element <code>data</code>:</p>
 
 <pre><code>   &lt;data&gt;
@@ -541,16 +541,16 @@ children of document element <code>data</code>:</p>
 <p>In XPath abbreviated syntax, the first is
 <code>/data/owner</code> and the second is
 <code>/data/records</code>.  Each of these elements has its own
-purpose and structure.  Therefore below I'll call them
+purpose and structure.  Therefore below I’ll call them
 owner branch and records branch respectively.</p>
 
 
    <h3 id="userdata-owner">Userdata structure: owner branch</h3>
 
 <p>Owner branch of a userdata file describes the account and
-the user.  It's primary content are <code>login</code>,
+the user.  It’s primary content are <code>login</code>,
 <code>name</code>, <code>password</code> elements, whose purpose
-won't be a great puzzle for you.  To make it clear,
+won’t be a great puzzle for you.  To make it clear,
 <code>password</code> is verbatim password that the user has to
 enter to enter into account, no ciphering applied.  Element
 <code>name</code> contains human name of the user.</p>
@@ -602,7 +602,7 @@ list.  But still this means the following structure.</p>
 
 <p>Most usually the record in a userdata describes the same
 person as the owner branch does, but technically this
-doesn't have to be that way.  </p>
+doesn’t have to be that way.  </p>
 
 <p>The only possible record type at this stage is
 <code>person</code> record type.</p>
@@ -610,13 +610,13 @@ doesn't have to be that way.  </p>
 <p>A person record is a hash in perl terms.  In XML terms it is
 an unordered list of elements, which cannot be repeated.
 Elements <code>id</code>, <code>type</code>, <code>sid</code> represent
-the record's identifier, type (of text value
-"<code>person</code>") and short-id respectively.</p>
+the record’s identifier, type (of text value
+“<code>person</code>”) and short-id respectively.</p>
 
 <p>Element <code>contact</code> contains contact info of the
 person.  <code>name</code> contains name data.
-<code>contributions</code> -- the research profile data.
-<code>affiliations</code> -- you guessed it.</p>
+<code>contributions</code> — the research profile data.
+<code>affiliations</code> — you guessed it.</p>
 
 <p>The items which need mentioning are:</p>
 
@@ -624,7 +624,7 @@ person.  <code>name</code> contains name data.
 
 <dt><code>contact/email-pub</code></dt>
 
-<dd>Contains text "<code>true</code>" if user gave her
+<dd>Contains text “<code>true</code>” if user gave her
 permission to publish her email address.  Contains
 <code>&lt;undef/&gt;</code> otherwise.</dd>
 
@@ -647,28 +647,28 @@ screen</dd>
 
 <dt><code>about-owner</code></dt>
 
-<dd>Contains text "<code>yes</code>" if the record describes the
+<dd>Contains text “<code>yes</code>” if the record describes the
 account owner.  System adds this to every record normally
 created by the registration process and uses it to build
-appropriate elements of user interface ("your profile"
-vs. "Vasya Pupkin's profile").</dd>
+appropriate elements of user interface (“your profile”
+vs. “Vasya Pupkin’s profile”).</dd>
 
 <dt><code>profile</code></dt>
 
 <dd>External record presentation data.  <code>profile/url</code>
-contains personal profile URL, <code>profile/file</code> -- the
+contains personal profile URL, <code>profile/file</code> — the
 profile filename path in the local filesystem,
-<code>profile/export</code> -- names of files, to which the
+<code>profile/export</code> — names of files, to which the
 record is exported.</dd>
 
 </dl>
 
 
-   <h2 id="adm-slash">Administrator's screens</h2>
+   <h2 id="adm-slash">Administrator’s screens</h2>
 
 <p>Some administrator functions are available through the ACIS
 web interface itself.  It makes monitoring and administering
-the service easier.  Several <code>/adm/...</code> screens exist
+the service easier.  Several <code>/adm/…</code> screens exist
 for these functions.</p>
 
 
@@ -687,7 +687,7 @@ screen.  First, she can enter a special password,
 <li>one of the following:
 <ul>
 <li>the user entered the same password or</li>
-<li>the password is present in the user's browser
+<li>the password is present in the user’s browser
 cookies,</li>
 </ul>
 </li>
@@ -695,15 +695,15 @@ cookies,</li>
 
 <p>then system lets her in.</p>
 
-<p>When system asks the user for admin's password, there is an
+<p>When system asks the user for admin’s password, there is an
 option to save the password in a cookie.  Browser will store
 the cookie for a month since its creation.  After that
-browser will drop the cookie and you'll have to enter the
+browser will drop the cookie and you’ll have to enter the
 password again.</p>
 
 <p>Second, a currently logged-in user might have an
 administrator privilege.  A user has administrator privilege
-if there is <code>admin</code> element in her userdata's owner
+if there is <code>admin</code> element in her userdata’s owner
 <code>type</code> element (XPath:
 <code>/data/owner/type/admin</code>).  There is no way a user
 can get administrator privilege other than by a manual edit
@@ -711,12 +711,12 @@ of her userdata file.</p>
 
 <p>The second way to access the administrator screens is
 preferable.  Especially, when you access it from a shared
-computer, beause it doesn't leave the pass cookie.</p>
+computer, beause it doesn’t leave the pass cookie.</p>
 
 <h3 id="admsql" C="/adm/sql"><code class="C">/adm/sql</code></h3>
 
 <p>This screen gives you capability to enter and execute any
-SQL query on behalf of the ACIS' MySQL user and with
+SQL query on behalf of the ACIS’ MySQL user and with
 <a class="c" href="conf.html#acis-db-name">acis-db-name</a> as the default database.</p>
 
 <p>It prints out the query results, if any.</p>
@@ -724,7 +724,7 @@ SQL query on behalf of the ACIS' MySQL user and with
 <h3 id="admevents" C="/adm/events"><code class="C">/adm/events</code></h3>
 
 <p>The screen provides access to the <a href="adm.html#events-database">events database</a>, which contains a
-log of everything what happened within ACIS' web interface.</p>
+log of everything what happened within ACIS’ web interface.</p>
 
 <p>The screen itself works in two modes: overview and data
 retrieval.  Overview mode shows you for which years, months
@@ -740,12 +740,12 @@ provide navigational cues, which make it straightforward to
 use; we hope so.</p>
 
 
-   <h4 id="id2263067">Checking a particular date</h4>
+   <h4 id="id2264044">Checking a particular date</h4>
 
 <p>The overview mode offers a form (at the bottom of the
 screen), which you can use to browse events for a particular
 date or a period of time.  Just enter the starting date and
-(optionally) the finishing date and click "SHOW" button.</p>
+(optionally) the finishing date and click “SHOW” button.</p>
 
 <p>Alternatively, you can directly request the screen to show
 events for a particular date, via URL.  Add a date in format
@@ -756,17 +756,17 @@ you get that.  E.g.,</p>
 </code></pre>
 
 <p>If you want to check events for a day starting from a
-particular time, add "/HH:MM:SS" to an URL which has a date
+particular time, add “/HH:MM:SS” to an URL which has a date
 already:</p>
 
 <pre><code>http://acis.super.edu/adm/events/2005-11-04/12:03:45
 </code></pre>
 
 
-   <h4 id="id2263104">Filters</h4>
+   <h4 id="id2264085">Filters</h4>
 
 <p>There are several filters which you can enable via the <a href="adm.html#admeventspref">preferences</a> screen, or explicitly by
-adding "?filter" or "?filter1+filter2" to the URL.</p>
+adding “?filter” or “?filter1+filter2” to the URL.</p>
 
 <p>At this time there are two filters defined:</p>
 
@@ -774,7 +774,7 @@ adding "?filter" or "?filter1+filter2" to the URL.</p>
 
 <dt><code>hidemagic</code></dt>
 
-<dd>Do not show so called "magic" sessions.  Magic sessions are those
+<dd>Do not show so called “magic” sessions.  Magic sessions are those
 created by ACIS machinery itself to do work on behalf of the users.
 For instance, the <a href="apu.html">APU</a> works via such sessions.
 If you filter out the magic sessions, you will only the see the actual
@@ -785,7 +785,7 @@ interface.</dd>
 
 <dd>A filter to show only events related to the research
 profile.  Claiming or removing or refusing works will be
-shown, everything else -- will not.
+shown, everything else — will not.
 </dd>
 
 </dl>
@@ -820,10 +820,10 @@ users.</p>
 
 <p>You choose what field do you want to search by, enter the
 search key and push [SEARCH].  If the key expression
-includes "<code>%</code>" sign, it assumes that you use MySQL's
+includes “<code>%</code>” sign, it assumes that you use MySQL’s
 simple pattern matching syntax (operator <code>LIKE</code>).  In
 that syntax <code>%</code> means zero or more of any character.
-If your expression doesn't include percent character, it
+If your expression doesn’t include percent character, it
 assumes that you want full field value match.  For instance,
 if you search by a known email address of a user and you
 enter her complete address.</p>
@@ -850,7 +850,7 @@ deleted.</p>
 
 
 
-   <h2 id="id2263260">Customizing an ACIS installation</h2>
+   <h2 id="id2264259">Customizing an ACIS installation</h2>
 
 <p>An ideal web application is so flexible that you can build
 it into an existing website seamlessly and you can customize
@@ -868,7 +868,7 @@ effectively.</p>
 <p>Phrases are bits of (X)HTML markup which some of the ACIS
 XSLT templates insert into the final pages in appropriate
 context.  A phrase may be a single word or a whole bunch of
-paragraphs; size doesn't matter.  Each phrase has its own
+paragraphs; size doesn’t matter.  Each phrase has its own
 identifier and a default value; but you can override it.</p>
 
 <p>For instance, the <code>service-intro</code> phrase is a slogan
@@ -897,7 +897,7 @@ ready-to-use <code>phrase.xml</code> file.)</p>
   &lt;/phrasing&gt;
 </code></pre>
 
-<p>and create <code>&lt;phrase id='...'&gt; ... &lt;/phrase&gt;</code>
+<p>and create <code>&lt;phrase id=’…’&gt; … &lt;/phrase&gt;</code>
 element inside it with id of the phrase you want to
 override.  For example, <code class="f BROKEN">phrase-local.xml</code> may look
 like this:</p>
@@ -928,21 +928,21 @@ after the <code>service-intro</code> phrase, before the
 
 <dt><code>announcements</code></dt>
 
-<dd>Returning users' welcome page shows this at the top of
+<dd>Returning users’ welcome page shows this at the top of
 the main content area (after the profile menu panel).</dd>
 
 <dt><code>homepage-title</code></dt>
 
-<dd>HTML page title of the service' homepage.
- Default: <a class="c" href="conf.html#site-name">site-name</a> + ": home", defined in
+<dd>HTML page title of the service’ homepage.
+ Default: <a class="c" href="conf.html#site-name">site-name</a> + “: home”, defined in
  <code class="f BROKEN">presentation/default/index.xsl</code>.</dd>
 
 
 <dt><code>page-footer</code></dt>
 
 <dd>Every page includes <code>page-footer</code> after the main
-content <code>div</code>, inside <code>&lt;div class='footer'&gt;</code>.  By default it
-includes: an administrator's email link, home link
+content <code>div</code>, inside <code>&lt;div class=’footer’&gt;</code>.  By default it
+includes: an administrator’s email link, home link
 (<a class="c" href="conf.html#home-url">home-url</a>) and a link to page top.
 
 <p>The default is defined in <code class="f BROKEN">presentation/default/page.xsl</code>.</p>
@@ -964,22 +964,22 @@ them.  Default: empty.</dd>
 
 <dd>The first screen of new registration includes this in
 the main content <code>&lt;div&gt;</code>, right above the
-"Introduce yourself" header.  Default: empty.</dd>
+“Introduce yourself” header.  Default: empty.</dd>
 
 
 <dt><code>institution-search-instructions</code></dt>
 
 <dd>Instructions for the institutions search form.  Default:
-"<code>Enter main words of your institution name.  You may try
-acronyms, too.</code>".</dd>
+“<code>Enter main words of your institution name.  You may try
+acronyms, too.</code>”.</dd>
 
 
 <dt><code>metadata-idenfitifer</code></dt> 
 
 <dd>A word or a phrase to refer to identifiers in the
-primary metadata.  The research profile's manual search
-screen uses it.  For <a href="http://authors.repec.org/"><abbr title="RePEc Author Service">RAS</abbr></a>, for instance, we use "RePEc
-handles".  Default: "<code>metadata identifiers</code>".</dd>
+primary metadata.  The research profile’s manual search
+screen uses it.  For <a href="http://authors.repec.org/"><abbr title="RePEc Author Service">RAS</abbr></a>, for instance, we use “RePEc
+handles”.  Default: “<code>metadata identifiers</code>”.</dd>
 
 <dt><code>research-main-epilog</code></dt>
 
@@ -989,8 +989,8 @@ bottom, after the menu table.  Default is in the
 
 <dt><code>not-satisfied-with-automatic-search</code></dt>
 
-<dd>This one will be shown under the heading "Not
-satisfied with search results?" on the research profile
+<dd>This one will be shown under the heading “Not
+satisfied with search results?” on the research profile
 autosearch suggestion pages.  Default is in
 <code class="f BROKEN">phrases.xml</code>.</dd>
 
@@ -1001,7 +1001,7 @@ confirmation email message text. Default: empty.</dd>
 
 <dt><code>email-confirmation-no-works-claimed</code></dt>
 
-<dd>Used in confirmation emails only if the user didn't add
+<dd>Used in confirmation emails only if the user didn’t add
 any works to his research profile, while he registered.
 Goes after the <code>email-confirmation-about-registering</code>
 phrase.  Default: empty.</dd>
@@ -1056,9 +1056,9 @@ the directory contains an XML file with a matching pathname,
 it will load this file and show it to the user.  A file has
 a matching pathname if its relative pathname from
 <code class="f BROKEN">site/</code> equals the requested address plus
-"<code>.xml</code>".  For instance, if <a class="c" href="conf.html#base-url">base-url</a> is
-"<code>http://web.site.org</code>" and request came for
-"<code>http://web.site.org/about</code>", ACIS will check
+“<code>.xml</code>”.  For instance, if <a class="c" href="conf.html#base-url">base-url</a> is
+“<code>http://web.site.org</code>” and request came for
+“<code>http://web.site.org/about</code>”, ACIS will check
 <code class="f BROKEN">site/</code> directory for <code class="f BROKEN">about.xml</code> file.</p>
 
 <p>The structure is simple: </p>
@@ -1083,17 +1083,17 @@ of the resulting HTML page.  Content of <code>content</code>
 will go into the page body.</p>
 
 <p>The pages will look as all other ACIS pages to the user.
-They'll have the same standard header, the same footer, will
+They’ll have the same standard header, the same footer, will
 use the same styling.</p>
 
-<p>In the header they'll have links appropriate to the user's
+<p>In the header they’ll have links appropriate to the user’s
 context.  If the user is undergoing an initial registration
 process, the header will invite him to continue
 registration.  To an already-registered user who logged-in,
 the header will propose to return into account or log out.</p>
 
-<p>When creating such pages, you'll want to check that the page
-name won't conflict with any of the screens defined in ACIS.
+<p>When creating such pages, you’ll want to check that the page
+name won’t conflict with any of the screens defined in ACIS.
 Check <code class="f BROKEN">screens.xml</code> file for that.</p>
 
 
@@ -1107,13 +1107,13 @@ ACIS home directory will contain these items:</p>
 
 <tr>
 <th>directory</th>
-<th>what's in it</th>
+<th>what’s in it</th>
 </tr>
 
 <tr>
 <td class="f">userdata/</td> 
 
-<td>userdata files -- files, describing the users'
+<td>userdata files — files, describing the users’
 accounts</td>
 </tr>
 
@@ -1153,7 +1153,7 @@ accounts</td>
  <td class="f">RI/</td>
 
  <td>
-<a href="daemon.html">Update daemon's</a>
+<a href="daemon.html">Update daemon’s</a>
  files: configuration, logs and data</td>
 
 </tr>
@@ -1227,7 +1227,7 @@ generated from <a class="c" href="conf.html#mainconf">main.conf</a>
 <tr>
  <td class="f">ri-socket</td>
  <td>
-<a href="daemon.html">Update daemon's</a> unix-domain
+<a href="daemon.html">Update daemon’s</a> unix-domain
 socket; the daemon listens to it.</td>
 </tr>
 
@@ -1274,7 +1274,7 @@ socket; the daemon listens to it.</td>
  given to for processing.</td>
  </tr>
 
-<tr> <td class="f">RI/update_ch0.log ...
+<tr> <td class="f">RI/update_ch0.log …
  RI/update_ch5.log</td> <td>
 <a href="#ri-daemon">Update
  daemon</a> logs of processing the actual requests.  Each of
@@ -1314,7 +1314,7 @@ socket; the daemon listens to it.</td>
   
 <address class="footer">
 <p>$Id$</p>
-<p>Generated: Sun Aug 26 00:01:45 2007</p>
+<p>Generated: Mon Aug 27 13:23:00 2007</p>
 <p><a href="http://acis.openlib.org/">ACIS project</a>,
           acis<i>@</i>openlib<span>.org</span></p>
 </address>

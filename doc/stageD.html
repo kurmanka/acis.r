@@ -7,16 +7,16 @@
 <body>
       
 
-   <h1 id="id2251618">Stage D: full-text links, document-to-document links and fuzzy name searches </h1>
+   <h1 id="id2251956">Stage D: full-text links, document-to-document links and fuzzy name searches </h1>
 
 <h3><i>Table of contents</i></h3>
-<p class="toc">   <a href="#fuzzy">Fuzzy name searching</a><br>      <a href="#id2251632">TODO</a><br>      <a href="#id2251654">notions</a><br>      <a href="#id2251669">configuration</a><br>      <a href="#id2251732">administration</a><br>      <a href="#id2251740">implementation components</a><br>      <a href="#id2251769">tools</a><br>   <a href="#fturls">Full-text file recognition</a><br>      <a href="#id2251782">TODO</a><br>      <a href="#id2251827">input</a><br>      <a href="#id2251850">user choices</a><br>      <a href="#id2251956">configuration</a><br>      <a href="#id2251970">data storage</a><br>      <a href="#id2251984">data tables</a><br>      <a href="#id2252059">implementation components</a><br>   <a href="#d2d">Document to document links</a><br>      <a href="#id2252104">TODO</a><br>      <a href="#id2252136">notions</a><br>      <a href="#id2252145">configuration</a><br>      <a href="#id2252161">components</a><br>      <a href="#id2252256">screen design</a><br></p>
+<p class="toc">   <a href="#fuzzy">Fuzzy name searching</a><br>      <a href="#id2251970">TODO</a><br>      <a href="#id2251991">notions</a><br>      <a href="#id2252007">configuration</a><br>      <a href="#id2252096">administration</a><br>      <a href="#id2252104">implementation components</a><br>      <a href="#id2252133">tools</a><br>   <a href="#fturls">Full-text file recognition</a><br>      <a href="#id2252146">TODO</a><br>      <a href="#id2252195">input</a><br>      <a href="#id2252219">user choices</a><br>      <a href="#id2252325">configuration</a><br>      <a href="#id2252340">data storage</a><br>      <a href="#id2252354">data tables</a><br>      <a href="#id2252432">implementation components</a><br>   <a href="#d2d">Document to document links</a><br>      <a href="#id2252476">TODO</a><br>      <a href="#id2252509">notions</a><br>      <a href="#id2252520">configuration</a><br>      <a href="#id2252537">components</a><br>      <a href="#id2252633">screen design</a><br></p>
 
 
    <h2 id="fuzzy">Fuzzy name searching</h2>
 
 
-   <h3 id="id2251632">TODO</h3>
+   <h3 id="id2251970">TODO</h3>
 
 <ul>
 <li><p>documentation</p></li>
@@ -26,36 +26,36 @@ APU)?</p></li>
 </ul>
 
 
-   <h3 id="id2251654">notions</h3>
+   <h3 id="id2251991">notions</h3>
 
 <p>distance level = Levenshtein distance / string length of the name variation</p>
 
 <p>The default critical distance level of distance is 1/m, i.e. 1/7 
-e.g. if the Levenshtein distance is 2 edits and the name variation's
+e.g. if the Levenshtein distance is 2 edits and the name variation’s
 length is 20, the distance level is 2/20 = 0.1 ; O.1 is less then 1/7,
 so, this would be a successful and positive match.</p>
 
 
-   <h3 id="id2251669">configuration</h3>
+   <h3 id="id2252007">configuration</h3>
 
 <ul>
-<li><p>fuzzy-name-search -- on or off</p></li>
-<li><p>fuzzy-name-search-min-common-prefix -- The number of characters n
+<li><p>fuzzy-name-search — on or off</p></li>
+<li><p>fuzzy-name-search-min-common-prefix — The number of characters n
 of at the start of a name variation that has to match in the name
 expressions exactly.  Default: 3.</p></li>
-<li><p>fuzzy-name-search-min-variation-length -- The minimum number of
+<li><p>fuzzy-name-search-min-variation-length — The minimum number of
 characters m that a name variation would have to have in order to
 qualify for being fuzzy matched. The default is 7.</p></li>
-<li><p>fuzzy-name-search-max-name-occurr-in-doc-names -- The maximum number
+<li><p>fuzzy-name-search-max-name-occurr-in-doc-names — The maximum number
 of occurrences of a name expression in the document author names
 table before it is considered for fuzzy matching. The default is 1.
 If this parameter is set to 0 or is not set, no maximum is checked.</p></li>
-<li><p>fuzzy-name-search-max-name-occurr-in-name-variations -- The maximum
+<li><p>fuzzy-name-search-max-name-occurr-in-name-variations — The maximum
 number of occurrences of a name expression in the name variations
 table before it is considered for fuzzy matching. By default, maximum
 is 0, ie. a name expression should not be present among name
 variations.  Set is to -1 to disable this limit.</p></li>
-<li><p>fuzzy-name-search-via-web -- should fuzzy name searches be run when
+<li><p>fuzzy-name-search-via-web — should fuzzy name searches be run when
 research search is initiated by the online user?  (When a search is
 APU-initiated, this is a question of <a class="c" href="conf.html#fuzzy-name-search">fuzzy-name-search</a>.)</p></li>
 </ul>
@@ -64,12 +64,12 @@ APU-initiated, this is a question of <a class="c" href="conf.html#fuzzy-name-sea
 
 
 
-   <h3 id="id2251732">administration</h3>
+   <h3 id="id2252096">administration</h3>
 
 <p>Run bin/fuzzy_search_table script regularly to update the rare table.</p>
 
 
-   <h3 id="id2251740">implementation components</h3>
+   <h3 id="id2252104">implementation components</h3>
 
 <ol>
 <li><p>given a set of name expressions (i.e. document author names) compare
@@ -83,7 +83,7 @@ name expressions, which should be fuzzy-compared to that variation.</p></li>
 <p>mysql&gt; select name,count(name) from names group by name;</p>
 
 
-   <h3 id="id2251769">tools</h3>
+   <h3 id="id2252133">tools</h3>
 
 <p>String::Approx</p>
 
@@ -91,11 +91,11 @@ name expressions, which should be fuzzy-compared to that variation.</p></li>
    <h2 id="fturls">Full-text file recognition</h2>
 
 
-   <h3 id="id2251782">TODO</h3>
+   <h3 id="id2252146">TODO</h3>
 
 <ol>
 <li>
-<p>input data -- support LoTEc data format
+<p>input data — support LoTEc data format
 ftp://all.repec.org/LotEc</p>
 
 <ul>
@@ -109,14 +109,14 @@ ftp://all.repec.org/LotEc</p>
 <li><p>add listed works count? - not critical, maybe</p></li>
 <li><p>scroll the page vertically so that the menu is in the screen
 middle? - maybe; not critical</p></li>
-<li><p>add explanations or links to explanations -- Thomas hasn't yet sent
+<li><p>add explanations or links to explanations — Thomas hasn’t yet sent
 me the wording corrections and/or explanations</p></li>
 </ul>
 </li>
 </ol>
 
 
-   <h3 id="id2251827">input</h3>
+   <h3 id="id2252195">input</h3>
 
 <p>authoritative:</p>
 
@@ -141,7 +141,7 @@ me the wording corrections and/or explanations</p></li>
 </code></pre>
 
 
-   <h3 id="id2251850">user choices</h3>
+   <h3 id="id2252219">user choices</h3>
 
 <p>In the recognition menu, there are four mutually exclusive options.</p>
 
@@ -170,7 +170,7 @@ been chosen. In the permission menu, there are two options</p>
 <p>Co-authors may make contradictory choices. An ACIS installation records
 such choices, but does not resolve them.</p>
 
-<p>Short versions of the menu items, first menu ("recognition"):</p>
+<p>Short versions of the menu items, first menu (“recognition”):</p>
 
 <ol>
 <li>wrong (n)</li>
@@ -179,7 +179,7 @@ such choices, but does not resolve them.</p>
 <li>correct full-text file (y)</li>
 </ol>
 
-<p>second menu ("permission"):</p>
+<p>second menu (“permission”):</p>
 
 <ol>
 <li>may archive (y)</li>
@@ -188,16 +188,16 @@ such choices, but does not resolve them.</p>
 </ol>
 
 
-   <h3 id="id2251956">configuration</h3>
+   <h3 id="id2252325">configuration</h3>
 
 <p>conf parameter:</p>
 
 <ul>
-<li>full-text-urls-recognition -- on or off</li>
+<li>full-text-urls-recognition — on or off</li>
 </ul>
 
 
-   <h3 id="id2251970">data storage</h3>
+   <h3 id="id2252340">data storage</h3>
 
 <p>The URLs are stored in the ft_urls table.  The user decisions (choices)
 are stored in the ft_urls_choices table.  (See below.)  <b>They are
@@ -205,7 +205,7 @@ not stored in userdata!</b> (Contrary to where every other piece of
 data given by users is stored.)</p>
 
 
-   <h3 id="id2251984">data tables</h3>
+   <h3 id="id2252354">data tables</h3>
 
 <p>table <strong>ft_urls</strong>:</p>
 
@@ -213,7 +213,7 @@ data given by users is stored.)</p>
 <li>dsid char(15) not null</li>
 <li>url blob not null </li>
 <li>checksum char(16) binary not null</li>
-<li>nature ENUM(\'authoritative\',\'automatic\') not null</li>
+<li>nature ENUM('authoritative','automatic') not null</li>
 <li>source varchar(255) not null</li>
 </ul>
 
@@ -226,7 +226,7 @@ source_i(source(50))</code></p>
 <li>dsid char(15) not null</li>
 <li>checksum char(16) binary not null</li>
 <li>psid char(15) not null</li>
-<li>choice char(2) not null -- first char: d|y|r|n (corresponding menu items:
+<li>choice char(2) not null — first char: d|y|r|n (corresponding menu items:
 2|4|3|1); second char: y|c|n (1|2|3) </li>
 <li>time datetime not null</li>
 </ul>
@@ -234,7 +234,7 @@ source_i(source(50))</code></p>
 <p><code>primary key prim(dsid, checksum, psid), index t_i(time), index psid_i(psid)</code></p>
 
 
-   <h3 id="id2252059">implementation components</h3>
+   <h3 id="id2252432">implementation components</h3>
 
 <ol>
 <li><p>input processing, ft_urls table making</p></li>
@@ -255,11 +255,11 @@ optionally.)</p>
    <h2 id="d2d">Document to document links</h2>
 
 
-   <h3 id="id2252104">TODO</h3>
+   <h3 id="id2252476">TODO</h3>
 
 <ul>
 <li><p>screen: improve destination document listing (menu); for instance,
-follow Sune's recommendation.  Or Thomas' idea of 
+follow Sune’s recommendation.  Or Thomas’ idea of 
 alphabetical order.</p></li>
 <li><p>use Ajax to send the new link data and update the page?</p></li>
 <li><p>use Ajax to delete a link?</p></li>
@@ -268,23 +268,23 @@ alphabetical order.</p></li>
 </ul>
 
 
-   <h3 id="id2252136">notions</h3>
+   <h3 id="id2252509">notions</h3>
 
-<p>link type -- has a name, description and, possibly, a reverse link type
+<p>link type — has a name, description and, possibly, a reverse link type
 name; some link types have no reverse.</p>
 
 
-   <h3 id="id2252145">configuration</h3>
+   <h3 id="id2252520">configuration</h3>
 
 <ul>
-<li>document-document-links-profile -- yes / no</li>
+<li>document-document-links-profile — yes / no</li>
 </ul>
 
 <p>$HOME/doclinks.conf.xml.eg is an example configuration file.  Rename to 
 $HOME/doclinks.conf.xml and edit to your liking.</p>
 
 
-   <h3 id="id2252161">components</h3>
+   <h3 id="id2252537">components</h3>
 
 <ol>
 <li>
@@ -296,15 +296,15 @@ $HOME/doclinks.conf.xml and edit to your liking.</p>
 <li>
 <p>query configuration:</p>
 
-<p>$lab = $conf-&gt;type('follow-up')-&gt;label;
- $rev = $conf-&gt;type('follow-up')-&gt;rev;
- $rnm = $conf-&gt;type('follow-up')-&gt;rev-&gt;name;</p>
+<p>$lab = $conf-&gt;type(‘follow-up’)-&gt;label;
+ $rev = $conf-&gt;type(‘follow-up’)-&gt;rev;
+ $rnm = $conf-&gt;type(‘follow-up’)-&gt;rev-&gt;name;</p>
 
 <p>or </p>
 
-<p>$lab = $conf-&gt;label('follow-up');
- $rna = $conf-&gt;rev('follow-up');
- $rla = $conf-&gt;revlabel('follow-up');</p>
+<p>$lab = $conf-&gt;label(‘follow-up’);
+ $rna = $conf-&gt;rev(‘follow-up’);
+ $rla = $conf-&gt;revlabel(‘follow-up’);</p>
 </li>
 </ul>
 </li>
@@ -342,7 +342,7 @@ useful abstraction level</p>
 </ol>
 
 
-   <h3 id="id2252256">screen design</h3>
+   <h3 id="id2252633">screen design</h3>
 
 <ul>
 <li><p>use Yahoo! UI javascript library?</p></li>
@@ -351,7 +351,7 @@ useful abstraction level</p>
 
   
 <address class="footer">
-<p>Generated: Sun Aug 26 00:01:45 2007</p>
+<p>Generated: Mon Aug 27 13:23:00 2007</p>
 <p><a href="http://acis.openlib.org/">ACIS project</a>,
           acis<i>@</i>openlib<span>.org</span></p>
 </address>

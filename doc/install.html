@@ -7,17 +7,17 @@
 <body>
       
 
-   <h1 id="id2248506">ACIS Installation</h1>
+   <h1 id="id2248537">ACIS Installation</h1>
 
 <h3><i>Table of contents</i></h3>
-<p class="toc">   <a href="#id2248513">Requirements</a><br>   <a href="#id2248608">The Files</a><br>   <a href="#id2248622">Installation</a><br>      <a href="#id2248800">Setting up the basic utilities</a><br>   <a href="#id2248846">Upgrading</a><br></p>
+<p class="toc">   <a href="#id2248543">Requirements</a><br>   <a href="#id2248648">The Files</a><br>   <a href="#id2248662">Installation</a><br>      <a href="#id2248848">Setting up the basic utilities</a><br>   <a href="#id2248894">Upgrading</a><br></p>
 
 
-   <h2 id="id2248513">Requirements</h2>
+   <h2 id="id2248543">Requirements</h2>
 
 <p>To use ACIS you need a Unix/Linux system with Perl 5.8,
 MySQL and Apache.  To install ACIS and to perform
-administrative work you'll need shell access to the machine.
+administrative work you’ll need shell access to the machine.
 To make ACIS useful you need a collection of
 academic-related metadata, in an ACIS-compatible form.  For
 sending email messages, ACIS needs <em>sendmail</em> or another
@@ -47,13 +47,13 @@ mail transport agent.</p>
 ACIS.  Probably newer versions will work just as well.</p>
 
 
-   <h2 id="id2248608">The Files</h2>
+   <h2 id="id2248648">The Files</h2>
 
 <p>ACIS distribution packages are available from
 <a href="http://acis.openlib.org/code/">http://acis.openlib.org/code/</a>.</p>
 
 
-   <h2 id="id2248622">Installation</h2>
+   <h2 id="id2248662">Installation</h2>
 
 <p>You can run ACIS as a usual Unix user.  For some
 installation steps you will probably need root access.  For
@@ -62,9 +62,9 @@ Every step, where the opposite is not mentioned, you can do
 and shall do as an unprivileged user.</p>
 
 <ol>
-<li><p>Unpack ACIS package to a temporary directory, let's say
+<li><p>Unpack ACIS package to a temporary directory, let’s say
 <code>tmp/</code>.</p></li>
-<li><p>Choose and create a directory to install ACIS to.  We'll
+<li><p>Choose and create a directory to install ACIS to.  We’ll
 call that <i>ACIS home directory</i> or simply <i>home</i>.</p></li>
 <li><p>Run <code>tmp/ACIS-.../install.sh home</code> to install
 into <code>home</code> directory.</p></li>
@@ -72,7 +72,7 @@ into <code>home</code> directory.</p></li>
 installation</a>.  This may be the next step to do.</p></li>
 <li><p>Configure MySQL. Create a MySQL user with a password, if
 necessary. Or you can use an existing MySQL account, if you
-wish. Create a database for ACIS' data tables.</p></li>
+wish. Create a database for ACIS’ data tables.</p></li>
 <li><p>Change to the ACIS home directory.</p></li>
 <li><p>Open <code>main.conf.eg</code> file, edit it to adapt it to
 your system and save as <code>main.conf</code>.  See
@@ -89,8 +89,8 @@ appropriately</a> and restart it, if neccessary.  (Optional.)</p></li>
 
 <p>At this stage, if everything above was done correctly,
 the system is almost ready for a grand opening.  Users
-can register, although there's no data in the database
-yet.  So it's not yet very useful.</p>
+can register, although there’s no data in the database
+yet.  So it’s not yet very useful.</p>
 
 <p>The only thing left is to fill the databases with your
 academic metadata.  Read about <a href="daemon.html#sending-update-requests">how to send an update
@@ -98,7 +98,7 @@ request for some data collection</a> and do send a
 request to update root (<code>/</code>) of your data
 collection.</p>
 
-<p>When the update is done -- the system is ready, given
+<p>When the update is done — the system is ready, given
 that nothing has gone wrong.</p>
 </li>
 <li><p>Set up <a class="c" href="adm.html#binclean-up">bin/clean-up</a>, <a class="c" href="apu.html#binapu">bin/apu</a> to run
@@ -108,7 +108,7 @@ regularly via crontab.  (See next section.)</p></li>
 </ol>
 
 
-   <h3 id="id2248800">Setting up the basic utilities</h3>
+   <h3 id="id2248848">Setting up the basic utilities</h3>
 
 <p>Configure your machine to start <a class="c" href="adm.html#binrid">bin/rid</a><code>
 start</code> (relative to ACIS home dir) on boot and
@@ -127,7 +127,7 @@ as a cron-job or a batch job to be executed regularly or at
 low-load periods.</p>
 
 
-   <h2 id="id2248846">Upgrading</h2>
+   <h2 id="id2248894">Upgrading</h2>
 
 <p>If you already have a version of ACIS installed, and want to
 upgrade it to the latest version, the procedure is simple.
@@ -137,7 +137,7 @@ script:</p>
 <pre><code>~/tmp$ ACIS-1.4.5-20051108a/install.sh /opt/ACIS
 </code></pre>
 
-<p>...assuming that <code>/opt/ACIS</code> is where you have the
+<p>…assuming that <code>/opt/ACIS</code> is where you have the
 previous version installed.  The installation script will
 detect the previous installation and will upgrade it
 automatically.</p>
@@ -147,7 +147,7 @@ automatically.</p>
 
   
 <address class="footer">
-<p>Generated: Sun Aug 26 00:01:45 2007</p>
+<p>Generated: Mon Aug 27 13:23:00 2007</p>
 <p><a href="http://acis.openlib.org/">ACIS project</a>,
           acis<i>@</i>openlib<span>.org</span></p>
 </address>

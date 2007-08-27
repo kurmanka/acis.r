@@ -7,10 +7,10 @@
 <body>
       
 
-   <h1 id="id2246873">ACIS configuration</h1>
+   <h1 id="id2246833">ACIS configuration</h1>
 
 <h3><i>Table of contents</i></h3>
-<p class="toc">   <a href="#mainconf">The <code class="C">main.conf</code> file</a><br>   <a href="#id2246909">Parameters</a><br>      <a href="#id2246912">Core</a><br>      <a href="#id2247118">Perl and CGI</a><br>      <a href="#id2247253">Database parameters</a><br>      <a href="#id2247316">Data input (primary metadata: research, institutions, citations, etc.)</a><br>      <a href="#id2247414">Data output (personal data and submitted institutions)</a><br>      <a href="#conf-research">Research profile</a><br>         <a href="#conf-fuzzy">Fuzzy search</a><br>      <a href="#apu-conf">APU</a><br>      <a href="#cit-screen-conf">Citations screens</a><br>      <a href="#id2247906">Logging, debugging and performance profiling</a><br>      <a href="#id2248010">Other</a><br>   <a href="#binsetup">Updating a running system's configuration -- <code class="C">bin/setup</code> utility</a><br></p>
+<p class="toc">   <a href="#mainconf">The <code class="C">main.conf</code> file</a><br>   <a href="#id2246869">Parameters</a><br>      <a href="#id2246872">Core</a><br>      <a href="#id2247087">Perl and CGI</a><br>      <a href="#id2247224">Database parameters</a><br>      <a href="#id2247294">Data input (primary metadata: research, institutions, citations, etc.)</a><br>      <a href="#id2247393">Data output (personal data and submitted institutions)</a><br>      <a href="#conf-research">Research profile</a><br>         <a href="#conf-fuzzy">Fuzzy search</a><br>      <a href="#apu-conf">APU</a><br>      <a href="#cit-screen-conf">Citations screens</a><br>      <a href="#id2247904">Logging, debugging and performance profiling</a><br>      <a href="#id2248019">Other</a><br>   <a href="#binsetup">Updating a running system’s configuration — <code class="C">bin/setup</code> utility</a><br></p>
 
 <h2 id="mainconf" C="main.conf">The <code class="C">main.conf</code> file</h2>
 
@@ -23,10 +23,10 @@ There is an example of such file in <a class="f" href="internal.html#mainconfeg"
 ACIS home directory.</p>
 
 
-   <h2 id="id2246909">Parameters</h2>
+   <h2 id="id2246869">Parameters</h2>
 
 
-   <h3 id="id2246912">Core</h3>
+   <h3 id="id2246872">Core</h3>
 
 <dl>
 
@@ -60,7 +60,7 @@ like <code>http://web.site.org</code>.  But then you need to
 configure your web server accordingly.  <a href="apache-conf.html#acis-site-top">How to do that in
 Apache.</a> Do not put a trailing slash into this value.  If
 you get this value wrong, ACIS will not correctly interpret
-users' requests.  Required.</dd>
+users’ requests.  Required.</dd>
 
 <dt id="base-cgi-script-filename" C="base-cgi-script-filename"><code class="C">base-cgi-script-filename</code></dt>
 
@@ -82,7 +82,7 @@ it.  May be the same as base-url or different.  Required.</dd>
 static web-accessible files.  ACIS will use it for
 JavaScript and CSS files, personal profile pages, et cetera.
 
-It may be the same as <a class="c" href="conf.html#base-url">base-url</a>, but you'll need to
+It may be the same as <a class="c" href="conf.html#base-url">base-url</a>, but you’ll need to
 configure your webserver accordingly.  It has to serve
 static files by itself, and call ACIS for everything
 else.
@@ -104,7 +104,7 @@ URLs and <a href="apache-conf.html#redirect-profile-urls">have setup your webser
 
 URL of a profile page is built as follows:
 <a class="c" href="conf.html#static-base-url">static-base-url</a> + <a class="c" href="conf.html#profile-pages-dir">profile-pages-dir</a> +
-profile's unique part + <code>"/"</code>.  Profile's unique
+profile’s unique part + <code>"/"</code>.  Profile’s unique
 part is its short-id in slash-separated form:
 e.g. <code>"p/s/i/d/3"</code>.  If you enable this option,
 this part will instead be just short-id,
@@ -118,7 +118,7 @@ Default value: undef, i.e. false;
 
 <dd>Prefix of the profile pages URLs.  Terminate it with a
 slash.  See previous item for an explanation.  Default
-value: <code>"profile/"</code>.</dd>
+value: <code>“profile/”</code>.</dd>
 
 
 <dt id="session-lifetime" C="session-lifetime"><code class="C">session-lifetime</code></dt>
@@ -129,7 +129,7 @@ action, untill it expires.  Default value: 15.</dd>
 
 <dt id="system-email" C="system-email"><code class="C">system-email</code></dt>
 
-<dd>Value for the "From:" header of email messages, that
+<dd>Value for the “From:” header of email messages, that
 ACIS will send.  Required.</dd>
 
 
@@ -141,7 +141,7 @@ ACIS will send.  Required.</dd>
 </dl>
 
 
-   <h3 id="id2247118">Perl and CGI</h3>
+   <h3 id="id2247087">Perl and CGI</h3>
 
 <p><dt id="perlbin" C="perlbin"><code class="C">perlbin</code></dt></p>
 
@@ -166,15 +166,15 @@ function</a> manpage.
 for Perl libraries. This option appends 
 a Perl library directory <i>directory</i>
 into the main CGI file <code>a.cgi</code>, by saying <code>BEGIN{ push @INC,
-'</code><i>directory</i><code>'; }</code>.
+‘</code><i>directory</i><code>’; }</code>.
 </dd></p>
 
 <p><dt id="cgi-pperl-binary" C="cgi-pperl-binary"><code class="C">cgi-pperl-binary</code></dt></p>
 
-<p><dd>Type: string.  Enables support for Matt Sergeant's fine <a href="http://search.cpan.org/dist/PPerl/">PPerl</a> instead of plain old slow
- CGI.  If set, it will be used instead of perl in the CGI script's shebang
+<p><dd>Type: string.  Enables support for Matt Sergeant’s fine <a href="http://search.cpan.org/dist/PPerl/">PPerl</a> instead of plain old slow
+ CGI.  If set, it will be used instead of perl in the CGI script’s shebang
  line (the first line of the script, which normally says
- <code>"#!/usr/bin/perl"</code>).  It will also cause the CGI script to be adapted
+ <code>”#!/usr/bin/perl”</code>).  It will also cause the CGI script to be adapted
  in some minor ways to the PPerl environment: some modules will be preloaded
  and clean-ups will be done after each request processed.</dd></p>
 
@@ -186,7 +186,7 @@ by the <a class="c" href="conf.html#binsetup">bin/setup</a> script after install
 </dd></p>
 
 
-   <h3 id="id2247253">Database parameters</h3>
+   <h3 id="id2247224">Database parameters</h3>
 
 <dl> 
 
@@ -214,14 +214,14 @@ Required.</dd>
 <dd>All three are deprecated parameters replaced by the
 single <a class="c" href="conf.html#db-name">db-name</a>.  They were used to specify MySQL
 database names for specific compontents of ACIS.  Certain
-database tables would then go to "acis" database, some to
-"sid" database and the rest to the "metadata" database.
+database tables would then go to “acis” database, some to
+“sid” database and the rest to the “metadata” database.
 Should not be used in new acis installations.</dd>
 
 </dl>
 
 
-   <h3 id="id2247316">Data input (primary metadata: research, institutions, citations, etc.)</h3>
+   <h3 id="id2247294">Data input (primary metadata: research, institutions, citations, etc.)</h3>
 
 <dl>
 
@@ -239,9 +239,9 @@ Optional.</dd>
 <dt id="metadata--type" C="metadata-"><code class="C">metadata-<i>X</i>-type</code></dt>
 
 <dd>Type of data collection <i>X</i>.  Useful possible
-values: "<code>RePEcRec</code>", "<code>AMF</code>",
-"<code>CitationsAMF</code>" (for <a href="citations.html">citations</a> data) and
-"<code>FullTextUrlsAMF</code>" (for <a href="stageD.html#fturls">full-text URLs</a> data).</dd>
+values: “<code>RePEcRec</code>”, “<code>AMF</code>”,
+“<code>CitationsAMF</code>” (for <a href="citations.html">citations</a> data) and
+“<code>FullTextUrlsAMF</code>” (for <a href="stageD.html#fturls">full-text URLs</a> data).</dd>
 
 
 <dt id="metadata--home" C="metadata-"><code class="C">metadata-<i>X</i>-home</code></dt>
@@ -250,7 +250,7 @@ values: "<code>RePEcRec</code>", "<code>AMF</code>",
 </dl>
 
 
-   <h3 id="id2247414">Data output (personal data and submitted institutions)</h3>
+   <h3 id="id2247393">Data output (personal data and submitted institutions)</h3>
 
 <dl>
 
@@ -271,7 +271,7 @@ short-ids, if you care).  Required.</dd>
 <dt id="institutions-maintainer-email" C="institutions-maintainer-email"><code class="C">institutions-maintainer-email</code></dt>
 
 <dd>Email address of the person maintaining the institutions
-database.  When users submit an institution's data, message
+database.  When users submit an institution’s data, message
 will be sent to this address.  Defaults to
 <a class="c" href="conf.html#admin-email">admin-email</a>, if not specified.</dd>
 
@@ -362,7 +362,7 @@ not run.</dd>
 
 <dd>Type: integer number.  This is the miminum number of
 days between APU runs for a single record.  In other words,
-APU won't be run for a record, if last time APU has already
+APU won’t be run for a record, if last time APU has already
 been done for it less than that many days ago.  Default: 21
 (day).  (More often than this may cause an overwhelming
 effect on some users in case of a growing database, if every
@@ -373,7 +373,7 @@ sent.)</dd>
 <dt id="echo-apu-mails" C="echo-apu-mails"><code class="C">echo-apu-mails</code></dt>
 
 <dd>Type: Boolean.  Whether or not send a copy of all APU
-mails to the service admin.  If set to true, admin's email
+mails to the service admin.  If set to true, admin’s email
 will be added into the <code>BCC:</code> field.  </dd>
 
 
@@ -441,7 +441,7 @@ similarity assessment algorithm</a>.</p>
 
 <dd>
 <p>Citations, which have similarity value less than this
-threshold, won't even be suggested for user's consideration as
+threshold, won’t even be suggested for user’s consideration as
 potential.</p>
 
 <p>Default value: 0.65</p>
@@ -494,12 +494,12 @@ idea.</p>
 
 <dd>
 <p>On the potential citations screen, show HOW the work is cited
-first, and WHERE it is cited second.  For example: "as: ...(citation
-string) in: ...(work title) by ... (authors)".  This may make looking
+first, and WHERE it is cited second.  For example: “as: …(citation
+string) in: …(work title) by … (authors)”.  This may make looking
 through a large list of citations easier for the user.</p>
 
 <p>Default: off.  So by default each citation is presented this way:
-"in: ... by ..." on the first line, and "as: ..." on the second.</p>
+“in: … by …” on the first line, and “as: …” on the second.</p>
 </dd>
 
 <dt id="citations-by-document-search-at-profile-load" C="citations-by-document-search-at-profile-load"><code class="C">citations-by-document-search-at-profile-load</code></dt>
@@ -529,7 +529,7 @@ in the database.</p>
 </dl>
 
 
-   <h3 id="id2247906">Logging, debugging and performance profiling</h3>
+   <h3 id="id2247904">Logging, debugging and performance profiling</h3>
 
 <dl>
 
@@ -547,7 +547,7 @@ Default: undef, ie. feature is off.</dd>
 <dt id="debug-log" C="debug-log"><code class="C">debug-log</code></dt>
 
 <dd>When specified to a writeable file name, each ACIS
-request's processing will be debug-logged to this file.
+request’s processing will be debug-logged to this file.
 Verbose.
 
 Default: undef, ie. the feature is off.</dd>
@@ -571,7 +571,7 @@ intermediate XML file into
 <code>{HOME}/presenter_data.xml</code> and the XSLT result into
 <code>{HOME}/presenter_result.xml</code>.  If the files exist,
 ACIS will overwrite it silently, so at any given time these
-files will contain only the last request' data.  This option
+files will contain only the last request’ data.  This option
 might be helpful for debugging the XSLT stylesheets.
 
 Default: undef, ie. feature is off.</dd>
@@ -592,20 +592,20 @@ data (timings) at the end of each page.  Default: off.</dd>
 <dt id="requests-log" C="requests-log"><code class="C">requests-log</code></dt>
 
 <dd>Name of file to log every incoming request to.  Defaults
-to string <code>"*stderr*"</code> which means "log to
-standard error output filehandle".  Usually, Apache
+to string <code>"*stderr*"</code> which means “log to
+standard error output filehandle”.  Usually, Apache
 redirects stderr output of CGI scripts to the error
 log of the website.</dd>
 
 </dl>
 
 
-   <h3 id="id2248010">Other</h3>
+   <h3 id="id2248019">Other</h3>
 
 <dl>
 <dt id="admin-access-pass" C="admin-access-pass"><code class="C">admin-access-pass</code></dt>
 
-<dd>Special administrator's password to access the <a href="adm.html#adm-slash">administrator's screens</a>.  Must
+<dd>Special administrator’s password to access the <a href="adm.html#adm-slash">administrator’s screens</a>.  Must
 be at least 6 characters long.  Optional.  When not
 specified only users which have admin privileges can access
 the screens and only while they are logged in.  <a href="adm.html#amd-slash-access">Read more about it.</a>
@@ -618,7 +618,7 @@ the screens and only while they are logged in.  <a href="adm.html#amd-slash-acce
 <dd>Name of a set of XSLT presentation files to use.  A set
 of XSLT presentation files is a directory, path, relative to
 <code>{HOME}/presentation/</code> directory.  Default value:
-"<code>default</code>".  So by default XSLT templates are read
+“<code>default</code>”.  So by default XSLT templates are read
 from <code>{HOME}/presentation/default/</code>.
 </dd>
 
@@ -633,13 +633,13 @@ templates are read from
 
 <dd>The umask to use when creating files and directories.
 This value directly influences the access permissions of the
-created files.  Read perl's <code>perldoc -f umask</code>
-and/or Unix' <code>man umask</code>.  Optional.</dd>
+created files.  Read perl’s <code>perldoc -f umask</code>
+and/or Unix’ <code>man umask</code>.  Optional.</dd>
 
 
 <dt id="require-modules" C="require-modules"><code class="C">require-modules</code></dt>
 
-<dd>List of perl modules or simply ".pl" files to load
+<dd>List of perl modules or simply “.pl” files to load
 (<code>require</code>) upon system start.  Whitespace
 separated.</dd>
 
@@ -653,10 +653,10 @@ exist at the time <a class="c" href="adm.html#binbackup_tables">bin/backup_table
 
 </dl>
 
-<h2 id="binsetup" C="bin/setup">Updating a running system's configuration -- <code class="C">bin/setup</code> utility</h2>
+<h2 id="binsetup" C="bin/setup">Updating a running system’s configuration — <code class="C">bin/setup</code> utility</h2>
 
 <p><a class="c" href="conf.html#mainconf">main.conf</a> file is the main ACIS configuration file.
-Yet it is not directly read by ACIS and any of its'
+Yet it is not directly read by ACIS and any of its’
 components during normal operation.  Instead they read their
 own separate configuration files.  For instance,
 <code>ardb.conf</code>, <code>acis.conf</code>,
@@ -664,7 +664,7 @@ own separate configuration files.  For instance,
 cetera.</p>
 
 <p>All these files are created and updated from
-<a class="c" href="conf.html#mainconf">main.conf</a>'s contents by the <code>bin/setup</code>
+<a class="c" href="conf.html#mainconf">main.conf</a>’s contents by the <code>bin/setup</code>
 utility.</p>
 
 <p><code>bin/setup</code> reads <a class="c" href="conf.html#mainconf">main.conf</a> and generates
@@ -674,11 +674,11 @@ reflected in the installation.  You may also need to restart
 the <a href="daemon.html#ri-daemon">daemon program</a> so that it is
 aware of the changes you made.</p>
 
-<p>About the other utilities read the <a href="adm.html#utils">respective section</a> in the <a href="adm.html">administrator's guide</a>.</p>
+<p>About the other utilities read the <a href="adm.html#utils">respective section</a> in the <a href="adm.html">administrator’s guide</a>.</p>
 
   
 <address class="footer">
-<p>Generated: Sun Aug 26 00:01:45 2007</p>
+<p>Generated: Mon Aug 27 13:23:00 2007</p>
 <p><a href="http://acis.openlib.org/">ACIS project</a>,
           acis<i>@</i>openlib<span>.org</span></p>
 </address>
