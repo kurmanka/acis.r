@@ -6,27 +6,25 @@ ACIS</h1>
 
 ## Introduction
 
-
 ACIS is a pretty complicated application.  It both gives a
 web interface to users and it produces web-accessible
 objects.  For all this to work, it needs to know how to
 reference itself and where to create other objects and how
 to reference them.
 
-
 If you are making a real-world public ACIS-based service,
-you'll want ACIS to be available via a short URL and you'll
-want it to produce short and nice URLs.  Then you'll need to
-adapt Apache configuration.  Particular adaptation depends
+you want ACIS to be available via a short URL and you 
+want it to produce short and nice URLs. For this you need to
+adapt Apache configuration.  The particular adaptation depends
 on your choices for the ACIS configuration parameters.  In
-most simple case you don't need to do that, but then your
-URLs will be a bit messy.
+simplest case, i.e. if you don't change the configuration,
+your URLs will be a bit unwieldy.
 
 Exact reasons to touch Apache configuration:
 
 1. You may want ACIS to sit at the root address of a
    website.  E.g. <code>http://web.site.org/</code> versus
-   <code>http://web.site.org/cgi-bin/acis.pl</code> .  See
+   <code>http://web.site.org/cgi-bin/acis.pl</code>. See
    configuration parameter <c>base-url</c>.
 
 2. You may want ACIS to generate short and clean URLs for
@@ -39,8 +37,8 @@ Exact reasons to touch Apache configuration:
    <c>profile-pages-dir</c>.
 
 3. You may want to have the same URL value as your
-   <c>static-base-url</c> and your <c>base-url</c>.  Which
-   means simply shorter and nicier URLs.
+   <c>static-base-url</c> and your <c>base-url</c>, which
+   implies simply shorter and nicer URLs.
 
 
 ##  What to do
@@ -49,17 +47,17 @@ Here are the instructions for Apache 1.3+.  If you want ACIS
 to work with Apache 2, there is <a ref='apache2'>a little
 difference</a>.
 
-OK, let's say you have <co>web.site.org</co> website and
+Assume you have a site <co>web.site.org</co> and
 want to run ACIS on it and you have default settings for
 most parameters.
 
 <p id='acis-site-top'>A normal CGI script has address
 of something like, <co>.../cgi-bin/script.pl</co>, but you
-want your users to access ACIS through the shortest, niciest
+want your users to access ACIS through the shortest
 <co>http://web.site.org/</co> address.  Then we have to do
 the following.</p>
 
-First, we enable mod_rewrite in our &lt;VirtualHost> section:
+First, we enable mod_rewrite in our &lt;VirtualHost&gt; section:
 
       RewriteEngine on
 
@@ -77,8 +75,8 @@ the last one of all rewrite rules used.  This rule means:
 pass _all_ requests for the website to ACIS.
 
 But ACIS includes and produces some static files, which also
-have to be web-accessible.  Personal profile pages -- most
-important of all.  We need to configure Apache to serve
+have to be web-accessible.  The personal profile pages are
+the most important ones.  We need to configure Apache to serve
 those requests by itself, without involving ACIS.  One of
 the ways to do that is to add
 
@@ -94,11 +92,10 @@ like this:
       RewriteRule ^(/.*)$ /cgi-bin/acis.pl$1 [L,T=application/x-httpd-cgi]
 
 Then Apache will pass to <co>/cgi-bin/acis.pl</co> all
-requests, but those starting with <co>/static/</co>.  So you
+requests except those starting with <co>/static/</co>.  So you
 can set <c>static-base-url</c> to
 <co>http://web.site.org/static</co> and
 <c>static-base-dir</c> to a corresponding directory name.
-
 
 The personal profile URLs will then have form of
 <co>http://web.site.org/static/profile/p/s/i/d/1/</co>,
@@ -108,7 +105,7 @@ In case you don't like that, read on.
 
 ###  Making personal profile URLs shorter
 
-First thing we could do is remove <co>static/</co> part.
+A first thing we could do is remove the <co>static/</co> part.
 For that we replace the respective RewriteRule with several
 others.  
 
@@ -129,7 +126,7 @@ everything else will be taken by ACIS.  Now we can set
 <c>static-base-dir</c> to its apporpriate docroot,
 e.g. <co>/home/user/public_html</co>.  
 
-<p id='redirect-profile-urls'>Second thing we could
+<p id='redirect-profile-urls'> A second thing we could
 do to make personal profile URLs human friendly is eliminate
 the slash characters in <co>p/s/i/d/1</co> part.  Here comes
 the next set of rewrite rules:</p>
@@ -139,7 +136,8 @@ the next set of rewrite rules:</p>
       RewriteRule ^/P/(.)(.)(.)(.)/(.*)    /profile/p/$1/$2/$3/$4/$5    [L]
       RewriteRule ^/P/(.)(.)(.)/(.*)       /profile/p/$1/$2/$3/$4       [L]
 
-If placed before our static files rules in Apache conf, it
+If placed before our static files rules in the Apache
+configuration, it
 will make requests like <co>/profile/psid1/</co> map to
 actual files as if it was a request for
 <co>/profile/p/s/i/d/1/</co>.  Now to let ACIS know we did
@@ -171,7 +169,7 @@ And we have something like the following in our
 <c>main.conf</c>:
 
       base-url        = http://web.site.org
-      base-cgi-script-filename = /var/apache/htdoc/user-cgi-bin/acis.pl
+      base-cgi-script-filename = /var/www/user-cgi-bin/acis.pl
       home-url        = http://web.site.org/
       static-base-url = http://web.site.org
       static-base-dir = /home/user/public_html
@@ -189,13 +187,13 @@ One of the things you need to use suexec is your CGI scripts
 must reside somewhere below global DocumentRoot directory.
 That's why in <c>main.conf</c> snippet above the
 <c>base-cgi-script-filename</c> param points to a file in
-<co>/var/apache/htdoc/user-cgi-bin/</co> (assuming that the
-global DocumentRoot is <co>/var/apache/htdoc</co>).  To make
+<co>/var/www/user-cgi-bin/</co> (assuming that the
+global DocumentRoot is <co>/var/www</co>).  To make
 this directory correspond to your virtual host's
 <co>/cgi-bin/</co> you use the following in apache conf
 &lt;VirtualHost> section:
 
-       ScriptAlias /cgi-bin/ /var/apache/htdoc/user-cgi-bin/
+       ScriptAlias /cgi-bin/ /var/www/user-cgi-bin/
 
 
 ###  Even shorter profile URLs
@@ -223,20 +221,21 @@ Apache conf to read:
       RewriteRule ^/pro/ - [L]
       ...
 
-Which is a straight <code>"profile/"</code> -> <code>"pro/"</code>
-replacement.  Off you go.
+This is a straight <code>"profile/"</code> -> <code>"pro/"</code>
+replacement. 
 
 
 ###  Changing configuration of a running sytem
 
 An important thing to know about personal profile URLs is
-that once system generates and assigns a profile URL, is
-stores it in the user's profile and uses it since.  If you
+that once ACIS generates and assigns a profile URL, is
+stores it in the user's profile and uses it from then onwards.
+If you
 change your setup, the previously-assigned profile URLs will
 still have the old format and ACIS will not rebuild them.
 The only case when ACIS rebuilds a profile URL is when it
 finds that it can't write the profile page file to its
-place.  Then it tries to generate new URL and new file
+place.  Then it tries to generate a new URL and a new file
 pathname for it (using current configuration) and uses that.
 
 That's why you better settle <c>static-base-dir</c>,
@@ -246,7 +245,6 @@ from the start.  And, of course, <c>base-url</c> and
 <c>home-url</c>.
 
 
-
 ###  Other files that might need to be served statically
 
 If you run ACIS at a website's top address, you may need or
@@ -254,7 +252,7 @@ prefer to serve some other files by Apache itself, without
 involving ACIS.  For instance, you may want to create
 favourites icon <co>/favicon.ico</co> for your website, or
 you want to create <co>/robots.txt</co> file.  ACIS will not
-serve such files and such requests will only burden the
+serve such files. Requests for these files will only burden the
 system and clutter the logs.  You have to serve these files
 with Apache.  For that you simply have to add appropriate
 RewriteRules to your config, before the terminal rule line:
@@ -272,11 +270,11 @@ If you have lines
       # terminal rule:
       RewriteRule ^(/.*)$ /cgi-bin/acis.pl$1 [L,T=application/x-httpd-cgi]
 
-replace it with
+replace them with
 
       # terminal rule:
       RewriteRule ^/(.*)$ /cgi/acis.cgi/$1  [NS,PT]
 
-It worked for me.  I hope it helps you as well.
+It worked for Ivan Kurmanov.  He hopes it helps you as well.
 
 
