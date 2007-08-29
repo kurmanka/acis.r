@@ -1,0 +1,192 @@
+ACIS Source Code Guide
+======================
+
+<toc/>
+
+
+Separate components
+-------------------
+
+ACIS is not a monolithic program.  It is a large collection of modules,
+scripts, configuration files and templates.  And there are several
+components which are closely related to ACIS and are required to use
+it.  But these components may be used without ACIS, completely
+independently.  Therefore their source code is managed and packaged
+separately.
+
+The central repository for ACIS is the account
+<co>aacis@acis.openlib.org</co>. There, we have four directories,
+which correspond to four projects:
+
+-  <co>~/dev/ReDIF-perl</co>
+
+-  <co>~/dev/AMF-perl</co>
+
+-  <co>~/dev/RePEc-Index</co>
+
+-  <co>~/dev/acis</co>
+
+Each project contains a separate source tree, managed with <a
+href="http://darcs.net">Darcs</a> revision control system.
+
+
+Darcs
+-----
+
+Darcs is an easy-to-use system.  It currently lacks some nice-to-have
+features, if compared to SVN or CVS.  It's core advantage is that it
+supports a purely distributed development.
+
+These component projects and main ACIS source code may be developed
+right in aacis@acis.openlib.org. But it is better to open your own
+aacis account on your machine, let us refer to the as mybox
+here. After a change is done, you need to submit it to the
+repository. The repository is where the source code revisions are
+stored. This lives on the account <co>aacis</co>
+at the host <co>acis.openlib.org</co>.
+
+You will have to study the userguide of Darcs, http://darcs.net/ but
+you don't have to do it now.
+
+
+Working on a local working copy of a project
+--------------------------------------------
+
+First install Darcs on your machine.  Set up your local environment
+DARCS\_EMAIL to your email address. Set the environment
+DARCS\_DONT\_ESCAPE\_8BIT to <co>1</co>. Then get a local copy
+of a project _project_.
+
+  <co>aacis@mybox:~ darcs get --set-scripts-executable aacis@acis.openlib.org:dev/</co>_project_
+
+This would make you a local directory _project_ in your current
+directory, where _project_ would be "acis", "ReDIF-perl"and so
+on. Your local copy of a project's source code is called a working
+copy.
+
+
+Syncing your local changes with the central repository
+------------------------------------------------------
+
+<!-- I thought there is no central respository in darcs  -->
+
+When starting a change:
+
+  <co>aacis@mybox:~/dev/</co>_project_<co>$ darcs pull -a</co>
+
+After doing a change:
+
+  <co>aacis@mybox:~/dev/</co>_project_<co>$ darcs push</co>
+
+or
+
+  <co>aacis@mybox:~/dev/</co>_project_<co>$ darcs push -a</co>
+
+If you create a new module, script or some other file, you may want to
+do two things, add it to the darcs repository. 
+      
+  <co>aacis@mybox:~/dev/</co>_project_<co>$ darcs add</co> _file\_to\_add_
+
+where _file\_to\_add is the file to add. Then add _file\_to\_add_
+to the <co>MANIFEST</co> file.
+
+<!-- what is the manifest file good for? -->
+
+
+Manifest file
+-------------
+
+There is a MANIFEST file in each of the project directories.  It lists
+all files to be packaged in a release of the project. A useful command
+is
+
+ <co>aacis@mybox:~/dev/</co>_project_<co>$ make manifest</co>
+
+<!-- no, this is a useless command, it does not work! -->
+
+See also: MANIFEST.SKIP, google for "MANIFEST.SKIP file" or look it up
+in the Perl camel book.
+
+
+Basic code editing procedure with Darcs
+---------------------------------------
+
+For example, let's imagine I had to make a change to the ReDIF-perl
+project.  Here are the first steps of the procedure:
+
+ <co>aacis@mybox:~$ cd dev/ReDIF-perl</co>
+
+ <co>aacis@mybox:~/dev/ReDIF-perl$ emacs lib/ReDIF/Parser.pm</co>
+
+for example. Then you may want to review the changes that you have
+made to the code.  Darcs would show it to you in a format similar to
+diff:
+
+ <co>aacis@mybox:~/dev/ReDIF-perl$ darcs whatsnew</co>
+
+Then you may want to make sure the change didn't break any tests:
+
+ <co>aacis@mybox:~/dev/ReDIF-perl$ make tests</co>
+
+Then let's assume the tests passed fine and you want to submit 
+your change:
+
+ <co>aacis@mybox:~/dev/ReDIF-perl$ darcs record -am "an improvement to the parsing algorithm"</co>
+
+The text in quotes is the name of your patch.  It should briefly
+explain the substance of the change, or at least it's character.
+
+
+Releasing a packaged version
+----------------------------
+
+If <co>darcs record</co> worked fine and didn't complain, you may now
+want to release a new version package to the public. You have to do
+this at the central repository. Here we use the example of
+ReDIF-perl. You do the following.
+
+ <co>aacis@acis:~/dev/ReDIF-perl$ perl release.pl</co>
+
+That should make a new version number for you and pack a distribution.
+The version number would be generated automatically, by incrementing
+the previous one by one.  If it was 0.4 the new version would be 0.5;
+if it was 4.44.4 then the new one would be 4.44.5.  The current
+version number is stored in the <co>Makefile.PL</co> file.  See the
+<co>release.pl</co> file for details.
+
+The release file is generated in the current directory and its full
+name is printed on the standard output.  You may grab it and upload to
+somewhere for other people to use. For example, ReDIF-perl releases go
+to <co>http://all.repec.org/ReDIF-perl/</co>.
+
+This is the most basic development scenario for these three auxilary
+projects.  For ACIS itself the darcs part is the same, but it has a
+separate package building script.
+
+If the <co>release.pl</co> script fails
+
+ <co>aacis@acis:~/dev/ReDIF-perl$ MAKEMAKEFILE=1; perl Makefile.PL</co>
+
+ <co>aacis@acis:~/dev/ReDIF-perl$ perl release.pl</co>
+
+<!-- I added a semicolon above -->
+
+
+Building an ACIS package
+------------------------
+
+There are two ways the build an ACIS package. If you just want to
+package acis as such, you can do
+
+ <co>aacis@acis:~/dev/acis$ perl build/dist.pl [</co>_version_<co>]</co>
+
+where _version_ is the version number. Then you release ReDIF-perl,
+AMF-perl and RePEc-Index from their separate directories. An ACIS
+distribution may include these components as well. It will have them
+in an <co>extra/</co> subdirectory. Such a full distribution is built
+using
+
+ <co>aacis@acis:~/dev/acis$ perl build/dist.pl -f [</co>_version_<co>]</co>
+
+where _version_ is the version number.
+
