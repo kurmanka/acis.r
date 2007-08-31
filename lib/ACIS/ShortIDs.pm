@@ -117,22 +117,19 @@ sub finish_and_store_id {
   $longid = lc $longid;
 
   my $prefix = shift;
-
   $prefix = lc $prefix;  ### convert all entries to lowercase
 
   my $number = get_lastnumber( $prefix );
   if ( not defined $number ) {
     $number = 1;
+  } else { 
+    $number ++;
   }
 
-
   my $id;
-  
  GENERATE: 
   ### generate a valid (unique) short id
-  
   my $failures = 0;  
-
   while ( 1 ) {
     $id = $prefix . $number;
     my $ok = store_id_handle( $id, $longid );
