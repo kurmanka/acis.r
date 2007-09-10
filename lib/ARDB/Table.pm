@@ -1,4 +1,4 @@
-package ARDB::Table;
+package ARDB::Table
 
 use strict;
 use warnings;
@@ -31,6 +31,13 @@ sub new {
   return $self;
 }
 
+
+#
+# The charset and collation are utf-8.
+# This is a mysql snippet that sets these, with blanks!
+# 
+my $char_coll=" character set utf8 collate utf8_general_ci ";
+
 sub realname { $_[0]->{realname}; }
 
 
@@ -39,10 +46,25 @@ sub add_field {
   my $name   = shift;
   my $type   = shift;
 
+  my $need_char_col='';
+  my @charfields=('char','varchar','text');
+
+
   $self -> {fields} -> {$name} = $type;
   push @{ $self->{fields_list} }, $name;
 
   $self -> {create_statement_body} .= "$name $type,\n";
+  #
+  # if the type accepts a collation, add this as well
+  # 
+  foreach my $field_that_uses_chars (@charfields) {
+    if($type=~m|$field_that_uses_chars\s*\(|i) {
+      $self -> {create_statement_body} .= $char_coll;
+      # char and varchar overlapp
+      last;
+    }
+  }
+  $self -> {create_statement_body} .= ",\n";
 }
 
 sub create_table_statement {
@@ -85,7 +107,7 @@ sub perform_create {
   $self -> {create_statement_body} =~ s/\s*,\s*$//;
   my $creation_params = $self -> {create_statement_body} ;
   my $table_name = $self -> {realname} ;
-  $sql_object -> prepare ( "CREATE TABLE $table_name ( $creation_params )" );
+  $sql_object -> prepare ( "CREATE TABLE $table_name $char_coll ( $creation_params )" );
   my $r = $sql_object -> execute;
   if ( $r ) { return undef;
   } else {
