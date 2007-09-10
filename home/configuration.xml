@@ -113,7 +113,7 @@
         <field name="urlabout" sql-type=" text"/>
         <field name="classif"  sql-type=" CHAR(50)" />
 
-        <field name='location' sql-type=' TEXT CHARACTER SET utf8'/><!-- DO WE NEED UTF-8 HERE? --> 
+        <field name='location' sql-type=' TEXT CHARACTER SET utf8'/>
         <!-- synthetic string containg some other details of
              the document, see doc/citations.html -->
 
