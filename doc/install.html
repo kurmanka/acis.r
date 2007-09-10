@@ -10,7 +10,7 @@
    <h1 id="id2248537">ACIS Installation</h1>
 
 <h3><i>Table of contents</i></h3>
-<p class="toc">   <a href="#id2248543">Requirements</a><br>   <a href="#id2248648">The Files</a><br>   <a href="#id2248662">Installation</a><br>      <a href="#id2248848">Setting up the basic utilities</a><br>   <a href="#id2248894">Upgrading</a><br></p>
+<p class="toc">   <a href="#id2248543">Requirements</a><br>   <a href="#id2248648">The Files</a><br>   <a href="#id2248662">Installation</a><br>      <a href="#id2248853">Setting up the basic utilities</a><br>   <a href="#id2248898">Upgrading</a><br></p>
 
 
    <h2 id="id2248543">Requirements</h2>
@@ -72,7 +72,10 @@ into <code>home</code> directory.</p></li>
 installation</a>.  This may be the next step to do.</p></li>
 <li><p>Configure MySQL. Create a MySQL user with a password, if
 necessary. Or you can use an existing MySQL account, if you
-wish. Create a database for ACIS’ data tables.</p></li>
+wish. Create a database for ACIS’ data tables. Use 
+US ASCII as the default character set. Thus if the
+name of the database is “acis”, use
+<code>create database acis default character set ascii;</code>.</p></li>
 <li><p>Change to the ACIS home directory.</p></li>
 <li><p>Open <code>main.conf.eg</code> file, edit it to adapt it to
 your system and save as <code>main.conf</code>.  See
@@ -108,7 +111,7 @@ regularly via crontab.  (See next section.)</p></li>
 </ol>
 
 
-   <h3 id="id2248848">Setting up the basic utilities</h3>
+   <h3 id="id2248853">Setting up the basic utilities</h3>
 
 <p>Configure your machine to start <a class="c" href="adm.html#binrid">bin/rid</a><code>
 start</code> (relative to ACIS home dir) on boot and
@@ -127,7 +130,7 @@ as a cron-job or a batch job to be executed regularly or at
 low-load periods.</p>
 
 
-   <h2 id="id2248894">Upgrading</h2>
+   <h2 id="id2248898">Upgrading</h2>
 
 <p>If you already have a version of ACIS installed, and want to
 upgrade it to the latest version, the procedure is simple.
@@ -147,7 +150,7 @@ automatically.</p>
 
   
 <address class="footer">
-<p>Generated: Wed Aug 29 22:59:09 2007</p>
+<p>Generated: Tue Sep 11 00:32:23 2007</p>
 <p><a href="http://acis.openlib.org/">ACIS project</a>,
           acis<i>@</i>openlib<span>.org</span></p>
 </address>
