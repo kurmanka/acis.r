@@ -1,4 +1,4 @@
-package ARDB::Table
+package ARDB::Table;
 
 use strict;
 use warnings;
@@ -13,20 +13,20 @@ use Carp::Assert;
 sub new { 
   my $class      = shift;
   my $table_name = shift;
- 
+  
   my $self = {
-    name     => $table_name,
-    create_statement_body => '',
-    realname => $table_name,
-    
-    ##################################
-    ### obsolete, but still using: ###
-    ##################################
-    fields   => {},
-    fields_list => [],
-    
+              name     => $table_name,
+              create_statement_body => '',
+              realname => $table_name,
+              
+              ##################################
+              ### obsolete, but still using: ###
+              ##################################
+              fields   => {},
+              fields_list => [],
+              
   };
-    
+  
   bless $self, $class;
   return $self;
 }
@@ -34,9 +34,9 @@ sub new {
 
 #
 # The charset and collation are utf-8.
-# This is a mysql snippet that sets these, with blanks!
+# This is a mysql snippet that sets these.
 # 
-my $char_coll=" character set utf8 collate utf8_general_ci ";
+my $char_coll="character set utf8 collate utf8_general_ci";
 
 sub realname { $_[0]->{realname}; }
 
@@ -45,25 +45,26 @@ sub add_field {
   my $self   = shift;
   my $name   = shift;
   my $type   = shift;
-
+  
   my $need_char_col='';
-  my @charfields=('char','varchar','text');
-
-
+  
+  
   $self -> {fields} -> {$name} = $type;
   push @{ $self->{fields_list} }, $name;
-
-  $self -> {create_statement_body} .= "$name $type,\n";
+  
+  $self -> {create_statement_body} .= "$name $type";
+  #
+  #my @charfields=('char','varchar','text');
   #
   # if the type accepts a collation, add this as well
   # 
-  foreach my $field_that_uses_chars (@charfields) {
-    if($type=~m|$field_that_uses_chars\s*\(|i) {
-      $self -> {create_statement_body} .= $char_coll;
-      # char and varchar overlapp
-      last;
-    }
-  }
+  #foreach my $field_that_uses_chars (@charfields) {
+  #  if($type=~m|$field_that_uses_chars\s*\(|i) {
+  #    $self -> {create_statement_body} .= $char_coll;
+  #    # char and varchar overlapp
+  #    last;
+  #  }
+  #}
   $self -> {create_statement_body} .= ",\n";
 }
 
@@ -78,21 +79,21 @@ sub store_values {
   my $self       = shift;
   my $sql_object = shift;
   my $data       = shift;
-
+  
   my $sql_data;
   my @params = ();
   
   foreach ( sort keys %$data ) {
     my $val = $data -> { $_ };
-
+    
     next unless $val;
-
+    
     $sql_data .= " $_=?, ";
     push @params, $val;
   }
-
+  
   $sql_data =~ s/(.*), *$/$1/;
-
+  
   my $name = $self->{realname};
   #print 'insert into '. $name . ' set ' . $sql_data;
   $sql_object -> prepare ( 'insert into '. $name . ' set ' . $sql_data );
@@ -107,10 +108,11 @@ sub perform_create {
   $self -> {create_statement_body} =~ s/\s*,\s*$//;
   my $creation_params = $self -> {create_statement_body} ;
   my $table_name = $self -> {realname} ;
-  $sql_object -> prepare ( "CREATE TABLE $table_name $char_coll ( $creation_params )" );
+  $sql_object -> prepare ( "CREATE TABLE $table_name ( $creation_params ) $char_coll" );
   my $r = $sql_object -> execute;
   if ( $r ) { return undef;
-  } else {
+  }
+  else {
     return $sql_object -> error;
   }
 }
@@ -136,17 +138,17 @@ sub store_record {
   my @fields;
   my @values;
   while ( my ($field, $value) = each %$record ) {
-#    assert( $field !~ m/\-/ , "field name contains a dash! ($field)" );
+    #    assert( $field !~ m/\-/ , "field name contains a dash! ($field)" );
     push @fields, $field;
     push @values, $value;
   }
-
+  
   my $statement = "REPLACE $table_name SET " . join ', ', grep {$_ .= '=?'} @fields;
   $sql -> prepare ( $statement );
   $sql -> execute ( @values );
-
-#  print "Stored to $table_name\n";
-  #XXX check for SQL errors
+  
+  # print "Stored to $table_name\n";
+  # XXX check for SQL errors
 }
 
 
