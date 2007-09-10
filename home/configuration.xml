@@ -66,8 +66,8 @@
 
 <table name='institutions'>
     <field name='id'       sql-type="VARCHAR(200) NOT NULL PRIMARY KEY" />
-    <field name='name'     sql-type="VARCHAR(255) NOT NULL" />
-    <field name='location' sql-type="VARCHAR(200)" />
+    <field name='name'     sql-type="VARCHAR(255) NOT NULL CHARACTER SET UTF8" />
+    <field name='location' sql-type="VARCHAR(200) CHARACTER SET UTF8" />
     <field name='data'     sql-type="BLOB NOT NULL" />
 
     <create-table-sql>
@@ -108,12 +108,12 @@
         <field name="id"       sql-type=" CHAR(255) NOT NULL PRIMARY KEY" />
         <field name="sid"      sql-type=" CHAR(15) NOT NULL" />
         <field name="type"     sql-type=" CHAR(20) NOT NULL" />
-        <field name="title"    sql-type=" VARCHAR(255) NOT NULL"/>
-        <field name="authors"  sql-type=" text"/>
+        <field name="title"    sql-type=" VARCHAR(255) NOT NULL CHARACTER SET UTF8"/>
+        <field name="authors"  sql-type=" TEXT CHARACTER SET UTF8"/>
         <field name="urlabout" sql-type=" text"/>
         <field name="classif"  sql-type=" CHAR(50)" />
 
-        <field name='location' sql-type=' TEXT'/> 
+        <field name='location' sql-type=' TEXT CHARACTER SET UTF8'/><!-- DO WE NEED UTF-8 HERE? --> 
         <!-- synthetic string containg some other details of
              the document, see doc/citations.html -->
 
@@ -129,7 +129,7 @@
  <table name='res_creators_bulk'>
    <field name='sid'    sql-type="CHAR(12) NOT NULL" />
    <field name='role'   sql-type='char(15) NOT NULL' />
-   <field name='names'  sql-type='VARCHAR(255) NOT NULL'/>
+   <field name='names'  sql-type='VARCHAR(255) NOT NULL CHARACTER SET UTF8'/>
 
    <create-table-sql>
      PRIMARY KEY ( sid, role ),
@@ -141,7 +141,7 @@
  <table name='res_creators_separate'>
    <field name='sid'   sql-type="CHAR(12) NOT NULL" />
    <field name='role'  sql-type="char(15) NOT NULL" />
-   <field name='name'  sql-type="VARCHAR(255) NOT NULL" />   
+   <field name='name'  sql-type="VARCHAR(255) NOT NULL CHARACTER SET UTF8" />   
    <field name='email' sql-type="VARCHAR(100) " />
 
    <create-table-sql>
@@ -233,8 +233,8 @@
     <field name='owner'     sql-type=' char(110) not null '/>
     <field name='userdata_file'   
                             sql-type=' char(200) binary not null'/>
-    <field name='namelast'  sql-type=' char(70) not null' />
-    <field name='namefull'  sql-type=' char(70) not null'/>
+    <field name='namelast'  sql-type=' char(70) not null CHARACTER SET UTF8' />
+    <field name='namefull'  sql-type=' char(70) not null CHARACTER SET UTF8'/>
     <field name='profile_url' 
                             sql-type='char(100) binary not null default ""'/>
     <field name='homepage'  sql-type='char(130) binary not null default ""'/>
@@ -250,7 +250,7 @@
 
   <table name='acis:names'>
     <field name='shortid'   sql-type=' char(10) not null ' />
-    <field name='name'      sql-type=' char(255) not null ' />
+    <field name='name'      sql-type=' char(255) not null CHARACTER SET UTF8' />
     <field name='probability' 
                             sql-type='tinyint unsigned not null' />
     <create-table-sql>PRIMARY KEY (shortid, name),
@@ -303,7 +303,7 @@
 
   <table name='acis:users'>
     <field name='login'    sql-type=' varchar(255) not null primary key ' />
-    <field name='name'     sql-type=' varchar(255)' />
+    <field name='name'     sql-type=' varchar(255) CHARACTER SET UTF8' />
     <field name='password' sql-type=' char(20) not null '/>
     <field name='userdata_file'
                            sql-type=' char(200) not null ' />
@@ -372,8 +372,8 @@
     <field name='class' sql-type='varchar(20)' /> 
            <!-- authenticate, session, contributions, ... -->
     <field name='action' sql-type='varchar(30)'/>         
-    <field name='descr' sql-type='text'/>
-    <field name='data'  sql-type='text'/>
+    <field name='descr' sql-type='text CHARACTER SET UTF8'/>
+    <field name='data'  sql-type='text CHARACTER SET UTF8'/>
 <!--
     <field name='login' sql-type='varchar(100)' />
     <field name='url'   sql-type='varchar(200)' />
@@ -442,8 +442,8 @@
     <field name='cnid'            sql-type='SERIAL'/> <!-- BIGINT UNSIGNED NOT NULL AUTO_INCREMENT UNIQUE -->
     <field name='clid'            sql-type='CHAR(38) BINARY NOT NULL'/>
     <field name='srcdocsid'       sql-type='CHAR(15) NOT NULL'/>
-    <field name='ostring'         sql-type='TEXT NOT NULL'/>
-    <field name='nstring'         sql-type='VARCHAR(255) NOT NULL'/>
+    <field name='ostring'         sql-type='TEXT NOT NULL CHARACTER SET UTF8'/>
+    <field name='nstring'         sql-type='VARCHAR(255) NOT NULL CHARACTER SET UTF8'/>
     <field name='trgdocid'        sql-type='VARCHAR(255)'/>
     <field name='moretrgdocids'   sql-type='TEXT NULL'/>
     
@@ -519,8 +519,4 @@
   </table>
 
 </configuration>
-
-
-
-
 
