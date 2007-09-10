@@ -67,7 +67,10 @@ into <code>home</code> directory.
 
 5. Configure MySQL. Create a MySQL user with a password, if
    necessary. Or you can use an existing MySQL account, if you
-   wish. Create a database for ACIS' data tables.
+   wish. Create a database for ACIS' data tables. Use 
+   US ASCII as the default character set. Thus if the
+   name of the database is "acis", use
+   <code>create database acis default character set ascii;</code>.
 
 6. Change to the ACIS home directory.
 
