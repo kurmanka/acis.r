@@ -4,13 +4,13 @@ use strict;
 use Carp::Assert;
 use Storable qw( freeze );
 use Digest::MD5;
-
 use ACIS::ShortIDs;
+use ACIS::FullTextURLs::Input qw( process_urls_for_resource clear_urls_for_dsid );
+use ACIS::Web::HumanNames;
+
 require ARDB::ReDIF::Processing;
 require AMF::2ReDIF;
-
 require ACIS::FullTextURLs;
-use ACIS::FullTextURLs::Input qw( process_urls_for_resource clear_urls_for_dsid );
 
 my $rec;
 my $te;
@@ -74,11 +74,11 @@ sub process_text {
   my $title = get 'title';
 
   $item = {
-	   id    => $id,
-	   sid   => $sid,
-	   type  => $type,
-	   title => $title,
-	  };
+           id    => $id,
+           sid   => $sid,
+           type  => $type,
+           title => $title,
+          };
 
   if ( $url ) { $item -> {'url-about'} = $url; }
 
@@ -95,21 +95,21 @@ sub process_text {
   ##
 
   my $row = {
-	     id   => $id,
-	     sid  => $sid,
-	     type => $type,
-	     urlabout => $url,
-	     authors => $item->{authors},
-	     title => $item->{title},
-	    };
+             id   => $id,
+             sid  => $sid,
+             type => $type,
+             urlabout => $url,
+             authors => $item->{authors},
+             title => $item->{title},
+            };
 
   my $location = '';
   foreach ( qw( journaltitle journalabbreviatedtitle
-		journalidentifier
-		issuedate volume part issue
-		season quarter startpage endpage pages
-		articlenumber
-	     ) ) {
+                journalidentifier
+                issuedate volume part issue
+                season quarter startpage endpage pages
+                articlenumber
+             ) ) {
     $location .= ' ' . $rec -> get_value( "serial/$_" );
   }
   $location =~ s/\s+/ /g;
@@ -125,8 +125,8 @@ sub process_text {
   my $table  = $config -> table( 'res_creators_bulk' );
   if ( $authors ) {
     my $r = { sid  => $sid,
-	      role => 'author',
-	      names => $authors };
+              role => 'author',
+              names => $authors };
     $table -> store_record ( $r, $sql );
     
   }
@@ -136,8 +136,8 @@ sub process_text {
   
   if ( $editors ) {
     my $r = { sid  => $sid,
-	      role => 'editor',
-	      names => $editors };
+              role => 'editor',
+              names => $editors };
     $table -> store_record ( $r, $sql );
     
   }
@@ -147,7 +147,7 @@ sub process_text {
   
   my $res = {
              sid => $sid,
-	    };
+            };
 
   $table  = $config -> table( 'res_creators_separate' );
   $table -> delete_records( 'sid', $sid, $sql );
@@ -159,7 +159,7 @@ sub process_text {
     
     if ( $_ eq '' ) {
       $role = 'editor';
-	next;
+        next;
     }
     
     $res -> {role}  = $role;
@@ -535,11 +535,14 @@ sub normalize_personal_names {
       $res .= $sep;
       $res .= $_;
     }
-    ## from the Web::HumanNames module.  
-    normalize_name();
+   ## from the Web::HumanNames module.
+    # it is not clear what it does. Therefore I
+    # have commented it out, and placed by a simple 
+    # lowercase command
+    #&ACIS::Web::HumanNames::normalize_name();
+    $_=lc($_);
     if ( not $_ ) { $_ = 'InvalidName'; }
   }
-  
   if ( $etal ) { $res .= "${sep}et al"; }
   if ( $res )  { $res .= $sep; }
   
