@@ -103,17 +103,7 @@ sub process_text {
              title => $item->{title},
             };
 
-  my $location = '';
-  foreach ( qw( journaltitle journalabbreviatedtitle
-                journalidentifier
-                issuedate volume part issue
-                season quarter startpage endpage pages
-                articlenumber
-             ) ) {
-    $location .= ' ' . $rec -> get_value( "serial/$_" );
-  }
-  $location =~ s/\s+/ /g;
-  $location =~ s/(^\s+|\s+$)//g;
+  my $location = &make_location_string($rec);
   $row -> {location} = $location;
   
   my $table  = $config -> table( 'resources' );
@@ -547,6 +537,59 @@ sub normalize_personal_names {
   if ( $res )  { $res .= $sep; }
   
   return $res;
+}
+
+
+##
+## makes location string
+##
+sub make_location_string {
+  my $rec=shift;
+  my $location = '';
+  ##
+  ## Ivan's old code. not exactly a moment of glory
+  ##
+  ##foreach ( qw( journaltitle journalabbreviatedtitle
+  ##              journalidentifier
+  ##              issuedate volume part issue
+  ##              season quarter startpage endpage pages
+  ##             articlenumber
+  ##           ) ) {
+  ##  
+  ## new code, draws heavily on data found in Xref
+  ##
+  my $journal_title=$rec -> get_value('serial/journaltitle' );
+  if(not $journal_title) {
+    $location =~ s/\s+/ /g;
+    $location =~ s/(^\s+|\s+$)//g;
+    return $location;
+  }
+  $location    .= $journal_title;
+  my $volume    = $rec -> get_value('serial/volume');
+  if($volume) {
+    $location  .= ", vol. $volume";
+  }
+  my $part      = $rec->get_value('serial/part' );
+  if($part) {
+    $location  .= ", no. $part"; 
+  }
+  my $start_page= $rec -> get_value('serial/startpage' );
+  if($start_page) {
+    $location  .= " pp. $start_page";
+  }
+  my $end_page  = $rec -> get_value('serial/endpage' );
+  if($start_page == $end_page) {
+    $location  .= ~s| pp\. $start_page|p. $start_page|g ;
+    $location =~ s/\s+/ /g;
+    $location =~ s/(^\s+|\s+$)//g;
+    return $location;
+  }
+  if($end_page) {    
+    $location  .= "\x{2013}$end_page";
+  }
+  $location =~ s/\s+/ /g;
+  $location =~ s/(^\s+|\s+$)//g;
+  return $location;
 }
 
 
