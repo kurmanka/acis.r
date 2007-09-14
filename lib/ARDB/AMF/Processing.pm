@@ -525,11 +525,8 @@ sub normalize_personal_names {
       $res .= $sep;
       $res .= $_;
     }
-   ## from the Web::HumanNames module.
-    # it is not clear what it does. Therefore I
-    # have commented it out, and placed by a simple 
-    # lowercase command
-    #&ACIS::Web::HumanNames::normalize_name();
+    ## from the Web::HumanNames module.
+    &ACIS::Web::HumanNames::normalize_name();
     $_=lc($_);
     if ( not $_ ) { $_ = 'InvalidName'; }
   }
