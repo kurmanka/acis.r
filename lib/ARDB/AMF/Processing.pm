@@ -572,11 +572,11 @@ sub make_location_string {
   }
   my $start_page= $rec -> get_value('serial/startpage' );
   if($start_page) {
-    $location  .= " pp. $start_page";
+    $location  .= ", pp. $start_page";
   }
   my $end_page  = $rec -> get_value('serial/endpage' );
   if($start_page == $end_page) {
-    $location  .= ~s| pp\. $start_page|p. $start_page|g ;
+    $location  .= ~s|, pp\. $start_page|, p. $start_page|g ;
     $location =~ s/\s+/ /g;
     $location =~ s/(^\s+|\s+$)//g;
     return $location;
