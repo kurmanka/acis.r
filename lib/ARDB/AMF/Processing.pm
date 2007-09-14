@@ -403,9 +403,6 @@ sub generate_short_id {
   return $sid;
 }
 
-
-
-
 sub process_organization {
   my $ARDB = shift;
   my $rec  = shift;
@@ -422,9 +419,11 @@ sub process_fulltext_urls {
 
 ##
 ## removes whitespace at the beginning and end
+## and removes double blanks
 ##
 sub rem_blank {
   my $in=shift;
+  $in =~ s/\s+/ /g;
   $in =~ s/(^\s+|\s+$)//g;
   return $in;
 }
@@ -557,8 +556,7 @@ sub make_location_string {
   ##
   my $journal_title=$rec -> get_value('serial/journaltitle' );
   if(not $journal_title) {
-    $location =~ s/\s+/ /g;
-    $location =~ s/(^\s+|\s+$)//g;
+    $location = &rem_blank($location);
     return $location;
   }
   $location    .= $journal_title;
@@ -576,16 +574,14 @@ sub make_location_string {
   }
   my $end_page  = $rec -> get_value('serial/endpage' );
   if($start_page == $end_page) {
-    $location  .= ~s|, pp\. $start_page|, p. $start_page|g ;
-    $location =~ s/\s+/ /g;
-    $location =~ s/(^\s+|\s+$)//g;
+    $location =~ s|, pp\. $start_page|, p. $start_page|g ;
+    $location = &rem_blank($location);
     return $location;
   }
   if($end_page) {    
     $location  .= "\x{2013}$end_page";
   }
-  $location =~ s/\s+/ /g;
-  $location =~ s/(^\s+|\s+$)//g;
+  $location = &rem_blank($location);
   return $location;
 }
 
