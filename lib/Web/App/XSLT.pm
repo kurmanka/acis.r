@@ -93,6 +93,7 @@ sub run_xslt_presenter {
   my $parser = new XML::LibXML;
   my $xslt   = new XML::LibXSLT;
 
+  $parser -> max_depth(1000);
   $parser -> expand_entities (0);
   $parser -> load_ext_dtd (0);
   $parser -> validation(0);
