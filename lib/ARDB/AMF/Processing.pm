@@ -254,6 +254,7 @@ sub process_collection {
   process_text( );
 }
 
+
 ##
 ## process author data
 ##
@@ -407,9 +408,191 @@ sub process_organization {
   my $ARDB = shift;
   my $rec  = shift;
   my $sql  = $ARDB -> sql_object;
-  $te = AMF::2ReDIF::translate( $rec );
-  ARDB::ReDIF::Processing::process_institution( $ARDB, $te, $relations, 1 );
+  ARDB::ReDIF::Processing::process_institution( $ARDB, $rec, $relations, 1 );
 }
+
+
+sub process_institution {
+  # ivan's lines
+  my $ARDB   = shift;
+  my $record = shift;
+  my $relations = shift;
+  my $repec  = shift || 2;
+  my $sql    = $ARDB -> sql_object;
+  my $config = $ARDB -> config;
+  my $table  = $config -> table( 'institutions' );
+  
+  # Here I go, with more comments
+  #
+  # We contruct "location" to be the first postal given
+  # note that "location" here is not the same 
+  # as the location in the text noun.
+
+  my $location_field=$record->{'postal'}->[0]->[0];
+
+  # The name is what users can search
+  # to constuct the name, we take all <name>s in the 
+  # AMF record, and all <shortname>s in the AMF record
+  # and simply concatenate them.
+
+  # But first, let us find the length of the 
+  # field, so we make sure it does not get too long.
+  my $name_field_description= $table->{fields}->{name};
+  $name_field_description=~m|VARCHAR\((\d+)\)|
+    or warn "bad field description: $name_field_description\n";
+  my $name_field_max_size=$1;
+
+  # initalize name field
+  my $name_field='';
+
+  # loop over <name>s and <shortname>s in the record
+  foreach my $name_occurence (@{$record->{name}},@{$record->{shortname}}) {
+    # take the name from the occurence
+    my $name=$name_occurence->[0];
+    # how long is the original name?
+    my $name_length=length($name);
+    # if the combined name is not too long
+    if(length($name_field) + $name_length <= $name_field_max_size) {
+      # concatenated it
+      $name_field=$name_field.' '.$name;
+      # if the name contains \x{2019}, also add a 
+      # occurence with \x{2019} replaced by \x{0027}
+      if($name=~m|\x{2019}|) {
+        # form addtional name occurence
+        my $add_name=$name;
+        $add_name=~s|\x{2019}|\x{0027}|g;
+        # check if we can add
+        if(length($name_field) + $name_length <= $name_field_max_size) {
+          # concatenated it
+          $name_field=$name_field.' '.$add_name;
+        }
+      }      
+    }
+  }
+
+  # collect the id field
+  my $id_field=$record->{ID};
+
+  # now, turn to the data blob. here is how a blob looks like
+  # 'location' => '',
+  # 'name' => 'Academy of International Economic and Political Relations, Gdynia',
+  # 'postal' => 'Poland',
+  # 'phone' => '',
+  # 'homepage' => 'http://www.wsms.edu.pl/',
+  # 'email' => '',
+  # 'fax' => '',
+  # 'id' => 'info:3lib:we:ojohw',
+  # 'name_en' => ''
+ 
+  # the data_field hash
+  my $data_field;
+
+  # location is same as postal
+  $data_field->{'location'}=$record->{'postal'}->[0]->[0];
+
+  # name is only the first name in the AMF record
+  $data_field->{'name'}=$record->{'name'}->[0]->[0];
+  # fix ampersand
+  $data_field->{'name'}=~s|&amp;|&|g;  
+
+  # postal is same as postal
+  $data_field->{'postal'}=$record->{'postal'}->[0]->[0];
+
+  # we have no phone data in whoarewe
+  $data_field->{'phone'}='';
+
+  # homepage is same as homepage
+  $data_field->{'homepage'}=$record->{'homepage'}->[0]->[0];
+
+  # we have no email data in whoarewe
+  $data_field->{'email'}='';
+
+  # we have no fax data in whoarewe
+  $data_field->{'fax'}='';
+
+  # the id is trivial
+  $data_field->{'id'}=$record->{ID};
+
+  # normally we don't have English names
+  $data_field->{'name_en'}='';
+  # search for names before the first one, if
+  # one has english as the xml:lang, make
+  # that the English name
+  my $count=1;
+  # loop over names
+  while(defined($record->{'name'}->[$count]->[0])) {
+    # find language
+    my $lang=$record->{'name'}->[$count]->[1]->{'xml:lang'};
+    # it is starts with "en"
+    if($lang=~m|^en|i) {
+      # make that the English name
+      $data_field->{'name_en'}=$record->{'name'}->[$count]->[0];
+      # and leave
+      last;
+    }
+    # increment the <name> count
+    $count++;
+  }
+ 
+  ##print Dumper $data_field;
+
+
+  # here is some of Ivan's code that I don't use
+
+  ##my $map = $config -> mapping( 'institution_obj' );
+  ##
+  ##
+  ##  my $name    = $record -> {name};
+  ##  my $name_en = $record -> {'name-en'};
+  ##  
+  ##  ## \x{2014} -- &mdash;
+  ##  ## \x{00BB} -- &raquo;
+  ##  ## \x{2192} -- &rarr;  
+  ##  $name    =~ s/\n\n/\n\x{2192} /g; 
+  ##  $name_en =~ s/\n\n/\n\x{2192} /g; 
+  ##
+  ##  $name =~ s/&amp;/&/g;
+  ##  $name_en =~ s/&amp;/&/g;
+  ##
+  ##  $record -> {name} = $name;
+  ##  $record -> {'name-en'} = $name_en;
+  ##  
+  ##  if ( $repec >1 and $record->id =~ /ea$/ ) {
+  ##    return;
+  ##  }
+  ##
+  ##  my $name_idx     = "$name $name_en";
+  ##  
+  ##  my $iobj;
+  ##
+  ##  my $location_idx = $iobj ->{location};
+  ##  if ( not $location_idx ) {
+  ##    $location_idx = $iobj ->{postal};
+  ##  }
+  ###  $location_idx .= " " . $iobj ->{postal};
+
+ 
+  # freeze the $data_field, to be stored in the tabel
+  my $data = freeze $data_field;
+  
+  # this is the table structure
+  my $struct = {
+                # the id
+                id => $id_field,
+                # the searchable name
+                name => $name_field,
+                # the searchable location
+                location => $location_field,
+                # the blob
+                data => $data 
+               };
+  ##print Dumper $struct;
+
+
+  $table -> store_record( $struct, $sql );
+  
+}
+
 
 sub process_fulltext_urls {
   my @authurls = get 'file/url';
@@ -461,8 +644,7 @@ sub process_name {
   if($composedname) {
     return $composedname;
   }
-  ## otherwise look at the name
-  my $name = $in->get_value('name') || return;
+  ## otherwise look at the name  my $name = $in->get_value('name') || return;
   $name = &rem_blank($name);
   if(defined($namesuffix)) {
     $name=$name.', '.$namesuffix;
