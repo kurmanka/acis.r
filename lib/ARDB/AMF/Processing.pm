@@ -644,7 +644,8 @@ sub process_name {
   if($composedname) {
     return $composedname;
   }
-  ## otherwise look at the name  my $name = $in->get_value('name') || return;
+  ## otherwise look at the name
+  my $name = $in->get_value('name') || return;
   $name = &rem_blank($name);
   if(defined($namesuffix)) {
     $name=$name.', '.$namesuffix;
