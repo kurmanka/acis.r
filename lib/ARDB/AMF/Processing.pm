@@ -408,7 +408,7 @@ sub process_organization {
   my $ARDB = shift;
   my $rec  = shift;
   my $sql  = $ARDB -> sql_object;
-  ARDB::ReDIF::Processing::process_institution( $ARDB, $rec, $relations, 1 );
+  process_institution( $ARDB, $rec, $relations, 1 );
 }
 
 
