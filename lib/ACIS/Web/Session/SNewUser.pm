@@ -33,6 +33,7 @@ use Carp::Assert;
 
 use ACIS::Web::Session;
 use ACIS::Web::UserData;
+use ACIS::Web::Affiliations;
 
 use base qw( ACIS::Web::Session );
 
@@ -71,17 +72,8 @@ sub close {
   ### write userdata
   $self -> save_userdata( $app );
 
-  ### - send submitted institution emails -
-  ### XXX This code is repeated here and in ::SOldUser.  It should be
-  ### removed after a while after new code is installed, when all
-  ### existing sessions with 'submitted-institutions' are closed.
-  my $submitted = $self -> {'submitted-institutions'};
-  foreach ( @$submitted ) {
-    next if not $_;
-    $app -> variables -> {institution} = $_;
-    $app -> send_mail( 'email/new-institution.xsl' );
-    undef $_;
-  }
+  &ACIS::Web::Affiliations::send_submitted_institutions_at_session_close($self);
+
   ### remove registration session
   my $old_session_file = $self ->{'remove-old-session-file'};
   unlink $old_session_file;

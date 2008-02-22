@@ -35,6 +35,7 @@ use Web::App::Common qw( &date_now debug );
 
 use ACIS::Web::Session;
 use ACIS::Web::UserData;
+use ACIS::Web::Affiliations;
 
 use base qw( ACIS::Web::Session );
 
@@ -93,19 +94,7 @@ sub close {
     }
   }
 
-
-  ### - send submitted institution emails -
-  ### XXX This code is repeated here and in ::SNewUser.  It should be
-  ### removed after a while, when all existing sessions are processed.
-  my $submitted = $self -> {'submitted-institutions'};
-  if ( ref $submitted ) {
-    foreach ( @$submitted ) {
-      next if not $_;
-      $app -> variables ->{institution} = $_;
-      $app -> send_mail( 'email/new-institution.xsl' );
-      undef $_;
-    }
-  }
+  &ACIS::Web::Affiliations::send_submitted_institutions_at_session_close($self);
 
   $self -> SUPER::close( $app );
 }
