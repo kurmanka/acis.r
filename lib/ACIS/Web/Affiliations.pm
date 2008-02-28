@@ -32,6 +32,7 @@ package ACIS::Web::Affiliations;   ### -*-perl-*-
 use strict;
 
 use Data::Dumper;
+use Data::Random qw(:all);
 
 use Encode;
 use Carp::Assert;
@@ -630,6 +631,22 @@ sub submit_institution {
   my $oldname = $input -> {oldname} || '';
   my $id      = $input -> {id} || '';
 
+  # if we are using the authorclaim template-set
+  if($config->{'template-set'} eq 'authorclaim') {
+    debug "using authorclaim customized id generator\n";
+    # find a new ID
+    $id=&make_institution_id($app,'new');    
+    # store it
+    $input -> {id} = $id;
+    debug "found id $id\n";
+  }
+  # otherwise report in debugging that we are not
+  # using that template-set
+  else {
+    debug "template set is" . Dumper $config->{'template-set'};
+    debug "not using customized id generator for template set authorclaim";
+  }
+  
   assert( $name );
   debug "submit: name: $name";
   debug "submit:  old: $oldname";
@@ -672,7 +689,11 @@ sub submit_institution {
       debug "submit: added to the submitted list";
     }
 
-  } else {
+  }
+  # the following else does not work, for some peculiar
+  # reason, it does not appear to trigger the function
+  # to be run at session close 
+  else {
     ### create the submitted institutions list
     $session->{'submitted-institutions'} = [ $institution ];
     $session->run_at_close( 'require ACIS::Web::Affiliations; 
@@ -766,6 +787,64 @@ sub send_submitted_institutions_at_session_close {
       $acis ->send_mail( 'email/new-institution.xsl' );
       undef $_;
     }
+  }
+}
+
+#
+# creates a random new or old institution id. This routine
+# is only  used with the authorclaim presentation
+#
+sub make_institution_id {
+  my $app = shift;
+  # the sql object is reused
+  my $sql = $app -> sql_object;
+  # mode can be either 'new' in which case
+  # a new id is made, or can can be 'old'
+  # in which case an random 'old' id is generated.
+  # the latter case should only be used for debugging
+  # as the generation of that old id is highly inefficient.
+  my $mode=shift;
+  # a dummy id the be returned on error
+  my $dummy='info:3lib:we:aaaaa';
+  # check the mode
+  if(not (($mode eq 'new') or ($mode eq 'old'))) {
+    # if there is an error, return the dummy id 
+    return $mode;
+  }
+  # the id to be returned
+  my $id;
+  # continue until we find something to return
+  while(1) {
+    # this uses the random char library
+    my @rc=&rand_chars( set => 'alphanumeric',
+                        min => 5, max => 5 );
+    # we form the string
+    $id=join('',@rc);
+    # we lowercase it
+    $id=lc($id);
+    # The random part should start with a letter
+    # because it may one day be required to be used as an XML name
+    # discard the random part found, and start anew if it does
+    # start with a digit 
+    if($id=~m|^\d|) {
+      next;
+    }
+    # add the prefix
+    $id="info:3lib:we:$id";
+    # is it already in use?
+    my $query="SELECT id FROM institutions WHERE id='$id'" ;
+    # prepare the query
+    $sql -> prepare( $query );
+    # execute it
+    my $r = $sql -> execute();
+    # find the/a first row
+    my $row = $r->{row};
+    # in old repeat move on if a row is not found
+    if(($mode eq 'old') and not defined($row)) {
+      next;
+    }
+    # in old mode, or when the id is new, return the id
+    return $id;
   }
 }
 
