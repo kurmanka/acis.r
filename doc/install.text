@@ -115,9 +115,10 @@ appropriately</a> and restart it, if neccessary.  (Optional.)
 
 Configure your machine to start <c>bin/rid</c><co>
 start</co> (relative to ACIS home dir) on boot and
-<c>bin/rid</c><co> stop</co> before shutdown.  (For this
+<c>bin/rid</c><co> stop</co> before shutdown.  For this
 arrangement help of your local system administrator may be
-required.)
+required. The <c>debian/etc/init.d/rid.example</c> file
+as example code for Debian GNU/Linux.
 
 Configure a cron job for <c>bin/clean-up</c> at regular
 intervals and redirect its output into a log, e.g.:
