@@ -26,6 +26,11 @@
 
         <h2>Institution</h2>
 
+        <p>
+        Before submitting a new institution, please make sure it is not already listed 
+        in the database: did you use the search function on the previous screen?
+        </p>
+
           <xsl:call-template name='fieldset'><xsl:with-param name='content' xmlns='http://x'>
 
               <p>
@@ -44,7 +49,7 @@
         <label for='homepage'>Website address, required:</label><br />
         <input name='homepage' id='homepage' size='50'/><br/>
 
-        <label for='email'>Email address, optional:</label><br />
+        <label for='email'>Email address of the institution, optional:</label><br />
         <input name='email' id='email' size='50'/><br/>
          
         <xsl:if test='$form-values/id'>

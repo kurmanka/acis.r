@@ -95,7 +95,9 @@
 
               
               <h2>Your name</h2>
-              
+              <p>
+                Please don’t use any titles.
+              </p>
               <p>
                 <label for='fn'>First (given), required:</label><br/>
                 <input name='first-name' id='fn' size='50'>

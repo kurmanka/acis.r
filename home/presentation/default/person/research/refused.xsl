@@ -72,10 +72,10 @@
           <xsl:when test='$refused-count &gt; 1'>
              <xsl:text>are the </xsl:text>
              <xsl:value-of select='$refused-count'/>
-             <xsl:text> items that you have refused so far.</xsl:text>
+             <xsl:text> items that you have refused so far, and thus claim not to have authored.</xsl:text>
           </xsl:when>
           <xsl:when test='$refused-count = 1'>
-             <xsl:text>is the single item that you have refused so far.</xsl:text>
+             <xsl:text>is the single item that you have refused so far, and thus claimed not to have authored.</xsl:text>
           </xsl:when>
           </xsl:choose>
           
@@ -154,7 +154,7 @@ function remove_button_click() {
       function (xml) { 
         var parent = button.parentNode;
         var success;
-        if ( ! xml )                 return alert( 'no xml response; can not remove the item' );
+        if ( ! xml )                 return alert( 'no xml response; cannot remove the item' );
         if ( xml.documentElement )   xml = xml.documentElement;
 
         if ( $( 'unrefused list-item', xml ).size() ) {

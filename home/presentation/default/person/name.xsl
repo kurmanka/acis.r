@@ -26,7 +26,7 @@
 
 
        <p>
-        <label for='fn'>First name, required:</label><br/>
+        <label for='fn'>First name (no titles), required:</label><br/>
          <input name='first-name' id='fn' size='50'/>
         <br />
 
@@ -38,7 +38,7 @@
          <input name='last-name' id='ln' size='50'/>
         <br />
 
-        <label for='ns'>Name suffix, if any:</label>
+        <label for='ns'>Name suffix, if any (III, Jr., no titles):</label>
         <br />
         <input name='name-suffix' id='ns' size='6'/>
        </p>
@@ -54,7 +54,9 @@
 
          <label for='nvar'>The variations of your name, one per line.
          We will use them to find your works in our database
-         automatically.</label>
+         automatically.  We cannot find works where your name appears
+         differently than below. Include initials or middle names if you
+         published with such a wording of your name.</label>
        </p>
 
        <table>

@@ -361,7 +361,7 @@
             <i> &#x201C;I have no connection to the works <b>not selected</b> above.
             Add these works to the <a ref='@research/refused' >refused list</a> and
             do not suggest them to me in the
-            future.&#x201D;</i>
+            future, as I am <em>not</em> their author.&#x201D;</i>
           </label>
         </p>
         

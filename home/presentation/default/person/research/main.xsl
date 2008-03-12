@@ -621,7 +621,7 @@ for your works again.</small>
       >REFUSED RESEARCH ITEMS</a></h2>
 
       <p>These works are automatically excluded from the
-      search results, because you refused to claim them.</p>
+      search results, because you refused them, thus claim <em>not</em> to be their author.</p>
 
     </td>
   </tr>

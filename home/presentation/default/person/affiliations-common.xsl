@@ -85,11 +85,11 @@
 
   <xsl:template name='submit-invitation'>
 
-    <h2 id='submit'>Can not find your institution?</h2>
+    <h2 id='submit'>Cannot find your institution?</h2>
     
     <p style='margin-bottom: 2em;'
        ><a ref='@new-institution'>Submit a new institution record</a> to
-    our database.</p>
+    our database; but first, search for it in the form above.</p>
     
   </xsl:template>
 
