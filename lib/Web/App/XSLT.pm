@@ -175,6 +175,10 @@ sub run_xslt_presenter {
     dump_data_file( "$homedir/bad_trans_presenter_result.xml", \$result );
   }
 
+  # ToK 2008-04-04 remove xml:space attributes in result
+  $result=~s|\Q xml:space="preserve"\E||g;
+  $result=~s|\Q xml:space="default"\E||g;
+  # ToK 2008-04-04
 
   if ( $hide_emails ) {
     hide_emails( \$result );
