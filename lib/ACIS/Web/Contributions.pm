@@ -819,7 +819,7 @@ sub process {
             refuse_item( $handle, $item );
             $statistics ->{refused} ++;
           }
-
+          
           $clear_from_suggestions -> {$handle} = 1;
 
           if ( $item ) {
@@ -827,11 +827,22 @@ sub process {
             if ( not $sid ) {
               my $id = $item ->{id};
               warn "Document $id had no sid: " . $item->{title};
-            } else {
-              $clear_from_suggestions_sid ->{$sid} = 1;
             }
+            # important Cardiff change. We only clear the
+            # suggestion if the user did not press the "save_and_continue"
+            # button
+            elsif(not $input->{'save_and_continue'}) {
+                debug "suggestion $sid clear";
+                $clear_from_suggestions_sid ->{$sid} = 1;
+            }
+            else {
+                # before: $clear_from_suggestions_sid ->{$sid} = 1;
+                debug "suggestion $sid kept";
+            }
+            #
+            # end of Cardiff change
+            #
           }
-
           $processed++; 
         }
       }
