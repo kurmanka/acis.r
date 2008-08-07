@@ -8,15 +8,9 @@ package ACIS::Web::Background;
 
 use strict;
 use Exporter;
-
 use Proc::Daemon;
-
 use Web::App::Common;
-
-
-
 use vars qw( $TABLE @EXPORT_OK $APP );
-
 use base qw( Exporter );
 
 @EXPORT_OK = qw( &logit );
@@ -138,6 +132,10 @@ sub run_thread {
 
 
   my $parent = $PPerlServer::child_pid || $PPerlServer::spid || $$;
+ 
+  # undefine sql object here, not in fork==0
+  $app -> {'sql-object'} = undef;
+
   my $fork = fork ();
 
   if ( $fork == 0 ) {
@@ -145,10 +143,12 @@ sub run_thread {
 
     logit "forked from $parent to run $func";
     undef $sql;
-    $app -> {sql_object} = undef;
     $sql = $app -> sql_object;
 
-#    $sql_helper::VERBOSE_LOG = 1;   ### XXX debugging
+    # added this line for back process
+    $sql->{'back'}=1;
+
+    # $sql_helper::VERBOSE_LOG = 1;   ### XXX debugging
 
     my $midpid = $$;
 
@@ -162,7 +162,7 @@ sub run_thread {
 
     eval { 
       no strict;
-      &$func ( $app, $sql );
+      &$func( $app, $sql );
     };
 
     if ( $@ ) {
@@ -172,23 +172,26 @@ sub run_thread {
     ### clear up
     clear_thread_record ( $sql, $psid, $type );
 
-    ### exit
-    logit "finished";
+    logit "thread record cleared, finished back processing";
+
     exit 1;
     
-  } elsif ( defined $fork )  {
-    # the parent
-    
+  } 
+  elsif ( defined $fork )  {
+    # the parent    
     # wait till the child goes daemon
     wait;
+    debug "waited until child went daemon";
     return 1;
-
-  } else {
-
+  }
+  else {
+    # added this line for back process
+    undef $sql->{'back'};
     clear_thread_record ( $sql, $psid, $type );
+    debug "cleared thread recrord in else";
     return 0;
   }
-
+  debug "run_thread finished";
 }
 
 
