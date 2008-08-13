@@ -39,6 +39,10 @@ use ACIS::Resources::Suggestions;
 use ACIS::Resources::AutoSearch;
 use ACIS::Web::Citations;
 
+# cardiff change: use learning module
+use ACIS::Resources::Learn;
+# end cardiff change
+
 my $Conf;
 
 use vars qw( $DB $SQL );
@@ -442,6 +446,11 @@ sub main_screen {
 
  
   ACIS::Web::Contributions::show_whats_suggested( $app );
+  
+  # cardiff change: learn
+  # there will need to be cecking for the potential to learn
+  ACIS::Resources::Learn::sort_suggestions_through_learning( $app );
+  # end of cardiff change
 }
 
 

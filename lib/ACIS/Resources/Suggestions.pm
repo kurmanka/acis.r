@@ -38,10 +38,16 @@ sub save_suggestions {
   my $complained;
   my @replace;
 
-  $sql -> prepare_cached ( "replace into rp_suggestions values (?,?,?,'$reason',now())" );
+  # change for cardiff: added ? at the end
+  $sql -> prepare_cached ( "replace into rp_suggestions values (?,?,?,'$reason',now(),?)" );
+  # end change for cardiff: added ? at the end
   foreach ( @$doclist ) {
     my $dsid = $_->{sid} || next;
     my $ro   = $_->{role} || $role;
+    # change for cardiff: added relevance
+    my $relevance   = $_->{relevance} || '';
+    my $r = $sql -> execute( $psid, $dsid, $ro, $relevance );
+    # end of change for cardiff: added relevance
     my $r = $sql -> execute( $psid, $dsid, $ro );
     if ( $sql -> error
          and not $complained ) {
@@ -75,13 +81,14 @@ sub run_load_suggestions_query {
   debug "run_load_suggestions_query: enter";
   my $sql = $app ->sql_object;
   my $db  = $app ->config("metadata-db-name") || die;
+  # cardiff change: adding sug.relevance, and order by it (see end) 
   my $q = 
-  qq!select sug.dsid,sug.reason,sug.role,lib.data from rp_suggestions sug
+  qq!select sug.dsid,sug.reason,sug.role,sug.relevance,lib.data from rp_suggestions sug
     join $db.resources as lookup on sug.dsid=lookup.sid
     join $db.objects as lib using (id)
     where sug.psid=?
-    order by sug.time ASC!;
-
+    order by sug.relevance DESC!;
+  # end of cardiff change: adding sug.relevance, and order by it (see end) 
   $sql -> prepare( $q );
   my $r = $sql -> execute( $psid );
   if ( not $r or $sql->error ) {
@@ -106,6 +113,11 @@ sub load_suggestions {
     my $data = $r->{row}{data} || next;
     my $reason = $r->{row}{reason};
     my $item = thaw( $data ) || next;
+    # cardiff change: adding relevance of the item
+    if($r->{'row'}->{'relevance'}) {
+      $item->{'relevance'}=$r->{'row'}->{'relevance'};
+    }
+    # end of cardiff change: adding relevance of the item
     $count++;
 
     if ( not $reasons -> {$reason} ) {
@@ -170,6 +182,10 @@ sub load_suggestions_into_contributions {
     my $reason = $row ->{reason};
     my $data   = $row ->{data};
     my $dsid   = $row ->{dsid};
+    # cardiff change: adding relevance 
+    my $relevance = $row -> {relevance};
+    # end cardiff change: adding relevance 
+
     if ( not defined $dsid ) { warn "No dsid in a resource suggestion record!"; next; }
 
     if   ( $already_accepted ->{$dsid} ) { next; }
@@ -177,7 +193,13 @@ sub load_suggestions_into_contributions {
 
     my $item = thaw( $data ) or next;
     $item ->{role} ||= $row ->{role};
-    
+
+    # cardiff change: adding relevance
+    if($relevance) {
+      $item->{'relevance'}=$relevance;
+    }
+    # end cardiff change: adding relevance
+
     my $status;  # should the item be preselected for the user or not?
     if ( $reason =~ s/\-s(\d)$//g ) {  # the reason might specify this
       $status = $1;
