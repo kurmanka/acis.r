@@ -110,6 +110,10 @@ use sql_result;
 use constant LOG_EVERYTHING => 0;
 
 
+#
+# takes a file as first argument, writes the other
+# arguments to it. 
+#
 sub log_to {   # used by log method, not for direct usage
   my $file = shift;
   no warnings;
@@ -126,9 +130,12 @@ sub log_to {   # used by log method, not for direct usage
 
 sub new {
   my $class = shift;
+  # remainder of arguments are called @par
   my @par = @_;
 
   my $opt = {};
+  # if the first element of @par is a hash, it formes the 
+  # options
   if ( ref $par[0] eq 'HASH' ) {
     $opt = shift @par;
   }
@@ -306,7 +313,15 @@ sub query { }
 sub do {
   my $self = shift;
   my $dbh = $self->{dbh};
-  
+
+  my $dbh_child;
+  if($self->{back}) {
+    $self->log("This is a back query");     
+    $dbh_child = $dbh->clone();
+    $dbh->{InactiveDestroy} = 1;
+    undef $dbh;
+    $dbh=$dbh_child;
+  }
   $self->{query}  = join ", ", @_;
   $self->{qparams} = '';
 
@@ -334,6 +349,14 @@ sub prepare {
 
   TRY:
     my $dbh = $self->{dbh};
+    my $dbh_child;
+    if($self->{back}) {
+      $self->log("This is a back query");     
+      $dbh_child = $dbh->clone();
+      $dbh->{InactiveDestroy} = 1;
+      undef $dbh;
+      $dbh=$dbh_child;
+    }
     my $errstr;
     my $r;
     
@@ -362,6 +385,14 @@ sub prepare_cached {
     my $self = shift;
     my $dbh = $self->{dbh};
 
+    my $dbh_child;
+    if($self->{back}) {
+      $self->log("This is a back query");     
+      $dbh_child = $dbh->clone();
+      $dbh->{InactiveDestroy} = 1;
+      undef $dbh;
+      $dbh=$dbh_child;
+    }
     $self->{query}  = join ", ", @_;
     $self->{qparams} = '';
 
