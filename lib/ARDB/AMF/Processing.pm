@@ -103,8 +103,17 @@ sub process_text {
              title => $item->{title},
             };
 
-  my $location = &make_location_string($rec);
-  $row -> {location} = $location;
+  # the location information
+  my $location;
+  # if the status is defined, get it from there
+  if(defined($rec->get_value('status'))) {
+    $location = $rec->get_value('status');
+  }
+  # otherwise compose from serial information
+  else {
+    $location = &make_location_string($rec);
+  }
+  $row -> {'location'} = $location;
   
   my $table  = $config -> table( 'resources' );
   $table -> store_record ( $row, $sql );
