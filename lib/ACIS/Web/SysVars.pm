@@ -34,9 +34,12 @@ sub sysvar {
 sub sysflag {
   my ($self, $name) = @_;
   my $d = $self->{home} . '/state/';
-  debug "sysflag( $name )";
+  debug "checking for system flag file $name in $d";
   $name =~ s!(?:\.\.|/|\||\>|\<)!!g;
-  if ( -f "$d$name" ) { return 1; }
+  if ( -f "$d$name" ) { 
+    debug "found flag file $name";
+    return 1; 
+  }
   return undef;
 }
 
