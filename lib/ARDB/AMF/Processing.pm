@@ -71,8 +71,10 @@ sub process_text {
     return;
   }
 
+  # get title from title or from name
   my $title = get 'title';
 
+  # $item is what gets into the Objects table
   $item = {
            id    => $id,
            sid   => $sid,
@@ -80,12 +82,32 @@ sub process_text {
            title => $title,
           };
 
-  if ( $url ) { $item -> {'url-about'} = $url; }
-
+  # more processing of the item
   if ( not $title ) {
     my $name = get 'name';
     if ( $name ) { $item -> {title} = $name; }
   }
+
+  if ( $url ) { 
+    $item -> {'url-about'} = $url; 
+  }
+
+  # the location information
+  my $location;
+  # if the status is defined, get it from there
+  if(defined($rec->get_value('status'))) {
+    $location = $rec->get_value('status');
+  }
+  # otherwise compose loacion from serial information
+  else {
+    $location = &make_location_string($rec);
+  }
+
+  # for the object table
+  if( $location) {
+    $item->{'location'}=$location;
+  }
+
   #warn "call process_authors() and _editors()";
   process_authors();
   process_editors();
@@ -101,20 +123,9 @@ sub process_text {
              urlabout => $url,
              authors => $item->{authors},
              title => $item->{title},
+             location =>  $location
             };
 
-  # the location information
-  my $location;
-  # if the status is defined, get it from there
-  if(defined($rec->get_value('status'))) {
-    $location = $rec->get_value('status');
-  }
-  # otherwise compose from serial information
-  else {
-    $location = &make_location_string($rec);
-  }
-  $row -> {'location'} = $location;
-  
   my $table  = $config -> table( 'resources' );
   $table -> store_record ( $row, $sql );
   
