@@ -7,7 +7,7 @@ use strict;
 
 use Carp::Assert;
 
-use Storable qw( thaw freeze );
+use Storable qw( thaw nfreeze );
 
 sub store_record {
   my $sql = $ARDB::ARDB -> sql_object;
@@ -18,7 +18,7 @@ sub store_record {
 
   my $data;
   if ( $rec ) {
-    $data = freeze( $rec );
+    $data = nfreeze( $rec );
   }
 
   my $r = $sql -> execute( $id, $data );

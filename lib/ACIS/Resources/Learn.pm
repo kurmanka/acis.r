@@ -5,7 +5,7 @@ use Carp::Assert;
 use Exporter;
 use base qw(Exporter);
 use vars qw(@EXPORT);
-use Storable qw(freeze thaw);
+use Storable qw(nfreeze thaw);
 use Web::App::Common;
 use ACIS::Web::Background qw(logit);
 use Data::Dumper;

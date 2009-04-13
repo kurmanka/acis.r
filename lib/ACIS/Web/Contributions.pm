@@ -1268,7 +1268,6 @@ sub reload_accepted_contributions {
     } else {
       debug "contribution $id can't be reloaded";
 
-      # freeze or clear?
       my $today = time;
       my $long_ago = $today - $grace_period;
 
@@ -1351,7 +1350,7 @@ sub reload_refused_contributions {
 ############################################################################
 
 use Encode;
-use Storable qw( freeze thaw );
+use Storable qw( nfreeze thaw );
 
 use vars qw( $select_what );
 

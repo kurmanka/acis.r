@@ -447,9 +447,9 @@ sub dump_sessions {
         next;
       }
 
-      ###  Pack the log with Storable's freeze
+      ###  Pack the log with Storable's nfreeze
 
-      my $log = Storable::freeze( $se->{log} );
+      my $log = Storable::nfreeze( $se->{log} );
 
       ### Pack $about as string of several attribute: value lines,
       ### "\n"-separated

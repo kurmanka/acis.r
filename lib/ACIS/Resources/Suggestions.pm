@@ -15,7 +15,7 @@ use vars qw(@EXPORT);
               clear_from_autosearch_suggestions
 );
 
-use Storable qw(freeze thaw);
+use Storable qw(nfreeze thaw);
 use Web::App::Common;
 use ACIS::Web::Background qw(logit);
 use Data::Dumper;
