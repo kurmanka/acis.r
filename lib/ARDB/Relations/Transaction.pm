@@ -175,11 +175,6 @@ ARDB::Relations::Transaction - class to process set of relations
 
 =head1 DESCRIPTION
 
-класс, зан€тый аккумулированием relations. при создании экземпл€ра объекта передаетс€
-template handle и объект relations. метод prepare получает все отношени€ template handle
-из таблицы relations, метод store сохран€ет новое отношение, метод commit определ€ет,
-какие relations нужно оставить в покое, а какие удалить из таблицы relations
-
 =head1 EXPORT
 
 None by default.

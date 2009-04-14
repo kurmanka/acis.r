@@ -429,8 +429,8 @@ sub parse_config {
   $self -> {config} = $siteconf;
   
 
-  use Storable qw( store );
-  store [ $screenconf, $siteconf ], "$home/config.bin.new";
+  use Storable qw( nstore );
+  nstore [ $screenconf, $siteconf ], "$home/config.bin.new";
   rename( "$home/config.bin.new", "$home/config.bin" );
 
   $self -> {config_parsed} = 1;

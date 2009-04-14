@@ -7,7 +7,7 @@ use strict;
 
 use Carp::Assert;
 use Data::Dumper;
-use Storable qw( &store &retrieve );
+use Storable qw( &nstore );
 
 use sql_helper;
 
@@ -285,7 +285,7 @@ sub init_config {
     || critical "ARDB::Configuration did not work";
   
   $config_object -> parse_config( $config_file );
-  store ( $config_object, $bin_config_file )
+  nstore ( $config_object, $bin_config_file )
     or log_error ( "cannot write binary config to '$bin_config_file'" );
 
 

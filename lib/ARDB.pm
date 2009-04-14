@@ -5,7 +5,7 @@ use strict;
 
 use Data::Dumper;
 use Carp::Assert;
-use Storable qw( &store &retrieve );
+#use Storable qw( &nstore &retrieve );
 
 use sql_helper;
 
