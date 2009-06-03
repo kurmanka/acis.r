@@ -139,8 +139,10 @@ if test "$cgi_pperl_reinit"; then
     /bin/bash -c "$cgi_pperl_reinit"
 fi
 
-if test -z $tempate_set; then
+if test $tempate_set; then
+    echo "template_set is $template_set"
     template_set='default'
+    echo "template_set becomes $template_set"
 fi
 
 if test -d $static_base_dir; then 
