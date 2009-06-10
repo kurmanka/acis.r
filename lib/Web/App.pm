@@ -272,7 +272,7 @@ sub init_presenter_data {
   my $pconf = $data -> {system} {config};
 
   foreach ( qw( base-url site-name site-name-long admin-email 
-                system-email static-base-url home-url )) {
+                system-email static-base-url home-url chunk-size )) {
     if ( $config -> {$_} ) {
       $pconf -> {$_} = $config -> {$_};
     }
