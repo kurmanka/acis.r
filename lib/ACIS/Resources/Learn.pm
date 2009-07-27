@@ -1,17 +1,13 @@
 package ACIS::Resources::Learn;
 
-use Carp;
-use Carp::Assert;
+
 use Exporter;
-use File::Temp ();
 use base qw(Exporter);
 use vars qw(@EXPORT);
-use Storable qw(freeze thaw);
+use File::Temp ();
 use Web::App::Common;
 use ACIS::Web::Background qw(logit);
-use ACIS::Resources::Suggestions;
 use Data::Dumper;
-use sql_helper;
 use strict;
 
 # part of cardiff
@@ -22,10 +18,7 @@ use strict;
 my $train_bin="/usr/bin/svm-train -q -b 1";
 my $predict_bin="/usr/bin/svm-predict -b 1";
 
-@EXPORT = qw( 
-              sort_suggestions_through_learning();
-              learn_via_svm();
-);
+@EXPORT = qw( learn_via_svm() );
 
 
 #
