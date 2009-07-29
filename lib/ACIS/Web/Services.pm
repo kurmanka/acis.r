@@ -31,6 +31,8 @@ package ACIS::Web;   ### -*-perl-*-
 #  $Id$
 #  ---
 
+# cardiff
+
 use strict;
 
 use Carp;
@@ -38,6 +40,8 @@ use Carp::Assert;
 use Data::Dumper;
 use CGI::Untaint;
 
+# inserted to avoid problems when running the module on its own.
+use ACIS::Web;           
 use Web::App::Common    qw( date_now debug convert_date_to_ISO );
 use ACIS::Data::DumpXML qw( dump_xml );
 
@@ -46,24 +50,23 @@ use Encode qw/encode decode/;
 use ACIS::Web::SysProfile;
 
 
-
 ####   SESSION STUFF   ####
 
 
 sub start_session {
   my $self  = shift;
   my $type  = shift;
-
+  
   assert( ref $self );
   assert( not $self -> session );
-
+  
   my $sid;
   my $class = $SESSION_CLASS{$type};
   if ( not $class ) { 
     $self -> errlog( "Session class for session type '$type' is undefined" );
     die "Session class for session type '$type' is undefined";
   }
-
+  
   my $session  = $class -> new( $self, @_ );
   if ( not $session ) {
     complain "can't create session of $class";
@@ -196,11 +199,33 @@ sub load_session {
 sub logoff_session {
   my $self = shift;
   my $session = $self -> session;
+  # cardiff: prepare for sorting call 
+  my $presenter=$self->{'presenter-data'};
+  my $psid=$self->{'presenter-data'}->{'request'}->{'session'}->{'current-record'}->{'shortid'};
+  my $bindir=$self->{'config'}->{'homebin'};
+  # cardiff
+
   $session -> close( $self );
 
-  $self -> clear_session_cookie;
+  $self -> clear_session_cookie;  
+  if ( $self->request ) { 
+    undef $self -> request -> {'session-id'}; 
+  }
 
-  if ( $self->request ) { undef $self -> request -> {'session-id'}; }
+  # cardiff: call the command to sort refused
+  if($presenter->{'response'}->{'success'}) {
+    my $executable="$bindir/sort_refused";
+    debug "I have to sort the refused documents: $executable";
+    if(-e $executable) {
+      my $s="$executable $psid &";
+      debug "running $s";
+      system($s);      
+    }
+  }
+  else {
+      debug "not presorting the refused because there was no change";
+  }
+  # end of call of the command to sort refused
   undef $self -> {session};
 }
 
