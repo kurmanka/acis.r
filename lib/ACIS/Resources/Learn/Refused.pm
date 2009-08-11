@@ -21,16 +21,16 @@ require ACIS::APU::Queue;
 
 ##my $to_do='pkr1';
 
-##&sort_refused($acis,$to_do);
+##&learn_refused($acis,$to_do);
 
 # the log file, a global variable
 my $log_file_name='';
 
 
-sub sort_refused {
+sub learn_refused {
   my $acis=shift;
   my $to_do=shift;
-  $log_file_name=$acis->{'config'}->{'homedir'}.'/opt/log/sort_refused_sql.log';
+  $log_file_name=$acis->{'config'}->{'homedir'}.'/opt/log/learn_refused_sql.log';
   # set up sql object
   my $db_name=$acis->{'config'}->{'db-name'};
   my $db_user=$acis->{'config'}->{'db-user'};

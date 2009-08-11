@@ -15,7 +15,7 @@ if(not $to_do) {
   exit
 }
 
-&ACIS::Resources::Learn::Refused::sort_refused($acis,$to_do);
+&ACIS::Resources::Learn::Refused::learn_refused($acis,$to_do);
 if($@) {
   print "error: $@";
 }
