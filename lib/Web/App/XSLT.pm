@@ -8,33 +8,30 @@ use open ':utf8';
 require XML::LibXML;
 require XML::LibXSLT;
 
+
 use Web::App::Common qw( debug );
 
 sub presentation_builder {
   my $self      = shift;
-  my $presenter = shift; ### or stylesheet file
+  my $presenter = shift; ## or stylesheet file
   my @params    = @_;
 
   return undef if not $presenter;
 
-  ###  run presenter
+  ##  run presenter
   if ( ref $presenter ) {
     assert defined $presenter->{file}, 'presenter file must be defined';
     if ( $presenter->{type} eq 'xslt' ) {
       return run_xslt_presenter( $self, $presenter ->{file}, @params );
     } 
-
-  } else {
-    ### filename as presenter
-    return run_xslt_presenter( $self, $presenter, @params );
-
   } 
-
+  else {
+    ## filename as presenter
+    return run_xslt_presenter( $self, $presenter, @params );    
+  } 
   die "unknown presenter type: $presenter->{type}";
   return undef;
 }
-
-
 
 
 
@@ -48,11 +45,11 @@ sub run_xslt_presenter {
 
   assert( $presenterfile );
 
-  my $homedir   = $self ->{home};
+  my $homedir   = $self ->{'home'};
   assert( $homedir );
 
   my $paths          = $self -> paths || die;
-  my $presenters_dir = $paths -> {presenters};
+  my $presenters_dir = $paths -> {'presenters'};
 
   my $data        = $self ->{'presenter-data'};
 
@@ -65,7 +62,7 @@ sub run_xslt_presenter {
   }
   #assert( $data_string );
 
-  $self -> time_checkpoint( 'serializer' );
+  ##$self -> time_checkpoint( 'serializer' );
 
   my $file = $presenters_dir . "/" . $presenterfile;
   my $result;
@@ -75,8 +72,8 @@ sub run_xslt_presenter {
   debug "using stylesheet $file to generate some content";
 
   my @event = ( -class => 'presentation',
-             -template => $presenterfile,
-                 -file => $file,
+                -template => $presenterfile,
+                -file => $file,
               );
   
   if ( not -f $file ) {
@@ -92,8 +89,6 @@ sub run_xslt_presenter {
   
   my $parser = new XML::LibXML;
   my $xslt   = new XML::LibXSLT;
-
-  XML::LibXSLT->max_depth(1000);
 
   $parser -> expand_entities (0);
   $parser -> load_ext_dtd (0);
@@ -124,9 +119,11 @@ sub run_xslt_presenter {
     $self -> time_checkpoint( 'transf_prep' );
     my $source = $parser -> parse_string ( $data_string );
     assert( $source, "Can't parse XML data string" );
-    $self -> time_checkpoint( 'parsed_data' );
+    ##$self -> time_checkpoint( 'parsed_data' );
     $result_object = $stylesheet -> transform($source);
-    $result = $stylesheet -> output_string( $result_object );
+    ## originally:
+    ##$result = $stylesheet -> output_string( $result_object );
+    $result = $stylesheet -> output_as_chars( $result_object );
   };
     
   if ( $@ or $XML::LibXSLT::error 
@@ -135,9 +132,11 @@ sub run_xslt_presenter {
     if ( not $@ ) {
       if ( $XML::LibXSLT::error ) {
         $err = "XML::LibXSLT::error: $XML::LibXSLT::error";
-      } elsif ( not $result_object ) {
+      }
+      elsif ( not $result_object ) {
         $err = 'no $result_object';
-      } elsif ( not $result ) {
+      }
+      elsif ( not $result ) {
         $err = 'no $result';
       }
     }
@@ -146,14 +145,15 @@ sub run_xslt_presenter {
                       -type  => 'error',
                       -descr => "stylesheet transformation problem",
                     );
-
+    
     dump_data_file( "$homedir/bad_presenter_data.xml", \$data_string );
-
+    
     die "Can't transform data with stylesheet: $file\n" .
       "Problem: $err";
   }
-
-  $result = Encode::decode_utf8( $result );
+  
+  ## not required if output_as_chars
+  ## $result = Encode::decode_utf8( $result );
 
   if ( not $error 
       and  ( 
@@ -161,11 +161,11 @@ sub run_xslt_presenter {
             or $result eq ''
             or $result =~ m!body></body! 
            ) 
-    ) {
+     ) {
     $self -> errlog( "xslt transformation result is empty: $file ($@)" );
     warn "presenter's transformation result is empty";
     debug "presenter's transformation result is empty";
-
+    
     $self -> sevent ( @event,
                       -type  => 'error',
                       -descr => "transformation result is empty",
@@ -174,12 +174,13 @@ sub run_xslt_presenter {
     dump_data_file( "$homedir/bad_trans_presenter_data.xml", \$data_string );
     dump_data_file( "$homedir/bad_trans_presenter_result.xml", \$result );
   }
-
+  
+  
   # ToK 2008-04-04 remove xml:space attributes in result
   $result=~s|\Q xml:space="preserve"\E||g;
   $result=~s|\Q xml:space="default"\E||g;
   # ToK 2008-04-04
-
+  
   if ( $hide_emails ) {
     hide_emails( \$result );
   }
