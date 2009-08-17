@@ -1,6 +1,6 @@
 #!/bin/sh
 
-homedir=
+homedir=/home/awho/acis
 
 if test -z $homedir; then
   echo "This script must be installed before usage"
@@ -38,11 +38,11 @@ perl -Ilib bin/conf.pl mainconf || exit 1
 ###  load parsed and translated into shell format configuration
 . thisconf.sh
 
-if test "$echo_arpu_mails"; then
-   echo ''
-   echo WARNING! You have an obsolete echo-arpu-mails parameter in main.conf.  Replace it with echo-apu-mails.
-   echo ''
-fi
+#if test "$echo_arpu_mails"; then
+#   echo ''
+#   echo WARNING! You have an obsolete echo-arpu-mails parameter in main.conf.  Replace it with echo-apu-mails.
+#   echo ''
+#fi
 
 function print_perl_preamble ()
 {
@@ -209,9 +209,13 @@ perl -e 'print "package ACIS::LocalConfig;\n\$home_dir=\"$ENV{homedir}\";\n1;\n"
 ### finalize ACIS
 echo parsing and checking ACIS::Web configuration
 bin/reparse_config 'ACIS::Web' acis.conf
-
 bin/setup_profile_menu
 
+### restart learning daemon, cardiff
+echo restarting the learning daemon
+kill -9 `cat $homedir/opt/learning_daemon.pid`
+rm -f $homedir/opt/learning_daemon.pid
+bin/learn_daemon
 
 
 
