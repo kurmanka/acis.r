@@ -146,7 +146,7 @@ sub learn_via_svm {
       ## replace the +1 or -1 with 0
       ## the indication will probably be ignored but
       ## it is nice to be precise.
-      $doc_line=~s|^\Q$start_of_line_to_learn\E|0|);
+      $doc_line=~s|^\Q$start_of_line_to_learn\E|0|;
       print $test_fh "$doc_line\n";
     }
   }
