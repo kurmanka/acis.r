@@ -59,8 +59,9 @@ sub process_text {
   my $config = $ardb -> {config};
   my $sql    = $ardb -> {sql_object};
 
-  if ( not $sid ) { $do_store = 0; }
-
+  if ( not $sid ) { 
+    $do_store = 0; 
+  }  
   if ( not $do_store ) {
     if ($sid) {
       $config -> table( 'res_creators_bulk' ) ->delete_where( $sql, "sid=?", $sid );
@@ -69,6 +70,13 @@ sub process_text {
     }
     $ardb -> {record} = { id => $id, type => $rec -> type };
     return;
+  }
+
+  ## warn about AMF problems
+  my $problems=$rec->{'PROBLEMS'};
+  use Data::Dumper;
+  if(defined($problems)) {
+    warn $problems;
   }
 
   # get title from title or from name
@@ -132,7 +140,7 @@ sub process_text {
   ##
   ##  resource creators
   ##
-  my $table  = $config -> table( 'res_creators_bulk' );
+  $table  = $config -> table( 'res_creators_bulk' );
   if ( $authors ) {
     my $r = { sid  => $sid,
               role => 'author',
@@ -203,7 +211,7 @@ sub process_text {
   
   ## editors' handles
   
-  my @h =  $rec -> get_value( "haseditor/ID" );
+  @h =  $rec -> get_value( "haseditor/ID" );
   push @h, $rec -> get_value( "haseditor/REF" );
   push @h, $rec -> get_value( "haseditor/identifier" );
 
@@ -283,9 +291,15 @@ sub process_authors {
   @authors   = ();
   @au_emails = ();
   my @aus = $rec -> get_value( 'hasauthor' );
+  if(not scalar @aus) {
+    warn "There no authors";
+  }
   foreach ( @aus ) {
     my $name=&process_name($_);
-    next if not $name;
+    if(not $name) {
+      warn "process_name did not return a name";
+      next;
+    }
     my $em = $_ ->get_value('email') || '';
     push @au_emails, $em;
     push @authors,   $name;
@@ -307,7 +321,10 @@ sub process_editors {
   my @eds = $rec-> get_value( 'haseditor' );
   foreach ( @eds ) {
     my $name=&process_name($_);
-      next if not $name;
+    if(not $name) {
+      warn "process_name did not give me a name";
+      next;
+    }
     my $em = $_ ->get_value('email') || '';
     push @ed_emails, $em;
     push @editors  , $name;
