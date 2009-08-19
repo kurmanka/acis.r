@@ -271,6 +271,7 @@ sub init_presenter_data {
   ###  $presenter-data/system/config
   my $pconf = $data -> {system} {config};
 
+  # cardiff change: added chunk-size
   foreach ( qw( base-url site-name site-name-long admin-email 
                 system-email static-base-url home-url chunk-size )) {
     if ( $config -> {$_} ) {
@@ -429,8 +430,8 @@ sub parse_config {
   $self -> {config} = $siteconf;
   
 
-  use Storable qw( nstore );
-  nstore [ $screenconf, $siteconf ], "$home/config.bin.new";
+  use Storable qw( store );
+  store [ $screenconf, $siteconf ], "$home/config.bin.new";
   rename( "$home/config.bin.new", "$home/config.bin" );
 
   $self -> {config_parsed} = 1;

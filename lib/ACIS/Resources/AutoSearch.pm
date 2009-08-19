@@ -6,6 +6,21 @@ use warnings;
 use Carp::Assert;
 use Exporter;
 use base qw(Exporter);
+use Data::Dumper;
+use Carp;
+use Web::App::Common;
+use ACIS::Resources;
+use ACIS::Resources::Search;
+use ACIS::Resources::Suggestions;
+use ACIS::Resources::SearchFuzzy;
+## cardiff change 
+use ACIS::Resources::Learn qw(form_learner);
+use ACIS::Resources::Learn::Suggested qw(learn_suggested);
+## end of cardiff change
+use ACIS::Web::Background qw(logit);
+use ACIS::Web::SysProfile;
+require ACIS::Web::Contributions;
+
 use vars qw(@EXPORT);
 @EXPORT = qw( 
               automatic_resource_search_now
@@ -15,17 +30,6 @@ use vars qw(@EXPORT);
               get_last_autosearch_time
            );
 
-use Data::Dumper;
-use Carp;
-use Web::App::Common;
-use ACIS::Resources;
-use ACIS::Resources::Search;
-use ACIS::Resources::Suggestions;
-use ACIS::Resources::SearchFuzzy;
-
-use ACIS::Web::Background qw(logit);
-use ACIS::Web::SysProfile;
-require ACIS::Web::Contributions;
 
 
 sub prepare_search_context {
@@ -64,13 +68,13 @@ sub prepare_search_context {
 
   return {
           %$init,
-    db      => $app->config('metadata-db-name'),
-    found   => {},
-    already => $ignore_index,
-    id      => $id, 
-    sid     => $sid,
-    already_suggested => $already_suggested,
-  };
+          db      => $app->config('metadata-db-name'),
+          found   => {},
+          already => $ignore_index,
+          id      => $id, 
+          sid     => $sid,
+          already_suggested => $already_suggested,
+         };
 }
 
 sub prepare_for_auto_search {
@@ -91,17 +95,39 @@ sub prepare_for_auto_search {
     $record -> {contributions} {autosearch} = $autosearch;
   }
 
-  my $name = $record->{name};
+  my $name = $record->{'name'};
   my $variations = $name->{variations};
   $autosearch -> {'names-list'} = [grep {$_} @$variations];
 
-  my $nicelist = [];
-  push @$nicelist, @{ $name ->{'additional-variations'} };
-  push @$nicelist, $name ->{full};
-  push @$nicelist, $name ->{latin}
-    if $name->{latin};
-  $autosearch -> {'names-list-nice'} = $nicelist;
+  ## this code leads to names being duplicated in the nice list
+  #my $nicelist = [];
+  #push @$nicelist, @{ $name ->{'additional-variations'} };
+  #push @$nicelist, $name ->{full};
+  #if $name->{'latin'} {
+  #  push @$nicelist, $name ->{'latin'}
+  #}
+  #$autosearch -> {'names-list-nice'} = $nicelist;
 
+  my $nicelist = [];
+  my $already_there_hash = {}; 
+  ## additional variations
+  foreach my $name_variation (@{ $name->{'additional-variations'} }) {
+    if(not $already_there_hash->{$name_variation}) {
+      push(@$nicelist, $name_variation);
+    }
+    $already_there_hash->{$name_variation} = 1;
+  }
+  ## the full name
+  if(not $already_there_hash->{$name ->{'full'}}) {
+    push(@$nicelist, $name->{'full'});
+  }
+  ## the latin name, if it is there
+  if($name->{'latin'} and not $already_there_hash->{$name ->{'latin'}}) {
+    push(@$nicelist, $name->{'latin'});
+  }
+  ## set the nice list in the session
+  $autosearch -> {'names-list-nice'} = $nicelist;
+  debug "nicelist is " . Dumper $nicelist;
   debug "prepare_for_auto_search: exit";
   return $autosearch;
 }
@@ -120,6 +146,7 @@ sub search_done {
 
   my $names_last_change_date = $record -> {name}{'last-change-date'};
   $autosearch -> {'for-names-last-changed'} = $names_last_change_date;
+  debug "search in background done";
 }
 
 sub get_last_autosearch_time {
@@ -149,8 +176,9 @@ sub get_bg_search_status {
     $app -> sql_object -> do( "update rp_suggestions set psid=? where psid=?", $sid, $tsid );
     if ( $threads ) {
       # let it run
-    } else {
-#      delete $record->{temporarysid};
+    } 
+    else {
+      #      delete $record->{temporarysid};
       undef $tsid;
     }
   } 
@@ -167,7 +195,6 @@ sub get_bg_search_status {
       }
     }
   }
-
   debug "get_bg_search_status: $status";
   return $status;
 }
@@ -185,8 +212,55 @@ sub search_for_resources_exact {
   my $contributions = $session ->{$id} {contributions};
   my $autosearch  = $contributions -> {autosearch};
   my $namelist    = $autosearch -> {'names-list'};
+  ## cardiff change: $results contains all results
+  my $results;
+  foreach my $name_variation ( @$namelist ) {
+    next if not $name_variation;
+    my $search = search_resources_for_exact_name( $sql, $context, $name_variation );
+    my $found = ( defined $search ) ? scalar( @$search ) : 'nothing' ;
+    logit "exact name: '$name_variation', found: $found";
+    push(@{$results},@{$search});
+  }
+  #logit "here is the result";
+  #logit Dumper $results;  
+  ## cardiff changes
+  logit "start learning";
+  ## defined in ResourcessLearn.pm
+  ## adds the results to the existing contribution
+  my $learner=&form_learner($app,'search_for_resources_exact',$results);
+  ## defined in Resourcess/Learn/Suggested.pm
+  ## this also saves the results, if it returns true
+  my $saved_results_boolean=&learn_suggested($learner,$sql,$context,'exact-name-variation-match');
+  logit "saved_results_boolean: $saved_results_boolean";
+  ## so if this is not true, save the results with the local function
+  if(not $saved_results_boolean) {
+    logit('there has been no learning, I have to store');
+    save_search_results( $context, 'exact-name-variation-match', $results );
+  }
+  ## end of cardiff change
+  logit "search_for_resources_exact: exit";
+  ## remember rosa sitting next to you? This line must stay!
+  return 1;
+}
 
-  ###  search for exact matches
+
+
+sub OLD_search_for_resources_exact {
+  my $app     = shift;
+  my $context = shift;
+  logit "search_for_resources_exact: enter";
+
+  my $sql     = $app -> sql_object;
+  my $session = $app -> session;
+  my $record  = $session ->current_record;
+  my $id      = $record->{id};
+  my $contributions = $session ->{$id} {contributions};
+  my $autosearch  = $contributions -> {autosearch};
+  my $namelist    = $autosearch -> {'names-list'};
+
+  ## search for exact matches
+  ## for cardiff this is problematic since the saving
+  ## of results happens for each name variation separately...
   foreach ( @$namelist ) {
     next if not $_;
     my $search = search_resources_for_exact_name( $sql, $context, $_ );
@@ -194,21 +268,26 @@ sub search_for_resources_exact {
     logit "exact name: '$_', found: $found";
     save_search_results( $context, 'exact-name-variation-match', $search );
   }
-
   logit "search_for_resources_exact: exit";
 }
 
 sub save_search_results {
   my ($context,$reason,$results) = @_;
-  return undef if not $results or not scalar @$results;
+  if(not $results or not scalar @$results) {
+    return undef;
+  }
   my $sql = $ACIS::Web::ACIS->sql_object;
   my $psid = $context->{sid};
   if ($context->{save_result_func}) {
+    logit "using special save" . $context->{save_result_func};
     my $save_func = $context->{save_result_func};
     &{$save_func}   ( $sql, $psid, $reason, undef, $results );
-  } else {
+  } 
+  else {
+    logit "using save_suggestions";
     save_suggestions( $sql, $psid, $reason, undef, $results );
   }
+  logit "search results saved";
   return 1;
 }
 
@@ -275,9 +354,6 @@ sub additional_searches {
 
 
 
-
-
-
 sub do_auto_search {
   my $app = shift;
   my $settings = shift;
@@ -291,13 +367,14 @@ sub do_auto_search {
 
   debug "auto search initiated: ", $settings->{via_web} ? "online" : "apu";
   search_for_resources_exact( $app, $context );
-
+  debug "search for resources finished";
+  ## are we doing additional searching
   if ( $app -> config( "research-additional-searches" ) ) {
     additional_searches( $app, $context ); 
     if ( $app->config( "fuzzy-name-search" ) ) {
-      # are we running search started via web interface, or started via
-      # APU?  If via the web, check if that's ok for fuzzy search.
-      if ( not $settings->{via_web} 
+      ## are we running search started via web interface, or started via
+      ## APU?  If via the web, check if that's ok for fuzzy search.
+      if ( not $settings->{'via_web'} 
            or $app->config( "fuzzy-name-search-via-web" ) ) {
         run_fuzzy_searches( $app, $context );
       }
@@ -310,8 +387,8 @@ sub automatic_resource_search_now {
   my $app = shift;
   my $session = $app -> session;
   my $record  = $session -> current_record;
-  my $id      = $record ->{id};
-  my $sid     = $record ->{sid};
+  my $id      = $record ->{'id'};
+  my $sid     = $record ->{'sid'};
   prepare_for_auto_search( $app );
   do_auto_search( $app, @_ );
   search_done( $app );

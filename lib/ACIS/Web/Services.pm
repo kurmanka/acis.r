@@ -214,8 +214,8 @@ sub logoff_session {
 
   # cardiff: call the command to sort refused
   if($presenter->{'response'}->{'success'}) {
-    my $executable="$bindir/learn_refused";
-    debug "I have to sort the refused documents: $executable";
+    my $executable="$bindir/learn_known_items";
+    debug "I have to learn the refused documents: $executable";
     if(-e $executable) {
       my $s="$executable $psid &";
       debug "running $s";

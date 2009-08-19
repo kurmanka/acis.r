@@ -7,9 +7,8 @@ package ACIS::Web::Contributions;  ### -*-perl-*-
 #    The Contributions profile.
 #
 #
-#  Copyright (C) 2003-2006 Ivan Kurmanov for ACIS project,
+#  Copyright (C) 2003-2009 Thomas Krichel for ACIS project,
 #  http://acis.openlib.org/
-#
 #
 #  This program is free software; you can redistribute it and/or modify
 #  it under the terms of the GNU General Public License, version 2, as
@@ -28,35 +27,41 @@ package ACIS::Web::Contributions;  ### -*-perl-*-
 #  $Id$
 #  ---
 
+# cardiff
 use strict;
 use Carp qw( cluck );
 use Carp::Assert;
 use Web::App::Common;
 require ACIS::Data::DumpXML::Parser;
 
-use ACIS::Resources::Search;
-use ACIS::Resources::Suggestions;
+
+use sql_helper;
+use Data::Dumper;
 use ACIS::Resources::AutoSearch;
+use ACIS::Resources::Search;
+#use ACIS::Resources::Suggestions qw(send_suggestions_to_learning_daemon load_suggestions_into_contribut);
+use ACIS::Resources::Suggestions;
 use ACIS::Web::Citations;
 
-# cardiff change: use learning module
-use ACIS::Resources::Learn;
-# end cardiff change
+use IO::Socket::UNIX;
+use Storable qw(freeze);
 
+use Storable;
 my $Conf;
 
 use vars qw( $DB $SQL );
 
 ###########################################################################
 ###   s u b   g e t   c o n f i g u r a t i o n
+###
 sub get_configuration {
   my $app = shift;
-  if ( $Conf ) { return $Conf; }
-
+  if ( $Conf ) { 
+      return $Conf; 
+  }
   my $file = $app -> home;
   $file .= '/contributions.conf.xml';
   $Conf = ACIS::Data::DumpXML::Parser -> new -> parsefile ( $file );
-
   if ( not $Conf ) {
     die "the contributions configuration problem";
   }
@@ -90,7 +95,8 @@ sub get_configuration {
         if ( not defined $_ ) {
           $_ = [ $name ];
           push @roles, $role;
-        } else {
+        } 
+        else {
           push @$_, $name;
         }
       }
@@ -130,21 +136,28 @@ sub prepare {
   my $session = $app -> session;
   my $vars    = $app -> variables;
   my $record  = $session -> current_record;
-  my $id      = $record  -> {id};  assert( $id );
+  my $id      = $record  -> {'id'}; 
+  assert( $id );
 
-  $contributions = $session -> {$id} {contributions} || {};
+  #
+  # process the chunk information
+  #
+  &change_or_delete_chunk($app);
 
-  $accepted = $record ->{contributions} {accepted} || [];
-  $refused  = $record ->{contributions} {refused } || [];
+  $contributions = $session -> {$id} -> {'contributions'} || {};
 
-  $record -> {contributions} {accepted}  = $accepted;
-  $record -> {contributions} {refused}   = $refused;
+  $accepted = $record ->{'contributions'} -> {'accepted'} || [];
+  $refused  = $record ->{'contributions'} -> {'refused' } || [];
+
+
+  $record -> {'contributions'} -> {'accepted'}  = $accepted;
+  $record -> {'contributions'} -> {'refused'}   = $refused;
   
   $SQL = $app -> sql_object;
   $DB  = $app -> config( 'metadata-db-name' );
 
   if ( not $session -> {$id} {'reloaded-accepted-contributions'} ) {
-    if ( scalar @$accepted ) {
+    if (scalar @$accepted ) {      
       reload_accepted_contributions( $acis );
     }
   }
@@ -153,73 +166,77 @@ sub prepare {
   ###  'already-accepted' in the session
 
   my $already_accepted = {}; 
-  foreach ( @$accepted ) {
-    my $id   = $_ ->{id};
-    my $type = $_ ->{type};
-    my $role = $_ ->{role};
+  foreach my $key ( @$accepted ) {
+    my $id   = $key ->{'id'};
+    my $type = $key ->{'type'};
+    my $role = $key ->{'role'};
     
     if ( $already_accepted ->{$id} ) {
-      undef $_;  ### double item
-    } else {
-      $already_accepted ->{$id} = $role;
+      undef $key;  ### double item
+    } 
+    else {
+        $already_accepted ->{$id} = $role;
     }
   }
 
   clear_undefined $accepted;
 
   my $already_refused = {}; 
-  foreach ( @$refused ) {
-    my $id = $_ ->{id};
+  foreach my $item ( @$refused ) {
+    my $id = $item ->{'id'};
     if ( $already_refused->{$id} ) {
-      undef $_;
-    } else { $already_refused -> {$id} = 1; }
+      undef $item;
+    } 
+    else { 
+        $already_refused -> {$id} = 1; 
+    }
   }
   clear_undefined $refused;
 
 
-  $contributions ->{'already-accepted'} = $already_accepted; 
-  $contributions ->{'already-refused' } = $already_refused ; 
+  $contributions->{'already-accepted'} = $already_accepted; 
+  $contributions->{'already-refused' } = $already_refused ; 
 
-  $contributions ->{accepted} = $accepted;
-  $contributions ->{refused}  = $refused;
+  $contributions->{'accepted'} = $accepted;
+  $contributions->{'refused'}  = $refused;
   
-  if ( $record -> {contributions} {autosearch} ) {
-    $contributions -> {autosearch} = $record -> {contributions} {autosearch};
+  if ( $record -> {'contributions'} -> {'autosearch'} ) {
+    $contributions -> {'autosearch'} = $record -> {'contributions'} -> {'autosearch'};
   }
-
+  
   ###  make contributions visible
-  $vars ->{contributions} = $session ->{$id}{contributions} = $contributions;
-
-  delete $contributions -> {actions};
-
-  debug "the contributions accepted and refused are prepared.";
-
+  $vars ->{'contributions'} = $session ->{$id}->{'contributions'} = $contributions;
+  
+  delete $contributions -> {'actions'};
+  
+  debug "the contributions accepted and refused are prepared in prepare()";
+  
 }
 
 
-sub prepare_identified {
-  my $app = shift;
-  my $rec = $app -> session -> current_record;
-  my $vars = $app-> variables;
-  # prepare citations data, if citations are enabled in configuration and if there are some
-  if ( $app ->config( 'citations-profile' ) or $app->session->owner->{type}{citations} ) {
-    ACIS::Web::Citations::prepare();
-    ACIS::Web::Citations::prepare_research_identified();
-  }
-}
+#sub prepare_accepted {
+#  my $app = shift;
+#  my $rec = $app -> session -> current_record;
+#  my $vars = $app-> variables;
+#  # prepare citations data, if citations are enabled in configuration and if there are some
+#  if ( $app ->config( 'citations-profile' ) or $app->session->owner->{type}{citations} ) {
+#    ACIS::Web::Citations::prepare();
+#    ACIS::Web::Citations::prepare_research_identified();
+#  }
+#}
 
 sub prepare_the_role_list {
   my $app = shift;
-
+  
   my $session = $app -> session;
   my $vars    = $app -> variables;
   my $record  = $session -> current_record;
-  my $id      = $record -> {id};
+  my $id      = $record -> {'id'};
   
   my $conf = get_configuration( $app );
-
+  
   my $role_list = $conf -> {roles_list};
-
+  
   $vars -> {'role-list'} = $role_list;
 }
 
@@ -231,11 +248,11 @@ sub prepare_configuration {
   my $session = $app -> session;
   my $vars    = $app -> variables;
   my $record  = $session -> current_record;
-  my $id      = $record -> {id};
-
+  my $id      = $record -> {'id'};
+  
   my $conf = get_configuration( $app );
-
-  $contributions ->{config} {types} = $conf -> {types};
+  
+  $contributions ->{'config'} -> {'types'} = $conf -> {'types'};
 }
 
 
@@ -253,14 +270,75 @@ sub find_suggested_item {  # look in suggestions or search results
   assert( $id ,    '$id is untrue');
   assert( $source, '$source is untrue');
 
-  my $suggest = $contributions ->{suggest};
-  my $search  = $contributions ->{search} ;
-  my $listlist = ($source eq 'suggestions')
-                      ? $suggest
-                      : [ $search ];
+  my $suggest = $contributions ->{'suggest'};
+
+  my $search  = $contributions ->{'search'} ;
+  #debug "\$search is";
+  #debug Dumper $search;
+  #my $listlist = ($source eq 'suggestions')
+  #                    ? $suggest
+  #                    : [ $search ];
+
+  my $listlist;
+  if($source eq 'suggestions') {
+    #debug "the source is suggestions";
+    $listlist=$suggest;
+    #debug "\$suggest is";
+    #debug Dumper $suggest; 
+  }
+  else {
+    #debug "the source is search";
+    $listlist= [ $search ];
+    #debug "\$search is";
+    #debug Dumper $search;
+  }
   foreach my $list ( @$listlist ) {
-    foreach ( @{ $list -> {list} } ) {
-      if( $_ ->{id} eq $id ) { return $_; }
+    foreach my $item ( @{ $list -> {'list'} } ) {
+      if( $item ->{'id'} eq $id ) {
+        return $item; 
+      }
+    }
+  }
+  return undef;
+}
+
+
+#
+#  look in suggestions or search results
+#
+sub find_refused_item {
+  my $id = shift;
+  assert( $id ,    '$id is untrue');
+  assert( $refused,'$refused is untrue');
+
+  #debug "find_refused_item: $id";
+
+  foreach my $key ( @{ $refused } ) {
+    #debug "key is" . Dumper $key;
+    my $my_id=$key -> {'id'};
+    if( $my_id eq $id ) {
+      return $key; 
+    }
+  }
+  return undef;
+}
+
+
+
+#
+# look in suggestions or search results
+#
+sub find_accepted_item { 
+  my $id            = shift;
+  assert( $id ,    '$id is untrue');
+  #assert( $accepted,'$accepted is untrue');
+  debug "find_accepted_item: $id";
+
+  foreach my $item ( @{ $accepted } ) {
+    #debug "item is" . Dumper $item;
+    if( $item ->{'id'} eq $id ) {
+      #debug "id is $item->{'id'}";
+      return $item; 
     }
   }
   return undef;
@@ -281,21 +359,24 @@ sub clear_some_suggestions {
   } elsif ( ref $to_clear eq 'HASH' ) {
     $hash_to_clear = $to_clear;
 
-  } else { die; }
+  } 
+  else { 
+      die; 
+  }
   
   
   my $suggest = $contributions -> {suggest};
   my $count_total = 0;
   my @clean_suggest = ();
 
-  foreach ( @$suggest ) {
+  foreach my $key ( @$suggest ) {
     my $count = 0;
-    my $listlist = $_ ->{list};
+    my $listlist = $key ->{'list'};
     
-    foreach ( @$listlist ) {
-      my $id = $_ ->{id};
+    foreach my $item ( @$listlist ) {
+      my $id = $item ->{'id'};
       if ( exists $hash_to_clear ->{$id} ) {
-        undef $_;
+        undef $item;
       } else {
         $count++;
         $count_total++;
@@ -304,7 +385,7 @@ sub clear_some_suggestions {
     clear_undefined $listlist;
     
     if ( not $count ) {
-      undef $_;
+      undef $key;
     }
   }
 
@@ -321,8 +402,10 @@ sub research_auto_status {
     #show_whats_suggested( $app );
     $app -> refresh( 5 );
   } else {
-    # no search is going on
-    $app -> redirect_to_screen_for_record( 'research/autosuggest' );
+    ## no search is going on, old code
+    #$app -> redirect_to_screen_for_record( 'research/autosuggest' );
+    # no search is going on, old code
+    $app -> redirect_to_screen( 'research/autosuggest' );
   }
 }
 
@@ -330,16 +413,19 @@ sub research_auto_status {
 
 sub main_screen {
   my $app = shift;
-
   my $session = $app -> session;
   my $vars    = $app -> variables;
   my $record  = $session -> current_record;
-  my $id      = $record -> {id};
+  my $id      = $record -> {'id'};
   my $sid     = $record -> {sid};
   my $input   = $app -> form_input;
 
+  #debug "this is the input";
+  #debug Dumper $input;
+
+
   assert( $contributions );
-#  my $contributions = $session -> {$id} {contributions};
+  # my $contributions = $session -> {$id} {contributions};
 
   my $laststatus = $contributions -> {laststatus} || '';
 
@@ -360,26 +446,39 @@ sub main_screen {
     {{  #### complex condition check block; last operator exits such block
 
       debug "did user request it?";
-      if ( $input -> {'start-auto-search'} ) { $start = 1; last; }
-
+      ## debug $input;
+      ##my $string=Dumper $input;
+      ##debug $string;
+      if ( $input -> {'start-auto-search'} ) {
+          $start = 1; 
+          last;
+      }
       debug "is it the first time ever?";
-      my $rec_contrib = $record -> {contributions};
-      if ( not exists $rec_contrib ->{autosearch} ) { $start = 1; last; }
-
+      my $rec_contrib = $record -> {'contributions'};
+      if ( not exists $rec_contrib ->{'autosearch'} ) {
+          $start = 1; 
+          last; 
+      }
       ###  a catch
-      if ( $rec_contrib ->{autosearch} == 1 ) {
-        $rec_contrib ->{autosearch} = {};
+      if ( $rec_contrib ->{'autosearch'} == 1 ) {
+        $rec_contrib ->{'autosearch'} = {};
       }
       
       debug "never searched before?";
-      if ( not defined $last_search )  { $start = 1; last; }
+      if ( not defined $last_search )  {
+        $start = 1;
+        last;
+      }
       
       my $time = time;
       debug "last time searched more than two weeks ago? ($time - $last_search)";
       my $diff = $time - $last_search;
       my $day  = 60 * 60 * 24;
-      if ( $diff > 14 * $day ) { $start = 1; last; }
-
+      if ( $diff > 14 * $day ) { 
+        $start = 1;
+        last;
+      }
+ 
       my $last_init = $contributions -> {autosearch} {'for-names-last-changed'};
       my $last_name_change = $record ->{name} {'last-change-date'};
 
@@ -391,7 +490,8 @@ sub main_screen {
       }
       
       debug "none of the above";
-    }}
+    }
+   }
 
     if ( $start ) {
       debug "yes, do search!";
@@ -407,26 +507,25 @@ sub main_screen {
         $app -> clear_process_queue;
         $app -> redirect_to_screen_for_record( 'research/auto/status' );
         $vars -> {$status} = 1;
-        $contributions -> {laststatus} = $status;
+        $contributions -> {'laststatus'} = $status;
         return 1;
-
-      } else {
+      } 
+      else {
         debug "start failed";
         $app -> error( 'auto-search-start-failed' );
         $status = 'auto-search-start-failed';
-      }
-
-    } else {
-
+      }      
+    } 
+    else {      
       if ( $laststatus eq 'running' 
            or $laststatus eq 'auto-search-started' ) {
         $status = 'auto-search-finished';
       }
     }
-
+    
   } else {
     ### if a search is running
-
+    
     if ( not scalar @$accepted ) {
       $app -> refresh( 60 );
     }
@@ -446,11 +545,7 @@ sub main_screen {
 
  
   ACIS::Web::Contributions::show_whats_suggested( $app );
-  
-  # cardiff change: learn
-  # there will need to be cecking for the potential to learn
-  ACIS::Resources::Learn::sort_suggestions_through_learning( $app );
-  # end of cardiff change
+
 }
 
 
@@ -461,9 +556,9 @@ sub main_screen {
 
 sub accept_item {
   my $item = shift;
-  my $role = shift || $item -> {role};
+  my $role = shift || $item -> {'role'};
   
-  my $id   = $item -> {id};
+  my $id   = $item -> {'id'};
   my $sid  = $item -> {sid};
 
   assert( $contributions );
@@ -509,9 +604,8 @@ sub accept_item {
 
   } else {
     ### do a replace, even though it might be unnecessary
-    foreach ( @$accepted ) {
-      if ( $_ ->{id} eq $id ) {
-        $_ = $item;
+    foreach my $key ( @$accepted ) {
+      if ( $key ->{'id'} eq $id ) {        
         $acis -> userlog( "replaced contribution: id $id, role $role" );
         $acis -> userlog( "work title: '$item->{title}' (type: $item->{type})" );
         $action = "re-accepted";
@@ -520,14 +614,14 @@ sub accept_item {
     }
   }
 
-  $item -> {role}           = $role;
+  $item -> {'role'}         = $role;
   $already_accepted ->{$id} = $role;
 
   if ( $action ) {
-    $acis -> sevent(   -class => 'contrib',
-                      -action => $action,
-($role ne 'author') ? ( -role => $role ) : (),
-                       -descr => $item->{title} . " ($item->{type}, $item->{id})",
+      $acis -> sevent(   -class => 'contrib',
+                         -action => $action,
+                         ($role ne 'author') ? ( -role => $role ) : (),
+                       -descr => $item->{title} . " ($item->{type}, $item->{'id'})",
                          -URL => $item ->{'url-about'},
  (exists $item->{authors}) ? ( -authors  => $item -> {authors} ) : (),
  (exists $item->{editors}) ? ( -editors  => $item -> {editors} ) : (),
@@ -551,10 +645,10 @@ sub remove_item {
   my $index;
   { 
     my $i = 0;
-    foreach ( @$accepted ) {
-      if ( $_ ->{id} eq $id ) {
+    foreach my $key ( @$accepted ) {
+      if ( $key ->{'id'} eq $id ) {
         $index = $i;
-        $item  = $_;
+        $item  = $key;
         last;
       }
       $i++;
@@ -563,15 +657,15 @@ sub remove_item {
   
   if ( defined $index 
        and $item ) {
-    my $role  = $item ->{role};
-    my $title = $item ->{title};
-    my $type  = $item ->{type};
+    my $role  = $item ->{'role'};
+    my $title = $item ->{'title'};
+    my $type  = $item ->{'type'};
 
     $acis -> userlog( "deleting a contribution: id $id, role $role" );
     $acis -> userlog( "contribution title: '$title' (type: $item->{type})" );
     splice @$accepted, $index, 1;
 
-    if ($item->{sid}) {
+    if ($item->{'sid'}) {
       require ACIS::Web::Citations;
       ACIS::Web::Citations::handle_document_removal( $item->{sid} );
     }
@@ -581,11 +675,11 @@ sub remove_item {
                      -action => 'removed',
                      -descr  => $title . " ($type, $id)",
                      -URL    => $item ->{'url-about'},
- (exists $item->{authors}) ? ( -authors  => $item -> {authors} ) : (),
- (exists $item->{editors}) ? ( -editors  => $item -> {editors} ) : (),
-                   );
-
-  } else {
+                     (exists $item->{authors}) ? ( -authors  => $item -> {authors} ) : (),
+                     (exists $item->{editors}) ? ( -editors  => $item -> {editors} ) : (),
+                   );    
+  } 
+  else {
     debug "looked through accepted list and didn't find the item to delete!";
   }
   
@@ -605,13 +699,12 @@ sub refuse_item {
   assert( $acis );
   my $already_refused = $contributions -> {'already-refused'};
 
-  if ( not $already_refused ->{$id} ) {
+  if ( not $already_refused -> {$id} ) {
     if ( not $item ) {
       $item = { id => $id };
     }
-    
     push @$refused, $item;
-    $already_refused ->{$id} = 1;
+    $already_refused -> {$id} = 1;
     $acis -> userlog ( "refuse a contribution: id: $id" );
     if ($item->{sid}) {
       ACIS::Web::Citations::handle_document_removal( $item->{sid} );
@@ -645,17 +738,19 @@ sub process {
   my $session = $app -> session;
   my $vars    = $app -> variables;
   my $record  = $session -> current_record;
-  my $id      = $record -> {id};
+  my $id      = $record -> {'id'};
   my $psid    = $record -> {sid};
 
   assert( $contributions );
+
+  debug('processing starts');
+
   
   &get_configuration( $app );
 
   my $conf = $Conf;
 
   my $input = $app -> form_input;
-
   assert( $accepted );
   assert( $refused  );
 
@@ -666,6 +761,7 @@ sub process {
   my $clear_from_suggestions = {};
   my $clear_from_suggestions_sid = {};
   
+  # decisions count
 
   my $processed = 0;
 
@@ -682,13 +778,18 @@ sub process {
 
   ###  process contribution additions and deletions
 
-  foreach ( keys %$input  ) {
-    my $val = $input -> {$_};
+  foreach my $key ( keys %$input  ) {
+    my $val = $input -> {$key};
 
+    # main paramater processing. 
+    # I don't know what it is good for.
 
+    # prevent the processing in the (if add loop) 
+    ### cardiff accept / refuse 
+    ### end of cardff ar_
     ########################################################
-                                              ###    A D D 
-    if ( $_ =~ m/^add_(.+)/ 
+    ### OLD   A D D 
+    if ( $key =~ m/^add_(.+)/ 
          and $val ) {            
       my $tid    = $1;
       my $handle = $input -> {"id_$tid"};
@@ -698,7 +799,7 @@ sub process {
            and $role 
            and $conf -> {roles} {$role} ) {
         ### all correct, but also we could check the item type and...
-        
+        debug(" found and ^add in legacy");
         assert( $source );
         my $item = find_suggested_item( $contributions, $handle, $source );
 
@@ -713,9 +814,7 @@ sub process {
              and $type eq 'chapter' ) {
           complain "chapter editor again!";
         }
-
-        $item -> {role} = $role;
-        my $sid = $item ->{sid};
+        my $sid = $item ->{'sid'};
         assert( $sid );
         my $action = accept_item( $item );
         $statistics -> {$action} ++;
@@ -724,14 +823,10 @@ sub process {
         $clear_from_suggestions  -> {$handle} = 1;
         $clear_from_suggestions_sid -> {$sid} = 1;
       }
-
-
-
-      ########################################################
-      #####################################   E D I T I N G 
-    } elsif ( $mode eq 'edit'                           
-              and $_ =~ m/^role_(.+)/
-              and not exists $input ->{"remove_$1"} ) {
+    }
+    elsif ( $mode eq 'edit'                           
+              and $key =~ m/^role_(.+)/
+            and not exists $input ->{"remove_$1"} ) {
 
       my $tid    = $1;
       my $handle = $input -> {"id_$tid"};
@@ -741,23 +836,23 @@ sub process {
            and $role 
            and $conf -> {roles} {$role} ) {
         ### all correct, but also we could check the item type and
-
+        
         if ( exists $already_accepted ->{$handle} ) {
-           foreach ( @$accepted ) {
-             if ( $_ ->{id} eq $handle ) {
-               my $item = $_;
+          foreach ( @$accepted ) {
+            if ( $_ ->{'id'} eq $handle ) {
+              my $item = $_;
                my $action = accept_item( $item, $role );
-               $statistics -> {$action} ++;
-               last;
-             }
-           }
+              $statistics -> {$action} ++;
+              last;
+            }
+          }
         }
         $processed++; 
       }
-
-      #######################################################
-    } elsif ( $_ =~ m/^remove_(.+)/ ) { ###   R E M O V E 
-
+    }
+    #### pre-cardiff remove code
+    elsif ( $key =~ m/^remove_(.+)/ ) { ###   R E M O V E 
+      
       debug "remove $1";
 
       my $tid    = $1;
@@ -771,76 +866,132 @@ sub process {
           $statistics -> {removed} ++;
         }
         $processed++; 
-
-      } else {
+      } 
+      else {
         $app -> errlog( "not in already accepted list: $handle!" );
       }
-        
-
-      
-      ###########################################################
-    } elsif ( $_ =~ m/^refuse_(.+)/ ) {   ###   R E F U S E  
+    } 
+    ### pre-cardiff refuse code
+    elsif ( $key =~ m/^refuse_(.+)/ ) {   ###   R E F U S E  
       my $tid    = $1;
       my $handle = $input -> {"id_$tid"};
-
+      
+      debug "in pre-cardiff refuse page" ;
       if ( $handle and $val ) {
-
         assert( $source );
         my $item = find_suggested_item( $contributions, $handle, $source );
         my $sid  = $item -> {sid};
-
-        if ( not $item ) {
-          $app -> errlog (
- "Can't find a contribution among our own suggestions: id: $handle" );
-        }
         
-        refuse_item( $handle, $item );
-
+        if ( not $item ) {
+          $app -> errlog ("Can't find a contribution among our own suggestions: id: $handle" );
+        } 
+        refuse_item( $handle, $item );        
         $statistics ->{refused} ++;
         $clear_from_suggestions -> {$handle} = 1;
-        if ( $sid ) {  $clear_from_suggestions_sid->{$sid}  = 1;  }
-
+        if ( $sid ) {  
+          $clear_from_suggestions_sid->{$sid}  = 1;  
+        }        
         $processed++; 
       }
-
     }  ###  not "add_...", not "remove_...", not "refuse_..." param
-      
   }  ####  end of the main parameters pass
-
-
-
-  if ( $mode eq 'add' ) {
-    my $refuse = $input ->{'refuse-ignored'};
-
-    foreach ( keys %$input  ) {
-      my $val = $input -> {$_};
+  if( $mode eq 'add') {
+    my $refuse_ignored = $input ->{'refuse-ignored'};
+    if($refuse_ignored) {
+      debug("refused ignored is on, this should not happen under cardiff.");
+    }
+    foreach my $key ( keys %$input  ) {
+      my $val = $input -> {$key};
       
-      if ( $_ =~ m/^id_(.+)/ ) {
-        my $tid    = $1;
+      if ( $key =~ m/^ar_(.+)/ and $val ) {            
+        my $wid    = $1;
+        my $handle = $input -> {"handle_$wid"};
+        my $role   = $input -> {"role_$wid"};
+        debug "found ar_, \$wid is $wid, \$handle is $handle, \$role is $role \$val is $val";
+        if ( $handle
+             and $role 
+             and $conf -> {'roles'} -> {$role}
+             and $val eq 'accept') {
+          ### all correct, but also we could check the item type and...
+          debug "starting to assert";
+          assert( $source );
+          debug "source asserted as $source";
+          my $item = find_suggested_item( $contributions, $handle, $source );          
+          if ( not $item ) {
+            debug "no item returned by find_sugested_item";
+            $app -> errlog( "Can't find a contribution among our own suggestions: id: $handle" );
+            next;
+          }
+          debug "accepted item found";
+          debug Dumper $item;
+          my $type = $item ->{'type'};
+          $item -> {role} = $role;
+          my $sid = $item ->{'sid'};
+          assert( $sid );
+          my $action = accept_item( $item );
+          $statistics -> {$action} ++;
+          $processed++; 
+          
+          debug "cleaning $handle from suggestions" ;          
+          $clear_from_suggestions  -> {$handle} = 1;
+          if ( $sid ) {  
+            $clear_from_suggestions_sid -> {$sid}= 1;  
+          }
+          $clear_from_suggestions_sid -> {$sid} = 1;
+          
+          # start of refuse code
+        }
+        elsif ( $handle 
+                and $val eq 'refuse' ) {
+          assert( $source );
+          my $item = find_suggested_item( $contributions, $handle, $source );
+          my $sid  = $item -> {'sid'};          
+          if ( not $item ) {
+            $app -> errlog ("Can't find a contribution among our own suggestions: id: $handle" );
+          }
+          debug("calling refuse_item");
+          refuse_item( $handle, $item );
+          
+          $statistics ->{refused} ++;
+          $clear_from_suggestions -> {$handle} = 1;
+          if ( $sid ) {  
+            $clear_from_suggestions_sid -> {$sid}= 1;  
+          }
+          $processed++; 
+        }
+        else {
+          debug "key $key not treated";
+        }
+      }      
+      # legacy code of old interface
+      elsif ( $key =~ m/^id_(.+)/ ) {
+        my $wid    = $1;
         my $handle = $val;
-        if ( $tid and $handle and not $input -> {"add_$tid"} ) {
-
+        debug("legacy code in add mode");
+        if ( $wid and $handle and not $input -> {"add_$wid"} ) {
+          
           assert( $source );
           ###  find it
           my $item = find_suggested_item( $contributions, $handle, $source );
 
-          if ( $refuse ) {
+          if ( $refuse_ignored ) {
             refuse_item( $handle, $item );
             $statistics ->{refused} ++;
           }
-          
+
           $clear_from_suggestions -> {$handle} = 1;
 
           if ( $item ) {
             my $sid  = $item -> {sid};
             if ( not $sid ) {
-              my $id = $item ->{id};
-              warn "Document $id had no sid: " . $item->{title};
-            }
-            # important Cardiff change. We only clear the
+              my $id = $item ->{'id'};
+              warn "Document $id had no sid: " . $item->{'title'};
+            } 
+            # important Cardiff change. We only clear the 
             # suggestion if the user did not press the "save_and_continue"
-            # button
-            elsif(not $input->{'save_and_continue'}) {
+            # button 
+            elsif(not $input->{'save_and_continue'}
+                  and not $input->{'save_and_continue_next_chunk'}) {
                 debug "suggestion $sid clear";
                 $clear_from_suggestions_sid ->{$sid} = 1;
             }
@@ -856,8 +1007,7 @@ sub process {
         }
       }
     }
-    
-    if ( $refuse ) {
+    if ( $refuse_ignored ) {
       $app -> set_form_value( 'refuse-ignored', 1 );
     }
   }
@@ -870,28 +1020,38 @@ sub process {
 
   if ( $processed ) {
     $app -> success( 1 );
-
-    if ( $statistics -> {accepted} ) {
+    if ( $statistics -> {'accepted'} ) {
       $app -> message( 'research-items-added' );
-
-    } elsif ( $statistics -> {'re-accepted'} ) {
-      $app -> message( 'research-items-replaced' );
-
-    } elsif ( $statistics -> {removed} ) {
-      $app -> message( 'research-items-removed' );
-
-    } elsif ( $statistics -> {refused} ) {
-      $app -> message( 'research-items-refused' );
-
-    } else {
-      $app -> message( 'research-decisions-processed' );
-    }      
-
-    if ( $session -> type eq 'new-user' 
-         and not $sug_count ) {
-      $app -> set_presenter( 'research/ir-guide' );
     }
+    elsif ( $statistics -> {'re-accepted'} ) {
+      $app -> message( 'research-items-replaced' );      
+    } 
+    elsif ( $statistics -> {'removed'} ) {
+      $app -> message( 'research-items-removed' );      
+    }
+    elsif ( $statistics -> {'refused'} ) {
+      $app -> message( 'research-items-refused' );      
+    } 
+    else {
+      $app -> message( 'research-decisions-processed' );
+    }
+    ## cardiff change
+    ## send suggestions to learning daemon
+    ## defined in ACIS/Resources/Suggestions.pm
+    &send_suggestions_to_learning_daemon($app,'process');
+    ## end of cardiff change.
   }
+  if ( $session -> type eq 'new-user' 
+       and not $sug_count ) {
+    $app -> set_presenter( 'research/ir-guide' );
+  }
+  
+  # if the save and exit button was pressed, move
+  # to the research screen
+  if($input->{'save'}) {
+    $app -> redirect_to_screen( 'research' );
+  }
+  debug "end of function 'process'";
 }
 
 sub current_process {
@@ -908,23 +1068,32 @@ sub current_process {
 
 sub prepare_refused {
   my $app = shift;
-
-  my $session = $app -> session;
+  my $session = $app -> session;  
   my $vars    = $app -> variables;
   my $record  = $session -> current_record;
-  my $id      = $record  -> {id};
+  my $id      = $record  -> {'id'};
+  ##
+  ## process the chunk information
+  ##
+  &change_or_delete_chunk($app);
 
-  $contributions = $session -> {$id} {contributions} || {};
 
-  $refused  = $record ->{contributions} {refused } || [];
-  $record -> {contributions} {refused}   = $refused;
+  $contributions = $session -> {$id} -> {'contributions'} || {};
+
+  $accepted = $record ->{'contributions'} -> {'accepted'} || [];
+  $refused  = $record ->{'contributions'} -> {'refused'} || [];
+
+  $record -> {'contributions'} -> {'refused'}   = $refused;
   
   my $already_refused = {}; 
   foreach ( @$refused ) {
-    my $id = $_ ->{id};
+    my $id = $_ ->{'id'};
     if ( $already_refused->{$id} ) {
       undef $_;
-    } else { $already_refused -> {$id} = 1; }
+    } 
+    else { 
+        $already_refused -> {$id} = 1; 
+    }
   }
   clear_undefined $refused;
 
@@ -932,12 +1101,66 @@ sub prepare_refused {
 
   $contributions ->{'already-refused' } = $already_refused ; 
   $contributions ->{refused}  = $refused;
-
-  ###  make it visible
-  $vars ->{contributions} {refused} = $refused;
+  
+  ##make it visible
+  $vars ->{'contributions'}->{'refused'} = $refused;
   
   debug "prepared the contributions/refused";
 }
+
+
+#
+# increment chunk number, or create one if there was none
+# or delete if not required
+#
+sub change_or_delete_chunk {
+  my $app = shift;
+  # this argument increments the chunk number regardless
+  my $increment= shift;
+
+  my $session = $app -> session;
+  my $screen_name = $app -> {'request'} -> {'screen'};
+  my $presenter_data = $app -> {'presenter-data'};
+
+  # remove the '-chunk' from the end of the screen name 
+  my $screen_name_without_chunk=$screen_name;
+  $screen_name_without_chunk =~ s|-chunk.*$||;
+  debug "screen_name_without_chunk $screen_name_without_chunk";
+
+  # if the screen does not have '-chunk' at the end
+  if($screen_name_without_chunk eq $screen_name) {
+    delete $session -> {'chunk'} -> {$screen_name_without_chunk};
+    ## debug "no chunking";
+    return;
+  }
+  # calculate new chunk number
+  # the chunk number is stored in the session
+  my $chunk_number = $session -> {'chunk'} -> {$screen_name_without_chunk};
+  if(defined($chunk_number)) {
+    if($screen_name =~ m|-chunk-forward$|) {
+      $chunk_number++;
+    } 
+    if($screen_name =~ m|-chunk-backward$|) {
+      if($chunk_number > 1) {
+        $chunk_number--;
+      }
+    } 
+  }
+  else {
+    $chunk_number=0;
+  }
+  # this is used to move to the next chunk 
+  # with the save-and-next-chunk-input input
+  if($increment) {
+    $chunk_number++;
+  }
+  # put in the session to save
+  $session -> {'chunk'} -> {$screen_name_without_chunk} = $chunk_number;
+  # put into presenter data to show
+  $presenter_data -> {'chunk'} -> {$screen_name_without_chunk} = $chunk_number;  
+}
+  
+
 
 
 
@@ -951,143 +1174,254 @@ sub process_refused {
   my $session = $app -> session;
   my $vars    = $app -> variables;
   my $record  = $session -> current_record;
-  my $id      = $record -> {id};
+  my $id      = $record -> {'id'};
   my $psid    = $record -> {sid};
   assert( $contributions );
   assert( $refused  );
   my $input = $app -> form_input;
   my $already_refused  = $contributions -> {'already-refused' }; 
   my $statistics = {};
+  my $conf=&get_configuration( $app );
   my $processed  = 0;
 
+
+
+  # moving to the next chunk
+  if($input->{'save_and_continue_next_chunk'}) {
+    ##debug('input save next chunk found');
+    &change_or_delete_chunk($app,1);
+  }
+ 
   ###  process contribution refusals
-  foreach ( keys %$input  ) {
-    my $val = $input -> {$_};
+  foreach my $key ( keys %$input  ) {
+    my $val = $input -> {$key};
 
     ########################################################
-                                           ###   R E F U S E  
-    if ( $_ =~ m/^unrefuse_(.+)/ 
+    ###   UN R E F U S E, legacy code
+    if ( $key =~ m/^unrefuse_(.+)/ 
          and $val ) {            
-      my $tid    = $1;
-      my $handle = $input -> {"id_$tid"};
+      my $wid    = $1;
+      my $handle = $input -> {"id_$wid"};
       debug( "unrefuse $handle" );
 
       if ( $handle ) {
         if ( $already_refused->{$handle} ) {
           # ok
           delete $already_refused->{$handle};
-        } else {
-          debug( "Can't find an item among refused: id: $handle" );
+        } 
+        else {
+          debug( "Can't find an item among refused in legacy: id: $handle" );
         }
         $processed++; 
       }
     }
+    # cardiff parse 
+    elsif ( $key =~ m/^ar_(.+)/ 
+            and $val ) {            
+      my $wid    = $1;      
+      my $handle = $input -> {"handle_$wid"};
+      my $role   = $input -> {"role_$wid"};
+      
+      debug "unrefuse with $wid handle $handle role $role" ;
 
-  }  ####  end of the main parameters pass
+      if ( $handle ) {
+        if ( $already_refused->{$handle} ) {
+          debug "unrefusing item $handle";
+          delete $already_refused->{$handle};
+        } 
+        else {
+          debug( "Can't find an item among refused in legacy: id: $handle" );
+        }
 
-  foreach ( @$refused ) {
-    my $id   = $_ ->{id};
+        my $item = find_refused_item( $handle);
+
+        if ( not $item ) {
+          debug( "Can't find a refused item among our own refusals: id: $handle" );
+          $app ->errlog( "Can't find a refused item among our own refusals: id: $handle" );
+          next;
+        }
+        
+        my $type = $item ->{'type'};
+        my $sid = $item ->{'sid'};
+        if(not $item->{'role'}) {
+          if($role) {
+            $item->{'role'}=$role;
+          }
+          else {
+            $item->{'role'}='author';
+          }
+        }
+        assert( $sid );
+        my $action = accept_item( $item );
+        $statistics -> {$action} ++;
+        $processed++; 
+      }
+    }
+  }
+  ####  end of the main parameters pass
+  
+  
+  foreach my $key ( @$refused ) {
+    my $id   = $key ->{'id'};
     if ( not $already_refused->{$id} ) {
-
-      undef $_;
-
+      
+      undef $key;
+      
       $acis -> userlog( "unrefuse a research item: $id" );
       $acis -> sevent( -class  => 'contrib',
                        -action => 'unrefused',
                        -descr  => $id );
-
-      $statistics -> {unrefused} ++;
+      
+      $statistics -> {'unrefused'} ++;
       debug( "cleared refused item $id" );
-
+      
     }
   }  
   clear_undefined $refused;
-
+  
+  
+  
   $contributions -> {actions} = $statistics;
-
-
+  
+  
   if ( $processed ) {
     $app -> success( 1 );
-
+    
     if ( $statistics -> {unrefused} ) {
       if ( $statistics -> {unrefused} == 1 ) {
         $app -> message( 'one-research-item-unrefused' );
-      } else {
+      } 
+      else {
         $app -> message( 'research-items-unrefused' );
       }
-    } else {
+    }
+    else {
       $app -> message( 'research-decisions-processed' );
     }      
-
+    
   }
 }
 
 
 ###########################################################################
-######   s u b    p r o c e s s   r e f u s e d   x m l    ################
+##########   s u b    p r o c e s s   a c c e p t e d   ###################
 ###########################################################################
 
-sub process_refused_xml {
+sub process_accepted {
   my $app = shift;
 
   my $session = $app -> session;
   my $vars    = $app -> variables;
   my $record  = $session -> current_record;
-  my $id      = $record -> {id};
+  my $id      = $record -> {'id'};
   my $psid    = $record -> {sid};
-
-  assert( $contributions );
-  assert( $refused  );
+  $contributions = $session -> {$id} -> {'contributions'} || {};
+  #assert( $contributions );
+  #assert( $refused  );
   my $input = $app -> form_input;
-  my $already_refused  = $contributions -> {'already-refused' }; 
-  my $cleared = [];
+  my $already_accepted  = $contributions -> {'already-accepted' }; 
+  my $statistics = {};
+  my $conf=&get_configuration( $app );
+  my $processed  = 0;
 
-  if ( $input -> {unrefuse} ) {
-    $input -> {unrefuse} =~ s/\x{0}$//g; 
-  }
+  ###  process contribution refusals form acceped scree
+  foreach my $key ( keys %$input  ) {
+    my $val = $input -> {$key};
+    debug "key is $key val is $val";
+    if ( $key =~ m/^handle_(.+)/ and
+         $val ) {            
+      my $wid    = $1;      
+      my $ar = $input -> {"ar_$wid"};
+      # if the ar is set, we move to the next
+      if($ar) {
+          next;
+      }
+      my $role   = $input -> {"role_$wid"};
+      my $handle = $input -> {"handle_$wid"};
+      
+      debug "refuse with $wid handle $handle role $role" ;
+        
+      if ( $handle ) {
+        if ( $already_accepted->{$handle} ) {
+          debug "refusing an accepted item $handle";
+          delete $already_accepted->{$handle};
+        } 
+        else {
+          debug( "Can't find an item among refused in legacy: id: $handle" );
+        }
 
-  if ( $input -> {unrefuse} ) {
-    my $handle = $input -> {unrefuse};
-    debug( "unrefuse $handle" );
-
-    if ( $handle ) {
-      if ( $already_refused->{$handle} ) {
-        # ok
-        delete $already_refused->{$handle};
-      } else {
-        debug( "Can't find an item among refused: id: $handle" );
+        my $item;
+        $item= find_accepted_item( $handle);
+        
+        if ( not $item ) {
+            debug( "Can't find a accepted item among our own accepted items: id: $handle" );
+            $app ->errlog( "Can't find a accepted item among our own acceptions: id: $handle" );
+            next;
+        }
+        
+        my $type = $item ->{'type'};
+        my $sid = $item ->{'sid'};
+        if(not $item->{'role'}) {
+          if($role) {
+            $item->{'role'}=$role;
+          }
+          else {
+            $item->{'role'}='author';
+          }
+        }
+        assert( $sid );
+        my $action = refuse_item( $handle, $item );
+        $statistics -> {$action} ++;
+        $processed++; 
       }
     }
   }
+  ####  end of the main parameters pass
   
-  foreach ( @$refused ) {
-    my $id   = $_ ->{id};
-    if ( not $already_refused->{$id} ) {
-      undef $_;
-
-      $acis -> userlog( "unrefuse a research item: $id" );
+  
+  foreach my $key ( @$accepted ) {
+    my $id   = $key ->{'id'};
+    if ( not $already_accepted->{$id} ) {
+      
+      undef $key;
+      
+      $acis -> userlog( "refuse an accepted a research item: $id" );
       $acis -> sevent( -class  => 'contrib',
-                       -action => 'unrefused',
+                       -action => 'refused',
                        -descr  => $id );
-
-      debug( "cleared refused item $id" );
-      push @$cleared, $id;
+      
+      $statistics -> {'refuse_accepted'} ++;
+      debug( "cleared accepted item $id" );
+      
     }
   }  
-  clear_undefined $refused;
-
-  if ( scalar @$cleared ) {
-    $app->variables -> {unrefused} = $cleared;
-  } else {
-    $app->variables -> {failed} = 1;
+  clear_undefined $accepted;
+  
+ 
+  $contributions -> {'actions'} = $statistics;
+  
+  
+  if ( $processed ) {
+    $app -> success( 1 );
+    
+    if ( $statistics -> {'refused_accepted'} ) {
+      if ( $statistics -> {'refused_accepted'} == 1 ) {
+        $app -> message( 'one-accepted-item-refused' );
+      } 
+      else {
+        $app -> message( 'accepted-items-refused' );
+      }
+    }
+    else {
+      $app -> message( 'research-decisions-processed' );
+    }          
   }
-
-  delete $app -> variables -> {contributions};
 }
 
 
-
-
+#
+# unknown purpose
+#
 sub switch {
   my $app = shift;
   my $session = $app -> session;
@@ -1106,12 +1440,13 @@ sub switch {
 
 
 
+
 sub reload_if_nothing_to_suggest {
   my $app = shift;
 
   my $session = $app -> session;
   my $record  = $session -> current_record;
-  my $id      = $record -> {id};
+  my $id      = $record -> {'id'};
   
   assert( $contributions );
 #  my $contributions = $session -> {$id} {contributions};
@@ -1152,7 +1487,7 @@ sub search { # research/search screen handler
   my $session = $app -> session;
   my $vars    = $app -> variables;
   my $record  = $session -> current_record;
-  my $id      = $record ->{id};
+  my $id      = $record ->{'id'};
 
   ###  preparations
   my %found_ids;
@@ -1162,7 +1497,7 @@ sub search { # research/search screen handler
   get_configuration( $app );
   my $conf = $Conf;
   assert( $contributions );
-#  my $contributions = $session ->{$id} {contributions} ;
+#  my $contributions = $session ->{$id} -> {'contributions'} ;
 
   my $current_index   = $contributions -> {'already-accepted'};
   my $already_refused = $contributions -> {'already-refused' };
@@ -1241,7 +1576,7 @@ sub reload_accepted_contributions {
   my $app = shift;
   my $session = $app -> session;
   my $record  = $session -> current_record;
-  my $id      = $record -> {id};
+  my $id      = $record -> {'id'};
   my $metadata_db = $app -> config( 'metadata-db-name' );
 
   # check if we did this already recently
@@ -1249,35 +1584,41 @@ sub reload_accepted_contributions {
   if ( not passed_since( $reload_min_period, $last_reload ) ) { return 0; }
 
   # check the flag to avoid double work
-  if ( $session ->{$id}{contributions}{reloaded} ) { return 1; }
-
-  my $accepted = $record ->{contributions}{accepted};
+  if ( $session -> {$id} -> {'contributions'} -> {'reloaded'} ) {
+    return 1;
+  }
+  my $accepted = $record ->{'contributions'} -> {'accepted'};
   my $accepted_size_before = scalar @$accepted;
-  foreach ( @$accepted ) {
-    my $item = $_;
-    my $id   = $_ ->{id};
-    my $type = $_ ->{type};
-    my $role = $_ ->{role};
+  foreach my $item ( @$accepted ) {
+    my $id   = $item -> {'id'};
+    my $type = $item -> {'type'};
+    my $role = $item -> {'role'};
     
+    # if there is no id the contribution, debug the contribution
+    if(not $id) {
+      debug "could not load a contribution, because it has no id";
+      debug Dumper $item;
+      next;
+    }
     my $reload = reload_contribution( $app, $id, $metadata_db );
-    if ( $reload and $reload->{sid} ) {
-      $_ = $reload;
-      $_ ->{role} = $role;
-      delete $_->{frozen};
-      
-    } else {
+    if ( $reload and $reload->{'sid'} ) {
+      my $item = $reload;
+      $item -> {'role'} = $role;
+      delete $item -> {'frozen'};      
+    }
+    else {
       debug "contribution $id can't be reloaded";
-
+      # freeze or clear?
       my $today = time;
       my $long_ago = $today - $grace_period;
-
-      if ( $_ ->{frozen} ) {
-        if ( $_ ->{frozen} <= $long_ago ) {
+      
+      if ( $item ->{'frozen'} ) {
+        if ( $item ->{'frozen'} <= $long_ago ) {
           # clear
-          undef $_;
-
-          my $title = $item ->{title};
-
+          undef $item;
+          
+          my $title = $item ->{'title'};
+          
           $app -> userlog( "clearing a contribution: id $id, role $role" );
           $app -> userlog( "contribution: '$title' (type: $item->{type})" );
           
@@ -1285,12 +1626,13 @@ sub reload_accepted_contributions {
                           -action => 'cleared lost',
                           -descr  => $title . " ($type, $id)",
                           -URL    => $item ->{'url-about'},
-           (exists $item->{authors}) ? ( -authors  => $item -> {authors} ) : (),
-           (exists $item->{editors}) ? ( -editors  => $item -> {editors} ) : (),
+                          (exists $item->{authors}) ? ( -authors  => $item -> {authors} ) : (),
+                          (exists $item->{editors}) ? ( -editors  => $item -> {editors} ) : (),
                         );
         }
-      } else {
-        $_ -> {frozen} = $today;
+      }
+      else {
+        $item -> {'frozen'} = $today;
       }
     }
   }
@@ -1305,42 +1647,59 @@ sub reload_accepted_contributions {
   }
   
   # remember the current time and set the flags to avoid repeating this again
-  put_sysprof_value( $record->{sid}, "last-reload-accepted-contrib", time );
-  $session ->{$id}{contributions}{reloaded} = 1;
-  $session ->{$id}{'reloaded-accepted-contributions'} = 1;
+  put_sysprof_value( $record->{'sid'}, "last-reload-accepted-contrib", time );
+  $session -> {$id} -> {'contributions'} -> {'reloaded'} = 1;
+  $session -> {$id} -> {'reloaded-accepted-contributions'} = 1;
 }
 
 
 
 sub reload_refused_contributions {
   my $app = shift;
-
   my $session = $app -> session;
   my $record  = $session -> current_record;
-  my $id      = $record -> {id};
+  my $id      = $record -> {'id'};
   my $metadata_db = $app -> config( 'metadata-db-name' );
 
-  if ( $session ->{$id}{contributions}{refused_reloaded} ) { return 1; }
-  $session ->{$id}{contributions}{refused_reloaded} = 1;
-
-  my $list = $record ->{contributions}{refused};
+  if ( $session ->{$id} ->{'contributions'} -> {'refused_reloaded'} ) {
+    return 1;
+  }
+  $session -> {$id}->{'contributions'}->{'refused_reloaded'} = 1;
+  my $list = $record ->{'contributions'}->{'refused'};
   my $list_size_before = scalar @$list;
-
-  foreach ( @$list ) {
-    my $item = $_;
-    my $id   = $_ ->{id};
+  ## reload contributions loop
+  foreach my $item ( @$list ) {
+    my $id   = $item ->{'id'};
+    if(not $id) {
+      debug "could not load a contribution, because it has no id";
+      debug Dumper $item;
+      next;
+    }
+    ## cardiff change: if this item has a relevance, get it out
+    my $relevance;
+    if(defined($item->{'relevance'})) {
+      $relevance=$item->{'relevance'};
+    }
+    ## end of cardiff change
+    #debug "reloading item $id";
     my $new  = reload_contribution( $app, $id, $metadata_db );
     if ( $new ) {
-      $_ = $new;
-    } else {
+      $item = $new;
+    } 
+    else {
       debug "refused item $id is not in the database";
     }
+    ## cardiff change: add the relevance
+    if(not defined($item->{'relevance'})) {
+      $item->{'relevance'}=$relevance;
+    }
+    ## end of cardiff change
   }
   clear_undefined $list;
   if ( $list_size_before ) {
     debug "refused contributions have been reloaded from the database";
   }
-  $session -> {$id} {'reloaded-refused-contributions'} = 1;
+  $session -> {$id} -> {'reloaded-refused-contributions'} = 1;
 }
 
 
@@ -1350,12 +1709,11 @@ sub reload_refused_contributions {
 ############################################################################
 
 use Encode;
-use Storable qw( nfreeze thaw );
+use Storable qw( freeze thaw );
 
 use vars qw( $select_what );
 
-$select_what = "select id,sid,data ";
-
+$select_what = "select id, sid, data ";
 
 
 sub search_documents {
@@ -1372,14 +1730,18 @@ sub search_documents {
     if ( $phrase ) {
       $table = 'res_creators_separate'; 
       $field = 'name';  
-
-    } else { 
-      $table = 'res_creators_bulk';
-      $field = 'names';  
+    } 
+    else { 
+        $table = 'res_creators_bulk';
+        $field = 'names';  
     }
-    
-  } elsif ( $field eq 'id'      ) { $table = 'resources';    }
-    elsif ( $field eq 'title'   ) { $table = 'resources';    }
+  } 
+  elsif ( $field eq 'id' ) {
+      $table = 'resources';
+  }
+  elsif ( $field eq 'title'   ) { 
+      $table = 'resources'; 
+  }
   
   my $where; 
 
@@ -1419,7 +1781,7 @@ sub show_whats_suggested {
   my $vars    = $app -> variables;
   my $session = $app -> session;
   my $record  = $session -> current_record;
-  my $id      = $record -> {id};
+  my $id      = $record -> {'id'};
   my $psid    = $record -> {sid};
 
   assert( $contributions );
@@ -1432,9 +1794,4 @@ sub show_whats_suggested {
 }
 
 
-
 1; # Cheers! ;)
-
-
-
-
