@@ -16,7 +16,7 @@ use vars qw(@EXPORT);
               send_suggestions_to_learning_daemon
 );
 
-use Storable qw(freeze thaw);
+use Storable qw(nfreeze thaw);
 ###
 ##use Data::Dumper;
 ###
@@ -169,7 +169,15 @@ sub load_suggestions {
   while ( $r->{row} ) {
     my $data = $r->{row}{data} || next;
     my $reason = $r->{row}{reason};
-    my $item = thaw( $data ) || next;
+    ## 4 september problem
+    my $item = eval {
+      thaw( $data );
+    };
+    if(not $item) {
+      debug "error in thaw $@";
+      next;
+    }
+    ## 4 setember problem
     debug "item is";
     debug Dumper $item;
     ## cardiff change: adding relevance of the item
@@ -255,7 +263,15 @@ sub load_suggestions_into_contributions {
     elsif ( $already_refused ->{$dsid} ) {
       next; 
     }
-    my $item = thaw( $data ) or next;
+    ## 4 september change
+    my $item = eval { 
+      thaw($data);
+    };
+    if(not $item) {
+      debug "error in thaw $@";
+      next;
+    }
+    ## 4 september change
     $item ->{'role'} ||= $row ->{'role'};    
     ## cardiff change: adding relevance
     if($relevance) {
@@ -347,7 +363,7 @@ sub send_suggestions_to_learning_daemon {
     return;
   }
   debug("$origin is sending a learner to daemon...");
-  my $frozen=freeze($learner);
+  my $frozen=nfreeze($learner);
   my $socket=IO::Socket::UNIX->new($learning_socket);
   if(not $socket) {
     debug "can not connect to the socket $learning_socket $@\n";

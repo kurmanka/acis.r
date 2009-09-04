@@ -643,6 +643,9 @@ sub process_fulltext_urls {
 ##
 sub rem_blank {
   my $in=shift;
+  if(not $in) {
+    return;
+  }
   $in =~ s/\s+/ /g;
   $in =~ s/(^\s+|\s+$)//g;
   return $in;
@@ -657,12 +660,12 @@ sub process_name {
   ## first use a concatenation of individual components
   ## as name
   my $composedname='';
-  my $givenname.=&rem_blank($in->get_value('givenname'));
-  my $familyname.=&rem_blank($in->get_value('familyname'));
-  my $additionalname.=&rem_blank($in->get_value('additionalname'));
+  my $givenname=&rem_blank($in->get_value('givenname'));
+  my $familyname=&rem_blank($in->get_value('familyname'));
+  my $additionalname=&rem_blank($in->get_value('additionalname'));
   ## the prefix is not actually used
   ## my $nameprefix.=&rem_blank($in->get_value('nameprefix'));
-  my $namesuffix.=&rem_blank($in->get_value('namesuffix'));
+  my $namesuffix=&rem_blank($in->get_value('namesuffix'));
   ## a composed name must have given and family name
   if($givenname and $additionalname and $familyname) {
     $composedname.=$givenname.' '.$additionalname
