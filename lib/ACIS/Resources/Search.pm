@@ -55,7 +55,7 @@ sub reload_contribution {
   my $row = $res -> {row};
   if ( $row ) {
     if ( $row->{data} ) {
-      $item = thaw( $row->{data} );
+      $item = eval {thaw( $row->{'data'} ); };
     }
   } else {
     debug "didn't find $id";
@@ -79,8 +79,8 @@ sub load_resources_by_ids {
       next;
     }
     my $row = $res -> {row};
-    if ( $row and $row->{data} ) {
-      my $item = thaw $row->{data};
+    if ( $row and $row->{'data'} ) {
+      my $item = eval { thaw $row->{'data'}; };
       push @list, $item;
     } else {
       debug "didn't find $_";
@@ -109,10 +109,10 @@ sub process_resources_search_results {
     
 # for performance reasons put make_resource_.. inline:
 #    my $item = make_resource_item_from_db_row( $row ); 
-    my $item = thaw( $row ->{data} );
+    my $item = eval { thaw( $row ->{'data'} ); };
 
     if ( not $item or not $item->{id} or not $item->{sid} ) {
-      complain "bad document record found: ", Dumper( $row ), "(id: $id)";
+      complain "bad document record found: (id: $id)";
     } else {
       $item ->{role} = $row->{role} 
         if $row->{role};

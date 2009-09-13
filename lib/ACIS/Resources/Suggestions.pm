@@ -170,9 +170,7 @@ sub load_suggestions {
     my $data = $r->{row}{data} || next;
     my $reason = $r->{row}{reason};
     ## 4 september problem
-    my $item = eval {
-      thaw( $data );
-    };
+    my $item = eval { thaw( $data ); };
     if(not $item) {
       debug "error in thaw $@";
       next;
@@ -264,9 +262,7 @@ sub load_suggestions_into_contributions {
       next; 
     }
     ## 4 september change
-    my $item = eval { 
-      thaw($data);
-    };
+    my $item = eval { thaw($data); };
     if(not $item) {
       debug "error in thaw $@";
       next;

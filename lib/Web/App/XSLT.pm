@@ -90,11 +90,16 @@ sub run_xslt_presenter {
   my $parser = new XML::LibXML;
   my $xslt   = new XML::LibXSLT;
 
+  ## set recursion large
+  $xslt->max_depth(10000);
+
   $parser -> expand_entities (0);
   $parser -> load_ext_dtd (0);
   $parser -> validation(0);
   $parser -> keep_blanks(0);
    
+
+
   my $stylesheet;
   
   # parsing the stylesheet
