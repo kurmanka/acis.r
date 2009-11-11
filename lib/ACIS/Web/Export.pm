@@ -156,7 +156,7 @@ sub make_amf_record {
   my $acis = shift;
   my $rec  = shift;
 
-  my $stylesheet = "export/amf-person.xsl";
+  my $stylesheet = "export/amf_person_presenter.xsl";
 
   my $variables  = $acis ->variables;
 

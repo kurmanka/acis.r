@@ -7,7 +7,7 @@ use strict;
 
 use Carp::Assert;
 use Data::Dumper;
-use Storable qw( &nstore );
+use Storable qw( &store &retrieve );
 
 use sql_helper;
 
@@ -65,7 +65,7 @@ sub new_bootstrap {
   
   debug "try to connect to mysql database";
 
-  sql_helper -> set_log_filename ( $home . '/sql.log' );
+  sql_helper -> set_log_filename ( $home . '/opt/log/sql.log' );
 
   my $sql_helper = sql_helper -> new( $self -> {db_name}, 
                                       $self -> {db_user},
@@ -234,7 +234,7 @@ my $rt = {};
 
     foreach ( qw( put-process-ref delete-process-ref ) ) {
       $_ =~ m/([-\w]+)(\-ref)$/;
-      my $text = $def->{"$1-text"};
+      my $text = $def->{"$1-text"} || '';
       p " '$_' => sub { \n$text\n },\n\n"; 
     }
     p "};\n\n";
@@ -285,7 +285,7 @@ sub init_config {
     || critical "ARDB::Configuration did not work";
   
   $config_object -> parse_config( $config_file );
-  nstore ( $config_object, $bin_config_file )
+  store ( $config_object, $bin_config_file )
     or log_error ( "cannot write binary config to '$bin_config_file'" );
 
 

@@ -5,7 +5,7 @@ use strict;
 
 use Data::Dumper;
 use Carp::Assert;
-#use Storable qw( &nstore &retrieve );
+use Storable qw( &store &retrieve );
 
 use sql_helper;
 
@@ -79,7 +79,7 @@ sub new {
   
   debug "try to connect to mysql database";
 
-  sql_helper -> set_log_filename ( $home . '/sql.log' );
+  sql_helper -> set_log_filename ( $home . '/opt/log/sql.log' );
 
   my $sql_helper = sql_helper -> new( $self -> {db_name}, 
                                       $self -> {db_user},

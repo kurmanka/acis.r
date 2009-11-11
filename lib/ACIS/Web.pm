@@ -118,7 +118,7 @@ sub sql_object {
   ### sql helper / driver module name
   my $class = 'sql_helper';
 
-  $class -> set_log_filename ( $self ->{home} . '/sql.log' );
+  $class -> set_log_filename ( $self ->{home} . '/opt/log/sql.log' );
 
   my $config = $self -> config;
 
@@ -197,10 +197,11 @@ sub parse_request_url {
         $self -> set_cookie( -name  => 'session',
                              -value => $session );
       }
-    } else {
-      $session = $cooki;
-      $req -> {'session-id'} = $session;
-      $req -> {'session-id-from-cookie'} = 1;
+    } 
+    else {
+        $session = $cooki;
+        $req -> {'session-id'} = $session;
+        $req -> {'session-id-from-cookie'} = 1;
     }
   }
   return ( $screen, $session );
@@ -330,9 +331,12 @@ sub redirect_to_screen_for_record {
   my $screen = shift;
   
   my $sid = $self -> session -> current_record -> {sid};
-  if ( substr( $sid, 0, 1 ) eq 'p' ) { ### a real shortid
+  if ( substr( $sid, 0, 1 ) eq 'p' ) { 
+    ## a real shortid
     $self -> redirect_to_screen( "$sid/$screen" );  
-  } else {                             ### a shortid placeholder
+  } 
+  else {                             
+    ## a shortid placeholder
     $self -> redirect_to_screen( $screen );  
   }    
 }
@@ -503,7 +507,9 @@ sub event {
   my $self = shift;
   my %p    = @_;
   my $sql = $self -> sql_object;
-
+  if(not $sql) {
+     return;
+  }
   if ( not $p{-data} ) {
     my @data = ();
     foreach ( keys %p ) {

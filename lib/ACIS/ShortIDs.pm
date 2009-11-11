@@ -347,7 +347,7 @@ sub get_sql_helper {
   }
 
   $sql_helper = sql_helper -> new( { 
-                                    logfile => $home_dir . '/sql.log',
+                                    logfile => $home_dir . '/opt/log/sql.log',
 #                                    verbose_log => 1,
                                    },
                                    $db_name, 

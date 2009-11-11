@@ -12,6 +12,7 @@ use strict;
 
 # part of cardiff
 
+
 #
 # global variables
 #
@@ -276,6 +277,18 @@ sub form_learner {
   my $psid    = $record -> {'sid'};
   ## the session id, only required for reporting
   my $sid     = $session -> {'id'};
+  my $log_dir;
+  ## if a new user session, things are different
+  if(ref($session) eq 'ACIS::Web::Session::SNewUser') {
+    ## we need to form the log directory from the
+    $id  = $record -> {'id'};
+    $log_dir=$id;
+    $log_dir=~s|:|/|g;
+    ## record->sid contains the session id
+    $sid=$record -> {'sid'};
+    ## and the psid is not known
+    undef($psid);
+  }
   my $contributions;
   ## daemon calls
   if(ref($app->{'variables'}->{'contributions'})) {
@@ -318,7 +331,7 @@ sub form_learner {
   ## if there are $results, they have to be added
   ## to the other suggested documents
   if(ref($results)) {
-    ## merge the the results into $suggested by sid
+    ## merge the the results into $suggested by dsid
     ## first prepare a hash of handle if $suggestde
     my $suggested_handles;
     foreach my $suggestion (@{$suggested}) {
@@ -338,12 +351,19 @@ sub form_learner {
   $learner -> {'suggested'}  = $suggested;
   $learner -> {'id'}         = $id;
   $learner -> {'sid'}        = $sid;
-  $learner -> {'psid'}       = $psid;
+  ## not defined for a new user
+  if(defined($psid)) {    
+    $learner -> {'psid'}       = $psid;
+  }
   $learner -> {'start_time'} = time();
   ## this is only used by the learning of suggested
   ## documents to form the log the sql object
   $learner -> {'config'} = $app-> {'config'};
   $learner -> {'origin'} = $origin;
+  ## add log_direcetory to the learner if it is defined
+  if(defined($log_dir)) {
+    $learner->{'log_dir'}=$log_dir;
+  }
   ## for debugging, 
   if($debug) {
     open(DEBUGLOG,"> /tmp/".time().'.learner');

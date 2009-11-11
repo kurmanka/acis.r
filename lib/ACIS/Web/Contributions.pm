@@ -871,29 +871,6 @@ sub process {
         $app -> errlog( "not in already accepted list: $handle!" );
       }
     } 
-    ### pre-cardiff refuse code
-    elsif ( $key =~ m/^refuse_(.+)/ ) {   ###   R E F U S E  
-      my $tid    = $1;
-      my $handle = $input -> {"id_$tid"};
-      
-      debug "in pre-cardiff refuse page" ;
-      if ( $handle and $val ) {
-        assert( $source );
-        my $item = find_suggested_item( $contributions, $handle, $source );
-        my $sid  = $item -> {sid};
-        
-        if ( not $item ) {
-          $app -> errlog ("Can't find a contribution among our own suggestions: id: $handle" );
-        } 
-        refuse_item( $handle, $item );        
-        $statistics ->{refused} ++;
-        $clear_from_suggestions -> {$handle} = 1;
-        if ( $sid ) {  
-          $clear_from_suggestions_sid->{$sid}  = 1;  
-        }        
-        $processed++; 
-      }
-    }  ###  not "add_...", not "remove_...", not "refuse_..." param
   }  ####  end of the main parameters pass
   if( $mode eq 'add') {
     my $refuse_ignored = $input ->{'refuse-ignored'};
@@ -1097,7 +1074,9 @@ sub prepare_refused {
   }
   clear_undefined $refused;
 
-  reload_refused_contributions( $app );
+  ## 2009-09-16: removed the reloading because it takes
+  ## too much time on a large profile
+  # reload_refused_contributions( $app );
 
   $contributions ->{'already-refused' } = $already_refused ; 
   $contributions ->{refused}  = $refused;
