@@ -19,6 +19,12 @@ use strict;
 my $train_bin="/usr/bin/svm-train -q -b 1";
 my $predict_bin="/usr/bin/svm-predict -b 1";
 
+
+## run parameters
+
+my $debug=0;
+
+
 @EXPORT_OK = qw( learn_via_svm form_learner);
 
 
@@ -31,7 +37,8 @@ my $predict_bin="/usr/bin/svm-predict -b 1";
 sub learn_via_svm {
   my $learner=shift;
   my $what_to_learn=shift;
-  my $debug=shift;
+  ## usse global debug parementer in module
+  ##my $debug=shift;
   ## switch on debuggin
   if(not defined($debug)) {
     $debug=0;
@@ -254,6 +261,7 @@ sub add_document_to_data {
   push(@{$data->{'ds'}},$line);
   return $data;
 }
+
 ##
 ## return a learner from an $app. called in modules that require learning
 ## like send_suggestions_to_learning_daemon
@@ -277,18 +285,22 @@ sub form_learner {
   my $psid    = $record -> {'sid'};
   ## the session id, only required for reporting
   my $sid     = $session -> {'id'};
-  my $log_dir;
-  ## if a new user session, things are different
+  ### if a new user session, things are different
   if(ref($session) eq 'ACIS::Web::Session::SNewUser') {
-    ## we need to form the log directory from the
-    $id  = $record -> {'id'};
-    $log_dir=$id;
-    $log_dir=~s|:|/|g;
-    ## record->sid contains the session id
+    ## the sessionn id is found in a different way
     $sid=$record -> {'sid'};
-    ## and the psid is not known
-    undef($psid);
-  }
+    ## the presonal short id is the session id. 
+    ## this has to stay here, because the sid is 
+    ## used instead of the psid in the suggestions table
+    $psid=$record -> {'sid'};
+  }  
+  $id  = $record -> {'id'};
+  ## we need to form the log directory from the full id
+  ## this is in a separate function so it can be used 
+  ## log analysis
+  my $log_dir=&find_learn_log_directory($id,
+                                        $app -> config('homedir'));
+  ## record->sid contains the session id
   my $contributions;
   ## daemon calls
   if(ref($app->{'variables'}->{'contributions'})) {
@@ -361,9 +373,7 @@ sub form_learner {
   $learner -> {'config'} = $app-> {'config'};
   $learner -> {'origin'} = $origin;
   ## add log_direcetory to the learner if it is defined
-  if(defined($log_dir)) {
-    $learner->{'log_dir'}=$log_dir;
-  }
+  $learner->{'log_dir'}=$log_dir;
   ## for debugging, 
   if($debug) {
     open(DEBUGLOG,"> /tmp/".time().'.learner');
@@ -373,6 +383,22 @@ sub form_learner {
   ## return the learner!
   return $learner;
 }
+
+
+## finds the learning log directory
+sub find_learn_log_directory {
+  ## a full short id 
+  my $id=shift;
+  my $home_dir=shift;
+  my $log_dir=$id;
+  ## delete everything before the date
+  $log_dir=~s|.*:(\d{4})-(\d{2})-(\d{2}):(.*)|$1/$2/$3/$4|;
+  $log_dir=~s|:|/|g;
+  $log_dir="$home_dir/log/learn/$log_dir";
+  return $log_dir;
+}
+
+
 
 # cheers!
 1;
