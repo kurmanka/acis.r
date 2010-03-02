@@ -136,30 +136,26 @@ sub run_thread {
   # undefine sql object here, not in fork==0
   $app -> {'sql-object'} = undef;
 
-  my $fork = fork ();
+  # FCGI: pre-fork care
+  # see http://www.fastcgi.com/docs/faq.html#Perlfork
+  if ($ACIS::FCGIReq) { $ACIS::FCGIReq -> Detach(); }
 
+  my $fork = fork();
   if ( $fork == 0 ) {
     # the child 
-
     logit "forked from $parent to run $func";
+
     undef $sql;
     $sql = $app -> sql_object;
-
-    # added this line for back process
     $sql->{'back'}=1;
-
     # $sql_helper::VERBOSE_LOG = 1;   ### XXX debugging
 
-    my $midpid = $$;
-
     ### detach
+    my $midpid = $$;
     Proc::Daemon::Init();
-
     logit "became daemon from $parent via $midpid";
 
-
     ### call the function
-
     eval { 
       no strict;
       &$func( $app, $sql );
@@ -171,14 +167,13 @@ sub run_thread {
     
     ### clear up
     clear_thread_record ( $sql, $psid, $type );
-
     logit "thread record cleared, finished back processing";
-
     exit 1;
-    
   } 
   elsif ( defined $fork )  {
     # the parent    
+    # FCGI post-fork care (main process)
+    if ($ACIS::FCGIReq) { $ACIS::FCGIReq -> Attach(); }
     # wait till the child goes daemon
     wait;
     debug "waited until child went daemon";
