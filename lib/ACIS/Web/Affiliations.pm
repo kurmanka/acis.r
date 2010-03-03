@@ -625,6 +625,7 @@ sub general_handler {
 sub submit_institution {
   my $app = shift;
   my $session = $app -> session;
+  my $config  = $app -> config;
   my $institution = {};
   my $input = $app -> form_input;
   my $name    = $input -> {name};
