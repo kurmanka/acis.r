@@ -36,7 +36,7 @@ export del_userda_dir="$homedir/deleted-userdata"
 perl -Ilib bin/conf.pl mainconf || exit 1
 
 ###  load parsed and translated into shell format configuration
-. thisconf.sh
+. ./thisconf.sh
 
 #if test "$echo_arpu_mails"; then
 #   echo ''
