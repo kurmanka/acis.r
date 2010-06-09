@@ -24,6 +24,12 @@ my $predict_bin="/usr/bin/svm-predict -b 1";
 
 my $debug=0;
 
+## should temporary files be deleted?
+my $unlink_tmp=0;
+if($debug) {
+  $unlink_tmp=1;
+}
+
 
 @EXPORT_OK = qw( learn_via_svm form_learner);
 
@@ -37,7 +43,7 @@ my $debug=0;
 sub learn_via_svm {
   my $learner=shift;
   my $what_to_learn=shift;
-  ## usse global debug parementer in module
+  ## use global debug parementer in module
   ##my $debug=shift;
   ## switch on debuggin
   if(not defined($debug)) {
@@ -49,13 +55,19 @@ sub learn_via_svm {
   if($debug) {
     open(DEBUGLOG,"> /tmp/$time.learn");
   }
+  ## single_sided indicator
+  my $single_sided='';
   my $accepted=$learner->{'accepted'};
   if(not ref($accepted)) {
     return "Error: \$accepted is not a reference.";
   }
   my $count_accepted=scalar @$accepted;
   if(not $count_accepted) {
-    return "There are no accepted items, therefore no learning.";
+    ## only refused documents for learning
+    $single_sided='refused';
+    if($debug) {
+      print DEBUGLOG "no accepted documents, single_sided is refused\n";
+    }
   }
   if($debug) {
     print DEBUGLOG "count_accepted is $count_accepted.\n";
@@ -66,7 +78,14 @@ sub learn_via_svm {
   }
   my $count_refused=scalar @$refused;
   if(not $count_refused) {
-    return "There are no refused items, therefore no learning.";
+    ## only accepted documents for learning
+    $single_sided='accepted';
+    if($debug) {
+      print DEBUGLOG "no refused documents, single_sided is accepted\n";
+    }
+  }
+  if(not $count_refused and not $count_accepted) {
+    return "There are neither refused nor accepeted items, therefore no learning.";
   }
   if($debug) {
     print DEBUGLOG "count_refused is $count_refused\n";
@@ -81,6 +100,9 @@ sub learn_via_svm {
   else {
     $count_suggested=0;
   }
+  if($single_sided and not $count_suggested) {
+    return "There can be no single_sided=$single_sided learning with no suggested documents";
+  }
   if($debug) {
     print DEBUGLOG "count_suggested is $count_suggested\n";
   }
@@ -91,11 +113,22 @@ sub learn_via_svm {
   ## indicator of what the start of the line to learn is
   my $start_of_line_to_learn;
   if($what_to_learn eq 'suggested') {
-    $target=$suggested;
-    $count_target=$count_suggested;
-    $start_of_line_to_learn='0';
     if($count_suggested < 2) {
       return "$count_suggested is not enough suggested items to learn them";
+    }
+    $target=$suggested;
+    ## the single_sided case 
+    if($single_sided eq 'accepted') {
+      $count_target=$count_refused;
+      $start_of_line_to_learn='-1';
+    }
+    elsif($single_sided eq 'refused') {
+      $count_target=$count_accepted;
+      $start_of_line_to_learn='+1';
+    }
+    else {
+      $count_target=$count_suggested;
+      $start_of_line_to_learn='0';
     }
   }
   elsif($what_to_learn eq 'refused') {
@@ -125,23 +158,35 @@ sub learn_via_svm {
   foreach my $doc (@{$refused}) {
     $data=&add_document_to_data($data,$doc,'-1');
   }
-  foreach my $doc (@{$suggested}) {
-    $data=&add_document_to_data($data,$doc,'0');
+  if($single_sided eq 'accepted') {
+    foreach my $doc (@{$suggested}) {
+      $data=&add_document_to_data($data,$doc,'-1');
+    }
   }
+  elsif($single_sided eq 'refused') {
+    foreach my $doc (@{$suggested}) {
+      $data=&add_document_to_data($data,$doc,'+1');
+    }
+  }
+  else {
+    foreach my $doc (@{$suggested}) {
+      $data=&add_document_to_data($data,$doc,'0');
+    }
+  } 
   ## now the document data lines are in $data->{'ds'}
   my @ds=@{$data->{'ds'}}; 
   ## training data for accepted and refused documnet
-  my $train_fh = File::Temp->new();
+  my $train_fh = File::Temp->new( UNLINK => $unlink_tmp );
   my $train_file=$train_fh->filename;
   ## the model file stores the results of training
-  my $model_fh=File::Temp->new();
+  my $model_fh=File::Temp->new( UNLINK => $unlink_tmp );
   my $model_file=$model_fh->filename();
   ## the test file contains the documents we want 
   ## to learn about
-  my $test_fh = File::Temp->new();
+  my $test_fh = File::Temp->new( UNLINK => $unlink_tmp );
   my $test_file=$test_fh->filename; 
   ## create out file, it contains the results
-  my $out_fh = File::Temp->new();    
+  my $out_fh = File::Temp->new( UNLINK => $unlink_tmp );    
   my $out_file=$out_fh->filename();
   ## write the training and testing files
   foreach my $doc_line (@ds) {
