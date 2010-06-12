@@ -63,7 +63,13 @@ users' requests.  Required.</dd>
 
 <dd>Filename of the CGI script, which ACIS creates and which
 is accessible through the <c>base-url</c> URL.
-Required.</dd>
+</dd>
+
+<dt><C>base-fcgi-script-filename</C></dt>
+
+<dd>Filename of the FCGI script, which ACIS creates and which
+is accessible through the <c>base-url</c> URL.
+Required</dd>
 
 
 <dt><C>home-url</C></dt>

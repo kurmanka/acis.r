@@ -19,16 +19,16 @@ table tr th {
 <body>
       
 
-   <h1 id="id2246169">Selected Database Tables</h1>
+   <h1 id="id2541372">Selected Database Tables</h1>
 
 <h3><i>Table of contents</i></h3>
-<p class="toc">   <a href="#records-table">Records table</a><br>   <a href="#names-table">Names table</a><br>   <a href="#id2246473">Misc</a><br>      <a href="#pidaid-db-expose">How to expose ACIS database for Person Identification
+<p class="toc">   <a href="#records-table">Records table</a><br>   <a href="#names-table">Names table</a><br>   <a href="#id2541667">Misc</a><br>      <a href="#pidaid-db-expose">How to expose ACIS database for Person Identification
 Aid</a><br></p>
 
 
 
 <p>ACIS creates and maintains a number of database tables.
-These tables are needed for system’s work, but can be used
+These tables are needed for system's work, but can be used
 for additional purposes.</p>
 
 
@@ -53,13 +53,13 @@ namefull, profile_url, emailmd5.</p>
 <tr>
 <td>shortid</td>
 <td>char(10) not null primary key</td>
-<td>record’s short-id</td>
+<td>record's short-id</td>
 </tr>
 
 <tr>
 <td>id</td>
 <td>char(130) not null</td>
-<td>record’s identifier</td>
+<td>record's identifier</td>
 </tr>
 
 <tr>
@@ -77,30 +77,30 @@ world</td> </tr>
 <tr>
 <td>namelast</td>
 <td>char(70) not null</td>
-<td>name of the person in the form “Lastname, Firstname”
+<td>name of the person in the form "Lastname, Firstname"
 with optional middle name and suffix following</td>
 </tr>
 
 <tr> <td>namefull</td> <td>char(70) not null</td> <td>full
 name of the person as user entered it on the name screen;
-usually “Firstname Middlename Lastname”</td> </tr>
+usually "Firstname Middlename Lastname"</td> </tr>
 
 <tr>
 <td>profile_url</td>
-<td>char(100) binary not null default ""</td>
+<td>char(100) binary not null default \"\"</td>
 <td>absolute URL of the personal profile page (on the site of the installation)</td>
 </tr>
 
 <tr>
 <td>homepage</td>
-<td>char(130) binary not null default ""</td>
+<td>char(130) binary not null default \"\"</td>
 <td>URL of the personal homepage, if known</td>
 </tr>
 
 <tr>
 <td>emailmd5</td>
-<td>char(16) binary not null default ""</td>
-<td>128 bit MD5 digest of the person’s email in lower case, if it is
+<td>char(16) binary not null default \"\"</td>
+<td>128 bit MD5 digest of the person's email in lower case, if it is
 known; empty string otherwise.  Calculated as:
 
 <blockquote><code><pre>
@@ -134,7 +134,7 @@ in main.conf via <a class="c" href="conf.html#acis-db-name">acis-db-name</a>, ta
 <tr>
 <td>shortid</td>
 <td>char(10) not null</td>
-<td>record’s short-id</td>
+<td>record's short-id</td>
 </tr>
 
 <tr>
@@ -156,7 +156,7 @@ equals 255
 <p>An index:  <code> PRIMARY KEY ( shortid, name ) </code></p>
 
 
-   <h2 id="id2246473">Misc</h2>
+   <h2 id="id2541667">Misc</h2>
 
 
    <h3 id="pidaid-db-expose">How to expose ACIS database for Person Identification
@@ -167,7 +167,7 @@ database</a> (and offer matching items for user to select).</p>
 
 <p>Given the fact that ACIS uses MySQL for database, and MySQL
 is a network-capable system, and includes an
-authorization/authentication subsystem, it’s most simple to
+authorization/authentication subsystem, it's most simple to
 use these features.  It is in the power of the ACIS
 administrator to make a particular database table accessible
 to another user on the net.  </p>
@@ -186,56 +186,57 @@ firewall configuration.)  </p>
 access on port 3306.  You may check or change it in your
 <code class="f BROKEN">/etc/my.cnf</code> or <code class="f BROKEN">/etc/mysql/my.cnf</code> file.</p>
 </li>
-<li>
-<p>Create a new MySQL user with a password for a
+<li><p>Create a new MySQL user with a password for a
 submission service to use.  Give to this new user SELECT
 privilege on certain fields of the records table and on
-the names table.  Here is what statements to run:</p>
+the names table.  Here is what statements to run:</p></li>
+</ol>
 
 <pre><code>GRANT SELECT (shortid,id,namelast,namefull,profile_url,homepage,emailmd5)
-  ON <span class="red">acisDatabase</span>.records
-  TO <span class="red">frank@eprints.super.edu</span> IDENTIFIED BY "<span class="red">goblin</span>";</code>
-</pre>
+      ON <span class="red">acisDatabase</span>.records
+      TO <span class="red">frank@eprints.super.edu</span> IDENTIFIED BY "<span class="red">goblin</span>";</code>
+  </pre>
 
 <pre><code>GRANT SELECT
-  ON <span class="red">acisDatabase</span>.names
-  TO <span class="red">frank@eprints.super.edu</span>;</code>
-</pre>
+      ON <span class="red">acisDatabase</span>.names
+      TO <span class="red">frank@eprints.super.edu</span>;</code>
+  </pre>
 
 <pre><code>FLUSH PRIVILEGES;</code>
-</pre>
+  </pre>
 
 <p>Here <code><span class="red">acisDatabase</span></code> is
-the database name (the <a class="c" href="conf.html#acis-db-name">acis-db-name</a> parameter in
-main.conf), <code><span class="red">frank@eprints.super.edu</span></code> is the
-name of the user and its hostname (name of the host from
-which it will contact our database), <code><span class="red">goblin</span></code> is its password.  You can
-run these statements in MySQL’s <code>mysql</code>
-terminal utility.  You will need administrator’s
-privileges.</p>
+  the database name (the <a class="c" href="conf.html#acis-db-name">acis-db-name</a> parameter in
+  main.conf), <code><span class="red">frank@eprints.super.edu</span></code> is the
+  name of the user and its hostname (name of the host from
+  which it will contact our database), <code><span class="red">goblin</span></code> is its password.  You can
+  run these statements in MySQL's <code>mysql</code>
+  terminal utility.  You will need administrator's
+  privileges.</p>
 
-<p>If the above does not work, and you can’t get database
-connected (error message “Client does not support
-authentication protocol requested by server; consider
-upgrading MySQL client”), read <a href="http://dev.mysql.com/doc/mysql/en/password-hashing.html">that</a>.
-Depending on your MySQL server version and client
-libraries your remedy may be in these statements:</p>
+<p>If the above does not work, and you can't get database
+  connected (error message "Client does not support
+  authentication protocol requested by server; consider
+  upgrading MySQL client"), read <a href="http://dev.mysql.com/doc/mysql/en/password-hashing.html">that</a>.
+  Depending on your MySQL server version and client
+  libraries your remedy may be in these statements:</p>
 
 <pre><code>UPDATE mysql.user SET Password = OLD_PASSWORD('<span class="red">goblin</span>')
-  WHERE Host = '<span class="red">eprints.super.edu</span>' AND User = '<span class="red">frank</span>';</code>
-</pre>
+      WHERE Host = '<span class="red">eprints.super.edu</span>' AND User = '<span class="red">frank</span>';</code>
+  </pre>
 
 <pre><code>FLUSH PRIVILEGES;</code>
-</pre>
-</li>
-<li><p>Send the hostname (local host where ACIS and MySQL are
+  </pre>
+
+<ol>
+<li>Send the hostname (local host where ACIS and MySQL are
 installed), the port number (e.g. 3306), the database name
 (e.g. <code><span class="red">acisDatabase</span></code>),
 the user name (e.g. <code><span class="red">frank</span></code>), the password
 (e.g. <code><span class="red">goblin</span></code>) to the
 submission service administrator.  (These items are
-collectively referred to as “MySQL access parameters” in
-<a href="http://acis.openlib.org/documents/saskatoon/">Saskatoon</a> doc.)</p></li>
+collectively referred to as "MySQL access parameters" in
+<a href="http://acis.openlib.org/documents/saskatoon/">Saskatoon</a> doc.)</li>
 </ol>
 
 <p>Relevant pieces of MySQL documentation online:</p>
@@ -262,16 +263,14 @@ collectively referred to as “MySQL access parameters” in
 <li>
 <p><a href="http://dev.mysql.com/doc/mysql/en/account-management-sql.html">Account Management Statements</a></p>
 
-<ul>
-<li>
-<a href="http://dev.mysql.com/doc/mysql/en/grant.html">GRANT and REVOKE Syntax</a> </li>
-</ul>
+<ul><li>
+<a href="http://dev.mysql.com/doc/mysql/en/grant.html">GRANT and REVOKE Syntax</a> </li></ul>
 </li>
 </ul>
 
   
 <address class="footer">
-<p>Generated: Tue Sep 11 00:32:23 2007</p>
+<p>Generated: Fri Jun 11 07:15:03 2010</p>
 <p><a href="http://acis.openlib.org/">ACIS project</a>,
           acis<i>@</i>openlib<span>.org</span></p>
 </address>

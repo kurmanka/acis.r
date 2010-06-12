@@ -1,19 +1,19 @@
 <html>
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-<title>Programmer’s guide (Internals) / ACIS documentation</title>
+<title>Programmer's guide (Internals) / ACIS documentation</title>
 <link rel="stylesheet" href="style.css">
 </head>
 <body>
       
 
-   <h1 id="id2253744">Programmer’s guide (Internals)</h1>
+   <h1 id="id2545244">Programmer's guide (Internals)</h1>
 
 <h3><i>Table of contents</i></h3>
-<p class="toc">   <a href="#id2253752">Overview</a><br>   <a href="#id2253776">Data processing</a><br>      <a href="#id2253966">Summary</a><br>   <a href="#webinterface">Web interface</a><br>      <a href="#id2254172">Summary</a><br>   <a href="#id2254213">A brief guide to the ACIS source files</a><br>   <a href="#id2254445">A detailed guide to the ACIS source files</a><br>      <a href="#id2254453">Traditional meta files</a><br>      <a href="#id2254512">Documentation</a><br>      <a href="#id2254702">Installation and configuration</a><br>      <a href="#id2254931">Presenters and other presentation-related files</a><br>         <a href="#id2254935">General</a><br>         <a href="#id2255188">Users’ screens</a><br>         <a href="#id2255260">Person-profile editing screens</a><br>         <a href="#id2255403">New user (initial registration) screens</a><br>         <a href="#id2255443">Administrative screens</a><br>         <a href="#id2255570">Email generation</a><br>         <a href="#id2255595">Other</a><br>      <a href="#id2255683">ACIS:: hierarchy</a><br>         <a href="#ACIS::Web">ACIS::Web — Web interface of ACIS</a><br>         <a href="#id2255972">Research Profile underlying modules</a><br>         <a href="#id2256024">APU</a><br>         <a href="#id2256061">Citations</a><br>         <a href="#id2256164">Other ACIS:: modules</a><br>      <a href="#id2256220">Web::App — the web application framework</a><br>         <a href="#id2256354">ACIS::Data::DumpXML</a><br>      <a href="#id2256399">ARDB — the data-processing</a><br>      <a href="#id2256649">SQL helper</a><br>      <a href="#id2256689">Other</a><br></p>
+<p class="toc">   <a href="#id2545251">Overview</a><br>   <a href="#id2545275">Data processing</a><br>      <a href="#id2545434">Summary</a><br>   <a href="#webinterface">Web interface</a><br>      <a href="#id2545624">Summary</a><br>   <a href="#id2545665">A brief guide to the ACIS source files</a><br>   <a href="#id2545896">A detailed guide to the ACIS source files</a><br>      <a href="#id2545905">Traditional meta files</a><br>      <a href="#id2545964">Documentation</a><br>      <a href="#id2546152">Installation and configuration</a><br>      <a href="#id2546377">Presenters and other presentation-related files</a><br>         <a href="#id2546381">General</a><br>         <a href="#id2546632">Users' screens</a><br>         <a href="#id2546704">Person-profile editing screens</a><br>         <a href="#id2546846">New user (initial registration) screens</a><br>         <a href="#id2546886">Administrative screens</a><br>         <a href="#id2547013">Email generation</a><br>         <a href="#id2547038">Other</a><br>      <a href="#id2547126">ACIS:: hierarchy</a><br>         <a href="#ACIS::Web">ACIS::Web -- Web interface of ACIS</a><br>         <a href="#id2547409">Research Profile underlying modules</a><br>         <a href="#id2547461">APU</a><br>         <a href="#id2547498">Citations</a><br>         <a href="#id2547600">Other ACIS:: modules</a><br>      <a href="#id2547657">Web::App -- the web application framework</a><br>         <a href="#id2547786">ACIS::Data::DumpXML</a><br>      <a href="#id2547831">ARDB -- the data-processing</a><br>      <a href="#id2548077">SQL helper</a><br>      <a href="#id2548117">Other</a><br></p>
 
 
-   <h2 id="id2253752">Overview</h2>
+   <h2 id="id2545251">Overview</h2>
 
 <p>Internally, ACIS consists of two main subsystems and a
 number of smaller tools.  These two main parts are very
@@ -32,7 +32,7 @@ subsystem will process.  The system is complex, but consists of simple
 parts; each part has distinct responsibilities.</p>
 
 
-   <h2 id="id2253776">Data processing</h2>
+   <h2 id="id2545275">Data processing</h2>
 
 <p>The data processing subsystem, in its turn, consists of two loosely
 coupled parts.  The first part monitors data files, tracks their
@@ -54,7 +54,7 @@ in the file <code class="f BROKEN">RI/collections</code>.</p>
 records</b>.  Each data record must have a unique identifier.  If two
 or more records in a collection have the same identifier, there is a
 <b>conflict</b>.  RePEc-Index excludes the conflicting records from
-further processing, until there’s only one record left with a
+further processing, until there's only one record left with a
 particular id.  When a data record is successfully read from a data
 file, RePEc-Index does its checks and, if everything is ok, executes
 further processing for it.  </p>
@@ -71,19 +71,19 @@ identifier conflict).  ARDB then <b>cleans up the
 database</b>. It removes the data which
 originated from that record.</p>
 
-<p>ARDB’s work is governed by an elaborate <b>configuration</b>.
+<p>ARDB's work is governed by an elaborate <b>configuration</b>.
 The configuration is stored in 
 (<code class="f BROKEN">configuration.xml</code> in the ACIS home directory. The <br>
 configuration specifies what ARDB has to do when
 processing a <b>record of a specific type</b>.  Possible
-kinds of actions: store some of the record’s data into a
+kinds of actions: store some of the record's data into a
 database table, execute certain perl code, extract a
 relationship of this record to some other record.  When
 cleaning up a record, ARDB can remove database table records
 or call perl code.</p>
 
-<p>ARDB’s configuration also defines <b>database tables</b>.  Those may
-be tables, which other parts of the configuration refer to, but they don’t
+<p>ARDB's configuration also defines <b>database tables</b>.  Those may
+be tables, which other parts of the configuration refer to, but they don't
 have to.  Either way, ARDB can create those tables for you; there is a
 script for that (<a class="c" href="adm.html#bincreate_tables">bin/create_tables</a>).  ACIS relies on this capability
 of ARDB to create tables which are needed.</p>
@@ -94,14 +94,14 @@ of ARDB to create tables which are needed.</p>
 RePEc-Index finds <b>a new or changed data record</b>, and this record
 has a valid unique identifier, it asks ARDB to process it.  When
 RePEc-Index finds that a record has been removed from a data file, it
-asks ARDB to remove the record’s data.  Also, when there is an id
+asks ARDB to remove the record's data.  Also, when there is an id
 conflict, RePEc-Index will request ARDB to clean up the conflicting
-record’s data.  The connection between RePEc-Index and ARDB is not
+record's data.  The connection between RePEc-Index and ARDB is not
 intrinsic; it is just in the way of how ACIS configures RI to 
 process the metadata.</p>
 
 
-   <h3 id="id2253966">Summary</h3>
+   <h3 id="id2545434">Summary</h3>
 
 <ul>
 <li><p>ACIS consists of data processing part and web-interface
@@ -131,11 +131,11 @@ modules + helper scripts</p></li>
 
 <p>There are two main parts in the set of perl modules that
 make ACIS web interface work.  First is the framework. It 
-contains general code for analysing a user’s request,
+contains general code for analysing a user's request,
 deciding how to treat that request and generating a
 response.  It helps ACIS to store and load user sessions and
 does a bunch of other little things for a web application.
-That’s why I call it the web application framework. It’s
+That's why I call it the web application framework. It's
 core is in the <code>Web::App</code> module.</p>
 
 <p>The second part contains the specifics of ACIS.  There lives
@@ -149,9 +149,9 @@ providing tools and a common environment.</p>
 <p>These two parts are tied together by: </p>
 
 <ol>
-<li><p>inheritance — <code>ACIS::Web</code> class inherits from
+<li><p>inheritance -- <code>ACIS::Web</code> class inherits from
 <code>Web::App</code> and extends it in ACIS-specific ways.</p></li>
-<li><p><code class="f BROKEN">screens.xml</code> — the application configuration.</p></li>
+<li><p><code class="f BROKEN">screens.xml</code> -- the application configuration.</p></li>
 </ol>
 
 <p>The application configuration, the <code class="f BROKEN">screens.xml</code> file,
@@ -166,7 +166,7 @@ Each screen definition in <code class="f BROKEN">screens.xml</code> configuratio
 specifies which modules and which functions will
 <a class="c" href="internal.html#WebApp">Web::App</a> invoke for it.  If a request came for an
 unknown (unspecified) screen, <a class="c" href="internal.html#WebApp">Web::App</a> will generate
-a 404 error and display a “Sorry” screen.</p>
+a 404 error and display a "Sorry" screen.</p>
 
 <p>Another thing that the screens configuration brings into the
 mix is presenters.  For each screen it defines an XSLT file,
@@ -177,8 +177,8 @@ application logic.</p>
 <p>All this separation between web-application general and
 ACIS-specific, between presentation and application logic
 works for flexibility and extensibility of the system.  It is
-an attempt to follow the “<a href="http://google.com/search?q=separation+of+concerns">separation
-of concerns</a>” principle.</p>
+an attempt to follow the "<a href="http://google.com/search?q=separation+of+concerns">separation
+of concerns</a>" principle.</p>
 
 <p>At the same time, the CGI script in ACIS is so simple that I
 could have left it unmentioned without harm.  Basically it
@@ -188,13 +188,13 @@ a similar way: they involve a certain part of the
 <code>ACIS::Web</code> and it does the rest.</p>
 
 
-   <h3 id="id2254172">Summary</h3>
+   <h3 id="id2545624">Summary</h3>
 
 <ul>
 <li><p>ACIS is built on top of a generic web-application
 framework.</p></li>
 <li><p><a class="c" href="internal.html#ACIS::Web">ACIS::Web</a> module and many other modules in
-the <code>ACIS::*</code> hierarchy encapsulate all what’s
+the <code>ACIS::*</code> hierarchy encapsulate all what's
 essentially ACIS-specific.</p></li>
 <li><p>All of the user interface is coded in XSLT stylesheets
 (templates).</p></li>
@@ -206,7 +206,7 @@ single solid application.</p></li>
 
 
 
-   <h2 id="id2254213">A brief guide to the ACIS source files</h2>
+   <h2 id="id2545665">A brief guide to the ACIS source files</h2>
 
 <p>Main parts and some key files</p>
 
@@ -274,13 +274,13 @@ for details</dd>
 </dl>
 
 
-   <h2 id="id2254445">A detailed guide to the ACIS source files</h2>
+   <h2 id="id2545896">A detailed guide to the ACIS source files</h2>
 
 <p>This is an annotated list of most files of an ACIS
 distribution. </p>
 
 
-   <h3 id="id2254453">Traditional meta files</h3>
+   <h3 id="id2545905">Traditional meta files</h3>
 
 <dl>
 
@@ -302,7 +302,7 @@ installation, but useful for re-packaging a distribution
 </dd>
 
 <dt id="README"><code class="F">README</code></dt>
-<dd>The most thrilling Agatha Christie’s detective
+<dd>The most thrilling Agatha Christie's detective
 novel.  Serious.</dd>
 
 <dt id="TODO"><code class="F">TODO</code></dt>
@@ -311,12 +311,12 @@ novel.  Serious.</dd>
 </dl>
 
 
-   <h3 id="id2254512">Documentation</h3>
+   <h3 id="id2545964">Documentation</h3>
 
 <dl>
 
 <dt id="docmakelinkedpl"><code class="F">doc/make.linked.pl</code></dt> <dd>Generates HTML with
-table of contents, with indirect links between the pages…
+table of contents, with indirect links between the pages...
 Requires <a href="http://daringfireball.net/projects/markdown/">Markdown</a>.pl and <code>xsltproc</code> in PATH.
 </dd>
 
@@ -372,7 +372,7 @@ Corresponding documentation sources in <a href="http://daringfireball.net/projec
 </dl>
 
 
-   <h3 id="id2254702">Installation and configuration</h3>
+   <h3 id="id2546152">Installation and configuration</h3>
 
 <dl>
 
@@ -401,7 +401,7 @@ that; used by <a class="c" href="conf.html#binsetup">bin/setup</a>.
 </dd>
 
 <dt id="homebintemplatesapupl"><code class="F">home/bin/templates/apu.pl</code></dt>
-<dd>Template for <a class="c" href="apu.html#binapu">bin/apu</a> script — <a href="apu.html#binapu"><abbr title="automatic profile update">APU</abbr></a>
+<dd>Template for <a class="c" href="apu.html#binapu">bin/apu</a> script -- <a href="apu.html#binapu"><abbr title="automatic profile update">APU</abbr></a>
 </dd>
 
 <dt id="homebintemplatesclean-uppl"><code class="F">home/bin/templates/clean-up.pl</code></dt>
@@ -424,7 +424,7 @@ and scripts.
 </dd>
 
 <dt id="homeconfigurationxml"><code class="F">home/configuration.xml</code></dt>
-<dd>ARDB configuration for ACIS’ primary metadata, for
+<dd>ARDB configuration for ACIS' primary metadata, for
 processing ReDIF and AMF
 </dd>
 
@@ -440,7 +440,7 @@ Example file for <a class="c" href="conf.html#mainconf">main.conf</a>.
 
 <dt id="homescreensxml"><code class="F">home/screens.xml</code></dt>
 <dd>
-<a class="c" href="internal.html#ACIS::Web">ACIS::Web</a>’s (<a class="c" href="internal.html#WebApp">Web::App</a>’s) web application
+<a class="c" href="internal.html#ACIS::Web">ACIS::Web</a>'s (<a class="c" href="internal.html#WebApp">Web::App</a>'s) web application
 configuration.  Defines screens, their processors and
 presenters and some additional parameters.
 
@@ -458,10 +458,10 @@ if necessary.  Copies all the files.  Runs
 </dl>
 
 
-   <h3 id="id2254931">Presenters and other presentation-related files</h3>
+   <h3 id="id2546377">Presenters and other presentation-related files</h3>
 
 
-   <h4 id="id2254935">General</h4>
+   <h4 id="id2546381">General</h4>
 
 <dl>
 
@@ -507,7 +507,7 @@ hierarchies.  See <code>error()</code> method in
 <dd>
 
 Messages, which are like errors, invoked by a code in Perl
-in ACIS::Web::… and Web::App::….  See <code>message()</code>
+in ACIS::Web::... and Web::App::....  See <code>message()</code>
 method in <a class="c" href="internal.html#WebApp">Web::App</a>.  </dd>
 
 <dt id="homepresentationdefaultfieldsxml"><code class="F">home/presentation/default/fields.xml</code></dt>
@@ -543,7 +543,7 @@ in case of the <code>new-institution</code> screen.</dd>
 <dd>
 
 Contains default values for phrases, invoked through
-<code>&lt;phrase ref=’…’/&gt;</code> markup elsewhere in
+<code>&lt;phrase ref='...'/&gt;</code> markup elsewhere in
 templates.  Such a phrase element will be replaced with
 content from this file or its installation-local equivalent
 <code>{HOME}/presentation/default/phrase-local.xml</code>. </dd>
@@ -556,7 +556,7 @@ content from this file or its installation-local equivalent
 <a href="http://jquery.com/">jQuery</a> JavaScript library</dd>
 
 <dt id="homepresentationdefaultstylebrownishcssadd"><code class="F">home/presentation/default/style/brownish.css.add</code></dt>
-<dd>This is joined with main.css to get brownish.css — the
+<dd>This is joined with main.css to get brownish.css -- the
 brownish color theme.
 </dd>
 
@@ -573,14 +573,14 @@ problem in IE 6/Win and IE 5.5/Win.
 </dl>
 
 
-   <h4 id="id2255188">Users’ screens</h4>
+   <h4 id="id2546632">Users' screens</h4>
 
 <dl>
 
 
 <dt id="homepresentationdefaultuserpagexsl"><code class="F">home/presentation/default/user/page.xsl</code></dt>
 <dd>
-<code>user-page</code> template for all users’ screens.</dd>
+<code>user-page</code> template for all users' screens.</dd>
 
 <dt id="homepresentationdefaultuserwelcomexsl"><code class="F">home/presentation/default/user/welcome.xsl</code></dt>
 <dd>When user has just logged in.</dd>
@@ -602,7 +602,7 @@ problem in IE 6/Win and IE 5.5/Win.
 </dl>
 
 
-   <h4 id="id2255260">Person-profile editing screens</h4>
+   <h4 id="id2546704">Person-profile editing screens</h4>
 
 <dl>
 
@@ -616,7 +616,7 @@ person-editing screens, e.g. person profile menu.</dd>
 <dt id="homepresentationdefaultpersonaffiliations-searchxsl"><code class="F">home/presentation/default/person/affiliations-search.xsl</code></dt>
 <dt id="homepresentationdefaultpersonaffiliationsxsl"><code class="F">home/presentation/default/person/affiliations.xsl</code></dt>
 <dt id="homepresentationdefaultpersonaffiliationsnew-institutionxsl"><code class="F">home/presentation/default/person/affiliations/new-institution.xsl</code></dt>
-<dd>Affiliations and “submit institution” screens</dd>
+<dd>Affiliations and "submit institution" screens</dd>
 
 
 <dt id="homepresentationdefaultpersoncontactxsl"><code class="F">home/presentation/default/person/contact.xsl</code></dt>
@@ -657,7 +657,7 @@ pictures of the users.  Not in use anymore.</dd>
 </dl>
 
 
-   <h4 id="id2255403">New user (initial registration) screens</h4>
+   <h4 id="id2546846">New user (initial registration) screens</h4>
 
 <dl>
 
@@ -676,7 +676,7 @@ pictures of the users.  Not in use anymore.</dd>
 </dl>
 
 
-   <h4 id="id2255443">Administrative screens</h4>
+   <h4 id="id2546886">Administrative screens</h4>
 
 <dl>
 
@@ -700,7 +700,7 @@ useful in the future or will be thrown away.</dd>
 </dd>
 
 <dt id="homepresentationdefaultadmpassxsl"><code class="F">home/presentation/default/adm/pass.xsl</code></dt>
-<dd>Asks password for <a href="adm.html#adm-slash"><code>/adm/…</code> screens</a>
+<dd>Asks password for <a href="adm.html#adm-slash"><code>/adm/...</code> screens</a>
 </dd>
 
 <dt id="homepresentationdefaultadmsearch-res-docxsl"><code class="F">home/presentation/default/adm/search-res-doc.xsl</code></dt>
@@ -728,7 +728,7 @@ useful in the future or will be thrown away.</dd>
 </dl>
 
 
-   <h4 id="id2255570">Email generation</h4>
+   <h4 id="id2547013">Email generation</h4>
 
 <dl>
 
@@ -745,7 +745,7 @@ useful in the future or will be thrown away.</dd>
 </dl>
 
 
-   <h4 id="id2255595">Other</h4>
+   <h4 id="id2547038">Other</h4>
 
 <dl>
 
@@ -789,10 +789,10 @@ phrase.</dd>
 </dl>
 
 
-   <h3 id="id2255683">ACIS:: hierarchy</h3>
+   <h3 id="id2547126">ACIS:: hierarchy</h3>
 
 
-   <h4 id="ACIS::Web">ACIS::Web — Web interface of ACIS</h4>
+   <h4 id="ACIS::Web">ACIS::Web -- Web interface of ACIS</h4>
 
 <dl>
 
@@ -871,7 +871,7 @@ Saves a profile as a static HTML page.
 Some general services for many screens and processors.
 Starts and load sessions, handles authentication, checks
 form values, provides form-field values, sets and clears
-cookies…
+cookies...
 
 </dd>
 
@@ -903,7 +903,7 @@ record, without writing it to his/her userdata.
 
 <dt id="libACISWebUserpm"><code class="F">lib/ACIS/Web/User.pm</code></dt>
 <dd>
-Registered users’ screens: name, settings, et cetera.
+Registered users' screens: name, settings, et cetera.
 
 </dd>
 
@@ -918,7 +918,7 @@ User account storage module.  Reads and writes <a href="adm.html#userdata">userd
 </dl>
 
 
-   <h4 id="id2255972">Research Profile underlying modules</h4>
+   <h4 id="id2547409">Research Profile underlying modules</h4>
 
 <dl> 
 <dt id="libACISResourcesSearchpm"><code class="F">lib/ACIS/Resources/Search.pm</code></dt>
@@ -926,7 +926,7 @@ User account storage module.  Reads and writes <a href="adm.html#userdata">userd
 manual search screen.</dd>
 
 <dt id="libACISResourcesAutoSearchpm"><code class="F">lib/ACIS/Resources/AutoSearch.pm</code></dt> <dd>Research
-profile’s automatic search, based on the user’s name
+profile's automatic search, based on the user's name
 variations.  May be called in a forked background process (via
 <a class="c" href="internal.html#ACISWebBackground">ACIS::Web::Background</a>).</dd>
 
@@ -938,7 +938,7 @@ variations.  May be called in a forked background process (via
 </dl>
 
 
-   <h4 id="id2256024">APU</h4>
+   <h4 id="id2547461">APU</h4>
 
 <dl>
 <dt id="libACISAPUpm"><code class="F">lib/ACIS/APU.pm</code></dt>
@@ -953,7 +953,7 @@ variations.  May be called in a forked background process (via
 </dl>
 
 
-   <h4 id="id2256061">Citations</h4>
+   <h4 id="id2547498">Citations</h4>
 
 <dl>
 <dt id="libACISCitationsInputpm"><code class="F">lib/ACIS/Citations/Input.pm</code></dt>
@@ -989,7 +989,7 @@ variations.  May be called in a forked background process (via
 </dl>
 
 
-   <h4 id="id2256164">Other ACIS:: modules</h4>
+   <h4 id="id2547600">Other ACIS:: modules</h4>
 
 <dl>
 
@@ -1023,14 +1023,14 @@ ARDB::Record interface.
 </dl>
 
 
-   <h3 id="id2256220">Web::App — the web application framework</h3>
+   <h3 id="id2547657">Web::App -- the web application framework</h3>
 
 <dl>
 
 <dt id="libWebApppm"><code class="F">lib/Web/App.pm</code></dt>
 
 <dd id="WebApp" C="Web::App">
-<code class="C">Web::App</code> — the core of the web applications
+<code class="C">Web::App</code> -- the core of the web applications
 framework.  Designed to be generic, although some
 project-specific stuff is still there.</dd>
 
@@ -1066,16 +1066,16 @@ other modules. </dd>
 
 <dt id="libWebAppScreenpm"><code class="F">lib/Web/App/Screen.pm</code></dt>
 <dd>A screen configuration container class, very simple.
-(One object — one screen.)</dd>
+(One object -- one screen.)</dd>
 
 <dt id="libWebAppSessionpm"><code class="F">lib/Web/App/Session.pm</code></dt>
 <dd id="WebAppSession" C="Web::App::Session">
-<code class="C">Web::App::Session</code> — session class.</dd>
+<code class="C">Web::App::Session</code> -- session class.</dd>
 
 </dl>
 
 
-   <h4 id="id2256354">ACIS::Data::DumpXML</h4>
+   <h4 id="id2547786">ACIS::Data::DumpXML</h4>
 
 <p>ACIS::Data::DumpXML is an XML-serializer, used by
 <a class="c" href="internal.html#ACIS::Web">ACIS::Web</a> (and <a class="c" href="internal.html#WebApp">Web::App</a>).
@@ -1096,7 +1096,7 @@ perl data structure.</dd>
 </dl>
 
 
-   <h3 id="id2256399">ARDB — the data-processing</h3>
+   <h3 id="id2547831">ARDB -- the data-processing</h3>
 
 <p>Abstract metadata database system.  Analyses independent
 metadata records and stores them in a database according to
@@ -1176,7 +1176,7 @@ avoid re-parsing and re-checking it every time. </dd>
 
 <dt id="libARDBSiteConfigpm"><code class="F">lib/ARDB/SiteConfig.pm</code></dt>
 <dd>
-Container class for local site’s configuration, such as DB
+Container class for local site's configuration, such as DB
 access parameters.</dd>
 
 <dt id="libARDBTestpm"><code class="F">lib/ARDB/Test.pm</code></dt> <dd>A simple testing
@@ -1194,7 +1194,7 @@ framework.  It is for ARDB test scripts in <code class="f BROKEN">t/</code>.</dd
 </dl>
 
 
-   <h3 id="id2256649">SQL helper</h3>
+   <h3 id="id2548077">SQL helper</h3>
 
 <p>SQL helper module, used throughout ACIS.  Provides a
 conveniently-wrapped interface to MySQL with problem
@@ -1217,28 +1217,28 @@ logging.</p>
 </dl>
 
 
-   <h3 id="id2256689">Other</h3>
+   <h3 id="id2548117">Other</h3>
 
 <dl>
 
 <dt id="libRePEcIndexCollectionACIS_UDpm"><code class="F">lib/RePEc/Index/Collection/ACIS_UD.pm</code></dt>
-<dd>Implementation of the “<code>ACIS_UD</code>” collection type
+<dd>Implementation of the "<code>ACIS_UD</code>" collection type
 for RePEc-Index (<a href="daemon.html">update daemon</a>).
 <code>ACIS_UD</code> is ACIS userdata files collection.</dd>
 
 <dt id="libRePEcIndexCollectionCitationsAMFpm"><code class="F">lib/RePEc/Index/Collection/CitationsAMF.pm</code></dt>
-<dd>Implementation of the “<code>CitationsAMF</code>” collection type
+<dd>Implementation of the "<code>CitationsAMF</code>" collection type
 for RePEc-Index.</dd>
 
 <dt id="libRePEcIndexCollectionFullTextUrlsAMFpm"><code class="F">lib/RePEc/Index/Collection/FullTextUrlsAMF.pm</code></dt>
-<dd>Implementation of the “<code>FullTextUrlsAMF</code>”
-collection type for RePEc-Index.  This is for the <a href="stageD.html#fturls">FullText URLs</a> input data.</dd>
+<dd>Implementation of the "<code>FullTextUrlsAMF</code>"
+collection type for RePEc-Index.  This is for the <a href="researchprofile.html#fturls">FullText URLs</a> input data.</dd>
 
 </dl>
 
   
 <address class="footer">
-<p>Generated: Tue Sep 11 00:32:23 2007</p>
+<p>Generated: Fri Jun 11 07:15:03 2010</p>
 <p><a href="http://acis.openlib.org/">ACIS project</a>,
           acis<i>@</i>openlib<span>.org</span></p>
 </address>

@@ -128,9 +128,14 @@ sub run_xslt_presenter {
     $result_object = $stylesheet -> transform($source);
     ## originally:
     ##$result = $stylesheet -> output_string( $result_object );
-    $result = $stylesheet -> output_as_chars( $result_object );
+    ## FCGI requires output as bytes 
+    if($ACIS::FCGIReq) { 
+      $result = $stylesheet -> output_as_bytes( $result_object );
+    }
+    else {
+      $result = $stylesheet -> output_as_chars( $result_object );
+    }
   };
-    
   if ( $@ or $XML::LibXSLT::error 
        or not $result_object or not $result ) {
     my $err = $@;

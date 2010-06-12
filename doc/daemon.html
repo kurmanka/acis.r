@@ -10,20 +10,20 @@
    <h1 id="ri-daemon">Update daemon</h1>
 
 <h3><i>Table of contents</i></h3>
-<p class="toc">   <a href="#id2245032">Introduction</a><br>   <a href="#collection">Metadata collections</a><br>      <a href="#ri-collections">Configuring collections</a><br>   <a href="#id2245273">Installation</a><br>   <a href="#id2245341">Administration</a><br>      <a href="#id2245345">Starting and stopping the daemon</a><br>      <a href="#sending-update-requests">Sending update requests</a><br>      <a href="#id2245425">Logs</a><br>      <a href="#db-house">Database housekeeping</a><br></p>
+<p class="toc">   <a href="#id2536702">Introduction</a><br>   <a href="#collection">Metadata collections</a><br>      <a href="#ri-collections">Configuring collections</a><br>   <a href="#id2536923">Installation</a><br>   <a href="#id2536990">Administration</a><br>      <a href="#id2536994">Starting and stopping the daemon</a><br>      <a href="#sending-update-requests">Sending update requests</a><br>      <a href="#id2537069">Logs</a><br>      <a href="#db-house">Database housekeeping</a><br></p>
 
 
-   <h2 id="id2245032">Introduction</h2>
+   <h2 id="id2536702">Introduction</h2>
 
 <p>The Update daemon keeps the 
 ACIS database tables up-to-date with the
 metadata collections that an ACIS service uses.  Ivan Kurmanov also
-sometimes calls it “RI daemon”.  RI stands for RePEc-Index,
+sometimes calls it "RI daemon".  RI stands for RePEc-Index,
 which is a historical name for the modules behind the
 daemon.</p>
 
 <p>The daemon reads data about documents, software components,
-series, and institutions from the collections’ data files and
+series, and institutions from the collections' data files and
 inserts it into corresponding tables.  If a record
 disappears from the underlying metadata collection, the RI
 daemon deletes corresponding data from the tables.</p>
@@ -44,18 +44,18 @@ daemon.</p>
 
 <p>Collections is how ACIS thinks about your metadata.  You may
 have zero, one or more separate collections.  If you have
-zero, ACIS won’t be of much use.  Each collection has an
+zero, ACIS won't be of much use.  Each collection has an
 <b>identifier</b>, a <b>type</b> and is stored in data files
 somewhere in the local file system.  These things are
-specified in the collections’ configuration (see below).</p>
+specified in the collections' configuration (see below).</p>
 
 <p>Collection identifiers must be unique for any particular
-ACIS service installation.  “<code>ACIS</code>” is a reserved
+ACIS service installation.  "<code>ACIS</code>" is a reserved
 collection identifier.</p>
 
-<p>Collection type must be “<code>AMF</code>” if your collection
-will consist of AMF files.  (For <a href="http://repec.org/">RePEc</a>’s ReDIF it is
-“<code>RePEcRec</code>”.)  Other collection types may be defined
+<p>Collection type must be "<code>AMF</code>" if your collection
+will consist of AMF files.  (For <a href="http://repec.org/">RePEc</a>'s ReDIF it is
+"<code>RePEcRec</code>".)  Other collection types may be defined
 in the future.</p>
 
 <p>A collection consists of any number of data files with stable
@@ -99,14 +99,14 @@ and <a class="c" href="conf.html#metadata--home">metadata-<i>X</i>-home</a> para
 <p>If you have several collections, separate their identifiers
 in <a class="c" href="conf.html#metadata-collections">metadata-collections</a> with a space.</p>
 
-<p>“<code>ACIS</code>” is a reserved collection identifier. The system
+<p>"<code>ACIS</code>" is a reserved collection identifier. The system
 uses it for its own generated data.</p>
 
 <p>You use collection identifiers when you request a data
 update of a collection with <a class="c" href="adm.html#binupdareq">bin/updareq</a> utility.</p>
 
 <p>Right now ACIS understands data in two metadata formats:
-<a href="http://repec.org">RePEc</a>’s ReDIF and
+<a href="http://repec.org">RePEc</a>'s ReDIF and
 <a href="http://amf.openlib.org/">AMF</a>.  Support for other metadata
 formats and collection structures can be added.  It is not
 very difficult to develop, provided the data is file-based or
@@ -116,7 +116,7 @@ has a pretty simple way to map records to files.</p>
 <code>{HOME}/RI/collections</code> file.</p>
 
 
-   <h2 id="id2245273">Installation</h2>
+   <h2 id="id2536923">Installation</h2>
 
 <p><strong>
 Normally, the update daemon is installed when you install 
@@ -147,10 +147,10 @@ system-wide software updates.  Read <a href="bdb-private.html">why and how to do
 that</a>.</p>
 
 
-   <h2 id="id2245341">Administration</h2>
+   <h2 id="id2536990">Administration</h2>
 
 
-   <h3 id="id2245345">Starting and stopping the daemon</h3>
+   <h3 id="id2536994">Starting and stopping the daemon</h3>
 
 <p>Use <a class="c" href="adm.html#binrid">bin/rid</a><code> start</code> and <a class="c" href="adm.html#binrid">bin/rid</a><code>
 stop</code> to start and stop update daemon, respectively.</p>
@@ -159,7 +159,7 @@ stop</code> to start and stop update daemon, respectively.</p>
 working.  If for some reason it were not running for some
 time, it is not a catastrophe.  Some update requests may be
 lost, but generally you can recover by running
-“<code>bin/updareq ACIS /</code>”.</p>
+"<code>bin/updareq ACIS /</code>".</p>
 
 
    <h3 id="sending-update-requests">Sending update requests</h3>
@@ -173,13 +173,13 @@ update file or directory <code>PATH</code> in collection
 <code>COLLECTION</code>.  <code>TOO_OLD</code> is time in seconds.
 If a file was last time processed more than <code>TOO_OLD</code>
 seconds ago, the daemon will process it again (even if it
-didn’t change since).  By default, <code>TOO_OLD</code> is
+didn't change since).  By default, <code>TOO_OLD</code> is
 <code>86400*12</code> seconds, which means 12 days.  </dd>
 
 </dl>
 
 
-   <h3 id="id2245425">Logs</h3>
+   <h3 id="id2537069">Logs</h3>
 
 <p>The main log of the update daemon is
 <code class="f BROKEN">RI/daemon.log</code>.  It is
@@ -187,7 +187,7 @@ the general log of requests coming in and what <em>processing
 channel</em> took it for processing.  </p>
 
 <p>All details of processing particular requests go into logs
-<code class="f BROKEN">RI/update_ch0.log</code>, <code class="f BROKEN">RI/update_ch1.log</code>, …
+<code class="f BROKEN">RI/update_ch0.log</code>, <code class="f BROKEN">RI/update_ch1.log</code>, ...
 <code class="f BROKEN">RI/update_ch5.log</code>.  Each of these correspond to a
 processing channel.  </p>
 
@@ -205,10 +205,10 @@ gives us parallel processing feature and great
 fault-protection.</p>
 
 <p>The database files are stored in <code class="f BROKEN">{HOME}/RI/data</code>.
-General files (so called “database environment”) are stored
+General files (so called "database environment") are stored
 in this directory, and files for specific collections are stored
 in subdirectories of it.  For example, data a for collection called
-“bliss” would live in <code class="f BROKEN">{HOME}/RI/data/bliss</code>.</p>
+"bliss" would live in <code class="f BROKEN">{HOME}/RI/data/bliss</code>.</p>
 
 <p>When data is added or modified in the database, the Berkeley
 DB library creates sequentially numbered log files, e.g.
@@ -236,9 +236,9 @@ from the Berkeley DB library package.  Some care you need
 here, because you may have these utilities installed
 system-wide.  And those can be of wrong version. <br>
 Therefore, if you have installed a <a href="bdb-private.html#bdb-private">private copy</a> of Berkeley DB, then
-you’ll have to refer to these utilities by full path.</p>
+you'll have to refer to these utilities by full path.</p>
 
-<p>For instance, in Ivan’s case, he had to use
+<p>For instance, in Ivan's case, he had to use
 <code class="f BROKEN">/home/ivan/lib/bdb/bin/db_checkpoint</code> and
 <code class="f BROKEN">/home/ivan/lib/bdb/bin/db_archive</code>.  So, Ivan uses a
 crontab entry which runs a little script like this:</p>
@@ -269,7 +269,7 @@ utility doc</a></p></li>
 
   
 <address class="footer">
-<p>Generated: Tue Sep 11 00:32:23 2007</p>
+<p>Generated: Fri Jun 11 07:15:03 2010</p>
 <p><a href="http://acis.openlib.org/">ACIS project</a>,
           acis<i>@</i>openlib<span>.org</span></p>
 </address>

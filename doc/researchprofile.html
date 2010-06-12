@@ -7,13 +7,13 @@
 <body>
       
 
-   <h1 id="id2256765">Research Profile</h1>
+   <h1 id="id2530686">Research Profile</h1>
 
 <h3><i>Table of contents</i></h3>
-<p class="toc">   <a href="#id2256772">Introduction &amp; overview</a><br>   <a href="#id2256822">Research Profile screens</a><br>      <a href="#id2256826">Identified Items</a><br>      <a href="#id2256836">Automatic Suggestions</a><br>      <a href="#id2256857">Refused Items</a><br>      <a href="#id2256873">Manual Search</a><br>      <a href="#id2256896">Auto Update Preferences</a><br>      <a href="#doclinks">Document-to-Document Links</a><br>      <a href="#fturls">Full-text URLs</a><br>         <a href="#binexport_fturls_choices"><code class="C">bin/export_fturls_choices</code> script</a><br>      <a href="#id2257108">Main Research Profile screen</a><br>   <a href="#rp-autosearch">Automatic research search</a><br>      <a href="#id2257124">Exact searches</a><br>      <a href="#id2257138">Additional searches</a><br>      <a href="#research-fuzzy">Fuzzy name search</a><br>         <a href="#binfuzzy_search_table"><code class="C">bin/fuzzy_search_table</code> script</a><br>   <a href="#rp-conf">Configuration of the Research Profile and its screens</a><br>      <a href="#id2257215">Automatic search</a><br>      <a href="#research-doclinks">Document-to-document links configuration</a><br>      <a href="#fturls-conf">Full-text URLs configuration</a><br>      <a href="#id2257320">Fuzzy search</a><br>   <a href="#rp-tech">Selected technical details</a><br>      <a href="#id2257362">Technical: database tables</a><br>         <a href="#id2257366"><code>resources</code></a><br>         <a href="#id2257387"><code>rp_suggestions</code></a><br>         <a href="#id2257406"><code>ft_urls</code></a><br>         <a href="#id2257439"><code>ft_urls_choices</code></a><br>      <a href="#id2257475">Technical: code structure</a><br></p>
+<p class="toc">   <a href="#id2530693">Introduction &amp; overview</a><br>   <a href="#id2530735">Research Profile screens</a><br>      <a href="#id2530739">Identified Items</a><br>      <a href="#id2530749">Automatic Suggestions</a><br>      <a href="#id2530764">Refused Items</a><br>      <a href="#id2530778">Manual Search</a><br>      <a href="#id2530802">Auto Update Preferences</a><br>      <a href="#doclinks">Document-to-Document Links</a><br>      <a href="#fturls">Full-text URLs</a><br>         <a href="#binexport_fturls_choices"><code class="C">bin/export_fturls_choices</code> script</a><br>      <a href="#id2531007">Main Research Profile screen</a><br>   <a href="#rp-autosearch">Automatic research search</a><br>      <a href="#id2531023">Exact searches</a><br>      <a href="#id2531033">Additional searches</a><br>      <a href="#research-fuzzy">Fuzzy name search</a><br>         <a href="#binfuzzy_search_table"><code class="C">bin/fuzzy_search_table</code> script</a><br>   <a href="#rp-conf">Configuration of the Research Profile and its screens</a><br>      <a href="#id2531110">Automatic search</a><br>      <a href="#research-doclinks">Document-to-document links configuration</a><br>      <a href="#fturls-conf">Full-text URLs configuration</a><br>      <a href="#id2531213">Fuzzy search</a><br>   <a href="#rp-tech">Selected technical details</a><br>      <a href="#id2531255">Technical: database tables</a><br>         <a href="#id2531259"><code>resources</code></a><br>         <a href="#id2531280"><code>rp_suggestions</code></a><br>         <a href="#id2529473"><code>ft_urls</code></a><br>         <a href="#id2529506"><code>ft_urls_choices</code></a><br>      <a href="#id2529539">Technical: code structure</a><br></p>
 
 
-   <h2 id="id2256772">Introduction &amp; overview</h2>
+   <h2 id="id2530693">Introduction &amp; overview</h2>
 
 <p>Research profile is one of the main parts of a personal record in ACIS.
 It lists the research works that the person has authored or otherwise
@@ -25,44 +25,44 @@ a software component, a series, et cetera.</p>
 which is designed to let users manage their list of research works.</p>
 
 <p>When a person includes a work into his or her <abbr title="research profile">RP</abbr>, we oftern refer to the event as
-“claiming”; we say, for instance, <i>the user claimed a document</i>.</p>
+"claiming"; we say, for instance, <i>the user claimed a document</i>.</p>
 
 <p>ACIS maintains its own database of documents and other research items.
-(We sometimes use a general word “resource” to refer to them.)  And
+(We sometimes use a general word "resource" to refer to them.)  And
 users do not have an ability to directly add their own stuff to the
 document database.  The personal RPs can only include items that are
 already present in the resource database.</p>
 
 
-   <h2 id="id2256822">Research Profile screens</h2>
+   <h2 id="id2530735">Research Profile screens</h2>
 
 
-   <h3 id="id2256826">Identified Items</h3>
+   <h3 id="id2530739">Identified Items</h3>
 
 <p>The identified items screen lists all the currently-claimed works of a
 person.  And it allows to remove items from the list, for example, to
 fix a mistake of adding a wrong item.</p>
 
 
-   <h3 id="id2256836">Automatic Suggestions</h3>
+   <h3 id="id2530749">Automatic Suggestions</h3>
 
 <p><a href="researchprofile.html#rp-autosearch">Automatic search</a> is the main procedure that
-we execute to find works for a person’s RP.  Automatic Suggestions
+we execute to find works for a person's RP.  Automatic Suggestions
 screen is where we show the results of the automatic search and let
 user either accept them or not, individually.</p>
 
 
-   <h3 id="id2256857">Refused Items</h3>
+   <h3 id="id2530764">Refused Items</h3>
 
 <p>The refused items is a list of research items which should not be
-suggested for inclusion into the person’s RP.  It is a blacklist of
+suggested for inclusion into the person's RP.  It is a blacklist of
 sorts.</p>
 
 <p>The refused items screen lets user review the list and delete items for
 it, if desired.  </p>
 
 
-   <h3 id="id2256873">Manual Search</h3>
+   <h3 id="id2530778">Manual Search</h3>
 
 <p>While <a href="researchprofile.html#rp-autosearch">automatic search</a> should find every
 resource an ACIS service has for a person, sometimes the metadata is
@@ -75,12 +75,12 @@ author/editor name, by record identifier.</p>
 results.</p>
 
 
-   <h3 id="id2256896">Auto Update Preferences</h3>
+   <h3 id="id2530802">Auto Update Preferences</h3>
 
-<p>ACIS provides <a href="apu.html">APU</a> — automatic profile update
+<p>ACIS provides <a href="apu.html">APU</a> -- automatic profile update
 service, which executes automatic research searches for a person even
 when user is not directly asking that.  It may automatically add
-closely matching items to the person’s RP.  But if user doesn’t want
+closely matching items to the person's RP.  But if user doesn't want
 that service, he can disable it on the Auto Update Preferences screen.</p>
 
 
@@ -135,7 +135,7 @@ decisions and change them.</p>
 <p>See <a href="researchprofile.html#fturls-conf">below</a> instructions on how to configure
 the feature and on its input data format.</p>
 
-<p>The collected data of users’ decisions can then be exported out of ACIS
+<p>The collected data of users' decisions can then be exported out of ACIS
 in a simple format:</p>
 
 <h4 id="binexport_fturls_choices" C="bin/export_fturls_choices">
@@ -153,10 +153,10 @@ following fields are included (in this order): </p>
 for the document) or <code>automatic</code> (automatically found via third-party
 tools)</li>
 <li>personal id (of the user who made the decision)</li>
-<li>the user’s choice in the recognition menu, one of: <code>correct</code>,
+<li>the user's choice in the recognition menu, one of: <code>correct</code>,
 <code>abstractpage</code>, <code>wrong</code>, <code>anotherversion</code>
 </li>
-<li>the user’s choice in the permission menu, one of: <code>mayarchive</code>,
+<li>the user's choice in the permission menu, one of: <code>mayarchive</code>,
 <code>checkupdates</code>, <code>notarchive</code> or an empty string</li>
 <li>the time when the decision was made (i.e. recordered by ACIS) in a
 simple YYYY-MM-DD HH:MM:SS format</li>
@@ -169,7 +169,7 @@ outputs all data from that day on.  The dates are expected in the
 YYYY-MM-DD format.</p>
 
 
-   <h3 id="id2257108">Main Research Profile screen</h3>
+   <h3 id="id2531007">Main Research Profile screen</h3>
 
 <p>Displays a menu of all the screens with a brief introduction into each
 and some general status information.  Provides a button to force
@@ -179,14 +179,14 @@ automatic search for the person with her current name variations.</p>
    <h2 id="rp-autosearch">Automatic research search</h2>
 
 
-   <h3 id="id2257124">Exact searches</h3>
+   <h3 id="id2531023">Exact searches</h3>
 
-<p>This is search by the person’s name variations in the names of the
+<p>This is search by the person's name variations in the names of the
 document authors (and editors).  As its name states, it finds exact
 matches only.</p>
 
 
-   <h3 id="id2257138">Additional searches</h3>
+   <h3 id="id2531033">Additional searches</h3>
 
 
    <h3 id="research-fuzzy">Fuzzy name search</h3>
@@ -216,7 +216,7 @@ statements) to standard output.</p>
 <p>See all <a href="conf.html#conf-research">research profile parameters</a>.</p>
 
 
-   <h3 id="id2257215">Automatic search</h3>
+   <h3 id="id2531110">Automatic search</h3>
 
 <ul>
 <li><a class="c" href="conf.html#research-additional-searches">research-additional-searches</a></li>
@@ -236,7 +236,7 @@ has a simple structure; a self-explanatory example file is supplied in
 
    <h3 id="fturls-conf">Full-text URLs configuration</h3>
 
-<p>The whole feature won’t be there unless you have enabled it with a
+<p>The whole feature won't be there unless you have enabled it with a
 <a class="c" href="conf.html#full-text-urls-recognition">full-text-urls-recognition</a> parameter.</p>
 
 <p>The input data format is AMF-based.  The authoritative URLs:</p>
@@ -264,7 +264,7 @@ has a simple structure; a self-explanatory example file is supplied in
 <p>If you have full-text URLs data separate from the document data,
 configure it as a special metadata collection in main.conf.  Use
 <code>FullTextUrlsAMF</code> as its type.  E.g. this collection is named
-‘URLs’:</p>
+'URLs':</p>
 
 <pre><code>metadata-collections="Papers URLs ..."
 metadata-Papers-home=/path/to/Papers
@@ -279,7 +279,7 @@ with the update daemon.  You have to explicitly request an update (see
 <a class="c" href="adm.html#binupdareq">bin/updareq</a>).</p>
 
 
-   <h3 id="id2257320">Fuzzy search</h3>
+   <h3 id="id2531213">Fuzzy search</h3>
 
 <ul>
 <li><a class="c" href="conf.html#fuzzy-name-search">fuzzy-name-search</a></li>
@@ -294,10 +294,10 @@ with the update daemon.  You have to explicitly request an update (see
    <h2 id="rp-tech">Selected technical details</h2>
 
 
-   <h3 id="id2257362">Technical: database tables</h3>
+   <h3 id="id2531255">Technical: database tables</h3>
 
 
-   <h4 id="id2257366"><code>resources</code></h4>
+   <h4 id="id2531259"><code>resources</code></h4>
 
 <pre><code>+----------+--------------+------+-----+---------+-------+
 | Field    | Type         | Null | Key | Default | Extra |
@@ -314,7 +314,7 @@ with the update daemon.  You have to explicitly request an update (see
 </code></pre>
 
 
-   <h4 id="id2257387"><code>rp_suggestions</code></h4>
+   <h4 id="id2531280"><code>rp_suggestions</code></h4>
 
 <pre><code>+--------+----------+------+-----+---------------------+-------+
 | Field  | Type     | Null | Key | Default             | Extra |
@@ -328,13 +328,13 @@ with the update daemon.  You have to explicitly request an update (see
 </code></pre>
 
 
-   <h4 id="id2257406"><code>ft_urls</code></h4>
+   <h4 id="id2529473"><code>ft_urls</code></h4>
 
 <ul>
 <li>dsid char(15) not null</li>
 <li>url blob not null </li>
 <li>checksum char(16) binary not null</li>
-<li>nature ENUM('authoritative','automatic') not null</li>
+<li>nature ENUM(\'authoritative\',\'automatic\') not null</li>
 <li>source varchar(255) not null</li>
 </ul>
 
@@ -342,13 +342,13 @@ with the update daemon.  You have to explicitly request an update (see
 source_i(source(50))</code></p>
 
 
-   <h4 id="id2257439"><code>ft_urls_choices</code></h4>
+   <h4 id="id2529506"><code>ft_urls_choices</code></h4>
 
 <ul>
 <li>dsid char(15) not null</li>
 <li>checksum char(16) binary not null</li>
 <li>psid char(15) not null</li>
-<li>choice char(2) not null — first char: d|y|r|n (corresponding menu items:
+<li>choice char(2) not null -- first char: d|y|r|n (corresponding menu items:
 2|4|3|1); second char: y|c|n (1|2|3) </li>
 <li>time datetime not null</li>
 </ul>
@@ -356,7 +356,7 @@ source_i(source(50))</code></p>
 <p><code>primary key prim(dsid, checksum, psid), index t_i(time), index psid_i(psid)</code></p>
 
 
-   <h3 id="id2257475">Technical: code structure</h3>
+   <h3 id="id2529539">Technical: code structure</h3>
 
 <p>Core modules:</p>
 
@@ -396,7 +396,7 @@ source_i(source(50))</code></p>
   
 <address class="footer">
 <p>$Id$</p>
-<p>Generated: Tue Sep 11 00:32:23 2007</p>
+<p>Generated: Fri Jun 11 07:15:03 2010</p>
 <p><a href="http://acis.openlib.org/">ACIS project</a>,
           acis<i>@</i>openlib<span>.org</span></p>
 </address>

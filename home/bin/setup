@@ -36,7 +36,7 @@ export del_userda_dir="$homedir/deleted-userdata"
 perl -Ilib bin/conf.pl mainconf || exit 1
 
 ###  load parsed and translated into shell format configuration
-. ./thisconf.sh
+. $homedir/thisconf.sh
 
 #if test "$echo_arpu_mails"; then
 #   echo ''
@@ -129,8 +129,14 @@ echo ""
 ###  install static web-accessible stuff
 
 if test $base_cgi_script_filename; then
-  echo writing $base_cgi_script_filename
+  echo writing $base_cgi_script_filename, obsolete
   . bin/setup.cgi_frontend > $base_cgi_script_filename
+  chmod +x $base_cgi_script_filename
+fi
+
+if test $base_fcgi_script_filename; then
+  echo writing $base_fcgi_script_filename
+  mv bin/acis.fcgi $base_fcgi_script_filename
   chmod +x $base_cgi_script_filename
 fi
 
