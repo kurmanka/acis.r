@@ -5,10 +5,13 @@ use Exporter;
 use base qw(Exporter);
 use vars qw(@EXPORT @EXPORT_OK);
 use File::Temp ();
+use File::Copy;
 use Web::App::Common;
 use ACIS::Web::Background qw(logit);
 use Data::Dumper;
 use strict;
+
+
 
 # part of cardiff
 
@@ -25,10 +28,7 @@ my $predict_bin="/usr/bin/svm-predict -b 1";
 my $debug=0;
 
 ## should temporary files be deleted?
-my $unlink_tmp=0;
-if($debug) {
-  $unlink_tmp=1;
-}
+my $unlink_tmp=1;
 
 
 @EXPORT_OK = qw( learn_via_svm form_learner);
@@ -45,15 +45,11 @@ sub learn_via_svm {
   my $what_to_learn=shift;
   ## use global debug parementer in module
   ##my $debug=shift;
-  ## switch on debuggin
-  if(not defined($debug)) {
-    $debug=0;
-  }
-  $debug=undef;
   ##for debugging, save train file, save time
   my $time=time();
+  my $debug=0;
   if($debug) {
-    open(DEBUGLOG,"> /tmp/$time.learn");
+    open(DEBUGLOG,"> /tmp/$time.learn_debug");
   }
   ## single_sided indicator
   my $single_sided='';
@@ -109,22 +105,27 @@ sub learn_via_svm {
   ## the target of learning
   my $target;
   ## how many elements in the target
-  my $count_target;
+  my $count_target=0;
   ## indicator of what the start of the line to learn is
   my $start_of_line_to_learn;
   if($what_to_learn eq 'suggested') {
     if($count_suggested < 2) {
       return "$count_suggested is not enough suggested items to learn them";
     }
-    $target=$suggested;
     ## the single_sided case 
+    $target=$suggested;
+    $count_target=$count_suggested;
     if($single_sided eq 'accepted') {
-      $count_target=$count_refused;
+      if($debug) {
+        print DEBUGLOG "single_sided is $single_sided\n";
+      }
       $start_of_line_to_learn='-1';
     }
     elsif($single_sided eq 'refused') {
-      $count_target=$count_accepted;
       $start_of_line_to_learn='+1';
+      if($debug) {
+        print DEBUGLOG "single_sided is $single_sided\n";
+      }
     }
     else {
       $count_target=$count_suggested;
@@ -209,26 +210,51 @@ sub learn_via_svm {
   my $s="$train_bin ".$train_fh->filename;
   $s.=" $model_file";
   ## for debuing, keep a copy of the intermediate files
-  if(defined($debug)) {    
+  if($debug) {    
     $s.="; cp $train_file /tmp/$time.$what_to_learn.train";
     $s.="; cp $model_file /tmp/$time.$what_to_learn.model";
+    print DEBUGLOG "doing: $s\n";
   }
   system($s);
   ## model is now trained, build the testing set
-  $s="$predict_bin $test_file $model_file $out_file";
-  ## for debuing, keep a copy of the intermediate files
-  if(defined($debug)) {
-    $s.="; cp $out_file /tmp/$time.$what_to_learn.out";
-    $s.="; cp $test_file /tmp/$time.$what_to_learn.test"; 
+  ## the semicoln has to stay at the end
+  $s="$predict_bin $test_file $model_file $out_file ; wait";
+  ## save a copy of temporar file
+  if($debug) {    
+    $s.="; cp $out_file /tmp/$time.$what_to_learn.result";
+    print DEBUGLOG "doing: $s\n";
   }
-  ## for the output, REQUIRED
-  $s.="; cat $out_file";
-  #print "doing: $s\n";
-  my $count_to_learn=0;
+  ## predict
+  system($s);
+  if($debug) {    
+    print DEBUGLOG "done: $s\n";
+  }
+  ### for the output, REQUIRED
+  #$s.="; cat $out_file";
+  ##print "doing: $s\n";
+  open(OUT,"< $out_file");
   ## read output and find the score for earch document
+  my $count_to_learn=0;
   my $result;
-  foreach my $line (`$s`) {
+  my @out_lines=<OUT>;
+  my $count_out_lines=$#out_lines+1;
+  if($debug) {    
+    print DEBUGLOG "count_out_lines is |$count_out_lines|\n";
+  }
+  ## this may be just one line, under fcgi, 2010-06-12  
+  if($count_out_lines == 1) {
+    ## re-parse the input
+    my $lines=join('',@out_lines);
+    @out_lines=split("\n",$lines);
+    if($debug) {    
+      print DEBUGLOG "reparsed", Dumper @out_lines;
+  } 
+  }
+  foreach my $line (@out_lines) {
     if(not $line=~m|^[+-]*1|) {
+      if($debug) {
+        print DEBUGLOG "could not parse: |$line|\n";
+      }
       next;
     }
     my @data=split(' ',$line);
@@ -246,6 +272,7 @@ sub learn_via_svm {
     }
     return "$error";
   }
+  ## if we debug, let us make a copy of the files
   if($debug) {
     print DEBUGLOG "done\n";
   }
@@ -321,7 +348,7 @@ sub form_learner {
   ## these results are added to the suggestions
   my $results=shift;
   ## a debug flag
-  my $debug=1;
+  my $debug=0;
   ## gather variables
   my $session = $app -> session;
   my $vars    = $app -> variables;
