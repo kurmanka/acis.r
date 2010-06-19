@@ -53,6 +53,7 @@ sub run_xslt_presenter {
 
   my $data        = $self ->{'presenter-data'};
 
+
   my $data_string = $self -> serialize_presenter_data;
   if ( $feed_data_string ) { 
     &$feed_data_string( $data_string );
@@ -86,35 +87,61 @@ sub run_xslt_presenter {
                     );
     return undef;
   }
-  
-  my $parser = new XML::LibXML;
-  my $xslt   = new XML::LibXSLT;
 
-  ## set recursion large
-  $xslt->max_depth(10000);
+  ## a persistent parser
+  my $parser;
+  if(defined($self->{'parser'})) {
+    debug("reused parser");
+    $parser=$self->{'parser'};
+  }
+  else {
+    $parser = new XML::LibXML;
+    $parser -> expand_entities(0);
+    $parser -> load_ext_dtd(0);
+    $parser -> validation(0);
+    $parser -> keep_blanks(0);
+    debug("created parser");
+    $self->{'parser'}=$parser;
+  }
 
-  $parser -> expand_entities (0);
-  $parser -> load_ext_dtd (0);
-  $parser -> validation(0);
-  $parser -> keep_blanks(0);
-   
+  ## a persistent xslt
+  my $xslt;
+  if(defined($self->{'xslt'})) {
+    debug("reused xslt");
+    $xslt = $self->{'xslt'};
+  }
+  else {
+    $xslt = new XML::LibXSLT;
+    ## set recursion large
+    $xslt->max_depth(10000);
+    debug("created xslt");
+    $self->{'xslt'}=$xslt;
+  }
 
-
+  ## persistent stylesheets
   my $stylesheet;
-  
-  # parsing the stylesheet
-  eval {
-    $stylesheet   = $xslt  -> parse_stylesheet_file( $file );
-    assert( $stylesheet );
-  };
+  if(defined($self->{'stylesheets'}->{$file})) {
+    debug("reused stylesheet");
+    $stylesheet=$self->{'stylesheets'}->{$file};
+  }
+  else {
+    ## parsing the stylesheet
+    eval {
+      $stylesheet   = $xslt  -> parse_stylesheet_file( $file );
+      assert( $stylesheet );
+    };
 
-  if ( $@ or $XML::LibXSLT::error ) {
-    $self -> errlog( "Can't parse xslt ($file): " . ($@ || $XML::LibXSLT::error) );
-    $self -> sevent ( @event,
-                     -type  => 'error',
-                     -descr => "stylesheet XML-invalid",
-                   );
-    die "Can't parse stylesheet $file: " . ($@ || $XML::LibXSLT::error);
+    if ( $@ or $XML::LibXSLT::error ) {
+      $self -> errlog( "Can't parse xslt ($file): " . ($@ || $XML::LibXSLT::error) );
+      $self -> sevent ( @event,
+                        -type  => 'error',
+                        -descr => "stylesheet XML-invalid",
+                      );
+      die "Can't parse stylesheet $file: " . ($@ || $XML::LibXSLT::error);
+    }
+    ## save the stylesheet
+    $self->{'stylesheets'}->{$file} = $stylesheet;
+    debug("created stylesheet");
   }
 
 
