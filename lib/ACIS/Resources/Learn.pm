@@ -218,7 +218,8 @@ sub learn_via_svm {
   system($s);
   ## model is now trained, build the testing set
   ## the semicoln has to stay at the end
-  $s="$predict_bin $test_file $model_file $out_file ; wait";
+  ##$s="$predict_bin $test_file $model_file $out_file > /dev/null ; wait";
+  $s="$predict_bin $test_file $model_file $out_file > /dev/null";
   ## save a copy of temporar file
   if($debug) {    
     $s.="; cp $out_file /tmp/$time.$what_to_learn.result";
