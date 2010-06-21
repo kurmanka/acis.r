@@ -155,8 +155,9 @@ sub run_xslt_presenter {
     $result_object = $stylesheet -> transform($source);
     ## originally:
     ##$result = $stylesheet -> output_string( $result_object );
-    ## FCGI requires output as bytes 
-    if($ACIS::FCGIReq) { 
+    ## FCGI requires output as bytes. Don't do this for exports,
+    ## that would double encode them!
+    if($ACIS::FCGIReq and not $file=~m|/export/|) { 
       $result = $stylesheet -> output_as_bytes( $result_object );
     }
     else {
