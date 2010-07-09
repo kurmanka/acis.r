@@ -513,8 +513,12 @@ sub remove_account {
     return;
   }
 
-  $app -> userlog( "removed $login account" );
-
+  ## find if there is a user. if there is no user, 
+  ## don't write anything to the userlog
+  my $user = $app->{'username'};
+  if($user) {
+    $app -> userlog( "removed $login account" );
+  }
 
   ###  send update request to the RI UD (RePEc-Index Update Daemon)
   require RePEc::Index::UpdateClient;
@@ -538,19 +542,20 @@ sub remove_account {
       
       if ( $f and -f $f ) {
         unlink $f;
-        $app-> userlog( "removed profile file $file" );
-      }
-      
+        if($user) {
+          $app-> userlog( "removed profile file $file" );
+        }
+      }      
       my $exp = $_ -> {profile} {export};
       if ( $exp ) {
         foreach ( values %$exp ) {
           unlink $_;
-          $app-> userlog( "removed exported profile data: $_" );
+          if($user) {          
+            $app-> userlog( "removed exported profile data: $_" );
+          }
         }
-      }
-      
-    }
-    
+      }      
+    }    
   }
 
   ### XXX Further clean-up is probably needed
@@ -851,7 +856,7 @@ sub build_result_document_list {
 
       use Storable qw( thaw );
       if ( $item -> {data} ) {
-        my $packed = thaw( $item -> {data} );
+        my $packed = eval {thaw( $item -> {data}); };
         foreach ( keys %$packed ) {
           my $val = $packed -> {$_};
           $item -> {$_} = $val;
