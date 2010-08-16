@@ -249,7 +249,7 @@ sub learn_via_svm {
     @out_lines=split("\n",$lines);
     if($debug) {    
       print DEBUGLOG "reparsed", Dumper @out_lines;
-  } 
+    } 
   }
   foreach my $line (@out_lines) {
     if(not $line=~m|^[+-]*1|) {
@@ -416,15 +416,15 @@ sub form_learner {
   ## if there are $results, they have to be added
   ## to the other suggested documents
   if(ref($results)) {
-    ## merge the the results into $suggested by dsid
-    ## first prepare a hash of handle if $suggestde
+    ## merge the the results into $suggested by sid
+    ## first prepare a hash of handle if $suggested
     my $suggested_handles;
     foreach my $suggestion (@{$suggested}) {
-      $suggested_handles->{$suggestion->{'dsid'}}=1;
+      $suggested_handles->{$suggestion->{'sid'}}=1;
     }
     ## then merge
     foreach my $result (@{$results}) {
-      if(not defined($suggested_handles->{$result->{'dsid'}})) {
+      if(not defined($suggested_handles->{$result->{'sid'}})) {
         push(@{$suggested},$result);
       }
     }
@@ -436,6 +436,10 @@ sub form_learner {
   $learner -> {'suggested'}  = $suggested;
   $learner -> {'id'}         = $id;
   $learner -> {'sid'}        = $sid;
+  ## evcino: count elements to make for easier debugging
+  $learner -> {'number_of_accepted'} = scalar @$accepted;
+  $learner -> {'number_of_refused'} = scalar @$refused;
+  $learner -> {'number_of_suggested'} = scalar @$suggested;
   ## not defined for a new user
   if(defined($psid)) {    
     $learner -> {'psid'}       = $psid;

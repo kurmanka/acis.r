@@ -59,7 +59,7 @@ sub run_xslt_presenter {
     &$feed_data_string( $data_string );
   }
   if ( $self -> config( "debug-transformations" ) ) {
-    dump_data_file( "$homedir/presenter_data.xml", \$data_string );
+    dump_data_file( "$homedir/opt/presenter_data.xml", \$data_string );
   }
   #assert( $data_string );
 
@@ -209,8 +209,8 @@ sub run_xslt_presenter {
                       -descr => "transformation result is empty",
                     );
 
-    dump_data_file( "$homedir/bad_trans_presenter_data.xml", \$data_string );
-    dump_data_file( "$homedir/bad_trans_presenter_result.xml", \$result );
+    dump_data_file( "$homedir/opt/bad_trans_presenter_data.xml", \$data_string );
+    dump_data_file( "$homedir/opt/bad_trans_presenter_result.xml", \$result );
   }
   
   
@@ -224,7 +224,7 @@ sub run_xslt_presenter {
   }
 
   if ( $self -> config( "debug-transformations" ) ) {
-    dump_data_file( "$homedir/presenter_result.xml", \$result );
+    dump_data_file( "$homedir/opt/presenter_result.xml", \$result );
   }
 
   return \$result;

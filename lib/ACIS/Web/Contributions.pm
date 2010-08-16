@@ -1120,7 +1120,7 @@ sub change_or_delete_chunk {
       $chunk_number++;
     } 
     if($screen_name =~ m|-chunk-backward$|) {
-      if($chunk_number > 1) {
+      if($chunk_number > 0) {
         $chunk_number--;
       }
     } 

@@ -17,13 +17,12 @@ use vars qw(@EXPORT);
 );
 
 use Storable qw(nfreeze thaw);
-###
-##use Data::Dumper;
-###
+use Data::Dumper;
 use Web::App::Common;
 use ACIS::Web::Background qw(logit);
 use ACIS::Resources::Learn qw(form_learner);
 use Carp;
+
 
 my $MAX_SUGGESTIONS_LIMIT = 1000;
 
@@ -176,7 +175,6 @@ sub load_suggestions {
       next;
     }
     ## 4 setember problem
-    debug "item is";
     debug Dumper $item;
     ## cardiff change: adding relevance of the item
     if($r->{'row'}->{'relevance'}) {
