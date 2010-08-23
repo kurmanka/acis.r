@@ -15,7 +15,6 @@ use strict;
 
 # part of cardiff
 
-
 #
 # global variables
 #
@@ -24,7 +23,6 @@ my $predict_bin="/usr/bin/svm-predict -b 1";
 
 
 ## run parameters
-
 my $debug=0;
 
 ## should temporary files be deleted?
@@ -49,7 +47,7 @@ sub learn_via_svm {
   my $time=time();
   my $debug=0;
   if($debug) {
-    open(DEBUGLOG,"> /tmp/$time.learn_debug");
+    open(DEBUGLOG,"> /tmp/learn_debug");
   }
   ## single_sided indicator
   my $single_sided='';
@@ -230,7 +228,7 @@ sub learn_via_svm {
   if($debug) {    
     print DEBUGLOG "done: $s\n";
   }
-  ### for the output, REQUIRED
+  ## for the output, REQUIRED
   #$s.="; cat $out_file";
   ##print "doing: $s\n";
   open(OUT,"< $out_file");
@@ -252,6 +250,7 @@ sub learn_via_svm {
     } 
   }
   foreach my $line (@out_lines) {
+    chomp $line;
     if(not $line=~m|^[+-]*1|) {
       if($debug) {
         print DEBUGLOG "could not parse: |$line|\n";
@@ -323,8 +322,8 @@ sub add_document_to_data {
     my $raw_frequency=$data->{'doc'}->{'terms'}->[$position];
     my $total=$data->{'doc'}->{'total'};
     my $adjusted_frequency=sqrt($raw_frequency/$total);
-    $data->{'doc'}->{'terms'}->[$position]=$adjusted_frequency;
-    #$data->{'doc'}->{'terms'}->[$position]=$raw_frequency;
+    #$data->{'doc'}->{'terms'}->[$position]=$adjusted_frequency;
+    $data->{'doc'}->{'terms'}->[$position]=$raw_frequency;
     $line.=$position.':'.$adjusted_frequency.' ';
   }
   chop $line;
@@ -349,23 +348,29 @@ sub form_learner {
   ## these results are added to the suggestions
   my $results=shift;
   ## a debug flag
+  ##
   my $debug=0;
+  if($debug) {
+    open(DEBUG, "> /tmp/form_learner.debug");
+  }
   ## gather variables
   my $session = $app -> session;
   my $vars    = $app -> variables;
+  my $request = $app -> request;
   my $record  = $session -> current_record;
   my $id      = $record -> {'id'};
+  ## the person short id
   my $psid    = $record -> {'sid'};
   ## the session id, only required for reporting
-  my $sid     = $session -> {'id'};
-  ### if a new user session, things are different
+  my $session_id     = $session -> id;
+  ## if this is a new user session, things are different
   if(ref($session) eq 'ACIS::Web::Session::SNewUser') {
     ## the sessionn id is found in a different way
-    $sid=$record -> {'sid'};
+    $session_id=$record -> {'sid'};
     ## the presonal short id is the session id. 
-    ## this has to stay here, because the sid is 
+    ## the session_id is 
     ## used instead of the psid in the suggestions table
-    $psid=$record -> {'sid'};
+    $psid=$session_id;
   }  
   $id  = $record -> {'id'};
   ## we need to form the log directory from the full id
@@ -415,31 +420,55 @@ sub form_learner {
   }
   ## if there are $results, they have to be added
   ## to the other suggested documents
+  ## the learner structure
+  my $learner;
   if(ref($results)) {
     ## merge the the results into $suggested by sid
     ## first prepare a hash of handle if $suggested
     my $suggested_handles;
+    if($debug) {
+      print DEBUG "receiving $results\n", Dumper $results, "\n";
+    }
     foreach my $suggestion (@{$suggested}) {
       $suggested_handles->{$suggestion->{'sid'}}=1;
     }
     ## then merge
+    my $count_result=0;
     foreach my $result (@{$results}) {
       if(not defined($suggested_handles->{$result->{'sid'}})) {
         push(@{$suggested},$result);
       }
     }
   }
-  ## the learner structure
-  my $learner;
+  if($debug) {
+    print DEBUG "received no results\n";
+  }
   $learner -> {'accepted'}   = $accepted;
   $learner -> {'refused'}    = $refused;
   $learner -> {'suggested'}  = $suggested;
   $learner -> {'id'}         = $id;
-  $learner -> {'sid'}        = $sid;
+  $learner -> {'session_id'} = $session_id;
+  ## not used, but good for reporting
+  $learner->{'log_dir'}=$log_dir;
   ## evcino: count elements to make for easier debugging
-  $learner -> {'number_of_accepted'} = scalar @$accepted;
-  $learner -> {'number_of_refused'} = scalar @$refused;
-  $learner -> {'number_of_suggested'} = scalar @$suggested;
+  if(ref($accepted)) {
+    $learner -> {'number_of_accepted'} = scalar @$accepted;
+  }
+  else {
+    $learner -> {'number_of_accepted'} = 0;
+  }
+  if(ref($refused)) {
+    $learner -> {'number_of_refused'} = scalar @$refused;
+  }
+  else {
+    $learner -> {'number_of_refused'} = 0;
+  }
+  if(ref($suggested)) {
+    $learner -> {'number_of_suggested'} = scalar @$suggested;
+  }
+  else {
+    $learner -> {'number_of_suggested'} = 0;
+  }
   ## not defined for a new user
   if(defined($psid)) {    
     $learner -> {'psid'}       = $psid;
@@ -453,9 +482,8 @@ sub form_learner {
   $learner->{'log_dir'}=$log_dir;
   ## for debugging, 
   if($debug) {
-    open(DEBUGLOG,"> /tmp/".time().'.learner');
-    print DEBUGLOG Dumper $learner;
-    close DEBUGLOG;
+    print DEBUG Dumper $learner;
+    close DEBUG;
   }
   ## return the learner!
   return $learner;
