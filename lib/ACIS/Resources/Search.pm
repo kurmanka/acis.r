@@ -110,10 +110,21 @@ sub process_resources_search_results {
 # for performance reasons put make_resource_.. inline:
 #    my $item = make_resource_item_from_db_row( $row ); 
     my $item = eval { thaw( $row ->{'data'} ); };
-
-    if ( not $item or not $item->{id} or not $item->{sid} ) {
-      complain "bad document record found: (id: $id)";
-    } else {
+    my $error=$@;
+    # evcino 
+    if ( not $item) {
+      complain "could not thaw record $id: $error," . $row->{'data'};
+      use Lib32::Decode;
+      $item=Lib32::Decode::via_daemon($row->{'data'});
+      $error=$@;
+    }
+    if ( not $item) {
+      complain "Lib32 could not thaw record $id: erorr $@" . $row->{'data'};
+    }
+    elsif(not $item->{'id'} or not $item->{'sid'} ) {
+      complain "bad document record found: (id: $id)\n" . Dumper $item;
+    } 
+    else {
       $item ->{role} = $row->{role} 
         if $row->{role};
       push @$result, $item;

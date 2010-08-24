@@ -14,6 +14,7 @@ use vars qw(@EXPORT);
               load_suggestions_into_contributions
               clear_from_autosearch_suggestions
               send_suggestions_to_learning_daemon
+              load_and_unbundle_suggestions 
 );
 
 use Storable qw(nfreeze thaw);
@@ -39,7 +40,7 @@ sub save_suggestions {
   ## cardiff: add debugging
   if($debug) {
     my $time=time();
-    open(LOG,"> /tmp/$time.save_suggestions");
+    open(LOG,"> /tmp/save_suggestions.$time");
   }
 
   if(not $sql) {
@@ -145,6 +146,7 @@ sub run_load_suggestions_query {
   my $r = $sql -> execute( $psid );
   if ( not $r or $sql->error ) {
     complain $sql->error;
+    complain $sql->error;
   }
   return $r;
 }
@@ -155,7 +157,8 @@ sub run_load_suggestions_query {
 sub load_suggestions {
   my $app    = shift;
   my $psid   = shift; # personal short-id
-  debug "load_suggestions: enter";
+  #open(LOG,"> /tmp/load_suggestions");
+  #print LOG "I enter load_suggestions\n";
 
   my $result = []; # a list of suggest. groups
   my $group;  # suggestions are grouped by reason
@@ -163,42 +166,53 @@ sub load_suggestions {
   my $list;   # temporary pointer
 
   my $r = run_load_suggestions_query($app,$psid);
-  debug "after suggestions, here is $app";
+  #print LOG "after suggestions query, here is $r";
+  #print LOG Dumper $r;
   my $count = 0;
-  while ( $r->{row} ) {
-    my $data = $r->{row}{data} || next;
-    my $reason = $r->{row}{reason};
+  ## evcino: find out why we don't find old suggestions
+  while ( $r->{'row'} ) {    
+    my $data = $r->{'row'}->{'data'};
+    if(not $data) {
+      debug "not data in suggestion \$r->{row}\n";
+      debug Dumper $r->{'row'};
+      next;
+    }
+    my $reason = $r->{'row'}->{'reason'};
     ## 4 september problem
     my $item = eval { thaw( $data ); };
     if(not $item) {
-      debug "error in thaw $@";
+      debug "error in thaw $@, \$r->{row}";
+      debug Dumper $r;
       next;
     }
     ## 4 setember problem
-    debug Dumper $item;
+    #debug Dumper $item;
     ## cardiff change: adding relevance of the item
     if($r->{'row'}->{'relevance'}) {
-      $item->{'relevance'}=$r->{'row'}->{'relevance'};
+      $item->{'relevance'}=$r->{'row'}->{'relevance'};      
+    }
+    else {
+      #debug "no relevance for an item in the suggestions\n";
     }
     ## end of cardiff change: adding relevance of the item
     $count++;
-
     if ( not $reasons -> {$reason} ) {
       ## create a new group for this reason:
       $group = {};
-      $group -> {reason} = $reason;
-      $group -> {list}   = [];
+      $group -> {'reason'} = $reason;
+      $group -> {'list'}   = [];
       $reasons -> {$reason} = $group;
       push @$result, $group;
     } 
-
-    $list = $reasons->{$reason} {list} || die;
+    $list = $reasons->{$reason}->{'list'} || die;
     push @$list, $item;
-  } continue {
+  } 
+  continue {
     $r -> next;
   }
-  debug "$count rows";
-  debug "load_suggestions: exit";
+  #print LOG "This is the result\n";
+  #print LOG Dumper $result;
+  #close LOG;
   return $result;
 }
 
@@ -279,7 +293,7 @@ sub load_suggestions_into_contributions {
     if ( $reason =~ s/\-s(\d)$//g ) {  
       ## the reason might specify this
       $status = $1;
-      $item -> {status} = $status;
+      $item -> {'status'} = $status;
     }
     if ( not $reasons -> {$reason} ) {
       $group = {};
@@ -309,12 +323,12 @@ sub load_suggestions_into_contributions {
     } 
     else {
       $list = $reasons->{$reason} ->{'list'};
-    }
-    
+    }    
     push @$list, $item;
+    ## evcino: try to do without this
     $already_suggested -> {$dsid} = $reason;
-
-  } continue {
+  } 
+  continue {
     $r -> next;
   }
   debug "$counter items";
@@ -387,7 +401,61 @@ sub clear_from_autosearch_suggestions {
   debug "clear_from_autosearch_suggestions: finished";
 }
 
-
+## evcino added this function, used is APU/RP.pm
+sub load_and_unbundle_suggestions {
+  my $app=shift;
+  my $sid=shift;
+  my $vars = $app -> variables;
+  my $results=load_suggestions( $app, $sid );
+  ## this is bundled together by reason, let's unbundle it
+  ## the unbundled suggestions
+  my $unbundled_suggestions=[];
+  my $count_suggestions_with_relevance=0;
+  my $count_suggestions_without_relevance=0;
+  foreach my $suggestions_for_reason (@{$results}) {
+    foreach my $suggestion (@{$suggestions_for_reason->{'list'}}) {      
+      ## temporary set the relevance to -1 if not defined      
+      if(not defined($suggestion->{'relevance'})) {
+        logit "suggestion has no relevance";
+        $suggestion->{'relevance'}=-1;
+        $count_suggestions_without_relevance++;
+      }
+      else {
+        logit "suggestion has relevance";
+        $count_suggestions_with_relevance++;
+      }
+      push(@{$unbundled_suggestions},$suggestion);
+    }
+  }
+  ## set vars to reflect these results
+  if($count_suggestions_with_relevance > 0) {
+    $vars->{'suggestions_learned'}=$count_suggestions_with_relevance;
+    logit "Suggestions have relevance.";
+  }
+  if($count_suggestions_without_relevance > 0) {
+    ## this is the default case in the stylesheet,
+    ## never mind that it is hopefully not appearing very often
+    $vars->{'suggestions_not_learned'}=$count_suggestions_without_relevance;
+    logit "No relevance in suggestions.";
+  }
+  if($count_suggestions_with_relevance > 0  and 
+     $count_suggestions_without_relevance > 0) {
+    logit "ERROR some suggestions have relevance, others not.";
+    delete $vars->{'suggestions_not_learned'};
+    delete $vars->{'suggestions_learned'};
+  }
+  ## sort by decreasing relevance
+  $unbundled_suggestions= [sort {$b->{'relevance'} <=> $a->{'relevance'}} @{$unbundled_suggestions}];
+  ## undefine references set to -1
+  if($count_suggestions_without_relevance > 0) {
+    foreach my $suggestion (@{$unbundled_suggestions}) {
+      if($suggestion->{'relevance'}==-1) {
+        delete $suggestion->{'relevance'};
+      }
+    }
+  }
+  return $unbundled_suggestions;
+}
 
 
 1;

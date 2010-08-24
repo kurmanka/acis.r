@@ -16,12 +16,17 @@ use Encode qw( encode );
 ####################   EMAIL  SENDING   ######################
 ##############################################################
 
+# evcino
+
+
 sub send_mail {
   my $app        = shift;
   my $stylesheet = shift;
   my %para       = @_;
 
   debug "sending email with template '$stylesheet'";
+
+  my $debug=1;
 
   my $config = $app -> config;
 
@@ -36,61 +41,59 @@ sub send_mail {
   my $header = '';
   my $body;
 
-  {
-    my @presenteropt = ();
-    if ( my $log = $app -> config( 'debug-email-data-log' ) ) {
-      ###  Logging the generated email text
-      my $home = $app -> home;
-      my $feeddatastring = sub { 
-        my $str = shift;
-        if ( open F, ">>:utf8", $log ) {
-          print F scalar( localtime ), "\n";
-          print F $str, "\n";
-          close F;
-        } else { 
-          warn "can't open log: $log";
-        }
-      };
-      @presenteropt = ( -feeddatastring => $feeddatastring );
-    }
-             
-    my $textref = $app -> run_presenter( $stylesheet, @presenteropt );
-    # run_presenter() may return a string or a reference to a string:
-    if (not ref $textref) { my $t = $textref; $textref = \$t; }
-#    debug "presenter generated: '''$$textref'''";
-
-    ###  Presenter can generate email headers.  Here they are:
-    my ( $pheaders, $pbody );
-    if ( (my $p = index( $$textref, "\n\n" )) > -1 ) {
-      $pheaders = substr( $$textref, 0, $p );
-      $pbody    = substr( $$textref, $p+2 );
-
-    } else {
-      complain "can't find where headers end and body begins";
-      die "can't find where headers end and body begins";
-    }
-
-    debug "header part: '''$pheaders'''";
-    debug "body part: '''$pbody'''";
-    foreach ( split /\n/, $pheaders ) {
-      my ( $k, $v ) = $_ =~ /^([^:\s]+):\s+(.+)$/;
-      if ( not $k or not $v ) {
-        die "bad header line: '$_'";
-        complain "bad header line: '$_'";
-        next;
+  my @presenteropt = ();
+  if ( my $log = $app -> config( 'debug-email-data-log' ) ) {
+    ###  Logging the generated email text
+    my $home = $app -> home;
+    my $feeddatastring = sub { 
+      my $str = shift;
+      if ( open F, ">>:utf8", $log ) {
+        print F scalar( localtime ), "\n";
+        print F $str, "\n";
+        close F;
+      } else { 
+        warn "can't open log: $log";
       }
-      
-      $k = ucfirst $k;
-      $head{ $k } = $v;
-      debug "from presenter: $k=($v)";
-    }
-
-    # mail body has to be formatted before sending:
-    $body = Web::App::EmailFormat::format_email( "$pbody\n" );
+    };
+    @presenteropt = ( -feeddatastring => $feeddatastring );
   }
+  my $textref = $app -> run_presenter( $stylesheet, @presenteropt );
+  # run_presenter() may return a string or a reference to a string:
+  if (not ref $textref) { my $t = $textref; $textref = \$t; }
+  ###
+  #print "presenter generated: '''$$textref'''";
+  ###
+  ##  Presenter can generate email headers.  Here they are:
+  my ( $pheaders, $pbody );
+  if ( (my $p = index( $$textref, "\n\n" )) > -1 ) {
+    $pheaders = substr( $$textref, 0, $p );
+    $pbody    = substr( $$textref, $p+2 );
+    
+  } 
+  else {
+    complain "can't find where headers end and body begins";
+    die "can't find where headers end and body begins";
+  }    
+  #print "header part: |$pheaders|\n";
+  #print "body part: |$pbody|\n";
+  ## | added this to avoid blank initial header
+  $pheaders=~s|^\n||;
+  ## |
+  foreach ( split /\n/, $pheaders ) {
+    my ( $k, $v ) = $_ =~ /^([^:\s]+):\s+(.+)$/;
+    if ( not $k or not $v ) {
+      die "bad header line: '$_'";
+      complain "bad header line: '$_'";
+      next;
+    }      
+    $k = ucfirst $k;
+    $head{ $k } = $v;
+      debug "from presenter: $k=($v)";
+  }
+  # mail body has to be formatted before sending:
+  $body = Web::App::EmailFormat::format_email( "$pbody\n" );
   debug "body formatted: ", length( $body ), " chars";
-#  debug "body formatted: ", $body, "\n-------";
-
+  #  debug "body formatted: ", $body, "\n-------";  
   #  Now the user-supplied header parameters override the default and the
   #  presenter's ones.
   foreach ( keys %para ) {
@@ -120,23 +123,32 @@ sub send_mail {
   }
 
   debug "open sendmail: $sendmail";
+  print "open sendmail\n";
   if ( open MESSAGE, "|-:utf8", $sendmail ) {
     print MESSAGE $header, "\n", $body;
+    ###
+    if($debug) {
+      open(DEBUGLOG,"> /tmp/email");
+      print DEBUGLOG $header, "\n", $body;
+      close DEBUGLOG;
+    }
+    ###
     close MESSAGE;
-  } else {
+  } 
+  else {
     $app -> errlog( "can't open a pipe to sendmail: $sendmail" );
     return undef;
   }
-
+  
   my $to = $head{To};
   my $cc = $head{Cc};
   $app -> sevent ( -class => 'email',
                    -action => 'sent',
-                 -template => $stylesheet,
-                       -to => $to,
-                    ($cc) ? ( -cc => $cc ) : ()
-                  );
-
+                   -template => $stylesheet,
+                   -to => $to,
+                   ($cc) ? ( -cc => $cc ) : ()
+                 );
+  
 }
 
 

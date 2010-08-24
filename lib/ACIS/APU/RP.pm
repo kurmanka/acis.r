@@ -1,4 +1,5 @@
-package ACIS::APU::RP;        ### -*-perl-*-  
+package ACIS::APU::RP;        
+### -*-perl-*-  
 # previously was known as ACIS::Web::ARPM
 #
 #  This file is part of ACIS software, http://acis.openlib.org/
@@ -29,12 +30,11 @@ package ACIS::APU::RP;        ### -*-perl-*-
 use strict;
 use ACIS::Web;
 use ACIS::Web::SysProfile;
-
 require ACIS::Web::Contributions;
 use ACIS::Resources::Suggestions;
 use ACIS::Resources::AutoSearch;
 use ACIS::Resources::Search;
-
+use Data::Dumper;
 use Web::App::Common qw( debug );
 
 *APP = *ACIS::Web::ACIS;
@@ -56,17 +56,17 @@ my $already_accepted;
 my $already_rejected;
 my $pref            ;
 my $suggestions;
+my $old_suggestions;
 my $original ;
-my $pretend;
 
+## evcino
 
 sub interactive { $interactive = 1; }
 
 sub search {
   $app = shift;
-  $pretend = shift; ### XXX not implemented yet
-
-  debug "enter RP::search()";
+  ## | replaces $pretend
+  my $mail_user=shift;
 
   $session = $app -> session;
   $vars    = $app -> variables;
@@ -77,29 +77,30 @@ sub search {
 
   logit "research search for $sid";
 
-  ####  general preparations
+  ##  general preparations
   ACIS::Web::Contributions::prepare( $app );
-  $contributions = $vars -> {contributions};
-  $accepted      = $contributions ->{accepted};
+  $contributions = $vars -> {'contributions'};
+  $accepted      = $contributions ->{'accepted'};
   $already_accepted = $contributions -> {'already-accepted'};
   $already_rejected = $contributions -> {'already-refused'};
-  $pref        = $contributions -> {preferences} {arpm};
+  $pref        = $contributions -> {'preferences'} -> {'arpm'};
 
   my $send_email;
  
-  debug "prepare";
+  logit "prepare";
   prepare_for_auto_search( $app );
-  debug "original load";
-  $suggestions = load_suggestions( $app, $sid );
-  $original = get_suggestions_ids( $suggestions );
-
+  logit "original load";
+  $old_suggestions = &load_and_unbundle_suggestions( $app, $sid );
+ 
+  ## add old suggestions to vars
+  $vars -> {'old_suggestions'} = $old_suggestions;
   if ( scalar keys %$original ) {
     $vars -> {'original-suggestions'} = $original;
   }
 
-  ###  Handle search
+  ##  Handle search
   {
-    debug "handle search";
+    logit "handle search";
     my @new_ids = ();
     my $rel_tab_db = $app -> config('metadata-db-name');
     my $rel_tab    = "$rel_tab_db.relations";
@@ -109,23 +110,23 @@ sub search {
     foreach ( qw( wrote/author edited/editor ) ) {
       my ( $relation, $role ) = ( m!^([^/]+)/(.+)$! );
 
-      $sql -> prepare_cached(
-       "select object from $rel_tab where subject=? and relation=? and source !=?"
-                            );
+      $sql -> prepare_cached("select object from $rel_tab where subject=? and relation=? and source !=?");
       my $res = $sql -> execute( $id, $relation, $id );
       
-      if ( not $res ) {        debug "bad query";     } 
-      if ( not $res->{row} ) { debug "nothing found"; }             
-
+      if ( not $res ) {        
+        logit "bad query";     
+      } 
+      if ( not $res->{row} ) { 
+        logit "nothing found"; 
+      }
       while ( $res and $res->{row} ) {
         my $obj = $res -> {row} {object};
         push @refs, $obj;
         $roles{$obj} = $role;
-        debug "found $role for $obj";
+        logit "found $role for $obj";
         $res -> next;
       }
-    }
-    
+    }    
     foreach ( @refs ) {
       if ( not $already_accepted -> {$_} 
            and not $already_rejected -> {$_} ) {
@@ -133,10 +134,9 @@ sub search {
       }
     }
 
-    ###  shouldn't I also check if the item is among suggestions already?
-    
-    ###  It may turn out that we already found the thing and already
-    ###  suggested it through email, may it not?
+    ##  shouldn't I also check if the item is among suggestions already?    
+    ##  It may turn out that we already found the thing and already
+    ##  suggested it through email, may it not?
 
     if ( scalar @new_ids ) {
       logit "id search: found ", scalar @new_ids, " items";
@@ -183,16 +183,16 @@ sub search {
         }
         
         ###  add into variables as "added-by-handle"
-        $vars -> {'added-by-handle'} = $new_full;
-        
-
-      } else {   ### add-by-handle disallowed
+        $vars -> {'added-by-handle'} = $new_full;      
+      } 
+      else {   ### add-by-handle disallowed
         ###  So, this means we need to simply suggest the items in an email
         ###  and add them to the suggestions table.  If they are in the
         ###  suggestions table already, we need to make sure they have reason
         ###  "exact-person-id-match".
         
         $send_email = 0;
+
         my @suggest;
         my @reset_reason_sids;
         my @add_to_suggest_table;
@@ -215,9 +215,9 @@ sub search {
               $send_email = 1;
               push @suggest, $_;
               push @reset_reason_sids, $rsid;
-            }
-            
-          } else {
+            }            
+          } 
+          else {
             $send_email = 1;
             push @suggest, $_;
             push @add_to_suggest_table, $_;
@@ -239,103 +239,187 @@ sub search {
       } ###  add-by-handle: true, false
     } ###  found something?
       else {
-#        logit "id search: nothing found";
+        logit "id search: nothing found";
     }        
   }  ###  do handle search ?
   
 
 
-  ###  Name search
-  debug "name search";
+  ##  Name search
+  logit "name search";
 
-  ###  does user want us to do a name search?
+  ##  does user want us to do a name search?
   if ( not defined $pref 
        or not defined $pref ->{'name-search'}
        or $pref -> {'name-search'} ) {{ # double braces for the last statement used inside it
-  
-    my $add = [];
-    my @suggest_exact;
-    my @suggest_approx;
-    my $handler = sub { # auto-add handler
-      my ($sql,$context,$reason,$role,$results) = @_;
-      if ($reason eq 'exact-name-variation-match'
-          or $reason eq 'exact-email-match') {
-        if ($add) {
-          push @$add, @$results;
-          return;
-        } else {
-          push @suggest_exact, @$results;
-        }
-      } else {
-        push @suggest_approx, @$results;
+         
+         logit "name search wanted by user";
+         ## array of resource to auto-accept
+         my $add = [];
+         my @suggest_exact;
+         my @suggest_approx;
+         ## auto-add handler
+         #my $handler = sub { 
+         #  my ($sql, $context, $reason, $role, $results) = @_;
+         #  if ($reason eq 'exact-name-variation-match'
+         #      or $reason eq 'exact-email-match') {
+         #    if ($add) {
+         #      push @$add, @$results;
+         #      logit "pushed somethnig to \$add";
+         #      return;
+         #    }
+         #    else {
+         #      push @suggest_exact, @$results;
+         #      my $count_found=scalar @$results;
+         #      logit "found $count_found results";
+         #    }
+         #  } 
+         #  else {
+         #    push @suggest_approx, @$results;
+         #  }
+         #  ## default action, defined in
+         #  ## ACIS/Resources/Suggestions.pm
+         #  save_suggestions(@_);
+         #};
+         logit "saving suggestions";
+         ## did the user allow to auto_add name search results?
+         if ( not $pref->{'add-by-name'} ) {
+           undef $add; 
+         }         
+         logit "starting search";
+         ####automatic_resource_search_now( $app, { save_result_func => $handler, via_apu => 1 } );
+         automatic_resource_search_now( $app, { via_apu => 1 } );
+         logit "ended search";
+         ## if add is set, add to contribututions. This should never
+         ## be done in AuthorClaim
+         if ( $add and scalar @$add ) {
+           $send_email = 1;
+           ###  add to accepted contributions
+           my $count_auto_accepted = 0;
+           foreach ( @$add ) {
+             ACIS::Web::Contributions::accept_item( $_ );
+             $count_auto_accepted++;
+           }
+           logit "name search: added ", $count_auto_accepted, "to accepted resources";
+         } 
+         elsif (scalar @suggest_exact) { 
+           $send_email = 1; 
+         }
+         else { 
+           logit "last statement is name search reached";
+           last; 
+         }         
+         if ($add and scalar @$add) { 
+           $vars->{'added-by-name'} = $add; 
+         }
+         my $s = \@suggest_exact;
+         ## include approximate matches also
+         if ($app->config('apu-research-mail-include-approx-hits')) { 
+           push @$s, @suggest_approx; 
+           $vars->{'suggest-by-name-includes-approx'}= scalar @suggest_approx;
+         }
+         ## if configuration parameter
+         if (my $max = $app->config('apu-research-max-suggestions-in-a-mail')) {
+           if ( (my $all = scalar @$s) > $max ) {
+             $#$s = $max-1;
+             $vars->{'suggest-by-name-listed-first'}=$max;
+             $vars->{'suggest-by-name-total-number'}=$all;
+             logit "cut suggestions in mail from $all to $max";
+           }
+         }         
+         $vars->{'suggest-by-name'} = $s;
+       }} ## double braces intentional -- needed for the "last" statement
+  ##
+  ## load the suggestions
+  ## &load_and_unbundle_suggestions in defined in Resource/Suggestions
+  ##
+  $vars->{'old_and_new_suggestions'} = &load_and_unbundle_suggestions( $app, $sid );  
+  $vars->{'old_suggestions'} = $old_suggestions;
+  ## print Dumper $vars->{'old_and_new_suggestions'};
+  if(defined ($vars->{'old_and_new_suggestions'})) {
+    logit "We have " . scalar @{$vars->{'old_and_new_suggestions'}} . " old and new suggestions";
+  }
+  if(defined ($old_suggestions)) {
+    logit "We have " . scalar @{$old_suggestions} . " old suggestions";
+  }
+  else {
+    logit "no old suggestions";
+  }
+  ##
+  ## sort by increasing relevance
+  ## build $vars->{'suggest-by-name'} to contain only 
+  ## the new suggestions
+  ## 
+  $vars->{'suggest-by-name'}=[];
+  foreach my $old_or_new_suggestion (@{$vars->{'old_and_new_suggestions'}}) {
+    my $dsid=$old_or_new_suggestion->{'sid'};
+    # logit "considering $dsid";
+    my $dsid_is_new=1;
+    ## if this is not in the old suggestions (we have to loop here)
+    foreach my $old_suggestion (@{$vars->{'old_suggestions'}}) {      
+      my $old_dsid=$old_suggestion->{'sid'};
+      # print "old dsid is $old_dsid\n";
+      if($old_dsid eq $dsid) {
+        $dsid_is_new=0;
+        last;
       }
-      # default action:
-      save_suggestions(@_);
-    };
-    if ( not $pref->{'add-by-name'} ) {
-      undef $add; 
     }
-
-    automatic_resource_search_now( $app, { save_result_func => $handler, via_apu => 1 } );
-
-    if ( $add and scalar @$add ) {
-        $send_email = 1;
-        ###  add to accepted contributions
-        my $c = 0;
-        foreach ( @$add ) {
-          ACIS::Web::Contributions::accept_item( $_ );
-          $c++;
-        }
-        logit "name search: added ", $c;
-    } 
-    elsif (scalar @suggest_exact) { $send_email = 1; }
-    else { last; }
-
-    if ($add and scalar @$add) { $vars->{'added-by-name'} = $add; }
-    my $s = \@suggest_exact;
-    if ($app->config('apu-research-mail-include-approx-hits')) { # include approximate matches also
-      push @$s, @suggest_approx; 
-      $vars->{'suggest-by-name-includes-approx'}= scalar @suggest_approx;
+    if($dsid_is_new) {
+      my $new_suggestion=$old_or_new_suggestion;
+      push(@{$vars->{'suggest-by-name'}}, $new_suggestion);
+      #logit "$dsid is a new suggestion";
     }
-    
-    if (my $max = $app->config('apu-research-max-suggestions-in-a-mail')) {
-      if ( (my $all = scalar @$s) > $max ) {
-        $#$s = $max-1;
-        $vars->{'suggest-by-name-listed-first'}=$max;
-        $vars->{'suggest-by-name-total-number'}=$all;
-      }
+    else {
+      my $old_suggestion=$old_or_new_suggestion;
+      push(@{$vars->{'original-suggestions'}}, $old_suggestion);
+      #logit "$dsid is an old suggestion";
     }
-
-    $vars->{'suggest-by-name'} = $s;
-  }} ### double braces intentional -- needed for the "last" statement
-  
-
-  
-  if ( $send_email ) {
-    delete $vars -> {contributions} {suggest};
-
-    if ( $vars -> {'added-by-name'} 
+  }
+  ## 
+  ## send email if we have some new suggestions
+  if(scalar(@{$vars->{'suggest-by-name'}})) {
+    $send_email=1;
+  }
+  if( $send_email ) {
+    logit "sending mail...";    
+    require Web::App::Email;
+    delete $vars -> {'contributions'} -> {'suggest'};    
+    ## save the profile if we have added something by name or handle
+    if( $vars -> {'added-by-name'} 
          or $vars -> {'added-by-handle'} ) {
       require ACIS::Web::SaveProfile;
       ACIS::Web::SaveProfile::save_profile( $app );
-    }
-
+    }    
     my %params = ();
-    if ( $app -> config( "echo-apu-mails" ) ) {
-      $params{-bcc} = $app -> config( "admin-email" );
-    }
-
-    require Web::App::Email;
+    ## | if mail_user is  set, send the admin a copy
+    ## | if a config parameter is set  
+    if($mail_user) {
+      ## evcino: always send a bcc
+      if ( $app -> config( "echo-apu-mails" ) ) {
+        $params{-bcc} = $app -> config( "admin-email" );
+        logit "sending -bcc to " . $app -> config( "admin-email" );
+      }
+      ## make sure we are not echoing the relevance
+      delete $vars->{'with_relevance_in_email'};
+      Web::App::Email::send_mail( $app, "email/arpm-notice.xsl", %params );
+      logit "email sent to user";    
+    }    
+    ## now send mail to the administrator
+    $params{-to} = $app -> config( "admin-email" );
+    undef $params{-bcc};
+    ## set the with-relevance parameter
+    $vars->{'with_relevance_in_email'}=1;
     Web::App::Email::send_mail( $app, "email/arpm-notice.xsl", %params );
-    logit "email sent";
-
+    logit "email sent to admin";    
+    ## done with mailing
     foreach ( qw( added-by-handle added-by-name 
+                  with_relevance_in_email old_suggestions old_and_new_suggestions
                   original-suggestions suggest-by-name suggest-by-handle ) ) {
       delete $vars -> {$_};
     }
-
     return "OK-1";
   }
+  logit "email not sent";
 
   return "OK-0";
 }
@@ -376,6 +460,19 @@ sub get_suggestions_ids {
   }
   return $ids;
 }
+
+
+sub determine_if_we_mail {
+  my $vars=shift;
+  #logit Dumper $vars;
+  my $count_suggestions_by_name=scalar(@{$vars->{'suggest-by-name'}});
+  logit "I have $count_suggestions_by_name new suggestions\n";
+  my $count_already_suggested=scalar(keys %{$vars->{'old_suggestions'}});
+  logit "I have $count_already_suggested old suggestions\n";
+}
+
+
+
 
 
 1;

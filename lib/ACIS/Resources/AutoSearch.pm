@@ -26,6 +26,7 @@ use vars qw(@EXPORT);
               automatic_resource_search_now
               prepare_for_auto_search
               get_bg_search_status
+              save_search_results 
               start_auto_res_search_in_bg
               get_last_autosearch_time
            );
@@ -85,20 +86,29 @@ sub prepare_for_auto_search {
   my $record  = $session -> current_record() || die;
   my $id      = $record ->{id} || die;
   my $sid     = $record ->{sid};
-  my $contributions = $session ->{$id} {contributions};
-  my $autosearch    = $contributions -> {autosearch};
-  { 
-    if ( not exists $contributions -> {autosearch} 
-         or $autosearch == 1 ) {
-      $contributions ->{autosearch} = $autosearch = {}
-    }
-    $record -> {contributions} {autosearch} = $autosearch;
+  ## evcino: syntax changes
+  my $contributions = $session ->{$id} -> {'contributions'};
+  ## autosearch has information such as
+  ##'names-list-nice' => [
+  ##                               'Thomas Krichel',
+  ##                               'Krichel, Thomas'
+  ##                             ],
+  ##        'for-names-last-changed' => '1276092787',
+  ##        'names-list' => [
+  ##                          'thomas krichel',
+  ##                          'krichel thomas'
+  ##                        ]
+  ##  
+  my $autosearch    = $contributions -> {'autosearch'};
+  if ( not exists $contributions -> {'autosearch'}
+       or $autosearch == 1 ) {
+    $contributions ->{'autosearch'} = $autosearch = {};
   }
-
+  $record -> {'contributions'} -> {'autosearch'} = $autosearch;
   my $name = $record->{'name'};
-  my $variations = $name->{variations};
+  my $variations = $name->{'variations'};
   $autosearch -> {'names-list'} = [grep {$_} @$variations];
-
+  
   ## this code leads to names being duplicated in the nice list
   #my $nicelist = [];
   #push @$nicelist, @{ $name ->{'additional-variations'} };
@@ -137,14 +147,14 @@ sub search_done {
   my $app     = shift;
   my $session = $app -> session;
   my $record  = $session -> current_record;
-  my $id      = $record ->{id} || die;
-  my $sid     = $record ->{sid};
+  my $id      = $record ->{'id'} || die;
+  my $sid     = $record ->{'sid'};
   my $contributions = $session ->{$id} {contributions};
   my $autosearch    = $contributions -> {autosearch};
 
-  put_sysprof_value( $record -> {sid}, 'last-autosearch-time', scalar time );
+  put_sysprof_value( $record -> {'sid'}, 'last-autosearch-time', scalar time );
 
-  my $names_last_change_date = $record -> {name}{'last-change-date'};
+  my $names_last_change_date = $record -> {'name'} -> {'last-change-date'};
   $autosearch -> {'for-names-last-changed'} = $names_last_change_date;
   debug "search in background done";
 }
@@ -204,18 +214,20 @@ sub search_for_resources_exact {
   my $app     = shift;
   my $context = shift;
   logit "search_for_resources_exact: enter";
+  logit "context is ". Dumper $context;
 
   my $sql     = $app -> sql_object;
   my $session = $app -> session;
   my $record  = $session ->current_record;
   my $id      = $record->{id};
-  my $contributions = $session ->{$id} {contributions};
-  my $autosearch  = $contributions -> {autosearch};
+  my $contributions = $session ->{$id} -> {contributions};
+  my $autosearch  = $contributions -> {'autosearch'};
   my $namelist    = $autosearch -> {'names-list'};
   ## cardiff change: $results contains all results
   my $results;
   foreach my $name_variation ( @$namelist ) {
     next if not $name_variation;
+    ## defined in Resources/Search.pm
     my $search = search_resources_for_exact_name( $sql, $context, $name_variation );
     my $found = ( defined $search ) ? scalar( @$search ) : 'nothing' ;
     logit "exact name: '$name_variation', found: $found";
@@ -225,13 +237,20 @@ sub search_for_resources_exact {
   #logit Dumper $results;  
   ## cardiff changes
   logit "start learning";
-  ## defined in ResourcessLearn.pm
+  ## defined in Resources/Learn.pm
   ## adds the results to the existing contribution
-  my $learner=&form_learner($app,'search_for_resources_exact',$results);
+  logit "there are " . scalar @$results . " results";
+  my $learner=&form_learner($app,'search_for_resources_exact', $results);
+  logit "there are " . scalar @{$learner->{'suggested'}} . " suggestions in the learner"; 
   ## defined in Resourcess/Learn/Suggested.pm
   ## this also saves the results, if it returns true
   my $saved_results_boolean=&learn_suggested($learner,$sql,$context,'exact-name-variation-match');
-  logit "saved_results_boolean: $saved_results_boolean";
+  if($saved_results_boolean) {
+    logit "saved_results_boolean: $saved_results_boolean";
+  }
+  else {
+    logit "saved_results_boolean is not defined, no learning!";
+  }
   ## so if this is not true, save the results with the local function
   if(not $saved_results_boolean) {
     logit('there has been no learning, I have to store');
@@ -245,37 +264,39 @@ sub search_for_resources_exact {
 
 
 
-sub OLD_search_for_resources_exact {
-  my $app     = shift;
-  my $context = shift;
-  logit "search_for_resources_exact: enter";
-
-  my $sql     = $app -> sql_object;
-  my $session = $app -> session;
-  my $record  = $session ->current_record;
-  my $id      = $record->{id};
-  my $contributions = $session ->{$id} {contributions};
-  my $autosearch  = $contributions -> {autosearch};
-  my $namelist    = $autosearch -> {'names-list'};
-
-  ## search for exact matches
-  ## for cardiff this is problematic since the saving
-  ## of results happens for each name variation separately...
-  foreach ( @$namelist ) {
-    next if not $_;
-    my $search = search_resources_for_exact_name( $sql, $context, $_ );
-    my $found = ( defined $search ) ? scalar( @$search ) : 'nothing' ;
-    logit "exact name: '$_', found: $found";
-    save_search_results( $context, 'exact-name-variation-match', $search );
-  }
-  logit "search_for_resources_exact: exit";
-}
+#sub OLD_search_for_resources_exact {
+#  my $app     = shift;
+#  my $context = shift;
+#  logit "search_for_resources_exact: enter";
+#
+#  my $sql     = $app -> sql_object;
+#  my $session = $app -> session;
+#  my $record  = $session ->current_record;
+#  my $id      = $record->{id};
+#  my $contributions = $session ->{$id} {contributions};
+#  my $autosearch  = $contributions -> {autosearch};
+#  my $namelist    = $autosearch -> {'names-list'};
+#
+#  ## search for exact matches
+#  ## for cardiff this is problematic since the saving
+#  ## of results happens for each name variation separately...
+#  foreach ( @$namelist ) {
+#    next if not $_;
+#    my $search = search_resources_for_exact_name( $sql, $context, $_ );
+#    my $found = ( defined $search ) ? scalar( @$search ) : 'nothing' ;
+#    logit "exact name: '$_', found: $found";
+#    save_search_results( $context, 'exact-name-variation-match', $search );
+#  }
+#  logit "search_for_resources_exact: exit";
+#}
 
 sub save_search_results {
   my ($context,$reason,$results) = @_;
   if(not $results or not scalar @$results) {
+    logit "no result, no saving";
     return undef;
   }
+  logit "saving search results";
   my $sql = $ACIS::Web::ACIS->sql_object;
   my $psid = $context->{sid};
   if ($context->{save_result_func}) {
@@ -361,13 +382,12 @@ sub do_auto_search {
   my $id      = $session -> current_record -> {id};
 
   my $context = prepare_search_context( $app, $settings );
-  if ( not $session -> {$id} {'reloaded-accepted-contributions'} ) {
+  if ( not $session -> {$id} -> {'reloaded-accepted-contributions'} ) {
     ACIS::Web::Contributions::reload_accepted_contributions( $app );
   }
-
-  debug "auto search initiated: ", $settings->{via_web} ? "online" : "apu";
+  logit "auto search initiated: ", $settings->{via_web} ? "online" : "apu";
   search_for_resources_exact( $app, $context );
-  debug "search for resources finished";
+  logit "search for resources finished";
   ## are we doing additional searching
   if ( $app -> config( "research-additional-searches" ) ) {
     additional_searches( $app, $context ); 
