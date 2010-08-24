@@ -26,7 +26,7 @@ sub send_mail {
 
   debug "sending email with template '$stylesheet'";
 
-  my $debug=1;
+  my $debug=0;
 
   my $config = $app -> config;
 
@@ -123,12 +123,12 @@ sub send_mail {
   }
 
   debug "open sendmail: $sendmail";
-  print "open sendmail\n";
   if ( open MESSAGE, "|-:utf8", $sendmail ) {
     print MESSAGE $header, "\n", $body;
     ###
     if($debug) {
       open(DEBUGLOG,"> /tmp/email");
+      binmode(DEBUGLOG,"utf8");
       print DEBUGLOG $header, "\n", $body;
       close DEBUGLOG;
     }
