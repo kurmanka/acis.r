@@ -1,7 +1,10 @@
 <xsl:stylesheet
-  xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
-  xmlns:exsl="http://exslt.org/common"
-  exclude-result-prefixes='exsl xml'
+    xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
+    xmlns:exsl="http://exslt.org/common"
+    xmlns:acis="http://acis.openlib.org"
+    xmlns:html="http://www.w3.org/1999/xhtml"
+    xmlns="http://www.w3.org/1999/xhtml"
+    exclude-result-prefixes="exsl xml html acis #default"
   version="1.0">
  
   <xsl:import href='../global.xsl'/>
@@ -13,7 +16,7 @@
   <xsl:import href='../person/research/listings.xsl'/><!-- for present-resource template -->
 
   <xsl:variable name='parents'>
-    <par id='citations'/>
+    <acis:par id='citations'/>
   </xsl:variable>
 
 
@@ -129,29 +132,29 @@
           <xsl:text>&#160;</xsl:text></span>
 
           <span class='body'>
-            <hl screen='citations/doclist'>
+            <acis:hl screen='citations/doclist'>
               <xsl:text>&#160;</xsl:text>
               <a ref='@citations/doclist'>document&#160;list</a>
               <xsl:text>&#160;</xsl:text>
-            </hl>
+            </acis:hl>
 
-            <hl screen='citations/autosug'>
+            <acis:hl screen='citations/autosug'>
               <xsl:text>&#160;</xsl:text>
               <a ref='@citations/autosug'>auto&#160;suggestions</a>
               <xsl:text>&#160;</xsl:text>
-            </hl>
+            </acis:hl>
 
-            <hl screen='citations/refused'>
+            <acis:hl screen='citations/refused'>
               <xsl:text>&#160;</xsl:text>
               <a ref='@citations/refused'>refused</a>
               <xsl:text>&#160;</xsl:text>
-            </hl>
+            </acis:hl>
 
-            <hl screen='citations/autoupdate'>
+            <acis:hl screen='citations/autoupdate'>
               <xsl:text>&#160;</xsl:text>
               <a ref='@citations/autoupdate'>auto&#160;update</a>
               <xsl:text>&#160;</xsl:text>
-            </hl>
+            </acis:hl>
 
           </span>
         </p>
@@ -164,9 +167,9 @@
 
   <xsl:variable name='to-go-options'>
     <xsl:if test='$request-screen != "citations"'>
-      <op><a ref='@citations' >main citations page</a></op>
+      <acis:op><a ref='@citations' >main citations page</a></acis:op>
     </xsl:if>
-    <root/>
+    <acis:root/>
   </xsl:variable>
 
 </xsl:stylesheet>

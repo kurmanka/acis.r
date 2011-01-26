@@ -1,8 +1,9 @@
 <xsl:stylesheet
-  xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
-  xmlns:exsl="http://exslt.org/common"
-  exclude-result-prefixes='exsl'
-  version="1.0">
+    xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
+    xmlns="http://www.w3.org/1999/xhtml"
+    xmlns:acis="http://acis.openlib.org"
+    exclude-result-prefixes='exsl xml acis html #default'
+    version="1.0">
   
   <xsl:import href='../page-universal.xsl'/>
   <xsl:import href='../forms.xsl'/>
@@ -39,57 +40,55 @@
 
 
   <xsl:template name='account-settings'>
-
-
-        <h1>Your account</h1>
-
-        <xsl:call-template name='show-status'/>
-
-        <form xsl:use-attribute-sets='form' name='set'>
-
-          <xsl:call-template name='fieldset'><xsl:with-param name='content' xmlns='http://x'>
-
+    
+    
+    <h1>Your account</h1>
+    
+    <xsl:call-template name='show-status'/>
+    
+    <acis:form xsl:use-attribute-sets='form' name='set'>
+      
+      <xsl:call-template name='fieldset'> 
+        
+        <xsl:with-param name='content'>
+          
           <h2>Login</h2>
-
+          
           <p>
-
+            
             <label for='email-inp'>Login name/email address: </label>
             <br />
-            <input name='email' id='email-inp' size='50'>
-              <check nonempty=''/>
-            </input>
+            <acis:input name='email' id='email-inp' size='50'>
+              <acis:check nonempty=''/>
+            </acis:input>
             <br />
-
-          <xsl:if test='$record-about-owner'>
-              <input type='checkbox' name='record-email' id='record-email' checked=''
-                     />
-              <label for='record-email'
-                     > Also update my record's contact details 
+            
+            <xsl:if test='$record-about-owner'>
+              <acis:input type='checkbox' name='record-email' id='record-email' checked=''/>
+              <label for='record-email'> Also update my record's contact details 
               accordingly</label>
               <br />
-          </xsl:if>
-          
-            <input type='checkbox' name='remember-login' id='rem-l'
-                     onchange='control_remember_password_switch();'
-                     />
+            </xsl:if>
+            
+            <acis:input type='checkbox' name='remember-login' id='rem-l'
+                        onchange='control_remember_password_switch();'/>
             <label for='rem-l'
-                   title='Cookie is a bit of information, stored on your computer'
-                   >
+                   title='Cookie is a bit of information, stored on your computer'>
               <xsl:text> Remember email address in a cookie.</xsl:text>
             </label>
           </p>
-
-          <onsubmit>
+          
+          <acis:onsubmit>
             var pass_old_e  = getRef("old");
             var pass_new_e  = getRef("new");
             var pass_conf_e = getRef("conf");
-
+            
             var pass_old  = pass_old_e.value;
             var pass_new  = pass_new_e.value;
             var pass_conf = pass_conf_e.value;
             
             if ( pass_new || pass_conf ) {
-              if ( pass_old == '' ) {
+               if ( pass_old == '' ) {
                 alert( "To change your password, first enter your current password." );
                 pass_old_e.focus();
                 return false;
@@ -101,9 +100,9 @@
                 return false;
               }
             }
-          </onsubmit>
-
-
+          </acis:onsubmit>
+          
+          
           <h2>Password</h2>
           
           <table id='passwords'>
@@ -112,11 +111,11 @@
                 <label for='old'>current:</label>
               </td>
               <td>
-                <input name='pass' type='password' id='old' 
-                       onchange='control_remember_password_switch();'>
-                  <name>current password</name>
-                </input>
-
+                <acis:input name='pass' type='password' id='old' 
+                            onchange='control_remember_password_switch();'>
+                  <acis:name>current password</acis:name>
+                </acis:input>
+                
               </td>
             </tr>
 
@@ -125,115 +124,100 @@
                 <label for='new'>new:</label>
               </td>
               <td>
-                <input name='pass-new' type='password' id='new'>
-                  <hint side=''>Minimum 6 digits or English letters.</hint>
-                </input>
+                <acis:input name='pass-new' type='password' id='new'>
+                  <acis:hint side=''>Minimum 6 digits or English letters.</acis:hint>
+                </acis:input>
               </td>
             </tr>
-
+            
             <tr>
               <td>
                 <label for='conf'>confirm:</label>
               </td>
               <td>
-                <input name='pass-confirm' type='password' id='conf'>
+                <acis:input name='pass-confirm' type='password' id='conf'>
                   <!-- check test='value &amp;&amp; value != getRef("new").value'>
-                    <do>
-                      alert( "New password and confirm values shall be the same.  Please try again." );
-                      getRef("new").focus();
-                      return false;
-                    </do>
-                  </check -->
-                </input>
+                       <do>
+                       alert( "New password and confirm values shall be the same.  Please try again." );
+                       getRef("new").focus();
+                       return false;
+                       </do>
+                       </check -->
+                </acis:input>
               </td>
             </tr>
-
+            
             <tr>
               <td>
               </td>
               <td>
-
-            <input type='checkbox' name='remember-pass' id='rem-p' />
-            <label for='rem-p'
-                   title='Will only work if you also choose to store your email in a cookie. See above.'
-                   >
-              <xsl:text> Remember password in a cookie.</xsl:text>
-            </label>
-
-          <script-onload>control_remember_password_switch();</script-onload>
-
-<script>
-function control_remember_password_switch() {
- var pass_old = getRef("old").value;
- var rem_log  = getRef( "rem-l" );
- var Switch   = getRef("rem-p");
- if ( pass_old != "" &amp;&amp; rem_log.checked ) {
-   Switch.disabled = false;
- } else { 
-   Switch.disabled = true;
- }
-}
-</script>
+                
+                <acis:input type='checkbox' name='remember-pass' id='rem-p' />
+                <label for='rem-p'
+                       title='Will only work if you also choose to store your email in a cookie. See above.'>
+                  <xsl:text> Remember password in a cookie.</xsl:text>
+                </label>
+                
+                <acis:script-onload>control_remember_password_switch();</acis:script-onload>
 
 
               </td>
             </tr>
 
           </table>
-
-<!--          <p>
-            <label>old:<br />
-            <input name='pass-old' type='password'/>
-            </label><br />
-
-            <label>new:<br />
-            <input name='pass-new' type='password'/>
-            </label><br />
-
-            <label>confirm:<br />
-            <input name='pass-conf' type='password'/>
-            </label>
-          </p>
-        
--->  
-
-   <h2>Owner</h2>
-
+          
+          <!--          <p>
+               <label>old:<br />
+               <acis:input name='pass-old' type='password'/>
+               </label><br />
+               
+               <label>new:<br />
+               <acis:input name='pass-new' type='password'/>
+               </label><br />
+               
+               <label>confirm:<br />
+               <acis:input name='pass-conf' type='password'/>
+               </label>
+               </p>
+               
+          -->  
+          
+          <h2>Owner</h2>
+          
           <p>
             <label for='name-input'>Account owner name:</label><br />
-            <input name='name' id='name-input' size='50'>
-              <check nonempty=''/>
-            </input>
+            <acis:input name='name' id='name-input' size='50'>
+              <acis:check nonempty=''/>
+            </acis:input>
           </p>
-
-
-
-<p>
-  <input type='submit' 
-         name='continue' 
-         value='SAVE' 
-         class='important'
-         />
-</p>
-
-          </xsl:with-param></xsl:call-template>
-
-    </form>
-
+          
+          
+          
+          <p>
+            <input type='submit' name='continue' value='SAVE' class='important'/>
+          </p>
+          
+        </xsl:with-param>
+      </xsl:call-template>
+      
+    </acis:form>
+    
   </xsl:template>
-
-
+  
+  
   <xsl:variable name='to-go-options'>
-
+    
     <xsl:choose>
       <xsl:when test='$advanced-user'>
-        <op><a ref='@menu' >records menu page</a></op>
+        <acis:op>
+          <a ref='@menu' >records menu page</a>
+        </acis:op>
       </xsl:when>
       <xsl:otherwise>
-        <root/>
+        <acis:root/>
       </xsl:otherwise>
     </xsl:choose>
-
+    
   </xsl:variable>
 
 

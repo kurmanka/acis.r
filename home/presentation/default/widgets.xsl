@@ -1,8 +1,11 @@
-<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" 
-                version="1.0"
-                xmlns:exsl="http://exslt.org/common"
-                exclude-result-prefixes='exsl xml'
-                >
+<xsl:stylesheet 
+    xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
+    xmlns:exsl="http://exslt.org/common"
+    xmlns:acis="http://acis.openlib.org"
+    xmlns:html="http://www.w3.org/1999/xhtml"
+    xmlns="http://www.w3.org/1999/xhtml"
+    exclude-result-prefixes="exsl xml html acis #default"
+    version="1.0">
 
   <xsl:template name='tabset'>
     <xsl:param name='id'/>
@@ -13,7 +16,7 @@
       
       <div class='tabs'>
 
-        <xsl:for-each select='exsl:node-set($tabs)//tab'>
+        <xsl:for-each select='exsl:node-set($tabs)//acis:tab'>
           <xsl:choose>
             <xsl:when test='@selected'>
               <div class='current'>

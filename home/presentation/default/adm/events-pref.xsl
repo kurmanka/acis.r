@@ -1,9 +1,13 @@
 <!--   This file is part of the ACIS presentation template-set.   -->
 
 <xsl:stylesheet
-  xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
-  xmlns:exsl="http://exslt.org/common"
-  exclude-result-prefixes='exsl'
+    xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
+    xmlns:exsl="http://exslt.org/common"
+    xmlns:acis="http://acis.openlib.org"
+    xmlns:html="http://www.w3.org/1999/xhtml"
+    xmlns="http://www.w3.org/1999/xhtml"
+    exclude-result-prefixes="exsl xml html acis #default"
+
   version="1.0">  
 
 
@@ -23,7 +27,7 @@
 screens.</p>
 
 
-<form id='pref'>
+<acis:form id='pref'>
 
 <script>
 function save_preferences () {
@@ -74,7 +78,7 @@ function setris() {
 
 </script>
 
-<script-onload>
+<acis:script-onload>
   var form   = getRef("pref");
   form.save.title='save preferences in cookies';
   form.save.disabled=false;
@@ -113,7 +117,7 @@ function setris() {
     }
   }
 
-</script-onload>
+</acis:script-onload>
 
 
 <style>
@@ -274,7 +278,7 @@ onclick='javascript:save_preferences();'/>
 
 
 
-</form>
+</acis:form>
        
       </xsl:with-param>
 

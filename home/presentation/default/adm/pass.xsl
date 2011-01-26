@@ -1,7 +1,11 @@
 <xsl:stylesheet
-  xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
-  xmlns:exsl="http://exslt.org/common"
-  exclude-result-prefixes='exsl'
+    xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
+    xmlns:exsl="http://exslt.org/common"
+    xmlns:acis="http://acis.openlib.org"
+    xmlns:html="http://www.w3.org/1999/xhtml"
+    xmlns="http://www.w3.org/1999/xhtml"
+    exclude-result-prefixes="exsl xml html acis #default"
+
   version="1.0">
   
   <xsl:import href='../page-universal.xsl'/>
@@ -13,7 +17,7 @@
 
         <h1>Confirm your competence</h1>
 
-        <form xsl:use-attribute-sets="form">
+        <acis:form xsl:use-attribute-sets="form">
           <p><label>Pass: 
           <input name='pass' type='text' size='12'/>
           </label>
@@ -26,7 +30,7 @@
                     id='remember-me'
           value='1'/> Remember? </label>
           </p>
-        </form>
+        </acis:form>
 
       </xsl:with-param>
     </xsl:call-template>

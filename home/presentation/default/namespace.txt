@@ -1,0 +1,64 @@
+
+The templates use the following namespaces and prefixes
+
+xsl   http://www.w3.org/1999/XSL/Transform
+exsl  http://exslt.org/common
+acis  http://acis.openlib.org
+date  http://exslt.org/dates-and-times
+html  http://www.w3.org/1999/xhtml
+      http://www.w3.org/1999/xhtml
+
+All templates should be set to use the xhtml namespace as the default,
+except the email templates and the export templates.
+
+The elements in the acis namespace include
+
+acis:c
+acis:check
+acis:comment
+acis:content
+acis:d
+acis:fields
+acis:field
+acis:desc
+acis:error
+acis:form
+acis:hint
+acis:message
+acis:messages
+acis:name
+acis:onsubmit
+acis:page
+acis:par
+acis:phrase
+acis:phrasing
+acis:root
+acis:script-onload
+acis:step
+acis:tab
+acis:ten
+
+When such an element is outside a namespace, or in the default xhtml
+namespace, it is surely an error, it needs to be found and fixed.
+
+Some elements may be in the acis namespace or in the xhtml namespace,
+or in the null namespace. These are the fieldset element
+
+acis:input
+acis:textarea
+acis:select
+
+There is a great deal of confusion because these elements
+go through very complicated treatment.
+
+
+The elements in the acis namespace should include, the following
+
+html:a
+html:input
+
+since they carry attributes not allowed with xhtml.  But I have not
+converted them since this is a relatively cumbersome operation.
+
+The data handled down by ACIS itself is in the null namespace.
+

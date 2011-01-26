@@ -1,9 +1,12 @@
 <xsl:stylesheet
- xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
- xmlns:exsl="http://exslt.org/common"
- xmlns:date="http://exslt.org/dates-and-times"
- exclude-result-prefixes='exsl date'
- version="1.0">
+    xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
+    xmlns:exsl="http://exslt.org/common"
+    xmlns:acis="http://acis.openlib.org"
+    xmlns:html="http://www.w3.org/1999/xhtml"
+    xmlns="http://www.w3.org/1999/xhtml"
+    exclude-result-prefixes="exsl xml html acis date #default"
+    xmlns:date="http://exslt.org/dates-and-times"
+    version="1.0">
 
   <xsl:import href='index.xsl'/>
   <xsl:import href='events.xsl'/>
@@ -56,20 +59,21 @@
     <xsl:choose>
       <xsl:when test='substring($start-date,12,8) != "00:00:00"'>
         
-        <a
-         xmlns='http://nnn' 
+        <!-- there was an xmlns='http://nnn' on the next element -->
+        <acis:a
          class='int'
          href='{$base-url}/adm/events/{substring($start-date,1,10)}{$link-suffix}'
          title='this day start'
-        >^&lt;&lt; day start</a>
+        >^&lt;&lt; day start</acis:a>
 
       </xsl:when>
       <xsl:otherwise>
 
-        <a xmlns='http://nnn' 
+        <!-- there was an xmlns='http://nnn' on the next element -->
+        <acis:a 
            class='int'
            href='{$base-url}{$previous-day-addr}{$link-suffix}'
-        >&lt;&lt;&lt; previous day</a>
+        >&lt;&lt;&lt; previous day</acis:a>
 
       </xsl:otherwise>
     </xsl:choose>
@@ -79,8 +83,8 @@
 
   <xsl:template name='go-forward'>
 
-    <a class='int'
-       xmlns='http://nnn' 
+    <!-- there was an xmlns='http://nnn' on the next element -->
+    <acis:a class='int'
        href='{$base-url}{$next-chunk-addr}{$link-suffix}'>
       <xsl:choose>
         <xsl:when test='$chunked'>next chunk </xsl:when>
@@ -90,7 +94,7 @@
       </xsl:choose>
 
       <xsl:text>&gt;&gt;&gt;</xsl:text>
-    </a>
+    </acis:a>
 
   </xsl:template>
 

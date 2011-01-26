@@ -1,10 +1,13 @@
 <!--   This file is part of the ACIS presentation template-set.   -->
 
 <xsl:stylesheet
-  xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
-  xmlns:exsl="http://exslt.org/common"
-  exclude-result-prefixes='exsl date'
-  xmlns:date="http://exslt.org/dates-and-times"
+    xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
+    xmlns:exsl="http://exslt.org/common"
+    xmlns:acis="http://acis.openlib.org"
+    xmlns:html="http://www.w3.org/1999/xhtml"
+    xmlns="http://www.w3.org/1999/xhtml"
+    exclude-result-prefixes="exsl xml html acis #default"
+
   version="1.0">  
 
 
@@ -36,18 +39,18 @@
 </xsl:template>
 
 <xsl:variable name='decades'>
-  <ten>
-    <d/> <d/> <d/> <d/> <d/> <d/> <d/> <d/> <d/> <d/>
-  </ten>
-  <ten>
-    <d/> <d/> <d/> <d/> <d/> <d/> <d/> <d/> <d/> <d/>
-  </ten>
-  <ten>
-    <d/> <d/> <d/> <d/> <d/> <d/> <d/> <d/> <d/> <d/>
-  </ten>
-  <ten>
-    <d/> <d/> <d/> <d/> <d/> <d/> <d/> <d/> <d/> <d/>
-  </ten>
+  <acis:ten>
+    <acis:d/> <acis:d/> <acis:d/> <acis:d/> <acis:d/> <acis:d/> <acis:d/> <acis:d/> <acis:d/> <acis:d/>
+  </acis:ten>
+  <acis:ten>
+    <acis:d/> <acis:d/> <acis:d/> <acis:d/> <acis:d/> <acis:d/> <acis:d/> <acis:d/> <acis:d/> <acis:d/>
+  </acis:ten>
+  <acis:ten>
+    <acis:d/> <acis:d/> <acis:d/> <acis:d/> <acis:d/> <acis:d/> <acis:d/> <acis:d/> <acis:d/> <acis:d/>
+  </acis:ten>
+  <acis:ten>
+    <acis:d/> <acis:d/> <acis:d/> <acis:d/> <acis:d/> <acis:d/> <acis:d/> <acis:d/> <acis:d/> <acis:d/>
+  </acis:ten>
 </xsl:variable>
 
 
@@ -58,10 +61,10 @@
 
   <table class='month'> 
     
-    <xsl:for-each select='exsl:node-set($decades)/ten'>
+    <xsl:for-each select='exsl:node-set($decades)/acis:ten'>
       <tr>
-        <xsl:for-each select='d'>
-          <xsl:variable name='number' select='count(preceding::d)+1'/>
+        <xsl:for-each select='acis:d'>
+          <xsl:variable name='number' select='count(preceding::acis:d)+1'/>
           <td>
             <xsl:if test='$node/hash-item[@key=$number]'>
               <xsl:variable name='day' select='$node/hash-item[@key=$number]'/>
@@ -169,7 +172,7 @@
 
   <p><span> </span></p>
 
-  <form screen='adm/events/show'>
+  <acis:form screen='adm/events/show'>
 
     <p>Show me events for period:</p>
 
@@ -209,18 +212,18 @@
       </tr>
     </table>
 
-<script-onload>
+<acis:script-onload>
 getRef("startdate").onfocus=function () {
  this.onfocus=null;
  if ( this.value == "YYYY-MM-DD" ) {
    this.value='';
  }
 }
-</script-onload>
+</acis:script-onload>
 
 <p>...or see <a ref='/adm/events/recent'>recent</a> events.</p>
 
-  </form>
+  </acis:form>
 
 </xsl:template>
 

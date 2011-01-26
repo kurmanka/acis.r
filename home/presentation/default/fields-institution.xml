@@ -1,47 +1,47 @@
-<fields>
+<acis:fields xmlns:acis="http://acis.openlib.org">
 
   <!-- 
 
-  This is for fields, which are either required or have very specific 
+  This is for acis:fields, which are either required or have very specific 
   syntax rules, so that a user may enter an "invalid" value.
 
   -->
 
- <field name='name'>
-  <desc>name in original language</desc>
- </field>
+ <acis:field name='name'>
+  <acis:desc>name in original language</acis:desc>
+ </acis:field>
 
- <field name='name-english'>
-  <desc>name in English</desc>
- </field>
+ <acis:field name='name-english'>
+  <acis:desc>name in English</acis:desc>
+ </acis:field>
 
- <field name='email'>
-  <desc>email address</desc>
- </field>
+ <acis:field name='email'>
+  <acis:desc>email address</acis:desc>
+ </acis:field>
 
- <field name='homepage'>
-  <desc>website address</desc>
- </field>
+ <acis:field name='homepage'>
+  <acis:desc>website address</acis:desc>
+ </acis:field>
 
- <field name='phone'>
-  <desc>phone number</desc>
- </field>
+ <acis:field name='phone'>
+  <acis:desc>phone number</acis:desc>
+ </acis:field>
  
  
- <field name='postal'>
-  <desc>postal address</desc>
- </field>
+ <acis:field name='postal'>
+  <acis:desc>postal address</acis:desc>
+ </acis:field>
 
- <field name='location'>
-  <desc>geographical location</desc>
- </field>
+ <acis:field name='location'>
+  <acis:desc>geographical location</acis:desc>
+ </acis:field>
 
- <field name='id'>
-  <desc>identifier</desc>
- </field>
+ <acis:field name='id'>
+  <acis:desc>identifier</acis:desc>
+ </acis:field>
  
- <field name='search-what'>
-   <desc>search expression</desc>
- </field>
+ <acis:field name='search-what'>
+   <acis:desc>search expression</acis:desc>
+ </acis:field>
 
-</fields>
+</acis:fields>

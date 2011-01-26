@@ -1,5 +1,9 @@
-<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
-  version="1.0">
+<xsl:stylesheet 
+    xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
+    xmlns="http://www.w3.org/1999/xhtml"
+    xmlns:acis="http://acis.openlib.org"
+    exclude-result-prefixes='exsl xml acis html #default'
+    version="1.0">
 
   <xsl:import href='page.xsl'/>
 
@@ -81,9 +85,9 @@
         | <a ref='@({$sid})/contact'>contact</a>
         | <a ref='@({$sid})/affiliations'>affiliations</a>
         | <a ref='@({$sid})/research'>research</a>
-    <!--[if-config(citations-profile)]-->
+    <!--[if-config(citations-profile)]
         | <a ref='@({$sid})/citations'>citations</a>
-    <!--[end-if]-->
+    [end-if]-->
         </small>
       </xsl:when>
       <xsl:otherwise>

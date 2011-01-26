@@ -1,13 +1,19 @@
-<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" 
-                xmlns:exsl="http://exslt.org/common"
-                version="1.0">
+<xsl:stylesheet 
+    xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
+    xmlns:exsl="http://exslt.org/common"
+    xmlns:acis="http://acis.openlib.org"
+    xmlns:html="http://www.w3.org/1999/xhtml"
+    xmlns="http://www.w3.org/1999/xhtml"
+    exclude-result-prefixes="exsl xml html acis #default"
+    version="1.0">
 
   <xsl:import href='main.xsl' />
   
   <xsl:variable name='parents'>
-    <par id='research/main'/>
+    <acis:par id='research/main'/>
   </xsl:variable>
 
+  <!-- ToK 2008-04-06 was research/fturls -->
   <xsl:variable name='current-screen-id'>research/fturls</xsl:variable>
 
 
@@ -309,10 +315,10 @@ function make_choice_text(choice) {
 
   <xsl:template name='hidden-choice-form'>
     <div style='display: none' id='choice-form'>
-      <form>
+      <acis:form>
         <div style='float:right'><a ref='#' class='js closeform'>[X]</a></div>
         <div id='menu1'><xsl:call-template name='recognition-menu'/></div>
-      </form>
+      </acis:form>
       <div id='menu2' style='display:none;'><xsl:call-template name='archival-menu'/></div>
     </div>
   </xsl:template>
@@ -345,11 +351,11 @@ span.default {color: gray}
 a.selected { color: #000 !important; }
     </style>
 
-<script-onload>
+<acis:script-onload>
 $("a.changechoice").click( change_choice_click );
 $("a.closeform").click( close_choice_form );
 $("ul.menu a").click( choice );
-</script-onload>
+</acis:script-onload>
 
 <xsl:call-template name='scripts'/>
 <xsl:call-template name='hidden-choice-form'/>

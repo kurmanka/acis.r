@@ -1,20 +1,24 @@
 <xsl:stylesheet
- xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
- xmlns:exsl="http://exslt.org/common"
- exclude-result-prefixes='exsl'
+    xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
+    xmlns:exsl="http://exslt.org/common"
+    xmlns:acis="http://acis.openlib.org"
+    xmlns:html="http://www.w3.org/1999/xhtml"
+    xmlns="http://www.w3.org/1999/xhtml"
+    exclude-result-prefixes="exsl xml html acis #default"
+
  version="1.0">
 
   <xsl:import href='index.xsl'/>
 
   <xsl:variable name='columns'>
-    <c name='date'>Date</c>
-    <c name='type'>Type</c>
-    <c name='class'>Class</c>
-    <c name='action'>Action</c>
-    <c name='descr'>Description</c>
-    <c name='data'>Data</c>
-    <c name='chain'>Session</c>
-    <c name='startend'>S/E</c>
+    <acis:c name='date'>Date</acis:c>
+    <acis:c name='type'>Type</acis:c>
+    <acis:c name='class'>Class</acis:c>
+    <acis:c name='action'>Action</acis:c>
+    <acis:c name='descr'>Description</acis:c>
+    <acis:c name='data'>Data</acis:c>
+    <acis:c name='chain'>Session</acis:c>
+    <acis:c name='startend'>S/E</acis:c>
   </xsl:variable>
 
   <xsl:template match='/'>
@@ -34,18 +38,17 @@
           <xsl:when test='$amount'>
             <table>
               <tr>
-                <xsl:for-each select='exsl:node-set($columns)/c'>
+                <xsl:for-each select='exsl:node-set($columns)/acis:c'>
                   <th><xsl:value-of select='text()'/></th>
                 </xsl:for-each>
               </tr>
-
+              
               <xsl:for-each select='//events/list-item'>
                 <xsl:variable name='e' select='.'/>
                 <tr>
-                  <xsl:for-each select='exsl:node-set($columns)/c'>
+                  <xsl:for-each select='exsl:node-set($columns)/acis:c'>
                     <td><xsl:value-of select='$e/*[name()=current()/@name]/text()'/></td>
                   </xsl:for-each>
-
                 </tr>
               </xsl:for-each>
             </table>

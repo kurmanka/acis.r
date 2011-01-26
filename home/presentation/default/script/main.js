@@ -1,59 +1,61 @@
 
 
-// toggle visibility 
+// toggle visibility of an element, by id
 
-function toggle( targetId ){  // stolen from http://www.happycog.com/j/h.js
-
-  if (document.getElementById){
-          var target = document.getElementById( targetId );
-                          if (target.style.display == "none"){
-                                  target.style.display = "";
-                          } else {
-                                  target.style.display = "none";
-                          }
-          }
+function toggle( targetId ) {  
+    if (document.getElementById){
+        var target = document.getElementById( targetId );
+        if (target.style.display == "none"){
+            target.style.display = "";
+        } 
+        else {
+            target.style.display = "none";
+        }
+    }
 }
 
 function getRef(obj) {
-  if ( typeof obj == "string" && document.getElementById ) {
-    obj= document.getElementById(obj);
-  }
-  return obj;
+    if ( typeof obj == "string" && document.getElementById ) {
+        obj= document.getElementById(obj);
+    }
+    return obj;
 }
 
 function get(obj) {
-  if ( typeof obj == "string" && document.getElementById ) {
-    return document.getElementById(obj);
-  } else {
-    return null;
-  }
+    if ( typeof obj == "string" && document.getElementById ) {
+        return document.getElementById(obj);
+    } 
+    else {
+        return null;
+    }
 }
 
 
 function show( targetId ) {
-  if ( document.getElementById ) {
-    var target = document.getElementById( targetId );
-    if ( target ) { target.style.display = ""; }
-  }
+    if ( document.getElementById ) {
+        var target = document.getElementById( targetId );
+        if ( target ) { 
+            target.style.display = ""; }
+    }
 }
 
 function hide( targetId ) {
-  if ( document.getElementById ) {
-    var target = document.getElementById( targetId );
-    if ( target ) { target.style.display = "none"; }
-  }
+    if ( document.getElementById ) {
+        var target = document.getElementById( targetId );
+        if ( target ) { target.style.display = "none"; }
+    }
 }
 
 
 var origClass;
 
 function ULL( a ) {
-  origClass = a.className;
-  a.className='hovering ' + a.className;
+    origClass = a.className;
+    a.className='hovering ' + a.className;
 }
 
 function HUL( a ) {
-  a.className = origClass;
+    a.className = origClass;
 }
 
 
@@ -62,44 +64,47 @@ function HUL( a ) {
 // or removes it if it is.
 
 function toggle_class( id, cla ) {
-  var o = getRef( id );
-  var class_list;
-  if ( o ) {
-
-     /// simple cases
-     if ( ! o.className
-          || o.className == '' ) {
-          o.className = cla; 
-	  return;
-     }
-  
-     if ( o.className == cla ) { 
-       o.className='';
-     } 
-
-     class_list = o.className.split( ' ' );
-
-  } else { return; }
-
-  var already_there = false;
-  var its_index;
-  for ( var i=0; i < class_list.length; i++ ) {
-     if ( class_list[i] == cla ) {
-       already_there = true;
-       its_index = i;
-       break;
-     }      
-  } 
-
-  if ( already_there ) {
-     class_list.splice(its_index, 1);
-     
-  } else {
-     class_list.push( cla );
-  }   
-
-  o.className = class_list.join(" ");
-  return;
+    var o = getRef( id );
+    var class_list;
+    if ( o ) {
+        
+        /// simple cases
+        if ( ! o.className
+             || o.className == '' ) {
+            o.className = cla; 
+            return;
+        }
+        
+        if ( o.className == cla ) { 
+            o.className='';
+        } 
+        
+        class_list = o.className.split( ' ' );
+        
+    } 
+    else { 
+        return; 
+    }
+    
+    var already_there = false;
+    var its_index;
+    for ( var i=0; i < class_list.length; i++ ) {
+        if ( class_list[i] == cla ) {
+            already_there = true;
+            its_index = i;
+            break;
+        }      
+    } 
+    
+    if ( already_there ) {
+        class_list.splice(its_index, 1);
+        
+    } else {
+        class_list.push( cla );
+    }   
+    
+    o.className = class_list.join(" ");
+    return;
 }
 
 // set_class_if() func
@@ -108,72 +113,72 @@ function toggle_class( id, cla ) {
 // checked logical value.
 
 function set_class_if( o, cla, checked ) {
-  if ( typeof o == 'string' ) {
-     o = getRef( o );
-  }
-  var class_list;
-  if ( o ) {
+    if ( typeof o == 'string' ) {
+        o = getRef( o );
+    }
+    var class_list;
+    if ( o ) {
 
-      /// simple cases
-//      if ( ! o.className ) { return; }
-      if (    o.className == '' 
-	   || o.className == cla ) {
-	  
-	  if ( checked ) {
-	      o.className = cla;
-	  } else {
-	      o.className = '';
-	  }
-	  return;
-     }
-  
-     class_list = o.className . split( ' ' );
-  }
-  var already_there = false;
-  var its_index;
-  var with_cla    ='';
-  var without_cla ='';
-
-  for ( var i=0; i < class_list.length; i++ ) {
-      var klass = class_list[i];
-      if ( klass ) {
-	  with_cla = with_cla + klass + " ";
-	  if ( klass == cla ) {
-	      already_there = true;
-	      its_index = i;
-	  } else {
-	      without_cla = without_cla + klass + " ";
-	  }
-      }
-  } 
-
-  if ( ! already_there ) {
-      with_cla = with_cla + cla;
-  }
-
-
+        /// simple cases
+        //      if ( ! o.className ) { return; }
+        if (    o.className == '' 
+                || o.className == cla ) {
+            
+            if ( checked ) {
+                o.className = cla;
+            } else {
+                o.className = '';
+            }
+            return;
+        }
+        
+        class_list = o.className . split( ' ' );
+    }
+    var already_there = false;
+    var its_index;
+    var with_cla    ='';
+    var without_cla ='';
+    
+    for ( var i=0; i < class_list.length; i++ ) {
+        var klass = class_list[i];
+        if ( klass ) {
+            with_cla = with_cla + klass + " ";
+            if ( klass == cla ) {
+                already_there = true;
+                its_index = i;
+            } else {
+                without_cla = without_cla + klass + " ";
+            }
+        }
+    } 
+    
+    if ( ! already_there ) {
+        with_cla = with_cla + cla;
+    }
+    
+    
   if ( already_there ) {
       if ( ! checked ) {
 	  o.className = without_cla;
 	  return;
       }
-     
+      
   } else {
       if ( checked ) {
 	  o.className = with_cla;
 	  return;
       }
   }   
-
+  
   return;
 }
 
 function set_class( o, name ) {
-  set_class_if( o, name, true );
+    set_class_if( o, name, true );
 }
 
 function unset_class( o, name ) {
-  set_class_if( o, name, false );
+    set_class_if( o, name, false );
 }
 
 
@@ -181,8 +186,8 @@ function unset_class( o, name ) {
 var item_label_click = false;
 
 function item_checkbox_changed ( rowid, c ) {
-  set_class_if( rowid, "select", c.checked );
-  /*c.blur();*/
+    set_class_if( rowid, "select", c.checked );
+    /*c.blur();*/
 }
 
 function item_checkbox_blur ( rowid, c ) {
@@ -208,19 +213,26 @@ function form_submit() {
   formChanged = false;
 }
 
-function check_form_changes() {
-  if ( formChanged && formChangedName ) {
-    var save = confirm(  "Save your changes before you leave?\n\nPress OK to save." );
-    
-    if ( save ) {
-      formChanged = false;
-      Submit( formChangedName );
-      return( false );
-    }
-  }
-  formChanged = false;
-  return true;
-}
+
+// eliminted 2009-11-23
+    // function check_form_changes() {
+    //  if ( formChanged && formChangedName ) {
+    //    var save = confirm(  "Save your changes before you leave?\n\nPress OK to save." );
+    //    if ( save ) {
+    //      formChanged = false;
+    //      /* cardiff change */
+    //      // alert(formChangedName);
+    //      var form=getRef(formChangedName);
+    //      // alert(form);
+    //      form.submit();
+    //      /* end of cardiff change */
+    //      return( false );
+    //    }
+    //  }
+    //  // alert('no form change');
+    //  formChanged = false;
+//  return true;
+//}
 
 
 
@@ -423,3 +435,34 @@ function DEBUG(text) {
     alert( text );
   }
 }
+
+
+/* used in settings.xsl */
+function control_remember_password_switch() {
+    var pass_old = getRef("old").value;
+    var rem_log  = getRef( "rem-l" );
+    var Switch   = getRef("rem-p");
+    if ( pass_old != "" && rem_log.checked ) {
+        Switch.disabled = false;
+    } 
+    else { 
+        Switch.disabled = true;
+    }
+}
+
+/* ussed in listings.xsl */
+function show_sibling_span_and_hide(start_element) {
+    var this_element=start_element.nextSibling;
+    while(this_element.nodeName.toLowerCase() != 'span') {
+        this_element=this_element.nextSibling;
+        // in case we reached the end
+        if(! this_element) {
+            return true;
+        }
+    }
+    this_element.setAttribute('style','display: inline');
+    start_element.setAttribute('style','display: none');
+    return true;
+}
+
+                

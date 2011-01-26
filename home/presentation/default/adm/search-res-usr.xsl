@@ -1,9 +1,12 @@
 <!--   This file is part of the ACIS presentation template-set.   -->
   
 <xsl:stylesheet
-  xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
-  xmlns:exsl="http://exslt.org/common"
-  exclude-result-prefixes='exsl'
+    xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
+    xmlns:exsl="http://exslt.org/common"
+    xmlns:acis="http://acis.openlib.org"
+    xmlns:html="http://www.w3.org/1999/xhtml"
+    xmlns="http://www.w3.org/1999/xhtml"
+    exclude-result-prefixes="exsl xml html acis #default"
   version="1.0">  
 
   <xsl:import href='../page.xsl'/>
@@ -53,13 +56,13 @@
 <!--
     <a ref='/adm/search?show=*&amp;for=records&amp;by=owner&amp;key={login}'>records</a>
 -->
-<form style='display: inline; padding: 6px;' screen='adm/search' class='narrow'>
+<acis:form style='display: inline; padding: 6px;' screen='adm/search' class='narrow'>
   <input type='hidden' name='show' value='*'/>
   <input type='hidden' name='for'  value='records'/>
   <input type='hidden' name='by'   value='owner'/>
   <input type='hidden' name='key'  value='{login}'/>
   <input type='submit' value='records' title="see this user's records"/>
-</form>
+</acis:form>
 
     </li>
   </xsl:for-each>

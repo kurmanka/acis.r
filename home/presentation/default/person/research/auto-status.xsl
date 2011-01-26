@@ -1,9 +1,16 @@
-<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0">
+<xsl:stylesheet 
+    xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
+    xmlns:exsl="http://exslt.org/common"
+    xmlns:acis="http://acis.openlib.org"
+    xmlns:html="http://www.w3.org/1999/xhtml"
+    xmlns="http://www.w3.org/1999/xhtml"
+    exclude-result-prefixes="exsl xml html acis #default"
+    version="1.0">
 
   <xsl:import href='main.xsl'/>
   
   <xsl:variable name='parents'>
-    <par id='research/main'/>
+    <acis:par id='research/main'/>
   </xsl:variable>
 
   <xsl:variable name='current-screen-id'>research/auto/status</xsl:variable>

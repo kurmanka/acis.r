@@ -1,13 +1,20 @@
-<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0">
+<xsl:stylesheet     
+    xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
+    xmlns:exsl="http://exslt.org/common"
+    xmlns:acis="http://acis.openlib.org"
+    xmlns="http://www.w3.org/1999/xhtml"
+    exclude-result-prefixes="exsl xml html acis #default"
+    version="1.0">
 
   <xsl:import href='main.xsl' />
   <xsl:import href='listings.xsl' />
   <xsl:import href='old-table.xsl' />
   
   <xsl:variable name='parents'>
-    <par id='research/main'/>
+    <acis:par id='research/main'/>
   </xsl:variable>
 
+  <!-- ToK: 2008-04-06: was research/search -->
   <xsl:variable name='current-screen-id'>research/search</xsl:variable>
 
 
@@ -58,8 +65,8 @@
       </xsl:choose>
     </xsl:variable>
 
-
-    <form screen='@research/search' name='searchform'>
+     <!-- changed name= to id=, then back to name=-->
+    <acis:form screen='@research/search' name='searchform'>
 
       <table >
         <tr style='vertical-align: middle'>
@@ -68,12 +75,11 @@
             <input type='text' name='q' id='q' size='50'
                    style='margin: 4px 4px 4px 0px;'
                    value='{$search/key}'>
-                  <check nonempty=''/>
-                  <name>a search expression</name>
+                  <acis:check nonempty=''/>
+                  <acis:name>a search expression</acis:name>
             </input>
           </td>
-          <td>
-            
+          <td>            
             <input type='submit' name='go' value=' FIND! ' class='significant'/>
             <xsl:text> </xsl:text>
             <input type='button' value='Clear' onclick='javascript:search_clear_and_focus()'/>
@@ -124,7 +130,7 @@
                   <xsl:attribute name='checked'/>
                 </xsl:if>
             </input><xsl:text> </xsl:text>
-            <phrase ref='metadata-identifiers'/>
+            <acis:phrase ref='metadata-identifiers'/>
             </label>
           </td>
 
@@ -156,7 +162,7 @@ function search_clear_and_focus() {
       <p class='spacer'>&#160;</p>
 -->
 
-    </form>
+    </acis:form>
 
   </xsl:template>
 
@@ -216,7 +222,7 @@ function search_clear_and_focus() {
     <!-- /paging -->
 
 
-    <form xsl:use-attribute-sets='form'><!-- XXX -->
+    <acis:form xsl:use-attribute-sets='form'><!-- XXX -->
       <input type='hidden' name='mode'   value='add'/>
       <input type='hidden' name='source' value='search'/>
       <input type='hidden' name='page'   value='{$the-page}'/>
@@ -244,10 +250,12 @@ function search_clear_and_focus() {
           <xsl:if test='field="title"'>titles</xsl:if>
           <xsl:if test='field="authors"'>authors</xsl:if>
           <xsl:if test='field="editors"'>editors</xsl:if>
-          <xsl:if test='field="id"'><phrase ref='metadata-identifiers'/></xsl:if>
+          <xsl:if test='field="id"'>
+            <acis:phrase ref='metadata-identifiers'/>
+          </xsl:if>
           <xsl:if test='field="name"'>names</xsl:if>
         </xsl:variable>
-
+        
         <xsl:variable name='result-phrasing'>
           <xsl:choose>
             <xsl:when test='$result-number &gt; 500'>more than 500 items</xsl:when>
@@ -256,7 +264,7 @@ function search_clear_and_focus() {
             <xsl:otherwise><xsl:value-of select='$result-number'/> items</xsl:otherwise>
           </xsl:choose>
         </xsl:variable>
-
+        
         <p>We searched for <xsl:value-of select='$search-for'/>
         in <xsl:copy-of select='$search-field'/> 
         of <xsl:value-of select='$search-what'/>.  
@@ -319,7 +327,7 @@ function search_clear_and_focus() {
         </xsl:choose>
       </p>
       
-    </form>
+    </acis:form>
 
   </xsl:template>
 

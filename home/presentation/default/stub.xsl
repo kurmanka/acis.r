@@ -1,10 +1,13 @@
 <!--   This file is part of the ACIS presentation template-set.   -->
 
 <xsl:stylesheet
-  xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
-  xmlns:exsl="http://exslt.org/common"
-  exclude-result-prefixes='exsl'
-  version="1.0">  
+    xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
+    xmlns:exsl="http://exslt.org/common"
+    xmlns:acis="http://acis.openlib.org"
+    xmlns:html="http://www.w3.org/1999/xhtml"
+    xmlns="http://www.w3.org/1999/xhtml"
+    exclude-result-prefixes="exsl xml html acis #default"
+    version="1.0">  
 
 
   <xsl:import href='page.xsl'/>
@@ -12,19 +15,18 @@
 
   <xsl:template match='/data'>
     <xsl:call-template name='page'>
-
+      
       <xsl:with-param name='title'>screen</xsl:with-param>
       
       <xsl:with-param name='content'>
+        
+        <h1>Screen</h1>
 
-<h1>Screen</h1>
-
-<p></p>
-       
+        <p></p>
+        
       </xsl:with-param>
 
     </xsl:call-template>
   </xsl:template>
-
-
+  
 </xsl:stylesheet>

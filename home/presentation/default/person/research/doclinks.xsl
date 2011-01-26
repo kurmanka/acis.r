@@ -1,11 +1,19 @@
-<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0">
+<xsl:stylesheet 
+    xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
+    xmlns:exsl="http://exslt.org/common"
+    xmlns:acis="http://acis.openlib.org"
+    xmlns:html="http://www.w3.org/1999/xhtml"
+    xmlns="http://www.w3.org/1999/xhtml"
+    exclude-result-prefixes="exsl xml html acis #default"
+    version="1.0">
 
   <xsl:import href='main.xsl' />
   
   <xsl:variable name='parents'>
-    <par id='research/main'/>
+    <acis:par id='research/main'/>
   </xsl:variable>
 
+  <!-- ToK: 2008-04-06: was research/doclinks -->
   <xsl:variable name='current-screen-id'>research/doclinks</xsl:variable>
 
 
@@ -61,14 +69,13 @@
         </xsl:otherwise>
       </xsl:choose>
       <xsl:text> </xsl:text>
-      <a class='linkdelete'
-         ref='@research/doclinks?src={list-item[1]/text()}&amp;rel={list-item[2]/text()}&amp;trg={list-item[3]/text()}&amp;del=1'>[<span>X</span>]</a>
+      <a ref='@research/doclinks?src={list-item[1]/text()}&amp;rel={list-item[2]/text()}&amp;trg={list-item[3]/text()}&amp;del=1' class='linkdelete'>[<span>X</span>]</a>
     </li>
   </xsl:template>
 
   <xsl:template name='link-form-hidden'>
     <div style='display:none' id='link-form'>
-      <form screen='@research/doclinks'>
+      <acis:form screen='@research/doclinks'>
         <div style='float:right'><a href='#' class='closeform js' title='close this'>[X]</a></div>
 
         <div><b>add a link</b>
@@ -100,7 +107,7 @@
         <input type='submit' name='add' value=' create link '/>
         or <a href='#' class='closeform'>cancel</a>
         </div>
-      </form>
+      </acis:form>
     </div>
   </xsl:template>
 
@@ -187,10 +194,10 @@ ul.links a.linkdelete span {
 }
     </style>
 
-<script-onload>
+<acis:script-onload>
 $("a.linkadd").click( add_link_form );
 $("a.closeform").click( close_add_link_form );
-</script-onload>
+</acis:script-onload>
 <script>
 var record_sid = "<xsl:value-of select='$record-sid'/>";
 var session_id = "<xsl:value-of select='$session-id'/>";

@@ -1,5 +1,10 @@
 <xsl:stylesheet
-  xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
+    xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
+    xmlns:exsl="http://exslt.org/common"
+    xmlns:acis="http://acis.openlib.org"
+    xmlns:html="http://www.w3.org/1999/xhtml"
+    xmlns="http://www.w3.org/1999/xhtml"
+    exclude-result-prefixes="exsl xml html acis #default"
   version="1.0">
   
   <xsl:import href='page.xsl'/>
@@ -38,13 +43,13 @@
             </address>
           </xsl:if>
           
-          <p class='permanent'>Permanent link: <a class='permanent' 
-          href='{$response-data/permalink}'
-          ><xsl:value-of select='$response-data/permalink/text()'
-          /></a></p>
+          <p class='permanent'>Permanent link: 
+          <a href='{$response-data/permalink}' class='permanent'>
+            <xsl:value-of select='$response-data/permalink/text()'/>
+          </a></p>
           
         </div>
-    
+        
       </xsl:with-param>
 
     </xsl:call-template> <!-- /page -->

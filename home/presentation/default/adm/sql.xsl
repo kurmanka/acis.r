@@ -1,7 +1,10 @@
 <xsl:stylesheet
- xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
- xmlns:exsl="http://exslt.org/common"
- exclude-result-prefixes='exsl'
+    xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
+    xmlns:exsl="http://exslt.org/common"
+    xmlns:acis="http://acis.openlib.org"
+    xmlns:html="http://www.w3.org/1999/xhtml"
+    xmlns="http://www.w3.org/1999/xhtml"
+    exclude-result-prefixes="exsl xml html acis #default"
  version="1.0">
 
   <xsl:import href='index.xsl'/>
@@ -28,7 +31,7 @@
 
         <h1>sql</h1>
 
-        <form xsl:use-attribute-sets="form" id='sql' 
+        <acis:form xsl:use-attribute-sets="form" id='sql' 
               screen='adm/sql' style='padding-right: 4px;'>
           <input name='body' value="{$query}" style='width: 90%'/>
 
@@ -45,7 +48,7 @@
           <input type='text' name='par3' style='width: 80%' value='{$par3}'/><br/>
           <input type='text' name='par4' style='width: 80%' value='{$par4}'/><br/>
 -->
-        </form>
+        </acis:form>
 
 
         <xsl:if test='$result'>

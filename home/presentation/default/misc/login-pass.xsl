@@ -1,6 +1,11 @@
 <xsl:stylesheet
-  xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
-  version="1.0">
+    xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
+    xmlns:exsl="http://exslt.org/common"
+    xmlns:acis="http://acis.openlib.org"
+    xmlns:html="http://www.w3.org/1999/xhtml"
+    xmlns="http://www.w3.org/1999/xhtml"
+    exclude-result-prefixes="exsl xml html acis #default"
+    version="1.0">
   
   <xsl:import href='../page.xsl'/>
 
@@ -14,48 +19,41 @@
   <xsl:template name='login-form' xml:space='preserve'>
     <xsl:param name='login'/>
 
-    <form xsl:use-attribute-sets='form' name='loginform'
-          action='{$form-action}' >
+    <!-- there was  name='loginform' -->
+    <acis:form xsl:use-attribute-sets='form' action='{$form-action}' >
       <p>
-      <xsl:call-template name='fieldset' xml:space='default'>
-        <xsl:with-param name='content' xmlns='http://x' xml:space='preserve'>
+        <xsl:call-template name='fieldset' xml:space='default'>
+          <xsl:with-param name='content' xml:space='preserve'>
+            <xsl:if test='//form/value/login'>
+              <label>email address:</label>
+              <acis:input name='login' type='text' readonly='' value='{//form/value/login}' />
+            </xsl:if>
+            <acis:input type='hidden' name='override'/>
+            <label>password:<br />
+            <acis:input name='pass' type='password' />
+            </label><br />            
+            <acis:script-onload>
+              document.loginform.pass.focus();
+            </acis:script-onload>
+          </xsl:with-param>
+        </xsl:call-template>
+        <br/>
+        <input type='submit' value='LOG IN' class='important'/>
+      </p>
+      
+      
+      <p>&#160;</p>
 
-          <xsl:if test='//form/value/login'>
-            <label>email address:</label>
-            <input name='login' type='text' readonly='' value='{//form/value/login}' />
-          </xsl:if>
-
-          <input type='hidden' name='override'/>
-
-     <label>password:<br />
-     <input name='pass' type='password' /></label><br />
-
-     <script-onload>
-document.loginform.pass.focus();
-     </script-onload>
-
-
-
-    </xsl:with-param>
-  </xsl:call-template> <!-- /fieldset -->
-
-  <br />
-  <input type='submit' value='LOG IN' class='important'/>
-  </p>
-   
-
-  <p>&#160;</p>
-
-  <p><a class='int' href='{$base-url}/forgotten-password'>Forgot your password?</a>
-  &#160;|&#160; <!-- &#8212; -->
-  <a class='int' href='{$base-url}/new-user'>Register as a new user.</a></p>
+      <p><a href='{$base-url}/forgotten-password' class='int'>Forgot your password?</a>
+      &#160;|&#160; <!-- &#8212; -->
+      <a href='{$base-url}/new-user' class='int'>Register as a new user.</a></p>
 
 
-</form>
+    </acis:form>
 
 
 
-</xsl:template>
+  </xsl:template>
   
 
 

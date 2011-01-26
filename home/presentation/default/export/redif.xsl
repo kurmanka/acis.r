@@ -1,12 +1,16 @@
 <xsl:stylesheet
-  xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
-  version="1.0">
+    xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
+    xmlns:exsl="http://exslt.org/common"
+    xmlns:acis="http://acis.openlib.org"
+    xmlns:html="http://www.w3.org/1999/xhtml"
+    exclude-result-prefixes="exsl xml html acis #default"
+    version="1.0">
   
   <xsl:import href='../global.xsl'/>
   <xsl:import href='../indent.xsl'/>
-
+  
   <xsl:output method='text' encoding='utf-8'/>
-
+  
   <xsl:template match='text()'/>
 
   <xsl:template match='//record[id and type="person"]'>

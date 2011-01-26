@@ -1,259 +1,402 @@
-<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0">
-
-  <xsl:import href='main.xsl' />
-  
-
+<xsl:stylesheet 
+    xmlns:xsl='http://www.w3.org/1999/XSL/Transform'
+    xmlns:exsl='http://exslt.org/common'
+    xmlns:acis='http://acis.openlib.org'
+    xmlns:html='http://www.w3.org/1999/xhtml'
+    xmlns='http://www.w3.org/1999/xhtml'
+    exclude-result-prefixes='exsl xml html acis #default'
+    version='1.0'>
+  <xsl:import href='main.xsl'/>
+  <xsl:import href='../../widgets.xsl'/>
+  <xsl:import href='research_common.xsl'/>
+  <xsl:import href='listings.xsl'/>
   <xsl:variable name='parents'>
-    <par id='research/main'/>
+    <acis:par id='research/main'/>
   </xsl:variable>
-
-  <xsl:variable name='current-screen-id'>research/refused</xsl:variable>
-
-
-  <xsl:variable name='refused-count' 
+  <xsl:variable name='the-screen'>refused</xsl:variable>
+  <xsl:variable name='current-screen-id'>
+    <xsl:text>research/refused</xsl:text>
+  </xsl:variable>
+  <xsl:variable name='incoming-chunk-number' 
+                select='/data/chunk/hash-item[@key=$current-screen-id]'/>
+  <xsl:variable name='items-count' 
                 select='count( $refused/list-item )'/>
-
-  <xsl:template name='table-resources-for-review'>
-    <xsl:param name='list'/>
-
-    <xsl:for-each select='$list/list-item[id]' xml:space='preserve'>
-      <xsl:variable name="nid" select='generate-id(.)'/>
-      <xsl:variable name="id" select='id'/>
-
-      <tr class='resource' id='row_{$nid}'  valign='baseline'>
-
-        <td class='but'>
-          <input type='submit' name='unrefuse_{$nid}' value='remove' 
-                               class='RemoveButton'   docid='{id}' 
-           ><xsl:if test='position() = 1'><xsl:attribute name='id'
-            >unrefuse_button1</xsl:attribute></xsl:if></input>
-
-          <input type='hidden' name='id_{$nid}' value='{id}'/>
-        </td>
-
-        <td class='numb'>
-          <xsl:choose xml:space='default'>
-            <xsl:when test='position() = last()'>
-              <span id='ncLast'><xsl:value-of select='position()'/>.</span>
-            </xsl:when>
-            <xsl:otherwise>
-              <xsl:value-of select='position()'/>.<xsl:text/>
-            </xsl:otherwise>
-          </xsl:choose>
-        </td>
-
-<xsl:choose xml:space='default'>
-  <xsl:when test='title'>
-        <td class='title' ><a href='{url-about}' title='{normalize-space(title/text())}'><xsl:value-of select='title' /></a></td>
-  </xsl:when>
-  <xsl:when test='url-about'>
-        <td class='title' >unknown, id: <a href='{url-about}'><xsl:value-of select='id' /></a></td>
-  </xsl:when>
-  <xsl:otherwise>
-        <td class='title' ><small>title unknown, id: <xsl:value-of select='id'/></small></td>
-  </xsl:otherwise>
-</xsl:choose>
-        <td class='authors' title='{authors}'><xsl:value-of select='authors'/></td>
-
-      </tr>
-
+  <xsl:variable name='max-chunk'
+                select='($items-count - ($items-count mod $chunk-size)) div $chunk-size'/>
+  <!-- auxilliary variable, not to be used anywhere but the next definition -->
+  <xsl:variable name='chunk-times'
+                select='($incoming-chunk-number - ($incoming-chunk-number mod ($max-chunk+1))) div ($max-chunk + 1)'/>
+  <!-- rolls between the zero and max-chunk -->
+  <xsl:variable name='chunk-number'
+                select='$incoming-chunk-number - ($max-chunk + 1) * $chunk-times'/>
+  <!-- fixme: not used but referenced in research_common.xsl.xml -->
+  <xsl:variable name='more-to-follow' 
+                select='"99"'/>
+  <!-- fixme: not used but referenced in research_common.xsl.xml -->
+  <xsl:variable name='more-to-follow-count' 
+                select='"99"'/>
+  <!-- fixme: not used but referenced in research_common.xsl.xml -->
+  <xsl:variable name='this-chunk-size' 
+                select='"100"'/>
+  <!-- the number of items at the end of a chunk -->
+  <xsl:variable name='theoretical-last-number'
+                select='$chunk-size * ($chunk-number + 1)'/>
+  <xsl:variable name='last-number'>
+    <xsl:choose>
+      <xsl:when test='$incoming-chunk-number'>
+        <!-- chunked case: find minimum -->
+        <xsl:choose>
+          <xsl:when test='$theoretical-last-number &lt; $items-count'>
+            <xsl:value-of select='$theoretical-last-number'/>
+          </xsl:when>
+          <xsl:otherwise>
+            <xsl:value-of select='$items-count'/>
+          </xsl:otherwise>
+        </xsl:choose>
+      </xsl:when>
+      <!-- full case -->
+      <xsl:otherwise>
+        <xsl:value-of select='$items-count'/>
+      </xsl:otherwise>
+    </xsl:choose>
+  </xsl:variable>
+  <xsl:variable name='first-number'>
+    <xsl:choose>
+      <!-- chunked case -->
+      <xsl:when test='$incoming-chunk-number &gt; 0'>
+        <xsl:value-of select='($chunk-number) * $chunk-size + 1'/>
+      </xsl:when>
+      <!-- full case -->
+      <xsl:otherwise>
+        <xsl:value-of select='"1"'/>
+      </xsl:otherwise>
+    </xsl:choose>
+  </xsl:variable>
+  <xsl:template name='table-resources-for-review-range'>
+    <xsl:param name='first'/>
+    <xsl:param name='last'/>
+    <xsl:for-each select='$refused/list-item[id]'>
+      <xsl:variable name='pos'>
+        <xsl:value-of select='@pos'/>
+      </xsl:variable>
+      <!-- pos starts counting at 0 -->
+      <xsl:variable name='firstpos'>
+        <xsl:value-of select='$first - 1'/>
+      </xsl:variable>
+      <xsl:variable name='lastpos'>
+        <xsl:value-of select='$last - 1'/>
+      </xsl:variable>
+      <xsl:if test='$pos &gt;= $firstpos'>
+        <xsl:if test='$pos &lt;= $lastpos'>
+          <xsl:variable name='wid' 
+                        select='generate-id(.)'/>
+          <xsl:variable name='id'
+                        select='id'/>
+          <xsl:variable name='alternate'>
+            <xsl:if test='position() mod 2'>
+              <xsl:text> alternate</xsl:text>
+            </xsl:if>
+          </xsl:variable>
+          <tr class='resource{$alternate}'
+              id='row_{$wid}'
+              valign='baseline'>        
+            <td class='description'>
+              <xsl:if test='relevance'>
+                <xsl:attribute name='title'>
+                  <xsl:text>computed probability that this is yours: </xsl:text>
+                  <xsl:value-of select='relevance'/>
+                </xsl:attribute>                
+              </xsl:if>   
+              <xsl:call-template name='present-resource'>
+                <xsl:with-param name='resource' 
+                                select='.'/>
+              </xsl:call-template>
+            </td>
+            <xsl:call-template name='refuse-choice'/>
+          </tr>      
+        </xsl:if>
+      </xsl:if>
     </xsl:for-each>
   </xsl:template>
-
-  <xsl:template name='refused-list-all'>
-
-        <form class='refused' 
-              id='theform'
-              screen='@research/refused' xsl:use-attribute-sets='form'>
-
-              <p>Below <xsl:text/>
-
+  <xsl:variable name='the-navigating-tabs'>
+    <xsl:choose>
+      <!-- chunked case -->
+      <xsl:when test='$incoming-chunk-number'>
+        <!-- the "all" tab, not selected -->
+        <acis:tab>
+          <a>
+            <xsl:attribute name='ref'>
+              <xsl:text>@research/</xsl:text>
+              <xsl:value-of select='$the-screen'/>
+            </xsl:attribute>
+            <xsl:text> all at once </xsl:text>
+          </a> 
+        </acis:tab>
+        <!-- the previous tab -->
+        <xsl:variable name='previous-start'>
+          <xsl:if test='$chunk-number &gt; 0'>
+            <xsl:value-of select='$first-number - $chunk-size'/>
+          </xsl:if>
+          <xsl:if test='$chunk-number = 0'>
+            <xsl:value-of select='$max-chunk * $chunk-size'/>
+          </xsl:if>
+        </xsl:variable>
+        <xsl:variable name='previous-end'>
           <xsl:choose>
-          <xsl:when test='$refused-count &gt; 1'>
-             <xsl:text>are the </xsl:text>
-             <xsl:value-of select='$refused-count'/>
-             <xsl:text> items that you have refused so far, and thus claim not to have authored.</xsl:text>
-          </xsl:when>
-          <xsl:when test='$refused-count = 1'>
-             <xsl:text>is the single item that you have refused so far, and thus claimed not to have authored.</xsl:text>
-          </xsl:when>
+            <xsl:when test='$chunk-number &gt; 0'>
+              <xsl:value-of select='$first-number - 1'/>
+            </xsl:when>
+            <xsl:otherwise>
+              <xsl:value-of select='$items-count'/>
+            </xsl:otherwise>
           </xsl:choose>
-          
-               <xsl:text> Remove items from this list to make them 
-               available again for inclusion in your </xsl:text>
-               <a ref='@research/identified' >research profile</a>. <xsl:text/>
-
-             </p>
-          
-          <table id='refusedTable' class='briefResources xfixedRowTable' cols='4'>
-            <tr
-              ><th class='but'
-             /><th class='numb' 
-             /><th>title of the work</th
-             ><th class='authors'>the authors</th
-            ></tr>
-            <xsl:call-template name='table-resources-for-review'>
-              <xsl:with-param name='list' select='$refused'/>
+        </xsl:variable>
+        <xsl:if test='$incoming-chunk-number &gt; 0'>
+          <acis:tab>
+            <a>
+              <xsl:attribute name='ref'>
+                <xsl:text>@research/</xsl:text>
+                <xsl:value-of select='$the-screen'/>
+                <xsl:text>-chunk-backward</xsl:text>
+              </xsl:attribute>
+              <xsl:value-of select='$previous-start'/>
+              <xsl:text> to </xsl:text>
+              <xsl:value-of select='$previous-end'/>
+            </a> 
+          </acis:tab>
+        </xsl:if>
+        <!-- current tab -->
+        <acis:tab>
+          <xsl:attribute name='selected'>1</xsl:attribute>
+          <xsl:value-of select='$chunk-size'/>
+          <xsl:text> per page </xsl:text>
+        </acis:tab>
+        <!-- the next tab -->
+        <xsl:if test='$chunk-size &lt; $items-count'>
+          <xsl:variable name='next-end'>
+            <xsl:if test='$chunk-number &lt; $max-chunk'> 
+              <xsl:choose>
+                <xsl:when test='$last-number + $chunk-size &lt; $items-count'>
+                  <xsl:value-of select='$last-number + $chunk-size'/>
+                </xsl:when>
+                <xsl:otherwise>
+                  <xsl:value-of select='$items-count'/>
+                </xsl:otherwise>
+              </xsl:choose>
+            </xsl:if>
+            <!-- chunk overlap case -->
+            <xsl:if test='$chunk-number = $max-chunk'> 
+              <xsl:value-of select='$chunk-size'/>
+            </xsl:if>
+          </xsl:variable>
+          <xsl:variable name='next-start'>
+            <xsl:if test='$chunk-number &lt; $max-chunk'>
+              <xsl:value-of select='$last-number + 1'/>
+            </xsl:if>
+            <!-- chunk overlap case --> 
+            <xsl:if test='$chunk-number = $max-chunk'> 
+              <xsl:value-of select='"1"'/>
+            </xsl:if>
+          </xsl:variable>
+          <!-- paul levine bug of exactly 200 papers -->
+          <xsl:if test="$next-end &gt; $next-start">            
+            <acis:tab>
+              <a>
+                <xsl:attribute name='ref'>
+                  <xsl:text>@research/</xsl:text>
+                  <xsl:value-of select='$the-screen'/>
+                  <xsl:text>-chunk-forward</xsl:text>
+                </xsl:attribute>
+                <xsl:value-of select='$next-start'/>
+                <xsl:text> to </xsl:text>
+                <xsl:value-of select='$next-end'/>
+              </a> 
+            </acis:tab>
+          </xsl:if>          
+        </xsl:if>
+      </xsl:when>
+      <!-- full case -->
+      <xsl:otherwise>
+        <acis:tab>
+          <xsl:attribute name='selected'>1</xsl:attribute>
+          <xsl:text> all at once </xsl:text>
+        </acis:tab>
+        <acis:tab>
+          <a>
+            <xsl:attribute name='ref'>
+              <xsl:text>@research/</xsl:text>
+              <xsl:value-of select='$the-screen'/>
+              <xsl:text>-chunk</xsl:text>
+            </xsl:attribute>
+            <xsl:value-of select='$chunk-size'/>
+            <xsl:text> per page </xsl:text>
+          </a>           
+        </acis:tab>
+      </xsl:otherwise>
+    </xsl:choose>
+  </xsl:variable>
+  <xsl:template name='refused-list-all'>
+    <xsl:call-template name='tabset'>
+      <xsl:with-param name='id'
+                      select='"tabs"'/>
+      <xsl:with-param name='tabs'>
+        <xsl:copy-of select='$the-navigating-tabs'/>
+      </xsl:with-param>
+      <xsl:with-param name='content'>
+        <acis:form class='refused'
+                   id='theform'
+                   xsl:use-attribute-sets='form'>
+          <xsl:attribute name='screen'>
+            <xsl:choose>
+              <xsl:when test='$incoming-chunk-number'>
+                <xsl:text>@research/refused-chunk</xsl:text>
+              </xsl:when>
+              <xsl:otherwise>
+                <xsl:text>@research/refused</xsl:text>
+              </xsl:otherwise>
+            </xsl:choose>
+          </xsl:attribute>
+          <table width='100%'>
+            <tr>
+              <td>
+                <xsl:text>Here </xsl:text>        
+                <xsl:if test='$items-count &gt; 1'>
+                  <xsl:text>are </xsl:text>
+                  <xsl:if test='$incoming-chunk-number'>
+                    <xsl:if test='$first-number'>
+                      <xsl:text> items number </xsl:text>
+                      <xsl:value-of select='$first-number'/>
+                      <xsl:text> to </xsl:text>
+                      <xsl:value-of select='$last-number'/>
+                      <xsl:text> of</xsl:text>
+                    </xsl:if>
+                    <xsl:text> the </xsl:text>
+                  </xsl:if>
+                  <xsl:if test='not($incoming-chunk-number)'>
+                    <xsl:text> all </xsl:text>
+                  </xsl:if>
+                  <xsl:value-of select='$items-count'/>                  
+                  <xsl:text> items that you have </xsl:text>
+                  <span class='refuse'>
+                    <xsl:text>refused</xsl:text>
+                  </span>
+                  <xsl:text> so far.</xsl:text>
+                </xsl:if>
+                <xsl:if test='$items-count = 1'>
+                  <xsl:text>is the single item that you have </xsl:text>
+                  <span class='refuse'>
+                    <xsl:text>refused</xsl:text>
+                  </span>
+                  <xsl:text> so far.</xsl:text>
+                </xsl:if>
+                <xsl:text> If you change your mind, you can </xsl:text>
+                <span class='accept'>
+                  <xsl:text>accept</xsl:text>
+                </span>
+                <xsl:text> any item into your </xsl:text>
+                <a ref='@research/accepted' >
+                  <xsl:text>research profile</xsl:text>
+                </a>
+                <xsl:text>.</xsl:text>
+              </td>
+              <!-- <td> -->
+              <!-- <xsl:text>max-chunk: </xsl:text> -->
+              <!-- <xsl:value-of select='$max-chunk'/> -->
+              <!-- <xsl:text>chunk-times: </xsl:text> -->
+              <!-- <xsl:value-of select='$chunk-times'/> -->
+              <!-- <xsl:text>in-chunk: </xsl:text> -->
+              <!-- <xsl:value-of select='$incoming-chunk-number'/> -->
+              <!-- <xsl:text>chunk: </xsl:text> -->
+              <!-- <xsl:value-of select='$chunk-number'/> -->
+              <!-- </td> -->
+              <td>
+                <xsl:copy-of select='$save-and-continue-input'/>
+              </td>
+            </tr>
+          </table>
+          <!-- resources list -->
+          <table class='suggestions resources'
+                 summary='The items you have refused.'
+                 width='100%'>
+            <tr class='here'>
+              <xsl:copy-of select='$item-description-header'/>
+              <xsl:copy-of select='$by-you-header'/>
+            </tr>
+            <xsl:call-template name='table-resources-for-review-range'>
+              <xsl:with-param name='list'
+                              select='$refused'/>
+              <xsl:with-param name='first'
+                              select='$first-number'/>
+              <xsl:with-param name='last'
+                              select='$last-number'/>
             </xsl:call-template>
           </table>
-          
-        </form>
-
-
-<script-onload>
-$("input.RemoveButton").click( remove_button_click );
-setup_the_table();
-</script-onload>
-
-<script>
-
-function setup_the_table() {
-
-  var form   = get( 'theform' );
-  var table  = get( 'refusedTable' );
-  table &amp;&amp; form &amp;&amp; set_width_as( table, form );
-
-  var table  = $( '#refusedTable' );
-  table &amp;&amp; table.addClass( 'fixedRowTable' );
-
-  var columns;
-  if ( 0
-       &amp;&amp; table 
-       &amp;&amp; table.getElementsByTagName
-       &amp;&amp; (columns = table.getElementsByTagName( 'th' ))
-       &amp;&amp; columns[0] ) {
-
-    var column1 = columns[0];
-    var column2 = columns[1];
-
-    var button = get( 'unrefuse_button1' );
-    DEBUG( get_width( button ) + ' ' + get_width( column1 ) );
-
-    button &amp;&amp; column1 &amp;&amp; set_width_as( column1, button, 32 );
-    DEBUG( get_width( button ) + ' ' + get_width( column1 ) );
-
-    var number = get( 'ncLast' );
-    number &amp;&amp; column2 &amp;&amp; set_width_as( column2, number, 6 );
-    DEBUG( get_width( button ) + ' ' + get_width( column1 ) );
-
-  }
-
-}
-
-
-var record_sid = "<xsl:value-of select='$record-sid'/>";
-var session_id = "<xsl:value-of select='$session-id'/>";
-
-function remove_button_click() {
-  var docid=this.getAttribute('docid');
-  this.setAttribute("disabled", 1);
-  var button = this;
-  if ( docid ) {
-    var url = '/' + record_sid + '/research/refused/xml!' + session_id; 
-    $.post( url, { unrefuse: docid },
-      function (xml) { 
-        var parent = button.parentNode;
-        var success;
-        if ( ! xml )                 return alert( 'no xml response; cannot remove the item' );
-        if ( xml.documentElement )   xml = xml.documentElement;
-
-        if ( $( 'unrefused list-item', xml ).size() ) {
-          $(parent.parentNode).addClass("disabled"); 
-          $(button).hide();
-          $(parent).append( "removed" );
-
-        } else {
-          alert( 'Opps!  Unrefusing item ' + docid + ' failed.' );
-
-          // debugging...
-          if ( ! xml.getElementsByTagName )              return alert( 'no xml.getElementsByTagName' ); 
-          if ( ! xml.getElementsByTagName('unrefused') ) return alert( 'no xml.getElementsByTagName(unrefused)' );
-
-          var unrefused = xml.getElementsByTagName( 'unrefused' );
-
-          if ( ! unrefused.size )            return alert( 'no unrefused.size' );
-          if ( ! unrefused.size() )          return alert( 'no unrefused.size()' );
-          else                               alert( 'unrefused size() is ' + unrefused.size() );
-
-          if ( ! unrefused[0] )              return alert( 'no unrefused[0]' );
-          if ( ! unrefused[0].firstChild )   return alert( 'no unrefused[0].firstChild' );
-          if ( ! unrefused[0].firstChild() ) return alert( 'no unrefused[0].firstChild()' );
-
-          var child = unrefused[0].firstChild();
-          if ( ! child.tagName )             return alert( 'no child.tagName' );
-          if ( ! child.tagName() )           alert( 'no child.tagName()' );
-          else                               alert( 'child tagName() is ' + child.tagName() );
-
-        }
-      }
-    );
-  }
-  return false;
-}
-
-    </script>
- 
-
-
-
+          <!-- table bottom navigation -->
+          <table width='100%'>
+            <tr>
+              <!-- "chunk" and "exit" inputs are different -->
+              <!-- depite the fact that only one is shown -->
+              <xsl:choose>                
+                <xsl:when test='$incoming-chunk-number'>
+                  <td align='right'>                
+                    <xsl:copy-of select='$save-and-next-chunk-input'/>
+                  </td>
+                </xsl:when>
+                <xsl:otherwise>
+                  <td align='right'>
+                    <xsl:copy-of select='$save-and-exit-input'/>
+                  </td>
+                </xsl:otherwise>
+              </xsl:choose>
+              <td align='right'>
+                <xsl:copy-of select='$save-and-continue-input'/>
+              </td>
+            </tr>
+          </table>     
+        </acis:form>    
+      </xsl:with-param>
+    </xsl:call-template>
   </xsl:template>
-
-
-
-
   <xsl:template name='research-refused'>
-
-
-    <h1 id='display'>Refused research items</h1>
-
-    <xsl:comment> subscreen <xsl:value-of select='$request-subscreen'/> </xsl:comment>
-
+    <h1 id='display'>
+      <xsl:text>Refused research items</xsl:text>
+    </h1>
+    <xsl:comment>
+      <xsl:text>subscreen </xsl:text>
+      <xsl:value-of select='$request-subscreen'/>
+    </xsl:comment>
     <xsl:call-template name='show-status'/>
-
     <xsl:choose>
       <xsl:when test='$refused/list-item'>
-
         <xsl:call-template name='refused-list-all'/>
-
       </xsl:when>
-    
       <xsl:otherwise> 
-
-        <p>At this moment, there are no refused research
-        items in your profile.</p>
-
-      </xsl:otherwise>
-  
+        <p>
+          <xsl:text> At this moment, there are no refused items in your profile.</xsl:text>
+        </p>
+      </xsl:otherwise>     
     </xsl:choose>
-
   </xsl:template>
-
-
-
-
-
-  <xsl:variable name='page-id'>researchRefused</xsl:variable>
-  <xsl:variable name='additional-head-stuff'>
-        <script type="text/javascript" src='{$base-url}/script/jquery.js'></script>
+  <xsl:variable name='page-id'>
+    <xsl:text>researchRefused</xsl:text>
   </xsl:variable>
-
-
-  
-
+  <xsl:variable name='additional-head-stuff'>
+    <!-- there used to a script element here, taken away 2010-06-13 -->
+    <!-- <script type='text/javascript'  -->
+    <!-- src='{$base-url}/script/refused.js'> -->
+    <!-- </script> -->
+    <script type='text/javascript' 
+            src='{$base-url}/script/research.js'></script>
+  </xsl:variable>
   <!--   n o w   t h e   p a g e   t e m p l a t e    -->
-
-    
   <xsl:template match='/data'>
-
     <xsl:call-template name='research-page'>
-      <xsl:with-param name='title'>refused items</xsl:with-param>
+      <xsl:with-param name='title'>
+        <xsl:text>refused items</xsl:text>
+      </xsl:with-param>
       <xsl:with-param name='content'>
         <xsl:call-template name='research-refused'/>
       </xsl:with-param>
     </xsl:call-template>
-
   </xsl:template>
-
-    
-
 </xsl:stylesheet>

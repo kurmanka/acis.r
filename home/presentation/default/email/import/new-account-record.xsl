@@ -1,5 +1,10 @@
 <xsl:stylesheet
-  xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
+    xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
+    xmlns:exsl="http://exslt.org/common"
+    xmlns:acis="http://acis.openlib.org"
+    xmlns:html="http://www.w3.org/1999/xhtml"
+    exclude-result-prefixes="exsl xml html acis #default"
+
   version="1.0">
  
   <xsl:import href='../general.xsl'/>
@@ -35,7 +40,7 @@ and use:
 
 to login.
 
-<phrase ref='email-account-imported-footer'/>
+<acis:phrase ref='email-account-imported-footer'/>
 
 </xsl:with-param>
 </xsl:call-template>

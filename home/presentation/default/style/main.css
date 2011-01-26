@@ -9,6 +9,10 @@ body {
  color: black;
 }
 
+td.firstcolumnlogin {
+ width: 10%
+}
+
 
 form { 
  clear: both;
@@ -22,13 +26,16 @@ form.narrow p { padding: 0; }
 form.narrow p { margin-top: 4px; margin-bottom: 4px; }
 
 
+.smallwidth {
+   width: 6%;
+}
 
 /* for IE 5 */
 form p { margin-top: 3px; padding-top: 6px; } 
 
 .active { background: #ffc; }
 
-input, textarea, select { 
+input, button, textarea, select { 
  padding: 1px;
  font-size: larger;
 }
@@ -507,11 +514,11 @@ body {
 
 .content {
  margin: 0;
- padding: 6px 40px 20px 40px;
+ padding: 6px 20px 20px 20px;
 }
 
 .footer {
- margin: 0px 40px 0px 40px;
+ margin: 0px 20px 0px 20px;
 }
 
 .footer .menu {
@@ -519,7 +526,7 @@ body {
 }
 
 .after-footer {
- padding: 40px;
+ padding: 20px;
 }
 
 
@@ -982,7 +989,7 @@ div.tabset .tabs a:visited {
 
 
 span.hidden {
- display: none;
+  visibility: hidden;
 }
 
 div.header,
@@ -1232,3 +1239,9 @@ div.PSA p {
  padding: 3px 8px 3px 8px;
  display: inline;
 }
+
+/* cardiff classes */
+.refuse { background-color: #FFbbbb; }
+.accept { background-color: #bbFFbb; }
+.hide {visibility: hidden; }
+/* end of cardiff classes */

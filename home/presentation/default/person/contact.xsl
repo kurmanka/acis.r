@@ -1,5 +1,11 @@
-<xsl:stylesheet
-  xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
+<xsl:stylesheet 
+   xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
+    xmlns:exsl="http://exslt.org/common"
+    xmlns:acis="http://acis.openlib.org"
+    xmlns:html="http://www.w3.org/1999/xhtml"
+    xmlns="http://www.w3.org/1999/xhtml"
+    exclude-result-prefixes="exsl xml html acis #default"
+
   version="1.0">
 
   <xsl:import href='../page-universal.xsl' />
@@ -20,53 +26,54 @@
         
         <xsl:call-template name='show-status'/>
         
-    <form xsl:use-attribute-sets='form'>
-
-     <xsl:call-template name='fieldset'><xsl:with-param name='content' xmlns='http://x'>
-
-       <p>
-        <label for='em'>Email address.  Required: <br />
-         <input name="email" id='em' size="50" maxsize="60" />
-        </label><br />
-
-        <label for='pub'>
-          <input name="email-pub" id='pub' type="checkbox" value='true' /> Show address in my
-         public profile</label>
-       </p>
+        <acis:form xsl:use-attribute-sets='form'>
+          
+          <xsl:call-template name='fieldset'>
+            <xsl:with-param name='content' xmlns='http://acis.openlib.org/fieldset'>
               
-       <p>
-        <label for='hp'>Your personal homepage, optional:<br />
-         <input name="homepage" id='hp' size="50" maxsize="90" />
-        </label><br />
-                  
-        <label for='ph'>Your phone number, optional:<br />
-         <input name="phone" id='ph' size="20" maxsize="40" />
-        </label><br />
-                    
-        <label for='post'>Your postal address, optional:<br />
-         <textarea name="postal" id='post' type="text" rows="5" cols="50"/>
-        </label>
-       </p>
+              <p>
+                <label for='em'>Email address.  Required: <br />
+                <acis:input name="email" id='em' size="50" maxlength="60" />
+                </label><br />
                 
-
-
-     </xsl:with-param></xsl:call-template>
-
-     <input type='submit' class='important' value='SAVE AND RETURN TO THE MENU' />
-     
-
-    </form>
-
-  </xsl:with-param>
-</xsl:call-template>
-
-</xsl:template>
-
-
+                <label for='pub'>
+                  <acis:input name="email-pub" id='pub' type="checkbox" value='true' />
+                  Show address in my public profile</label>
+              </p>
+              
+              <p>
+                <label for='hp'>Your personal homepage, optional:<br />
+                <acis:input name="homepage" id='hp' size="50" maxlength="90" />
+                </label><br />
+                
+                <label for='ph'>Your phone number, optional:<br />
+                <acis:input name="phone" id='ph' size="20" maxlength="40" />
+                </label><br />
+                
+                <label for='post'>Your postal address, optional:<br />
+                <acis:textarea name="postal" id='post' rows="5" cols="50"/>
+                </label>
+              </p>
+                    
+          
+            </xsl:with-param>
+          </xsl:call-template>
+          <p>
+            <input type='submit' class='important' value='SAVE AND RETURN TO THE MENU' />
+          </p>
+          
+        </acis:form>
+        
+      </xsl:with-param>
+    </xsl:call-template>
+    
+  </xsl:template>
+  
+  
   <xsl:variable name='to-go-options'>
-    <root/>
+    <acis:root/>
   </xsl:variable>
-
+  
 
 
 </xsl:stylesheet>

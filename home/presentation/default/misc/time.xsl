@@ -1,8 +1,12 @@
 <xsl:stylesheet
-  xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
-  xmlns:exsl="http://exslt.org/common"
-  exclude-result-prefixes='exsl'
-  version="1.0">
+    xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
+    xmlns:exsl="http://exslt.org/common"
+    xmlns:acis="http://acis.openlib.org"
+    xmlns:html="http://www.w3.org/1999/xhtml"
+    xmlns="http://www.w3.org/1999/xhtml"
+    exclude-result-prefixes="exsl xml html acis #default"
+    
+    version="1.0">
   
   <xsl:template name='time-difference-in-seconds'>
     <xsl:param name='diff'/>
@@ -71,12 +75,12 @@
 
   <xsl:template match='//time-difference-in-seconds/test'>
     <td><xsl:value-of select='text()'/></td><xsl:text>
-   </xsl:text>
-    <td>
+  </xsl:text>
+  <td>
       <xsl:call-template name='time-difference-in-seconds'>
         <xsl:with-param name='diff' select='text()'/>
       </xsl:call-template>
-    </td>
+  </td>
   </xsl:template>
 
 </xsl:stylesheet>

@@ -1,9 +1,12 @@
 <xsl:stylesheet
-  xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
-  xmlns:exsl="http://exslt.org/common"
-  xmlns:date="http://exslt.org/dates-and-times"
-  exclude-result-prefixes='exsl'
-  version="1.0">  
+    xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
+    xmlns:exsl="http://exslt.org/common"
+    xmlns:acis="http://acis.openlib.org"
+    xmlns:html="http://www.w3.org/1999/xhtml"
+    xmlns="http://www.w3.org/1999/xhtml"
+    exclude-result-prefixes="exsl xml html acis #default date"
+    xmlns:date="http://exslt.org/dates-and-times"
+    version="1.0">  
 
   <!--   This file is part of the ACIS presentation template set.   -->
 
@@ -15,32 +18,30 @@
 
 <p>
 <xsl:choose>
-<xsl:when test='$dot/record and not( $dot/ardb )'
-><span class='here'>&#160;the&#160;record&#160;</span>
+<xsl:when test='$dot/record and not( $dot/ardb )'>
+  <span class='here'>&#160;the&#160;record&#160;</span>
 </xsl:when>
 <xsl:otherwise>
-<span>&#160;<a ref='/adm/get/{$form-input/col}/{$form-input/id}/rec'
->the record</a>&#160;</span>
+<span>&#160;<a ref='/adm/get/{$form-input/col}/{$form-input/id}/rec'>the record</a>&#160;</span>
 </xsl:otherwise>
 </xsl:choose>
 | 
 <xsl:choose>
-<xsl:when test='$dot/history'
-><span class='here'>&#160;the&#160;history&#160;</span>
+<xsl:when test='$dot/history'>
+  <span class='here'>&#160;the&#160;history&#160;</span>
 </xsl:when>
 <xsl:otherwise>
-<span>&#160;<a ref='/adm/get/{$form-input/col}/{$form-input/id}'
->the history</a>&#160;</span>
+  <span>&#160;<a ref='/adm/get/{$form-input/col}/{$form-input/id}'>
+  the history</a>&#160;</span>
 </xsl:otherwise>
 </xsl:choose>
 |
 <xsl:choose>
-<xsl:when test='$dot/record and $dot/ardb'
-><span class='here'>&#160;ARDB&#160;</span>
+<xsl:when test='$dot/record and $dot/ardb'>
+  <span class='here'>&#160;ARDB&#160;</span>
 </xsl:when>
 <xsl:otherwise>
-<span>&#160;<a ref='/adm/get/{$form-input/col}/{$form-input/id}/ardb'
->ARDB</a>&#160;</span>
+  <span>&#160;<a ref='/adm/get/{$form-input/col}/{$form-input/id}/ardb'>ARDB</a>&#160;</span>
 </xsl:otherwise>
 </xsl:choose>
 
@@ -52,23 +53,23 @@
     <xsl:call-template name='page'>
 
       <xsl:with-param name='title'>
-<xsl:choose>
-<xsl:when test='$form-input/id'><xsl:value-of select='$form-input/id'/></xsl:when>
-<xsl:when test='//nosuchrecord'> record not found </xsl:when>
-<xsl:otherwise> adm/get </xsl:otherwise>
-</xsl:choose>
-</xsl:with-param>
+        <xsl:choose>
+          <xsl:when test='$form-input/id'><xsl:value-of select='$form-input/id'/></xsl:when>
+          <xsl:when test='//nosuchrecord'> record not found </xsl:when>
+          <xsl:otherwise> adm/get </xsl:otherwise>
+        </xsl:choose>
+      </xsl:with-param>
       
       <xsl:with-param name='content'>
 
         <xsl:choose>
           <xsl:when test='//nosuchrecord'>
-             <h1>Record not found</h1>
-             
-             <p><big><xsl:value-of select='$form-input/id'/></big></p>
-
+            <h1>Record not found</h1>
+            
+            <p><big><xsl:value-of select='$form-input/id'/></big></p>
+            
             <xsl:call-template name='menu'/>
-
+            
           </xsl:when>
           <xsl:when test='$form-input/id/text()'>
             
@@ -102,15 +103,15 @@
             <h2>Type</h2>
             
             <p><xsl:value-of select='type/text()'/></p>
-
-
+            
+            
             <h2>Present</h2>
-
+            
             <table class='list'>
               <tr><th>file</th><th>pos</th>
               <th>checksum</th><th>time</th>
               </tr>
-
+              
               <xsl:for-each select='present/list-item'>
                 <tr>
                   <td><xsl:value-of select='list-item[1]/text()'/></td>
@@ -121,7 +122,7 @@
               </xsl:for-each>
               
             </table>
-
+            
 
             <h2>History</h2>
             
@@ -155,7 +156,7 @@
         
         <xsl:text> </xsl:text>
 
-        <form class='xxx-wide'>
+        <acis:form class='xxx-wide'>
           <h2>Find a record</h2>
           
           <p>
@@ -179,7 +180,7 @@
             <input type='submit' value='GO!' />
           </p>
           
-        </form>
+        </acis:form>
         
         <xsl:call-template name='adm-menu'/>
         

@@ -1,7 +1,11 @@
 <xsl:stylesheet
-  xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
-  xmlns:exsl="http://exslt.org/common"
-  exclude-result-prefixes='exsl'
+    xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
+    xmlns:exsl="http://exslt.org/common"
+    xmlns:acis="http://acis.openlib.org"
+    xmlns:html="http://www.w3.org/1999/xhtml"
+    xmlns="http://www.w3.org/1999/xhtml"
+    exclude-result-prefixes="exsl xml html acis #default"
+
   version="1.0">  
 
   <!--   This file is part of the ACIS presentation template set.   -->
@@ -30,7 +34,7 @@ co {
 
 <p><a ref='#instructions'>Instructions.</a></p>
 
-<form class='xxx-wide'>
+<acis:form class='xxx-wide'>
 
 <h2>for documents</h2>
 
@@ -73,11 +77,11 @@ co {
 </tr>
 </table>
 
-</form>
+</acis:form>
 
 
 
-<form>
+<acis:form>
 
 <h2>for records</h2>
 
@@ -119,10 +123,10 @@ co {
 </table>
 
 
-</form>
+</acis:form>
 
 
-<form>
+<acis:form>
 
 
 <h2>for users</h2>
@@ -161,7 +165,7 @@ co {
 </td></tr>
 </table>
 
-</form>
+</acis:form>
 
 
 <h2 id='instructions'>Instructions</h2>

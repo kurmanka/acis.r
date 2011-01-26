@@ -1,5 +1,10 @@
 <xsl:stylesheet
-  xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
+    xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
+    xmlns:exsl="http://exslt.org/common"
+    xmlns:acis="http://acis.openlib.org"
+    xmlns:html="http://www.w3.org/1999/xhtml"
+    xmlns="http://www.w3.org/1999/xhtml"
+    exclude-result-prefixes="exsl xml html acis #default"
   version="1.0">
 
   <xsl:import href='page.xsl'/>
@@ -15,7 +20,7 @@
      
     <xsl:call-template name='show-status'/>
 
-    <form xsl:use-attribute-sets='form' enctype='multipart/form-data'>
+    <acis:form xsl:use-attribute-sets='form' enctype='multipart/form-data'>
 
       <xsl:if test='$response-data/photo/text()'>
         <img src='{$response-data/photo/text()}' class='photo'/>
@@ -32,7 +37,7 @@
       <p>
         <input type='submit' value='continue' class='important'/>
       </p>
-    </form>
+    </acis:form>
 
     <p><a ref='@menu'>Return to main menu.</a></p>
 

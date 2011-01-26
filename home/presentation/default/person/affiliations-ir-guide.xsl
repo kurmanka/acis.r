@@ -1,4 +1,11 @@
-<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0">
+<xsl:stylesheet 
+    xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
+    xmlns:exsl="http://exslt.org/common"
+    xmlns:acis="http://acis.openlib.org"
+    xmlns:html="http://www.w3.org/1999/xhtml"
+    xmlns="http://www.w3.org/1999/xhtml"
+    exclude-result-prefixes="exsl xml html acis #default"
+    version="1.0">
 
   <xsl:import href='../page-universal.xsl' />
 
@@ -8,8 +15,8 @@
 
 
   <xsl:variable name='to-go-options'>
-    <op><a ref='@affiliations'>back to affiliations</a></op>
-    <root/>
+    <acis:op><a ref='@affiliations'>back to affiliations</a></acis:op>
+    <acis:root/>
   </xsl:variable>
 
 

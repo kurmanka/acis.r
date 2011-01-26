@@ -1,7 +1,10 @@
 <xsl:stylesheet
- xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
- xmlns:exsl="http://exslt.org/common"
- exclude-result-prefixes='exsl'
+    xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
+    xmlns:exsl="http://exslt.org/common"
+    xmlns:acis="http://acis.openlib.org"
+    xmlns:html="http://www.w3.org/1999/xhtml"
+    xmlns="http://www.w3.org/1999/xhtml"
+    exclude-result-prefixes="exsl xml html acis #default"
  version="1.0">
 
   <xsl:import href='../page.xsl'/>
@@ -16,14 +19,14 @@
 
   <xsl:variable name='columns'>
 <!--
-    <c name='type'>Type</c>
-    <c name='class'>Class</c>
-    <c name='action'>Action</c>
+    <acis:c name='type'>Type</c>
+    <acis:c name='class'>Class</c>
+    <acis:c name='action'>Action</c>
 -->
-    <c name='descr'>Description</c>
-    <c name='data'>Data</c>
-    <c name='chain'>Session</c>
-    <c name='startend'>Start/End</c>
+    <acis:c name='descr'>Description</acis:c>
+    <acis:c name='data'>Data</acis:c>
+    <acis:c name='chain'>Session</acis:c>
+    <acis:c name='startend'>Start/End</acis:c>
   </xsl:variable>
 
   <xsl:variable name='event-dates'>
@@ -136,11 +139,11 @@ onclick=
 -->
 
 <!--
-                           <script-onload>
+                           <acis:script-onload>
 hide("<xsl:value-of select='$id'/>det"); 
 hide("<xsl:value-of select='$id'/>totalhide"); 
 show("<xsl:value-of select='$id'/>totalshow");
-</script-onload>
+</acis:script-onload>
 -->
 
         <span class='time'><xsl:value-of select='$time'/></span>
@@ -363,9 +366,9 @@ function showhide_log ( id ) {
     </script>
 
 <!--
-    <script-onload>brief_mode("theEvents");</script-onload>
+    <acis:script-onload>brief_mode("theEvents");</acis:script-onload>
 -->
-<script-onload>close_ses_boxes();</script-onload>
+<acis:script-onload>close_ses_boxes();</acis:script-onload>
 
     <div id='theEvents' class='brief'>
       <xsl:if test='contains( $user-agent, "MSIE 5.5;")'>

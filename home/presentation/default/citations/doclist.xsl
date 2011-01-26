@@ -1,11 +1,15 @@
 <xsl:stylesheet
     xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
     xmlns:exsl="http://exslt.org/common"
-    exclude-result-prefixes='exsl xml'
+    xmlns:acis="http://acis.openlib.org"
+    xmlns:html="http://www.w3.org/1999/xhtml"
+    xmlns="http://www.w3.org/1999/xhtml"
+    exclude-result-prefixes="exsl xml html acis #default"
     version="1.0">
  
   <xsl:import href='general.xsl'/>
 
+  <!-- ToK 2008-04-06: was citations/doclist -->
   <xsl:variable name='current-screen-id'>citations/doclist</xsl:variable>
   <xsl:variable name='list' select='$response-data/doclist'/>
   <xsl:variable name='identified-num' select='number($response-data/identified-number)'/>

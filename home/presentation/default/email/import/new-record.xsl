@@ -1,6 +1,10 @@
 <xsl:stylesheet
-  xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
-  version="1.0">
+    xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
+    xmlns:exsl="http://exslt.org/common"
+    xmlns:acis="http://acis.openlib.org"
+    xmlns:html="http://www.w3.org/1999/xhtml"
+    exclude-result-prefixes="exsl xml html acis #default"
+    version="1.0">
  
   <xsl:import href='new-account-record.xsl'/>
 
@@ -10,7 +14,7 @@
 <xsl:variable name='person' select='//import/real-user/name'/>
 
 <xsl:template match='/data'
-  ><xsl:call-template name='message'>
+><xsl:call-template name='message'>
   <xsl:with-param name='to'>"<xsl:value-of select='$user-name'/>" &lt;<xsl:value-of select='$user-email'/>&gt;</xsl:with-param>
   <xsl:with-param name='subject'>another person record added to your account on <xsl:value-of select='$site-name'/></xsl:with-param>
   <xsl:with-param name='content'>
