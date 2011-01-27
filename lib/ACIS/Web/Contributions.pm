@@ -27,7 +27,6 @@ package ACIS::Web::Contributions;  ### -*-perl-*-
 #  $Id$
 #  ---
 
-# cardiff
 use strict;
 use Carp qw( cluck );
 use Carp::Assert;
@@ -44,7 +43,6 @@ use ACIS::Resources::Suggestions;
 use ACIS::Web::Citations;
 
 use IO::Socket::UNIX;
-use Storable qw(freeze);
 
 use Storable;
 my $Conf;
@@ -1587,7 +1585,6 @@ sub reload_accepted_contributions {
     }
     else {
       debug "contribution $id can't be reloaded";
-      # freeze or clear?
       my $today = time;
       my $long_ago = $today - $grace_period;
       
@@ -1688,7 +1685,6 @@ sub reload_refused_contributions {
 ############################################################################
 
 use Encode;
-use Storable qw( freeze thaw );
 
 use vars qw( $select_what );
 
