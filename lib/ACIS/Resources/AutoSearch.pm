@@ -293,22 +293,38 @@ sub search_for_resources_exact {
 sub save_search_results {
   my ($context,$reason,$results) = @_;
   if(not $results or not scalar @$results) {
-    logit "no result, no saving";
+    # no result, no saving
     return undef;
   }
-  logit "saving search results";
-  my $sql = $ACIS::Web::ACIS->sql_object;
+  # saving search results
+  ## 2011-03-09 bug
+  #my $sql = $ACIS::Web::ACIS->sql_object;
+  my $sql;
+  if(not defined($context->{'sql'})) {
+    my $sql = eval {
+      ## this may not be defined
+      $ACIS::Web::ACIS->sql_object;
+    };
+    if(not defined($sql)) {
+      # I can not save because I could not create the sql object" . $@;
+      return;
+    }
+  }
+  else {
+    $sql=$context->{'sql'};
+  }
+  ## /2011-03-09 bug
+
   my $psid = $context->{sid};
   if ($context->{save_result_func}) {
-    logit "using special save" . $context->{save_result_func};
+    # "using special save" . $context->{save_result_func}
     my $save_func = $context->{save_result_func};
-    &{$save_func}   ( $sql, $psid, $reason, undef, $results );
+    &{$save_func}( $sql, $psid, $reason, undef, $results );
   } 
   else {
-    logit "using save_suggestions";
+    # using save_suggestions
     save_suggestions( $sql, $psid, $reason, undef, $results );
   }
-  logit "search results saved";
   return 1;
 }
 
