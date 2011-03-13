@@ -8,7 +8,10 @@ use strict;
 use Encode;
 use Exporter;
 
-require Storable;
+## schmorp
+#require Storable;
+use Common::Data;
+## /schmorp
 use Carp::Assert;
 
 use Web::App::Common;
@@ -89,8 +92,11 @@ sub chain_process_event($$;$) {
 
       if ( $e ->{packed} ) {
         my $log = $e ->{packed};
-        $chain ->{log} = Storable::thaw( $log );
-        
+        # eval thaw
+        ## schmorp
+        #$chain ->{log} = eval {Storable::thaw( $log ); };
+        $chain ->{'log'} = &Common::Data::inflate( $log ); 
+        ## /schmorp
         if ( not $chain->{log} ) {
           debug "bad storable frozen value: $e->{chain}";
         }
@@ -206,8 +212,12 @@ sub make_session($) {
 
   my $log = $row ->{packed};
   if ( $log ) {
-    require Storable;
-    $se ->{log} = Storable::thaw( $log );
+    ## schmorp
+    #require Storable;
+    # eval thaw
+    #$se ->{log} = eval {Storable::thaw( $log ); } ; 
+    $se->{'log'} = &Common::Data::inflate($log); 
+    ## /schmorp
     delete $se ->{open};
   }
 

@@ -1,13 +1,16 @@
 package ARDB::ObjectDB;
 
 # This is a module, which will be responsible for storing and loading
-# the metadata objects into/from the objects table in Mysql, using Storable.
+# the metadata objects into/from the objects table in Mysql, using Common::Data
 
 use strict;
-
 use Carp::Assert;
 
-use Storable qw( thaw nfreeze );
+## schmorp
+#use Storable qw( thaw nfreeze );
+#use Lib32::Decode;
+## /schmorp
+
 
 sub store_record {
   my $sql = $ARDB::ARDB -> sql_object;
@@ -18,7 +21,10 @@ sub store_record {
 
   my $data;
   if ( $rec ) {
-    $data = nfreeze( $rec );
+    ## schmorp
+    #$data = nfreeze( $rec );
+    $data=&Common::Data::deflate($rec);
+    ## /schmorp
   }
 
   my $r = $sql -> execute( $id, $data );
@@ -39,10 +45,20 @@ sub retrieve_record {
   if ( not $sql->error and $r ) {
     my $data = $r -> {row} {data};
     if ( $data ) {
-      $rec  = thaw $data;
+      ## schmorp
+      # eval thaw
+      #$rec  = eval {thaw $data; };
+      #if(not $rec) {
+      #  $rec=Lib32::Decode::via_daemon($data);
+      #  if (not $rec ) { 
+      #    warn "decode via daemon failed";
+      #    return undef;          
+      #  }
+      #}
+      $rec=&Common::Data::inflate($data);
+      ## /schmorp
     }
   }
-
   return $rec;
 }
 

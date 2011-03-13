@@ -6,7 +6,10 @@ use Carp::Assert;
 use ACIS::ShortIDs;
 
 #require ARDB::Record::Simple;
-use Storable qw( nfreeze );
+## schmorp
+#use Storable qw( nfreeze );
+use Common::Data;
+## /schmorp 
 use ACIS::Web::HumanNames qw(normalize_name);
 
 sub normalize_personal_names {
@@ -656,8 +659,11 @@ sub process_institution {
   }
 #  $location_idx .= " " . $iobj ->{postal};
 
-  
-  my $data = nfreeze $iobj;
+  ## schmorp
+  #my $data = nfreeze $iobj;
+  my $data = &Common::Data::deflate($iobj);
+  ## /schmorp
+
   my $struct = {
                 id => $record ->id,
                 name => $name_idx,

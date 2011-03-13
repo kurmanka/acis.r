@@ -2,7 +2,10 @@ package ARDB::AMF::Processing;
 
 use strict;
 use Carp::Assert;
-use Storable qw( nfreeze );
+## schmorp
+# use Storable qw( nfreeze );
+use Common::Data;
+## /schmorp
 use Digest::MD5;
 use ACIS::ShortIDs;
 use ACIS::FullTextURLs::Input qw( process_urls_for_resource clear_urls_for_dsid );
@@ -609,8 +612,11 @@ sub process_institution {
   ###  $location_idx .= " " . $iobj ->{postal};
 
  
-  # nfreeze the $data_field, to be stored in the tabel
-  my $data = nfreeze $data_field;
+  # nfreeze the $data_field, to be stored in the table
+  ## schmorp
+  # my $data = nfreeze $data_field;
+  my $data = &Common::Data::deflate($data_field);
+  ## // schmorp
   
   # this is the table structure
   my $struct = {

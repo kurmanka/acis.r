@@ -17,7 +17,10 @@ use vars qw(@EXPORT);
               load_and_unbundle_suggestions 
 );
 
-use Storable qw(nfreeze thaw);
+## schmorp
+#use Storable qw(nfreeze thaw);
+use Common::Data;
+## /schmorp
 use Data::Dumper;
 use Web::App::Common;
 use ACIS::Web::Background qw(logit);
@@ -178,13 +181,15 @@ sub load_suggestions {
       next;
     }
     my $reason = $r->{'row'}->{'reason'};
-    ## 4 september problem
-    my $item = eval { thaw( $data ); };
-    if(not $item) {
-      debug "error in thaw $@, \$r->{row}";
-      debug Dumper $r;
-      next;
-    }
+    ## schmorp
+    #my $item = eval { thaw( $data ); };
+    #if(not $item) {
+    #  debug "error in thaw $@, \$r->{row}";
+    #  debug Dumper $r;
+    #  next;
+    #}
+    my $item=&Common::Data::inflate($data);
+    ## /schmorp
     ## 4 setember problem
     #debug Dumper $item;
     ## cardiff change: adding relevance of the item
@@ -273,12 +278,14 @@ sub load_suggestions_into_contributions {
     elsif ( $already_refused ->{$dsid} ) {
       next; 
     }
-    ## 4 september change
-    my $item = eval { thaw($data); };
+    ## schmorp
+    #my $item = eval { thaw($data); };
+    my $item = &Common::Data::inflate($data);
     if(not $item) {
-      debug "error in thaw $@";
+      debug "error in inflating: $@";
       next;
     }
+    ## /schmorp
     ## 4 september change
     $item ->{'role'} ||= $row ->{'role'};    
     ## cardiff change: adding relevance
@@ -371,15 +378,25 @@ sub send_suggestions_to_learning_daemon {
     return;
   }
   debug("$origin is sending a learner to daemon...");
-  my $frozen=nfreeze($learner);
+  ## schmorp
+  #my $frozen=nfreeze($learner);
+  my $serial=&Common::Data::deflate($learner);
+  my $length=length($serial);
+  ## add length before the serial
+  $serial="$length\n$serial";
+  ## /schmorp
   my $socket=IO::Socket::UNIX->new($learning_socket);
   if(not $socket) {
     debug "can not connect to the socket $learning_socket $@\n";
     return;
   }
-  $socket->send("$frozen\n.\n");
+  ## schmorp
+  #$socket->send("$frozen\n.\n");
+  $socket->send("$serial");
+  ## /schmorp
   debug("sent learner to socket");
 }
+
 
 
 

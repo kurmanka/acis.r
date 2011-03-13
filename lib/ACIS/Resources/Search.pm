@@ -20,7 +20,10 @@ use vars qw(@EXPORT);
               search_resources_by_creator_email
               search_resources_for_exact_phrases
            );
-use Storable qw(thaw);
+## schmorp
+#use Storable qw(thaw);
+use Common::Data;
+## /schmorp
 use Web::App::Common;
 
 sub make_resource_item_from_db_row {
@@ -30,14 +33,17 @@ sub make_resource_item_from_db_row {
   my $id   = $row ->{id};
   my $role = $row ->{role};
   my $item;
-  eval { $item = thaw ( $data ); };
-  if ( $@ ) { 
-    complain "failed to thaw() a database-loaded resource record: $@";
-    $item = $row; 
-    delete $row ->{data}; 
-    undef $@; 
-  }
-  $item -> {id}  = $id;
+  ## schmorp
+  #eval { $item = thaw ( $data ); };
+  #if ( $@ ) { 
+  #  complain "failed to thaw() a database-loaded resource record: $@";
+  #  $item = $row; 
+  #  delete $row ->{data}; 
+  #  undef $@; 
+  #}
+  $item = &Common::Data::inflate($data);
+  ## /schmorp
+  $item -> {'id'}  = $id;
   if ( $role ) { $item -> {role} = $role; }
   return $item;
 }
@@ -55,10 +61,14 @@ sub reload_contribution {
   my $row = $res -> {row};
   if ( $row ) {
     if ( $row->{data} ) {
-      $item = eval {thaw( $row->{'data'} ); };
+      ## schmorp
+      #$item = eval {thaw( $row->{'data'} ); };
+      $item=&Common::Data::inflate($row->{'data'});
+      ## /schmorp
     }
-  } else {
-    debug "didn't find $id";
+  } 
+  else {
+    debug "didn't find object for $id";
   }
   return $item;
 }
@@ -80,7 +90,10 @@ sub load_resources_by_ids {
     }
     my $row = $res -> {row};
     if ( $row and $row->{'data'} ) {
-      my $item = eval { thaw $row->{'data'}; };
+      ## schmorp
+      #my $item = eval { thaw $row->{'data'}; };
+      my $item = &Common::Data::inflate($row->{'data'});
+      ## /schmorp
       push @list, $item;
     } else {
       debug "didn't find $_";
@@ -107,33 +120,35 @@ sub process_resources_search_results {
     if ( $id and $found_hash->{$id}++ ) { next; }
     if ( $filter_hash->{$id} ) { next; }
     
-# for performance reasons put make_resource_.. inline:
-#    my $item = make_resource_item_from_db_row( $row ); 
-    my $item = eval { thaw( $row ->{'data'} ); };
-    my $error=$@;
-    # evcino 
-    if ( not $item) {
-      complain "could not thaw record $id: $error," . $row->{'data'};
-      use Lib32::Decode;
-      $item=Lib32::Decode::via_daemon($row->{'data'});
-      $error=$@;
-    }
-    if ( not $item) {
-      complain "Lib32 could not thaw record $id: erorr $@" . $row->{'data'};
-    }
-    elsif(not $item->{'id'} or not $item->{'sid'} ) {
+    # for performance reasons put make_resource_.. inline:
+    #    my $item = make_resource_item_from_db_row( $row ); 
+    #my $item = eval { thaw( $row ->{'data'} ); };
+    ## schmorp
+    my $item = &Common::Data::inflate($row->{'data'});
+    #my $error=$@;
+    ## evcino 
+    #if ( not $item) {
+    #  complain "could not thaw record $id: $error," . $row->{'data'};
+    #  use Lib32::Decode;
+    #  $item=Lib32::Decode::via_daemon($row->{'data'});
+    #  $error=$@;
+    #}
+    #if ( not $item) {
+    #  complain "Lib32 could not thaw record $id: erorr $@" . $row->{'data'};
+    #}
+    ## /schmorp
+    if(not $item->{'id'} or not $item->{'sid'}) {
       complain "bad document record found: (id: $id)\n" . Dumper $item;
     } 
     else {
-      $item ->{role} = $row->{role} 
-        if $row->{role};
+      $item ->{'role'} = $row->{'role'} 
+        if $row->{'role'};
       push @$result, $item;
-    }
-    
-  } continue {
+    }    
+  } 
+  continue {
     $sqlres -> next;
-  }
-    
+  }  
   $sqlres -> finish;
 }
 

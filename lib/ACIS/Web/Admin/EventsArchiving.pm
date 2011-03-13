@@ -45,6 +45,10 @@ use ACIS::Web::Admin::Events qw(
                                 make_session
                                );
 
+## schmorp
+use Common::Data;
+## schmorp
+
 ###  Database table events_last_archived (date DATETIME, togo INT) is a
 ###  storage for status data.  Date field points to a time at which previous
 ###  archiving run stopped and at which archiving shall continue.  Togo field
@@ -418,7 +422,9 @@ sub dump_sessions {
 
   my $last_date = '';
 
+  ## schmorp
   require Storable;
+  ## /schmorp
 
   $sql ->prepare( "update events set packed=?,data=?"
                   . " where date=? and chain=? and startend=1" );
@@ -447,9 +453,11 @@ sub dump_sessions {
         next;
       }
 
-      ###  Pack the log with Storable's nfreeze
-
-      my $log = Storable::nfreeze( $se->{log} );
+      ## schmorp
+      ###  Pack the log with Storable's nfreeze      
+      #my $log = Storable::nfreeze( $se->{log} );
+      my $log=&Common::Data::deflate($se->{'log'});
+      ## /schmorp
 
       ### Pack $about as string of several attribute: value lines,
       ### "\n"-separated

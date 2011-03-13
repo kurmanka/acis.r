@@ -854,15 +854,19 @@ sub build_result_document_list {
       my $item = $rrow;
 # make_list_from_db_row( $rrow, $columns, 1 );
 
-      use Storable qw( thaw );
+      ## schmorp
+      #use Storable qw( thaw );
+      use Common::Data;     
       if ( $item -> {data} ) {
-        my $packed = eval {thaw( $item -> {data}); };
+        #my $packed = eval {thaw( $item -> {data}); };
+        my $packed=&Common::Data::inflate($item-> {'data'});
         foreach ( keys %$packed ) {
           my $val = $packed -> {$_};
           $item -> {$_} = $val;
         }
         delete $item -> {data};
       }
+      ## /schmorp
 
       push @$data, $item;
       $rrow = $res -> next;
