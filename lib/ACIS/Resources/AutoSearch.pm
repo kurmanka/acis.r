@@ -19,7 +19,12 @@ use ACIS::Resources::Learn::Suggested qw(learn_suggested);
 ## end of cardiff change
 use ACIS::Web::Background qw(logit);
 use ACIS::Web::SysProfile;
+use sql_helper;
 require ACIS::Web::Contributions;
+
+use ARDB::SiteConfig;
+
+
 
 use vars qw(@EXPORT);
 @EXPORT = qw( 
@@ -254,6 +259,7 @@ sub search_for_resources_exact {
   ## so if this is not true, save the results with the local function
   if(not $saved_results_boolean) {
     logit('there has been no learning, I have to store');
+    logit(Dumper $results);
     save_search_results( $context, 'exact-name-variation-match', $results );
   }
   ## end of cardiff change
@@ -297,28 +303,31 @@ sub save_search_results {
     return undef;
   }
   # saving search results
-  ## 2011-03-09 bug
+  ## 2011-03-09 bug, and 2011-05-19
   #my $sql = $ACIS::Web::ACIS->sql_object;
   my $sql;
-  if(not defined($context->{'sql'})) {
-    my $sql = eval {
+  if((not defined($context->{'sql'}) or (not $context->{'sql'}))) {
+    $sql = eval {
       ## this may not be defined
       $ACIS::Web::ACIS->sql_object;
     };
-    if(not defined($sql)) {
-      # I can not save because I could not create the sql object" . $@;
-      return;
+    if(not defined($sql) or not $sql) {
+      my $sql_log="/tmp/autosearch_sql.log";
+      sql_helper -> set_log_filename ( $sql_log );
+      my $site_config = new SiteConfig;
+      $sql = sql_helper -> new ( $site_config->{'db-name'}, 
+                                 $site_config->{'db-user'},
+                                 $site_config->{'db-pass'});
     }
-  }
+  } 
   else {
     $sql=$context->{'sql'};
   }
-  ## /2011-03-09 bug
-
-  my $psid = $context->{sid};
-  if ($context->{save_result_func}) {
-    # "using special save" . $context->{save_result_func}
-    my $save_func = $context->{save_result_func};
+  ## 2011-03-09 bug, and 2011-05-19
+  my $psid = $context->{'sid'};
+  if ($context->{'save_result_func'}) {
+    # "using special save" . $context->{'save_result_func'}
+    my $save_func = $context->{'save_result_func'};
     &{$save_func}( $sql, $psid, $reason, undef, $results );
   } 
   else {
