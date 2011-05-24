@@ -15,9 +15,8 @@ use Lib32::Decode;
 
 sub inflate {
   my $in=shift;
-  ## if it's not JSON, it will croak
   my $out;
-  ## second try YAML
+  ## first try YAML
   $out = eval {
     Load $in;
   };
@@ -26,6 +25,7 @@ sub inflate {
     return $out;
   }
   #warn "decoding YAML failed";
+  ## second try JSON
   $out=eval {     
     decode_json($in);
   };
@@ -34,7 +34,7 @@ sub inflate {
     return $out;
   }
   #warn "decoding JSON failed";
-  ## third: legacy data in 
+  ## third: legacy data of Storable
   $out = eval {
     thaw($in);
   };    
@@ -42,15 +42,15 @@ sub inflate {
     #  warn "thaw suceeded";
     return $out;
   }
-  #warn "decoding JSON failed";
+  #warn "thaw failed";
   if( $@ ) { 
     # warn "Storage: $@";                                                                                                                  
-    warn "decoding via daemon";
+    #warn "decoding via daemon";
     $out=Lib32::Decode::via_daemon($in);
-    if (not $out ) { 
-      warn "decode via daemon failed";
-      return undef;          
-    }
+    #if (not $out ) { 
+    #  warn "decode via daemon failed";
+    return undef;          
+    #}
   }
   return $out;
 }
