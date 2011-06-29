@@ -54,7 +54,7 @@ sub type {
 }
 
 
-use UNIVERSAL qw( isa );
+#use UNIVERSAL qw( isa );
 
 
 sub get_value {
@@ -69,13 +69,15 @@ sub get_value {
     my $step = shift @steps2;
 
     if ( not ref $data 
-         or ( UNIVERSAL::isa( $data, 'HASH' )
-              and not exists $data ->{$_} ) 
+         or ( # UNIVERSAL::isa( $data, 'HASH' )
+             ref($data) eq 'HASH' 
+             and not exists $data ->{$_} )
        ) {
       return ();
     } 
 
-    if ( UNIVERSAL::isa( $data, 'ARRAY' ) ) {
+    if (# UNIVERSAL::isa( $data, 'ARRAY' ) ) {
+        ref($data) eq 'ARRAY' ) {
       my $further = join '/', $step, @steps2;
       my @r;
       foreach ( @$data ) {
@@ -87,10 +89,11 @@ sub get_value {
     $data = $data -> {$_};
   }
   
-  if ( UNIVERSAL::isa( $data, 'ARRAY' ) ) { 
+  if (# UNIVERSAL::isa( $data, 'ARRAY' ) ) { 
+      ref($data) eq 'ARRAY') { 
     return @$data; 
   }
-   
+  
   return $data;
 }
 

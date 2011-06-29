@@ -560,7 +560,7 @@ sub as_string {
   return $s;
 }
 
-use UNIVERSAL qw( isa );
+#use UNIVERSAL qw( isa );
 
 sub make_string ($;$);
 sub make_string ($;$) {
@@ -575,7 +575,8 @@ sub make_string ($;$) {
     }
     my $s = '';
 
-    if ( UNIVERSAL::isa( $obj, 'HASH' ) 
+    if (# UNIVERSAL::isa( $obj, 'HASH' ) 
+         ref($obj) eq 'HASH'
          and exists $obj->{ostring} ) {
       # special citation hash treatment
       $s .= "HASH$class\n";
@@ -586,8 +587,9 @@ sub make_string ($;$) {
         $s .= "\n";
       }
       $s .= "${prefix}HASH END\n";
-
-    } elsif ( UNIVERSAL::isa( $obj, 'HASH' ) ) {
+      
+    } elsif (# UNIVERSAL::isa( $obj, 'HASH' ) ) {
+             ref( $obj) eq 'HASH' ) {
       $s .= "HASH$class\n";
       my @ks = sort keys %$obj;
       foreach ( @ks ) {
@@ -596,9 +598,9 @@ sub make_string ($;$) {
         $s .= "\n";
       }
       $s .= "${prefix}HASH END\n";
-
-    } elsif ( UNIVERSAL::isa( $obj, 'ARRAY')  ) {
-
+      
+    } elsif (# UNIVERSAL::isa( $obj, 'ARRAY')  ) {
+             ref($obj) eq 'ARRAY' ) {
       $s .= "ARRAY$class\n";
       my $n = 0;
       my $l = $obj;
