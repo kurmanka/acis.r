@@ -232,8 +232,8 @@ sub get_value_from_path {
   foreach ( @path ) {
     
     if ( not $data 
-         or not ref $data 
-         or not ref $data eq 'HASH' 
+         or not &ref($data) 
+         or not &ref($data) eq 'HASH' 
          #or not UNIVERSAL::isa( $data, 'HASH' )
        ) {
       return undef;
