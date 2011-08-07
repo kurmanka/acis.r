@@ -24,6 +24,8 @@ sub learn_known {
   if($debug) {
     print "opening $log_file_name\n";
   }
+  ## the login
+  my $login='';
   ## set up sql object
   my $db_name=$acis->{'config'}->{'db-name'};
   my $db_user=$acis->{'config'}->{'db-user'};
@@ -32,17 +34,23 @@ sub learn_known {
   my $sql = sql_helper -> new( $db_name, 
                                $db_user,
                                $db_pass);
-  my $login=ACIS::APU::get_login_from_queue_item($sql,$to_do);
-  if(not $login) {
-    if($debug) {
-      &log_it($log_file_name,"no login for $to_do");
+  if(defined($to_do->{'psid'})) {
+    my $psid=$to_do->{'psid'};
+    $login=ACIS::APU::get_login_from_queue_item($sql,$psid);
+    if(not $login) {
+      if($debug) {
+        &log_it($log_file_name,"no login for $to_do");
+      }
+      return;
     }
+    if($debug) {
+      &log_it($log_file_name,"found login: $login");
+    }
+  }
+  else {
+    ## add code later for what to do when a login is given
     return;
   }
-  if($debug) {
-    &log_it($log_file_name,"found login: $login");
-  }
-  
   require ACIS::Web::Admin;
   ## define the function applied to the session
   my $apply_learning = sub { 
@@ -85,11 +93,13 @@ sub learn_all_known {
   my $sql=shift;
   my $debug=shift;
   ## set debug to be true
-  if(not defined($debug)) {
-    ###$debug=1;
-  }
+  #if(not defined($debug)) {
+  #  $debug=1;
+  #}
   my $learner=&form_learner($app,'learn_all_known',$debug);
-  #print Dumper $learner;
+  #if($debug) {
+  #  print Dumper $learner;
+  #}
   ## call the main learning
   my $learned;
   my $refused;
