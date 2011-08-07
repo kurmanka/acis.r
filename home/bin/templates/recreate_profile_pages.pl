@@ -19,7 +19,7 @@ use Data::Dumper;
 my $acis = ACIS::Web -> new( home => $homedir );
 my $sql = $acis->sql_object;
 
-
+## work on arguments
 my $switches = {};
 my $queue = [];
 my $count_argv=0;
@@ -40,22 +40,22 @@ foreach my $arg ( @ARGV ) {
 }
 if(not $count_argv) {
   print "fatal: no argument\n";
+  exit;
 }
 if ( $switches->{'a'} ) {
   $sql -> prepare( "select login,userdata_file from users" );
   my $r = $sql -> execute();
-  push @$queue, $r->data;
+  push @$queue, @{$r->data};
 }
 
 
 require ACIS::Web::Admin;
 
-## prepape a session
+## prepare a session
 my $session = $acis -> start_session( "magic", { login => $0, IP => '0.0.0.0' } );
 assert( $acis ->session );
 
-
-foreach my $p (@$queue)  {
+foreach my $p (@{$queue})  {
   my $udf   = $p -> {'userdata_file'};
   my $login = $p -> {'login'};
   ## find will just list the profiles
@@ -63,23 +63,23 @@ foreach my $p (@$queue)  {
     print "u file: $udf\t\tlogin: $login\n";
     next;
   }  
-  if( $udf and -r $udf ) {
-    $acis -> update_paths_for_login( $login );
-    my $userdata = ACIS::Web::Admin::get_hands_on_userdata( $acis );
-    if( not $userdata ) { 
-      print "could not get my hand use userdata for $login\n";
-      next; 
-    }
-    $session -> object_set( $userdata );
-    # do things
-    require ACIS::Web::SaveProfile;
-    ACIS::Web::SaveProfile::save_profile( $acis );
-    print "data for $login saved  in $udf\n";
+  if( not $udf or not -r $udf ) {
+    print "could not open user data file '$udf'\n";
+    next;
   }
-  else {
-    print "could not user data file '$udf'\n";
+  $acis -> update_paths_for_login( $login );
+  my $userdata = ACIS::Web::Admin::get_hands_on_userdata( $acis );
+  if( not $userdata ) { 
+    print "could not get my hand use userdata for $login\n";
+    next; 
   }
+  $session -> object_set( $userdata );
+  # do things
+  require ACIS::Web::SaveProfile;
+  ACIS::Web::SaveProfile::save_profile( $acis );
+  print "data for $login saved  in $udf\n";
 }
+
 
 ##  close session
 if(defined($session)) {
@@ -114,5 +114,5 @@ sub get_profile_details {
     print "fatal: login for '$in' not found.\n";
     exit;
   }
-  return $r->{row};
+  return $r->{'row'};
 }
