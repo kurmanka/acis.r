@@ -39,11 +39,10 @@ sub save_profile {
   my $app = shift;
 
   my $session          = $app       -> session ;
-  my $ses_udata        = $session   -> object  ;
-  my $ses_udata_string = $ses_udata -> dump_xml;
+  my $session_object        = $session   -> object  ;
+  my $session_object_string = $session_object -> dump_xml;
 
   my @profiles = ();
-  my $number   =  0;
 
   my $variables = $app -> variables;
 
@@ -57,45 +56,43 @@ sub save_profile {
     $variables ->{'profile-owner'} {'last-login-date'} = $last_login;
   }
 
-  foreach my $record ( @{ $ses_udata ->{records} } ) {
-    my $id = $record ->{id};
+  ## a user may have several records
+  my $number   =  0;
+  foreach my $record ( @{ $session_object ->{records} } ) {
+    my $id = $record ->{'id'};
     $session -> set_current_record_no( $number );
 
-    {
-      use ACIS::Web::Export;
-      my $res = ACIS::Web::Export::redif( $app, $record );
-      debug( "ReDIF export: ", (($res) ? "OK" : "FAILED") );
-      if (not $res) {
-        debug "res: $res";
-      }
-
-      $res = ACIS::Web::Export::amf( $app, $record );
-      debug( "AMF export: ", (($res) ? "OK" : "FAILED") );
+    ## learn all known items
+    use ACIS::Resources::Learn::KnownItems;
+    my $sql = $app -> sql_object();
+    &ACIS::Resources::Learn::KnownItems::learn_all_known($app,$sql);
+    ## unclear why there is a { here
+    #{
+    use ACIS::Web::Export;
+    my $res = ACIS::Web::Export::redif( $app, $record );
+    debug( "ReDIF export: ", (($res) ? "OK" : "FAILED") );
+    if (not $res) {
+      # debug "res: $res";
     }
-
-    if ( $record ->{type} eq 'person' ) {
-      my $sid   = $record ->{sid};
-
+    
+    $res = ACIS::Web::Export::amf( $app, $record );
+    debug( "AMF export: ", (($res) ? "OK" : "FAILED") );
+    ## commented out closeing brace
+    #}
+  
+    if ( $record ->{'type'} eq 'person' ) {
+      my $sid   = $record ->{'sid'};      
       ### update the personal profile
       if ( $sid ) {
         my $link = &write_outside_personal_profile( $app );
         push @profiles, { name => $record->{name} {full}, 
                           link => $link };
-
+        
       }
-                                 
-      ###  has this particular record changed recently?  
-#        my $orig_record   = $userdata_records ->{$id};
-#        my $record_string = dump_xml( $record );
-
-      ###  if so, notify the person it is about (by email)
-      ###  (of course, if we have the email)
-
     } # if type == "person"
-
-  } continue {
-    $number ++;
-      
+  }
+  continue {
+    $number ++;    
   } # for each of the records in session
     
   $variables -> {'saved-profiles'} = \@profiles;
