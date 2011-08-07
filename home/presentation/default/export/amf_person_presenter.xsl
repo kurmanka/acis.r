@@ -122,7 +122,7 @@
           </xsl:for-each>
         </ispartof>
       </xsl:if>
-      <!-- additional variations -->     
+      <!-- name variations -->     
       <xsl:choose>
         <xsl:when test='contributions/autosearch/names-list/list-item'>
           <acis:names>
@@ -274,9 +274,6 @@
       <title>
         <xsl:value-of select='$text/title'/>
       </title>
-      <displaypage>
-        <xsl:value-of select='$text/url-about'/>
-      </displaypage>
       <!-- defined in person-listings.xsl -->
       <xsl:call-template name='all-person-names'>
         <xsl:with-param name='name-string'>
@@ -284,18 +281,21 @@
         </xsl:with-param>
         <xsl:with-param name='separator'/>
       </xsl:call-template>
+      <displaypage>
+        <xsl:value-of select='$text/url-about'/>
+      </displaypage>
+      <acis:relevance>
+        <xsl:value-of select='$text/relevance'/>
+      </acis:relevance>
     </text>
   </xsl:template>
   <!-- needs to be defined for person-listings.xsl to work -->
   <xsl:template name='what-to-do-with-person-name'>
     <xsl:param name='person-name'/>
-    <!-- fixme: you have to put the role here -->
     <hasauthor>
-      <person>
-        <name>
-          <xsl:value-of select='$person-name'/>
-        </name>
-      </person>
+      <name>
+        <xsl:value-of select='$person-name'/>
+      </name>
     </hasauthor>
   </xsl:template>
 </xsl:stylesheet>
