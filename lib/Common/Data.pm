@@ -77,5 +77,29 @@ sub deflate {
   return undef;
 }
 
+## deflate with json first, YAML second
+sub deflate_json {
+  my $in=shift;
+  my $out; 
+  $out = eval {
+    encode_json($in);
+  };
+  if(defined($out)) {
+    #warn "encoding JSON suceeded";
+    return $out;
+  }
+  #warn "encoding JSON failed";
+  ## if this fails use YAML
+  $out=Dump $in;
+  if(defined($out)) {
+    #warn "encoding YAML suceeded";
+    return $out;
+  }
+  assert($out);
+  return undef;
+}
+
+
+
 
 1;
