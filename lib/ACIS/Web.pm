@@ -72,8 +72,7 @@ sub new {
   my $params  = {@_};
   my $home    = $params -> {home};
   
-  $home = $ACIS::LocalConfig::home_dir
-                unless ( defined $home );
+  $home = $ACIS::LocalConfig::home_dir unless ( defined $home );
   assert( $home );
 
   $params -> {home}       = $home;
@@ -164,11 +163,13 @@ sub init_presenter_data {
 
   $self -> SUPER::init_presenter_data;
 
-  ### copy some of the configuration parameters into
-  ### presenter-data/system/config
+  ## copy some of the configuration parameters into
+  ## presenter-data/system/config
+  ## this includes the pitman parameters
   my $config = $self -> config;
-  my @copy = qw( institutions-maintainer-email research-auto-search-disabled );
-  my $pconf = $self -> {'presenter-data'} {system} {config};
+  my @copy = qw( institutions-maintainer-email research-auto-search-disabled 
+                 above-me-propose-accept below-me-propose-refuse );
+  my $pconf = $self -> {'presenter-data'} -> {'system'} -> {'config'};
   foreach ( @copy ) {
     $pconf ->{$_} = $config ->{$_};
   }

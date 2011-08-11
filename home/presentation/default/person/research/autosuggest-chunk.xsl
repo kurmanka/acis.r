@@ -123,7 +123,12 @@
       <xsl:with-param name='title'>autosearch suggestions</xsl:with-param>
       <xsl:with-param name='content'>
         <acis:script-onload>
-          <xsl:text>refuse_all_undecided();</xsl:text>
+          <!-- before pitman: <xsl:text>refuse_all_undecided();</xsl:text> -->
+          <xsl:text>pitman_prepare(</xsl:text>
+          <xsl:value-of select='$below-me-propose-refuse'/>
+          <xsl:text>,</xsl:text>
+          <xsl:value-of select='$above-me-propose-accept'/>
+          <xsl:text>);</xsl:text>
         </acis:script-onload>
         <xsl:call-template name='the-contributions'/>
       </xsl:with-param>

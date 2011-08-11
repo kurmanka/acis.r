@@ -398,3 +398,103 @@ function control_refuse_all_button (element) {
         control_class(parent_of_button_element, 'hide', true);
     }
 }
+
+// pitman prepare implements proposals to accept or refuse depending
+// an the relevance
+function pitman_prepare (below_me_propose_refuse,above_me_propose_accept) {
+    var form_elements=document.getElementsByTagName('form');
+    // assumes there is only one form
+    var form_element=form_elements[0];
+    var tr_elements=form_element.getElementsByTagName('tr');
+    // alert (tr_elements.length);
+    var tr_count;
+    //alert('preparing pitman');
+    // the title is supposd to contain the number at the end
+    // of the title string. We define the regex here so we don't
+    // have to repeat it in the loop
+    var find_relevance_regex = new RegExp('0\.[0-9]+$');
+
+  // we start at 4 because the first rows don't have the papers
+  for (tr_count=4;
+       tr_count < tr_elements.length;
+       tr_count++) {
+      //alert ('tr_count is ' + tr_count);
+      var my_tr_element = tr_elements[tr_count];
+      var relevance=find_relevance(my_tr_element,find_relevance_regex);
+      //alert('relevance found: ' + relevance);
+      if(! relevance || relevance <= below_me_propose_refuse) {
+          // second argument just gives opposite choice
+          set_choice_in_row(my_tr_element,'refuse','accept');
+      }
+      else if(relevance >= above_me_propose_accept) {
+          // second argument just gives opposite choice
+          set_choice_in_row(my_tr_element,'accept','refuse');
+      }
+      // note, this may leave some rows without any work
+      //if(tr_count>5) {
+      //    alert('done with tr_count');   
+      //    break;
+      //}
+  }
+    return true;
+}
+
+// part of pitman project
+// we find the relevance. We assume it is in the title
+// atttribute in the first td inside tr
+function find_relevance (tr_element,find_relevance_regex) {
+    var td_elements=tr_element.getElementsByTagName('td');
+    if(! td_elements.length) {
+        return;
+    }
+    // we assume the title is in the first <td> in the <tr>
+    var td_element_with_title=td_elements[0];
+    //alert(td_element_with_title);
+    var title=td_element_with_title.getAttribute('title');
+    if(! title) {
+        return;
+    }
+    // alert('title is ' + title);
+    var relevance = find_relevance_regex.exec(title);
+    return relevance;
+}
+
+// part of pitman project
+// set the choice to do, not dont, where do_it and dont
+// can be 'accept' and 'refuse'
+function set_choice_in_row(tr_element,do_it,dont) {
+    var input_elements=tr_element.getElementsByTagName('input');
+    if(! input_elements.length) {
+        // alert('no input element');
+        return;
+    }
+    var check_next=1;
+    for (input_count=0;
+         input_count < input_elements.length;
+         input_count++) {
+        // alert (input_count);
+        var my_input_element = input_elements[input_count];
+        // alert (my_input_element);
+        // alert(my_input_element.getAttribute('value'));
+        var is_checked=my_input_element.checked;
+        // alert("value is " + value); 
+        var my_value=my_input_element.getAttribute('value');
+        // alert("value is " + value); 
+        if(is_checked && (my_value == dont)) {
+            // alert('check_next becomes 0');
+            check_next=0;
+        }
+        else if(my_value == dont) {
+            // alert('check_next becomes 1');
+            check_next=1;
+        }
+        if((check_next == 1) && (! is_checked) && (my_value == do_it)) {
+            // alert('check_next is ' + check_next);
+            my_input_element.checked=true;
+            ar_colors(my_input_element);
+            check_next=1;
+        }
+      }
+    // alert('done setting choice ' + do_it + ' input element ' + input_count);
+}
+

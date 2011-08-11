@@ -9,6 +9,11 @@
     version='1.0'>
   <!-- part of cardiff -->
   <xsl:variable name='chunk-size' select='$config/chunk-size/text()'/>
+  <!-- pitman project -->
+  <xsl:variable name='above-me-propose-accept'
+                select='$config/above-me-propose-accept/text()'/>
+  <xsl:variable name='below-me-propose-refuse'
+                select='$config/below-me-propose-refuse/text()'/>
   <!-- table header for the description of the item -->
   <xsl:variable name='item-description-header'>
     <th class='desc'>
@@ -368,7 +373,7 @@
       <xsl:text>refuse</xsl:text>
     </span>
     <span>
-      <xsl:text> it, meaning you have nothing to do with it. </xsl:text>
+      <xsl:text> it, meaning you have nothing to do with it.</xsl:text>
     </span>
   </xsl:variable>
   <xsl:variable name='process-and-continue-button'>

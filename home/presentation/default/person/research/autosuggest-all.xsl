@@ -14,10 +14,12 @@
     <acis:par id='research/main'/>
   </xsl:variable>
   <xsl:variable name='the-screen'>autosuggest</xsl:variable>
-  <xsl:variable name='items-count' select='$suggestions-count'/>
+  <xsl:variable name='items-count' 
+                select='$suggestions-count'/>
   <xsl:variable name='current-screen-id'>research/autosuggest-all</xsl:variable>
   <xsl:variable name='form-target'>@research/autosuggest-all</xsl:variable>
-  <xsl:variable name='this-chunk-size' select='$items-count'/>
+  <xsl:variable name='this-chunk-size'
+                select='$items-count'/>
   <xsl:variable name='more-to-follow' 
                 select='$items-count &gt; $this-chunk-size'/>
   <xsl:variable name='more-to-follow-count' 
@@ -118,6 +120,13 @@
     <xsl:call-template name='research-page'>
       <xsl:with-param name='title'>autosearch suggestions</xsl:with-param>
       <xsl:with-param name='content'>
+        <acis:script-onload>
+          <xsl:text>pitman_prepare(</xsl:text>
+          <xsl:value-of select='$below-me-propose-refuse'/>
+          <xsl:text>,</xsl:text>
+          <xsl:value-of select='$above-me-propose-accept'/>
+          <xsl:text>);</xsl:text>
+        </acis:script-onload>
         <xsl:call-template name='the-contributions'/>
       </xsl:with-param>
     </xsl:call-template>

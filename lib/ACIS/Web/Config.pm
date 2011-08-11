@@ -40,56 +40,53 @@ sub configuration_parameters {
   my $self = shift;
 
   my $p = $self -> SUPER::configuration_parameters;
-
+  
   return {
     %$p, 
-
-    # web interface
+          
+    ## web interface
     'static-base-url',  'required',
     'static-base-dir',  'required',
     'session-lifetime', '15',
-
     'profile-pages-dir', 'profile/',
     'compact-redirected-profile-urls', "not-defined",
-
     'cgi-perl-wrapper',  'not-defined',
 
-    # cookies
-#    'auth-cookie-domain',    'not-defined',
-#    'auth-cookie-age-days',  '365',
+    ## cookies
+    #    'auth-cookie-domain',    'not-defined',
+    #    'auth-cookie-age-days',  '365',
     'admin-access-pass',     'not-defined',
    
-    # email-related
+    ## email-related
     'institutions-maintainer-email', 'required',
     
-    # The data that ACIS produces
+    ## The data that ACIS produces
     'person-id-prefix',    'required',
     'metadata-redif-output-dir', 'not-defined',
     'metadata-amf-output-dir',   'not-defined',
     
-    # database parameters
+    ## database parameters
     'metadata-db-name', 'required',
     'backup-directory', 'not-defined',
 
-    # general
+    ## general
     'temp-directory',        'not-defined',
 
-    # debugging
+    ## debugging
     'extreme-debug',         'not-defined',
     'log-profiling-data',    'not-defined',
     'show-profiling-data',   'not-defined',
     'echo-apu-mails',        'not-defined',
 
-    # disabling features
+    ## disabling features
     'research-auto-search-disabled', 'not-defined',
     'research-additional-searches',  'not-defined',
 
-
-    # ACIS Metadata Update (/meta/update)
+    ## ACIS Metadata Update (/meta/update)
     'meta-update-clients', 'not-defined',
     'meta-update-object-fetch-func', 'not-defined',
 
-    # citations:
+    ## citations:
     'citations-profile', 'not-defined',
     'citation-document-similarity-func', 'not-defined',
     'citation-document-similarity-ttl',  '100',     
@@ -97,6 +94,9 @@ sub configuration_parameters {
     'citation-document-similarity-preselect-threshold', '0.85',
     'test-citations'   => 'not-defined',
 
+    ## learning, pitman project 
+    'above-me-propose-accept', '1',
+    'below-me-propose-refuse', '0',
    };
 
 }
