@@ -96,6 +96,11 @@
           <xsl:value-of select='sid/text()'/> 
         </acis:shortid>
       </xsl:if>
+      <xsl:if test='//last-change-date/text()'>
+        <acis:last-change-date> 
+          <xsl:value-of select='//last-change-date/text()'/> 
+        </acis:last-change-date>
+      </xsl:if>
       <xsl:if test='$input-data/affiliations/list-item'>
         <ispartof>
           <xsl:for-each select='$input-data/affiliations/list-item'>
