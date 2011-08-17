@@ -38,7 +38,6 @@ use sql_helper;
 use Data::Dumper;
 use ACIS::Resources::AutoSearch;
 use ACIS::Resources::Search;
-#use ACIS::Resources::Suggestions qw(send_suggestions_to_learning_daemon load_suggestions_into_contribut);
 use ACIS::Resources::Suggestions;
 use ACIS::Web::Citations;
 
@@ -951,13 +950,13 @@ sub process {
 
           if ( $refuse_ignored ) {
             refuse_item( $handle, $item );
-            $statistics ->{refused} ++;
+            $statistics ->{'refused'} ++;
           }
 
           $clear_from_suggestions -> {$handle} = 1;
 
           if ( $item ) {
-            my $sid  = $item -> {sid};
+            my $sid  = $item -> {'sid'};
             if ( not $sid ) {
               my $id = $item ->{'id'};
               warn "Document $id had no sid: " . $item->{'title'};
@@ -1010,11 +1009,22 @@ sub process {
     else {
       $app -> message( 'research-decisions-processed' );
     }
-    ## cardiff change
-    ## send suggestions to learning daemon
-    ## defined in ACIS/Resources/Suggestions.pm
-    &send_suggestions_to_learning_daemon($app,'process');
-    ## end of cardiff change.
+    if($app -> config( "learn-via-daemon" )) {
+      ## send suggestions to learning daemon
+      ## defined in ACIS/Resources/Suggestions.pm
+      &send_suggestions_to_learning_daemon($app,'process');
+    }
+    ## form the learner
+    my $learner=&ACIS::Resources::Learn::form_learner($app);
+    if(not defined($learner)) {
+      complain "no learner";
+    }
+    else {
+      my $saved_results_boolean=&ACIS::Resources::Learn::Suggested::learn_suggested($learner,$SQL,undef,'exact-name-variation-match');
+      if(not defined($saved_results_boolean)) {
+        complain "learrning failed";
+      }
+    }
   }
   if ( $session -> type eq 'new-user' 
        and not $sug_count ) {

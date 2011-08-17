@@ -9,64 +9,122 @@
 #
 
 ###  GENERAL SETTINGS   
-
+#
 # perlbin = /opt/perl/bin/perl
 # umask = '0022'
+metadata-collections = ci cs db ec el pm sp we xx xr hl ol ag so
+metadata-ci-type = AMF
+metadata-ci-home = /home/awho/3lib/cis
+metadata-cs-type = AMF
+metadata-cs-home = /home/awho/3lib/citeseerxpsu
+metadata-db-type = AMF
+metadata-db-home = /home/awho/3lib/dblp
+metadata-ec-type = AMF
+metadata-ec-home = /home/awho/3lib/RePEc
+metadata-el-type = AMF
+metadata-hl-home = /home/awho/3lib/hal
+metadata-hl-type = AMF
+metadata-ol-home = /home/awho/3lib/openlibrary
+metadata-ol-type = AMF
+metadata-el-home = /home/awho/3lib/elis
+metadata-pm-type = AMF
+metadata-pm-home = /home/awho/3lib/pubmed
+metadata-sp-type = AMF
+metadata-sp-home = /home/awho/3lib/spires
+metadata-we-type = AMF
+metadata-we-home = /home/awho/3lib/we
+metadata-xx-type = AMF
+metadata-xx-home = /home/awho/3lib/arxiv
+metadata-xr-type = AMF
+metadata-xr-home = /home/awho/3lib/crossref
+metadata-ag-type = AMF
+metadata-ag-home = /home/awho/3lib/agris
+metadata-so-type = AMF
+metadata-so-home = /home/awho/3lib/solis
 
-# RePEc-data-dir=
-
-# metadata-collections=''
-# metadata--type=
-# metadata--home=
 
 
 ###  DATABASE PARAMETERS
-db-name     = acis
-
-db-user = root
-db-pass = root
-
+db-name = acis
+db-user = acis
+db-pass = kri1kur2
+#acis-db-name = acis
+#sid-db-name = acis 
+#metadata-db-name = acis
 
 ################################################
 ##   FOR THE ACIS WEB INTERFACE (ACIS::Web)   ##
 ################################################
 
 ###  Global parameters
-site-name      = ACIS
-site-name-long = ACIS
-admin-email    = admin@web.site.org
+site-name      = AuthorClaim Test
+site-name-long = AuthorClaim Test registration service
+admin-email    = admin@sahure.authorclaim.org
 
 ###  Web interface
-base-url = http://
-base-cgi-script-filename=/
+base-url = http://sahure.authorclaim.org
+base-cgi-script-filename=/var/www/awho/cgi/a.cgi
+base-fcgi-script-filename=/var/www/awho/cgi/acis.fcgi
 
-static-base-dir = /home/user/public_html/acis
-static-base-url = http://
+static-base-dir = /home/awho/public_html/acis
+static-base-url = http://sahure.authorclaim.org
 
-#compact-redirected-profile-urls
-#profile-pages-dir =
+# home url, missing in the mail.conf.eg
+home-url = http://sahure.authorclaim.org 
+compact-redirected-profile-urls = 1
+profile-pages-dir = 'profile/'
 
 session-lifetime = 20
 
+# send copy of apu mails to admin
+echo-apu-mails = 1
+
+### prepend local directory of perl modules
+perllibprepend = /home/awho/usr/lib/perl
+perllibadd = /home/awho/usr/share/perl 
 
 ###  Password to access /adm/ screens:
-# admin-access-pass = 
+admin-access-pass = kri1kur2
 
 ###  Email-related:
-system-email = "ACIS" <acis@web.site.org>
+system-email = "AuthorClaim" <admin@sahure.authorclaim.org>
 sendmail = /usr/sbin/sendmail -t
+#sendmail = /bin/false -t
 
 ###  The data that ACIS produces
 #metadata-redif-output-dir = ${homedir}/metadata.output.ReDIF
-#metadata-amf-output-dir = ${homedir}/metadata.output
+metadata-amf-output-dir = /home/awho/public_html/amf/
 
-person-id-prefix    = RePEc:per:
-institutions-maintainer-email = "Institutions" <institutions@web.site.org>
+person-id-prefix = info:lib/am:
+institutions-maintainer-email = "whoarewe-run" <whoarewe-run@lists.openlib.org>
 
+template-set = authorclaim 
+
+## size of chunk, a cardiff addition                                            
+chunk-size = 100
+## the location of the learing socket, a cardiff addition                       
+learning-socket = /home/awho/acis/learning_socket
+
+# persistent perl
+#cgi-pperl-binary=/usr/bin/pperl
+# don't use under normal run
+#cgi-pperl-reinit=/usr/bin/pperl -- -k /var/www/awho/cgi/a.cgi  ; 
+
+## learning, pitman project 
+above-me-propose-accept = 0.6
+below-me-propose-refuse = 0.4
+
+## learn some suggestions, in interactive where the user awaits a reponnse, via daemon
+#learn-via-daemon=1
+
+## system command to run after profile update, with the psid as argument
+system-command-after-profile-change = /home/awho/perl/call_test
+
+  
 ###  Debugging
 # +debug-info-visible
-# +debug-transformations
-# debug-log=
+ +debug-transformations
+debug-log=/home/awho/opt/acis.debug.log
 # +log-profiling-data
 # +show-profiling-data
 # +extreme-debug

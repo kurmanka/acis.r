@@ -64,7 +64,8 @@ sub configuration_parameters {
     'person-id-prefix',    'required',
     'metadata-redif-output-dir', 'not-defined',
     'metadata-amf-output-dir',   'not-defined',
-    
+    'system-command-after-profile-change', 'not-defined',
+
     ## database parameters
     'metadata-db-name', 'required',
     'backup-directory', 'not-defined',
@@ -92,11 +93,13 @@ sub configuration_parameters {
     'citation-document-similarity-ttl',  '100',     
     'citation-document-similarity-useful-threshold', '0.65',
     'citation-document-similarity-preselect-threshold', '0.85',
-    'test-citations'   => 'not-defined',
+    ## was 'test-citations'   => 'not-defined',
+    'test-citations', 'not-defined',
 
-    ## learning, pitman project 
+    ## learning
     'above-me-propose-accept', '1',
     'below-me-propose-refuse', '0',
+    'learn-via-daemon', 'not-defined'
    };
 
 }

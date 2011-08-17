@@ -217,12 +217,13 @@ echo parsing and checking ACIS::Web configuration
 bin/reparse_config 'ACIS::Web' acis.conf
 bin/setup_profile_menu
 
-### restart learning daemon, cardiff
-echo restarting the learning daemon
-kill -9 `cat $homedir/opt/learning_daemon.pid`
-rm -f $homedir/opt/learning_daemon.pid
-bin/learn_daemon
-
+### restart learning daemon
+if [ $learn_via_daemon ] ; then
+    echo restarting the learning daemon
+    kill -9 `cat $homedir/opt/learning_daemon.pid`
+    rm -f $homedir/opt/learning_daemon.pid
+    bin/learn_daemon
+fi
 
 
 
