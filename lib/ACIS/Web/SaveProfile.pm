@@ -90,10 +90,7 @@ sub save_profile {
         ## run the command the system-command-after-profile-change
         ## defined in acis.conf
         my $command_to_run=$app->config('system-command-after-profile-change');
-        open(L,"> /tmp/sa.log") ;
         ## run it in the background if it's an excecutable file
-        print L "comand to run is $command_to_run\n";
-        close L;
         if(defined($command_to_run) and -X $command_to_run) {
           system("$command_to_run $sid &");
         }
