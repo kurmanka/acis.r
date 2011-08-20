@@ -1,5 +1,3 @@
-
-
 use strict;
 use warnings;
 use Carp::Assert;
@@ -7,8 +5,6 @@ use ACIS::Web;
 use sql_helper;
 use Data::Dumper;
 
-## unclear why this is here
-#sub get_profile_details($);
 
 ## supported switches:
 ## a  --> do all users
@@ -92,23 +88,27 @@ sub get_profile_details {
   my $in = shift;
   my $where = '';
   my @params;
-  for ($in) {
-    if (m!\w\@[\w\-\.]+\.\w+! ) { # login / email
-      $where = 'login=?';
-      push @params, $_;
-      next;
-    } 
-    elsif (m!^p\w+\d+! ) { # short-id
-      warn "do not support shortids yet: $_\n";
-    } 
-    else {
-      warn "what is this: $_?\n";
+  ## case of a login /email
+  if($in=~m!\w\@[\w\-\.]+\.\w+! ) { 
+    $where = 'login=?';
+    push @params, $in;
+  }
+  ## case of a shortid
+  elsif ($in=~m!^p\w+\d+! ) { 
+    ## we have to look it up in the records first
+    $sql->prepare( "select owner from records where shortid=?" );
+    my $r = $sql->execute($in);
+    if($r->rows == 0) {
+      print "fatal: shortid '$in' not found.\n";
+      exit;
     }
+    $where = $r->{'row'}->{'owner'};
+    push @params, $where;
+  } 
+  else {
+    print "what is this: '$in'?\n";
   }
-  if($where) { 
-    $where = "where $where"; 
-  }
-  $sql->prepare( "select login,userdata_file from users $where" );
+  $sql->prepare( "select login,userdata_file from users where login=?" );
   my $r = $sql->execute( @params );
   if($r->rows == 0) {
     print "fatal: login for '$in' not found.\n";
