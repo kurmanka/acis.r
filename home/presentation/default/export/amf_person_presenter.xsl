@@ -298,9 +298,11 @@
   <xsl:template name='what-to-do-with-person-name'>
     <xsl:param name='person-name'/>
     <hasauthor>
-      <name>
-        <xsl:value-of select='$person-name'/>
-      </name>
+      <person>
+        <name>
+          <xsl:value-of select='$person-name'/>
+        </name>
+      </person>
     </hasauthor>
   </xsl:template>
 </xsl:stylesheet>

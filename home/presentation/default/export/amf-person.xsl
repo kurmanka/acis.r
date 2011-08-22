@@ -320,9 +320,11 @@
       </xsl:choose>
     </xsl:variable>
     <hasauthor>
-      <name>
-        <xsl:value-of select='$author-name-without-comma'/>
-      </name>
+      <person>
+        <name>
+          <xsl:value-of select='$author-name-without-comma'/>
+        </name>
+      </person>
     </hasauthor>
   </xsl:template>
 </xsl:stylesheet>
