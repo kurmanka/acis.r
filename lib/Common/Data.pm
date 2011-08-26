@@ -9,7 +9,8 @@ use Carp::Assert;
 use YAML::XS;
 use Data::Dumper;
 use JSON::XS;
-use Lib32::Decode;
+## commented, was used in AC for data on 32-bit machine
+#use Lib32::Decode;
 
 sub inflate {
   my $in=shift;
@@ -44,7 +45,7 @@ sub inflate {
   if( $@ ) { 
     # warn "Storage: $@";                                                                                                                  
     #warn "decoding via daemon";
-    $out=Lib32::Decode::via_daemon($in);
+    #$out=Lib32::Decode::via_daemon($in);
     #if (not $out ) { 
     #  warn "decode via daemon failed";
     return undef;          
@@ -87,7 +88,7 @@ sub inflate_json {
   if( $@ ) { 
     # warn "Storage: $@";                                                                                                                  
     #warn "decoding via daemon";
-    $out=Lib32::Decode::via_daemon($in);
+    #$out=Lib32::Decode::via_daemon($in);
     #if (not $out ) { 
     #  warn "decode via daemon failed";
     return undef;          

@@ -284,6 +284,9 @@ lib/ACIS/Resources/AutoSearch.pm
 lib/ACIS/Resources/Search.pm
 lib/ACIS/Resources/SearchFuzzy.pm
 lib/ACIS/Resources/Suggestions.pm
+lib/ACIS/Resources/Learn.pm
+lib/ACIS/Resources/Learn/KnownItems.pm
+lib/ACIS/Resources/Learn/Suggested.pm
 lib/ACIS/SessionHistory.pm
 lib/ACIS/Sessions.pm
 lib/ACIS/ShortIDs.pm
@@ -346,6 +349,7 @@ lib/ARDB/Setup.pm
 lib/ARDB/SiteConfig.pm
 lib/ARDB/Table.pm
 lib/ARDB/Test.pm
+lib/Common/Data.pm
 lib/RePEc/Index/Collection/ACIS_UD.pm
 lib/RePEc/Index/Collection/CitationsAMF.pm
 lib/RePEc/Index/Collection/FullTextUrlsAMF.pm
