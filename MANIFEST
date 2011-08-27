@@ -82,6 +82,7 @@ home/bin/setup.logs-browsing
 home/bin/setup.ri_collections
 home/bin/setup.ri_local_setup.pm
 home/bin/setup.sid_local.pm
+home/bin/templates/acis.fcgi.pl
 home/bin/templates/apu.pl
 home/bin/templates/archive_critical.sh
 home/bin/templates/arpu.pl
@@ -93,12 +94,16 @@ home/bin/templates/events_archiving.pl
 home/bin/templates/export_cit_events.pl
 home/bin/templates/export_fturls_choices.pl
 home/bin/templates/export_name_variations.pl
+home/bin/templates/fastcgi_single.pl
 home/bin/templates/fuzzy_search_table.pl
+home/bin/templates/learn_daemon.pl
+home/bin/templates/learn_known_items.pl
 home/bin/templates/mvrec.pl
 home/bin/templates/offline_maintain.pl
 home/bin/templates/recover_citation_events.pl
 home/bin/templates/recreate_profile_pages.pl
 home/bin/templates/reparse_config.pl
+home/bin/templates/restart.pl
 home/bin/templates/restore_table_backup.pl
 home/bin/templates/rmrec.pl
 home/bin/templates/sanitar.pl
