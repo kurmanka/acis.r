@@ -1,51 +1,75 @@
 <screens>
-<!-- <use-perl-module>ACIS::Web::NewUser</use-perl-module> -->
-<!-- <use-perl-module>ACIS::Web::User</use-perl-module> -->
-<!-- <use-perl-module>ACIS::Web::Affiliations</use-perl-module> -->
-<!-- cardiff -->
+
+<!--
+ <use-perl-module>ACIS::Web::NewUser</use-perl-module>
+ <use-perl-module>ACIS::Web::User</use-perl-module>
+ 
+ <use-perl-module>ACIS::Web::Affiliations</use-perl-module>
+-->
+
  <set var='config-params-for-presenters' 
       value=''/>
+
+
 <!--  common system screens -->
+ 
  <screen id='index' process-on-POST='1'>
+
    <use module='ACIS::Web::Site'/>
    <use module='ACIS::Web::User'/>
+
    <init>
      <call function='ACIS::Web::Site::homepage'/>
    </init>
+
    <process>
      <call function='ACIS::Web::User::normal_login' />      
    </process>
-   <presentation type='xslt'
-                 filename='index.xsl' />
+
+   <presentation type='xslt' filename='index.xsl' />
  </screen>
+
+
  <!--  user screens -->
+
   <screen id='welcome'>
+
     <use module='ACIS::Web::User'/>
     <use module='ACIS::Web::Contributions' />
+
     <call function='load_session_or_authenticate' />
     <call function='ACIS::Web::User::check_session_type' />
     <call function='ACIS::Web::Contributions::prepare'/>
     <call function='ACIS::Web::User::welcome' />
-    <presentation type='xslt'
-                  filename='user/welcome.xsl' />
+
+    <presentation type='xslt' filename='user/welcome.xsl' />
+
   </screen>
-<!--  this screen should check the requested short-id, check what type of -->
-<!--  record that record is, and choose the presenter based on the type. -->
+
   <screen id='menu'>
     <use module='ACIS::Web::User'/>
+    <!-- 
+
+      this screen should check the requested short-id, check what type of
+      record that record is, and choose the presenter based on the type.
+
+    -->
     <call function='load_session_or_authenticate' />
     <call function='ACIS::Web::User::check_session_type' />
-    <presentation type='xslt'
-                  filename='user/welcome.xsl' /> 
+    <presentation type='xslt' filename='user/welcome.xsl' /> 
   </screen>
+
   <screen id='records-menu'>
-    <presentation type='xslt'
-                  filename='user/records-menu.xsl'/>
+    <presentation type='xslt' filename='user/records-menu.xsl'/>
   </screen>
+
+  
   <screen id='forgotten-password'>
+    
     <process>
       <call function='ACIS::Web::forgotten_password' />
     </process>
+
     <presentation type='xslt' filename='misc/forgotten-password.xsl' />
   </screen>
   
@@ -341,28 +365,6 @@
 
   </screen>
 
-  <screen id='research/autosuggest-chunk'>
-
-    <use module='ACIS::Web::Contributions' />
-    <use module='ACIS::Web::Background'/>
-
-    <init>
-      <call function='load_session_or_authenticate' />
-      <call function='ACIS::Web::Contributions::prepare'/>
-      <call function='ACIS::Web::Contributions::main_screen'/>
-    </init>
-
-    <process>
-      <call function='load_session_or_authenticate' />
-      <call function='ACIS::Web::Contributions::prepare'/>
-      <call function='ACIS::Web::Contributions::process'/>
-      <call function='ACIS::Web::Contributions::main_screen'/>
-      <call function='ACIS::Web::Contributions::switch'/>
-    </process>
-    
-    <presentation type='xslt' filename='person/research/autosuggest-chunk.xsl' />
-
-  </screen>
 
   <screen id='research/autosuggest'>
 
@@ -387,77 +389,26 @@
 
   </screen>
 
-<!--
-  <screen id='research/autosuggest_cardiff'>
+
+  <screen id='research/identified'>
 
     <use module='ACIS::Web::Contributions' />
-    <use module='ACIS::Web::Background'/>
 
     <init>
       <call function='load_session_or_authenticate' />
       <call function='ACIS::Web::Contributions::prepare'/>
-      <call function='ACIS::Web::Contributions::main_screen'/>
+      <call function='ACIS::Web::Contributions::prepare_identified'/>
     </init>
 
     <process>
       <call function='load_session_or_authenticate' />
       <call function='ACIS::Web::Contributions::prepare'/>
+      <call function='ACIS::Web::Contributions::prepare_identified'/>
       <call function='ACIS::Web::Contributions::process'/>
-      <call function='ACIS::Web::Contributions::main_screen'/>
-      <call function='ACIS::Web::Contributions::switch'/>
     </process>
     
-    <presentation type='xslt' filename='person/research/autosuggest-all_cardiff.xsl' />
+    <presentation type='xslt' filename='person/research/identified.xsl' />
 
-  </screen>
--->
-
-  <screen id='research/autosuggest-all'>
-
-    <use module='ACIS::Web::Contributions' />
-    <use module='ACIS::Web::Background'/>
-
-    <init>
-      <call function='load_session_or_authenticate' />
-      <call function='ACIS::Web::Contributions::prepare'/>
-      <call function='ACIS::Web::Contributions::main_screen'/>
-    </init>
-
-    <process>
-      <call function='load_session_or_authenticate' />
-      <call function='ACIS::Web::Contributions::prepare'/>
-      <call function='ACIS::Web::Contributions::process'/>
-      <call function='ACIS::Web::Contributions::main_screen'/>
-      <call function='ACIS::Web::Contributions::switch'/>
-    </process>
-    
-    <presentation type='xslt' filename='person/research/autosuggest-all.xsl' />
-
-  </screen>
-
-
-  <screen id='research/accepted'>
-    <use module='ACIS::Web::Contributions' />
-    <call function='load_session_or_authenticate' />
-    <!-- we have to keep accepted here -->
-    <call function='ACIS::Web::Contributions::prepare'/>
-    <!-- <call function='ACIS::Web::Contributions::prepare_accepted'/> -->
-    <process>
-      <call function='ACIS::Web::Contributions::process_accepted'/>
-    </process>
-    <presentation type='xslt' filename='person/research/accepted.xsl' />
-  </screen>
-
-  <screen id='research/accepted-chunk'>
-    <use module='ACIS::Web::Contributions' />
-    <call function='load_session_or_authenticate' />
-    <!-- we have to keep accepted here -->
-    <call function='ACIS::Web::Contributions::prepare'/>
-    <!-- <call function='ACIS::Web::Contributions::prepare_accepted'/> -->
-    <process>
-      <call function='ACIS::Web::Contributions::process_accepted'/>
-    </process>
-    <presentation type='xslt' filename='person/research/accepted.xsl' />
   </screen>
 
   <screen id='research/refused'>
@@ -470,49 +421,15 @@
     <presentation type='xslt' filename='person/research/refused.xsl' />
   </screen>
 
-  <!-- same as research/refused -->
-  <screen id='research/refused-chunk'>
+  <screen id='research/refused/xml'>
     <use module='ACIS::Web::Contributions' />
     <call function='load_session_or_authenticate' />
     <call function='ACIS::Web::Contributions::prepare_refused'/>
     <process>
-      <call function='ACIS::Web::Contributions::process_refused'/>
+      <call function='ACIS::Web::Contributions::process_refused_xml'/>
     </process>
-    <presentation type='xslt' filename='person/research/refused.xsl' />
+    <call function='dump_variables_xml'/>
   </screen>
-
-  <!-- same as research/refused -->
-  <screen id='research/refused-chunk-forward'>
-    <use module='ACIS::Web::Contributions' />
-    <call function='load_session_or_authenticate' />
-    <call function='ACIS::Web::Contributions::prepare_refused'/>
-    <process>
-      <call function='ACIS::Web::Contributions::process_refused'/>
-    </process>
-    <presentation type='xslt' filename='person/research/refused.xsl' />
-  </screen>
-
-  <!-- same as research/refused -->
-  <screen id='research/refused-chunk-backward'>
-    <use module='ACIS::Web::Contributions' />
-    <call function='load_session_or_authenticate' />
-    <call function='ACIS::Web::Contributions::prepare_refused'/>
-    <process>
-      <call function='ACIS::Web::Contributions::process_refused'/>
-    </process>
-    <presentation type='xslt' filename='person/research/refused.xsl' />
-  </screen>
-
-  <!-- obsolete sreen -->
-  <!--  <screen id='research/refused/xml'> -->
-  <!--    <use module='ACIS::Web::Contributions' /> -->
-  <!--    <call function='load_session_or_authenticate' /> -->
-  <!--    <call function='ACIS::Web::Contributions::prepare_refused'/> -->
-  <!--    <process> -->
-  <!--      <call function='ACIS::Web::Contributions::process_refused_xml'/> -->
-  <!--    </process> -->
-  <!--    <call function='dump_variables_xml'/> -->
-  <!--  </screen> -->
 
 
   <screen id='research/search'>
@@ -533,6 +450,20 @@
     <call function="ACIS::Web::Contributions::research_auto_status"/>
     <presentation type='xslt' filename='person/research/auto-status.xsl' />
   </screen>
+
+
+  <screen id='research/autosuggest-1by1'>
+    <use module='ACIS::Web::Contributions' />
+    <call function='load_session_or_authenticate' />
+    <call function='ACIS::Web::Contributions::prepare'/>
+    <process>
+      <call function='ACIS::Web::Contributions::process'/>
+    </process>
+    <call function="ACIS::Web::Contributions::show_whats_suggested"/>
+    <call function="ACIS::Web::Contributions::reload_if_nothing_to_suggest"/>
+    <presentation type='xslt' filename='person/research/autosuggest-1by1.xsl' />
+  </screen>
+
 
   <screen id='research/autoupdate'>
     <use module='ACIS::Web::Contributions'/>
