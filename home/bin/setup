@@ -134,9 +134,10 @@ if test $base_cgi_script_filename; then
   chmod +x $base_cgi_script_filename
 fi
 
+## installationn of the suexec daemon 
 if test $base_fcgi_script_filename; then
   echo writing $base_fcgi_script_filename
-  mv bin/acis.fcgi $base_fcgi_script_filename
+  mv bin/acis_suexec.fcgi $base_fcgi_script_filename
   chmod +x $base_cgi_script_filename
 fi
 

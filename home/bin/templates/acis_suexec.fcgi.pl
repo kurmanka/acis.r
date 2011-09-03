@@ -8,7 +8,7 @@ umask 0000;
 ## create ACIS object
 $acis = new ACIS::Web( );
 ## the request
-my $request = FCGI::Request(\*STDIN, \*STDOUT, \*STDERR, \%ENV, FCGI::OpenSocket($homedir.'/acis.socket',5) );
+my $request = FCGI::Request();
 ## this variable can alter be used as an indicator whether we are running fcgi
 $ACIS::FCGIReq = $request;
 while ( $request->Accept() >= 0 ) {

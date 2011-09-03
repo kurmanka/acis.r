@@ -83,6 +83,7 @@ home/bin/setup.ri_collections
 home/bin/setup.ri_local_setup.pm
 home/bin/setup.sid_local.pm
 home/bin/templates/acis.fcgi.pl
+home/bin/templates/acis_suexec.fcgi.pl
 home/bin/templates/apu.pl
 home/bin/templates/archive_critical.sh
 home/bin/templates/arpu.pl
