@@ -17,7 +17,7 @@ sub store_record {
   my $rec = shift;
   my $id  = shift;
 
-  $sql -> prepare_cached( "replace into objects values ( ?, ? )" );
+  $sql -> prepare_cached( "replace into objects (id,data) values ( ?, ? )" );
 
   my $data;
   if ( $rec ) {
