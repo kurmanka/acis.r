@@ -271,9 +271,8 @@ sub init_presenter_data {
   ###  $presenter-data/system/config
   my $pconf = $data -> {system} {config};
 
-  # cardiff change: added chunk-size
   foreach ( qw( base-url site-name site-name-long admin-email 
-                system-email static-base-url home-url chunk-size )) {
+                system-email static-base-url home-url )) {
     if ( $config -> {$_} ) {
       $pconf -> {$_} = $config -> {$_};
     }

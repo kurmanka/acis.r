@@ -165,10 +165,10 @@ sub init_presenter_data {
 
   ## copy some of the configuration parameters into
   ## presenter-data/system/config
-  ## this includes the pitman parameters
+  ## this includes the pitman and cardiff parameters
   my $config = $self -> config;
   my @copy = qw( institutions-maintainer-email research-auto-search-disabled 
-                 above-me-propose-accept below-me-propose-refuse );
+                 above-me-propose-accept below-me-propose-refuse chunk-size );
   my $pconf = $self -> {'presenter-data'} -> {'system'} -> {'config'};
   foreach ( @copy ) {
     $pconf ->{$_} = $config ->{$_};
