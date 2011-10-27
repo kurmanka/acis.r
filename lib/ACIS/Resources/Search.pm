@@ -25,6 +25,7 @@ use vars qw(@EXPORT);
 use Common::Data;
 ## /schmorp
 use Web::App::Common;
+use Data::Dumper;
 
 sub make_resource_item_from_db_row {
   my $row = shift;
@@ -138,7 +139,7 @@ sub process_resources_search_results {
     #}
     ## /schmorp
     if(not $item->{'id'} or not $item->{'sid'}) {
-      complain "bad document record found: (id: $id)\n" . Dumper $item;
+      complain "bad document record found: (id: $id)\n" . Dumper( $row );
     } 
     else {
       $item ->{'role'} = $row->{'role'} 
