@@ -92,7 +92,8 @@ sub extract_citations ($) {
       undef $target;
     }
 
-    if ( UNIVERSAL::isa( $_->[0], 'AMF::Noun' )) {
+    if ( ref $_->[0]
+         and ref $_->[0] eq 'AMF::Noun' ) {
       my $noun = $_->[0];
       $target = $noun->ref;
       
