@@ -346,11 +346,13 @@ sub load_suggestions_into_contributions {
   if($counter==0) {
     return $result;
   }
-  ## if the counter shows that we have a new suggestion,
-  ## hand over to the learning daemon. There may be nothing
-  ## to learn if there are no accepted and/or refused items,
-  ## but the learning daemon does the reporting...
-  &send_suggestions_to_learning_daemon($app,'load_suggestions_into_contributions');
+  if($app -> config( "learn-via-daemon" )) {
+      ## if the counter shows that we have a new suggestion,
+      ## hand over to the learning daemon. There may be nothing
+      ## to learn if there are no accepted and/or refused items,
+      ## but the learning daemon does the reporting...
+      &send_suggestions_to_learning_daemon($app,'load_suggestions_into_contributions');
+  }
   ## important: we still have to return the result
   return $result;
 }
