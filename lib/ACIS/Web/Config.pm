@@ -52,6 +52,9 @@ sub configuration_parameters {
     'compact-redirected-profile-urls', "not-defined",
     'cgi-perl-wrapper',  'not-defined',
 
+    ## contributions
+    'chunk-size', '12',
+
     ## cookies
     #    'auth-cookie-domain',    'not-defined',
     #    'auth-cookie-age-days',  '365',
