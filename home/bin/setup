@@ -1,6 +1,6 @@
 #!/bin/bash
 
-homedir=~/acis
+homedir=
 
 if test -z $homedir; then
   echo "This script must be installed before usage"
