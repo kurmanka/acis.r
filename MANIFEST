@@ -137,6 +137,7 @@ home/bin/templates/upgrade_to_1.5.64.pl
 home/bin/templates/upgrade_to_1.5.7.pl
 home/bin/templates/upgrade_to_1.5.70.pl
 home/bin/templates/upgrade_to_1.6.1.pl
+home/bin/templates/upgrade_to_1.6.49.pl
 home/configuration.xml
 home/contributions.conf.xml
 home/doclinks.conf.xml.eg
