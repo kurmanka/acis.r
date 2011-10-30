@@ -94,7 +94,7 @@ my $perlbin = `which perl`;
 chomp( $perlbin );
 $conf -> set( 'perlbin', $perlbin );
 $conf -> set( 'repec-index-socket', "$homedir/ri-socket" );
-
+$conf -> set( 'serialization-module', 'Common::Data' );
 
 ###  read user's file
 $conf -> file( $main );

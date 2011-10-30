@@ -74,7 +74,9 @@ sub configuration_parameters {
     'backup-directory', 'not-defined',
 
     ## serialization method
-    'serialization-module',  'Common::Data',
+    # there is no default value here, but bin/conf.pl would write
+    # 'Common::Data' as the default value
+    'serialization-module',  'required', 
 
     ## general
     'temp-directory',        'not-defined',
