@@ -1,0 +1,11 @@
+echo "# Please do not modify this unless you know what you are doing."
+echo "# created by a setup script of ACIS package."
+echo
+echo 'package ACIS::Data::Serialization;'
+echo
+echo "use $serialization_module qw( inflate deflate );"
+echo
+echo "use Exporter qw( import );"
+echo "@EXPORT = qw( inflate deflate );"
+echo ""
+echo '1;'

@@ -146,6 +146,11 @@ if test "$cgi_pperl_reinit"; then
     /bin/bash -c "$cgi_pperl_reinit"
 fi
 
+# respect the $serialization_module param
+echo serialization via $serialization_module
+. bin/setup.data_serialization > lib/ACIS/Data/Serialization.pm
+
+
 if test $tempate_set; then
     echo "template_set is $template_set"
     template_set='default'

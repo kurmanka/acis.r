@@ -12,6 +12,10 @@ use JSON::XS;
 ## commented, was used in AC for data on 32-bit machine
 #use Lib32::Decode;
 
+use Exporter qw( import );
+use vars  qw( @EXPORT );
+@EXPORT = qw( inflate deflate );
+
 sub inflate {
   my $in=shift;
   my $out;

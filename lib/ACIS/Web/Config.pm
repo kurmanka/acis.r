@@ -73,6 +73,9 @@ sub configuration_parameters {
     'metadata-db-name', 'required',
     'backup-directory', 'not-defined',
 
+    ## serialization method
+    'serialization-module',  'Common::Data',
+
     ## general
     'temp-directory',        'not-defined',
 
