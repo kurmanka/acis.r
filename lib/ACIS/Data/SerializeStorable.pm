@@ -9,7 +9,7 @@ package ACIS::Data::SerializeStorable;
 # the home/bin/setup.data_serialization script.
 
 use strict;
-use Storable (nfreeze thaw);
+use Storable qw( nfreeze thaw );
 
 use Exporter qw( import );
 use vars qw( @EXPORT );
