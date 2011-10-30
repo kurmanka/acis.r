@@ -23,7 +23,7 @@ sub store_record {
   if ( $rec ) {
     ## schmorp
     #$data = nfreeze( $rec );
-    $data=&Common::Data::deflate($rec);
+    $data=deflate($rec);
     ## /schmorp
   }
 
@@ -55,7 +55,7 @@ sub retrieve_record {
       #    return undef;          
       #  }
       #}
-      $rec=&Common::Data::inflate($data);
+      $rec=inflate($data);
       ## /schmorp
     }
   }

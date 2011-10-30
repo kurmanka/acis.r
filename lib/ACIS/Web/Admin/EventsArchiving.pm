@@ -46,7 +46,7 @@ use ACIS::Web::Admin::Events qw(
                                );
 
 ## schmorp
-use Common::Data;
+use ACIS::Data::Serialization;
 ## schmorp
 
 ###  Database table events_last_archived (date DATETIME, togo INT) is a
@@ -456,7 +456,7 @@ sub dump_sessions {
       ## schmorp
       ###  Pack the log with Storable's nfreeze      
       #my $log = Storable::nfreeze( $se->{log} );
-      my $log=&Common::Data::deflate($se->{'log'});
+      my $log=deflate($se->{'log'});
       ## /schmorp
 
       ### Pack $about as string of several attribute: value lines,

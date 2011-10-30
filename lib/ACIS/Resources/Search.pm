@@ -22,7 +22,7 @@ use vars qw(@EXPORT);
            );
 ## schmorp
 #use Storable qw(thaw);
-use Common::Data;
+use ACIS::Data::Serialization;
 ## /schmorp
 use Web::App::Common;
 use Data::Dumper;
@@ -42,7 +42,7 @@ sub make_resource_item_from_db_row {
   #  delete $row ->{data}; 
   #  undef $@; 
   #}
-  $item = &Common::Data::inflate($data);
+  $item = inflate($data);
   ## /schmorp
   $item -> {'id'}  = $id;
   if ( $role ) { $item -> {role} = $role; }
@@ -64,7 +64,7 @@ sub reload_contribution {
     if ( $row->{data} ) {
       ## schmorp
       #$item = eval {thaw( $row->{'data'} ); };
-      $item=&Common::Data::inflate($row->{'data'});
+      $item=inflate($row->{'data'});
       ## /schmorp
     }
   } 
@@ -93,7 +93,7 @@ sub load_resources_by_ids {
     if ( $row and $row->{'data'} ) {
       ## schmorp
       #my $item = eval { thaw $row->{'data'}; };
-      my $item = &Common::Data::inflate($row->{'data'});
+      my $item = inflate($row->{'data'});
       ## /schmorp
       push @list, $item;
     } else {
@@ -125,7 +125,7 @@ sub process_resources_search_results {
     #    my $item = make_resource_item_from_db_row( $row ); 
     #my $item = eval { thaw( $row ->{'data'} ); };
     ## schmorp
-    my $item = &Common::Data::inflate($row->{'data'});
+    my $item = inflate($row->{'data'});
     #my $error=$@;
     ## evcino 
     #if ( not $item) {

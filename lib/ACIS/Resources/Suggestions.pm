@@ -19,7 +19,7 @@ use vars qw(@EXPORT);
 
 ## schmorp
 #use Storable qw(nfreeze thaw);
-use Common::Data;
+use ACIS::Data::Serialization;
 ## /schmorp
 use Data::Dumper;
 use Web::App::Common;
@@ -188,7 +188,7 @@ sub load_suggestions {
     #  debug Dumper $r;
     #  next;
     #}
-    my $item=&Common::Data::inflate($data);
+    my $item=inflate($data);
     ## /schmorp
     ## 4 setember problem
     #debug Dumper $item;
@@ -280,7 +280,7 @@ sub load_suggestions_into_contributions {
     }
     ## schmorp
     #my $item = eval { thaw($data); };
-    my $item = &Common::Data::inflate($data);
+    my $item = inflate($data);
     if(not $item) {
       debug "error in inflating: $@";
       next;
@@ -382,7 +382,7 @@ sub send_suggestions_to_learning_daemon {
   debug("$origin is sending a learner to daemon...");
   ## schmorp
   #my $frozen=nfreeze($learner);
-  my $serial=&Common::Data::deflate($learner);
+  my $serial=deflate($learner);
   my $length=length($serial);
   ## add length before the serial
   $serial="$length\n$serial";

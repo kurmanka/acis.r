@@ -10,7 +10,7 @@ use Exporter;
 
 ## schmorp
 #require Storable;
-use Common::Data;
+use ACIS::Data::Serialization;
 ## /schmorp
 use Carp::Assert;
 
@@ -95,7 +95,7 @@ sub chain_process_event($$;$) {
         # eval thaw
         ## schmorp
         #$chain ->{log} = eval {Storable::thaw( $log ); };
-        $chain ->{'log'} = &Common::Data::inflate( $log ); 
+        $chain ->{'log'} = inflate( $log ); 
         ## /schmorp
         if ( not $chain->{log} ) {
           debug "bad storable frozen value: $e->{chain}";
@@ -216,7 +216,7 @@ sub make_session($) {
     #require Storable;
     # eval thaw
     #$se ->{log} = eval {Storable::thaw( $log ); } ; 
-    $se->{'log'} = &Common::Data::inflate($log); 
+    $se->{'log'} = inflate($log); 
     ## /schmorp
     delete $se ->{open};
   }

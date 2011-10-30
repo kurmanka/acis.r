@@ -8,7 +8,7 @@ use ACIS::ShortIDs;
 #require ARDB::Record::Simple;
 ## schmorp
 #use Storable qw( nfreeze );
-use Common::Data;
+use ACIS::Data::Serialization;
 ## /schmorp 
 use ACIS::Web::HumanNames qw(normalize_name);
 
@@ -661,7 +661,7 @@ sub process_institution {
 
   ## schmorp
   #my $data = nfreeze $iobj;
-  my $data = &Common::Data::deflate($iobj);
+  my $data = deflate($iobj);
   ## /schmorp
 
   my $struct = {

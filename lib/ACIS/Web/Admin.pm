@@ -856,10 +856,10 @@ sub build_result_document_list {
 
       ## schmorp
       #use Storable qw( thaw );
-      use Common::Data;     
+      use ACIS::Data::Serialization;     
       if ( $item -> {data} ) {
         #my $packed = eval {thaw( $item -> {data}); };
-        my $packed=&Common::Data::inflate($item-> {'data'});
+        my $packed=inflate($item-> {'data'});
         foreach ( keys %$packed ) {
           my $val = $packed -> {$_};
           $item -> {$_} = $val;

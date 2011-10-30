@@ -4,7 +4,7 @@ use strict;
 use Carp::Assert;
 ## schmorp
 # use Storable qw( nfreeze );
-use Common::Data;
+use ACIS::Data::Serialization;
 ## /schmorp
 use Digest::MD5;
 use ACIS::ShortIDs;
@@ -615,7 +615,7 @@ sub process_institution {
   # nfreeze the $data_field, to be stored in the table
   ## schmorp
   # my $data = nfreeze $data_field;
-  my $data = &Common::Data::deflate($data_field);
+  my $data = deflate($data_field);
   ## // schmorp
   
   # this is the table structure

@@ -40,7 +40,7 @@ use Web::App::Common;
 
 ## schmorp
 #use Storable qw( thaw );
-use Common::Data;
+use ACIS::Data::Serialization;
 ## /schmorp
 
 sub load_institution {
@@ -64,7 +64,7 @@ sub load_institution {
   if ( $r and $r -> {rows} ) {  
     ## schmorp
     #my $inst = eval {thaw $r->{row}{data}; };
-    my $inst = &Common::Data::inflate($r->{'row'}{'data'});
+    my $inst = inflate($r->{'row'}{'data'});
     ## /schmorp
     return $inst;
   }
@@ -529,7 +529,7 @@ sub extract_institution_search_results {
     # eval thaw
     ## schmorp
     #my $institution = eval { thaw $data; };
-    my $institution = &Common::Data::inflate($data);
+    my $institution = inflate($data);
     ## /schmorp
     my $instid = $institution -> {id};
     
