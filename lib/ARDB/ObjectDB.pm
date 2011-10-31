@@ -10,6 +10,7 @@ use Carp::Assert;
 #use Storable qw( thaw nfreeze );
 #use Lib32::Decode;
 ## /schmorp
+use ACIS::Data::Serialization;
 
 
 sub store_record {
@@ -23,7 +24,7 @@ sub store_record {
   if ( $rec ) {
     ## schmorp
     #$data = nfreeze( $rec );
-    $data=deflate($rec);
+    $data = deflate($rec);
     ## /schmorp
   }
 
