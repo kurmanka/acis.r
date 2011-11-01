@@ -63,6 +63,8 @@ test -d sessions      || mkdir sessions
 test -d unconfirmed   || mkdir unconfirmed
 test -d deleted-userdata || mkdir deleted-userdata
 test -d doc           || mkdir doc
+test -d opt           || mkdir opt
+test -d opt/log       || mkdir opt/log
 
 # the same assumption as in sysconfig 
 test -d RI       || mkdir RI   
