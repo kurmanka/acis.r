@@ -1009,20 +1009,21 @@ sub process {
     else {
       $app -> message( 'research-decisions-processed' );
     }
+
     if($app -> config( "learn-via-daemon" )) {
       ## send suggestions to learning daemon
       ## defined in ACIS/Resources/Suggestions.pm
       &send_suggestions_to_learning_daemon($app,'process');
-    }
-    ## form the learner
-    my $learner=&ACIS::Resources::Learn::form_learner($app);
-    if(not defined($learner)) {
-      complain "no learner";
-    }
-    else {
-      my $saved_results_boolean=&ACIS::Resources::Learn::Suggested::learn_suggested($learner,$SQL,undef,'exact-name-variation-match');
-      if(not defined($saved_results_boolean)) {
-        complain "learrning failed";
+      ## form the learner
+      my $learner=&ACIS::Resources::Learn::form_learner($app);
+      if(not defined($learner)) {
+          complain "no learner";
+      }
+      else {
+          my $saved_results_boolean=&ACIS::Resources::Learn::Suggested::learn_suggested($learner,$SQL,undef,'exact-name-variation-match');
+          if(not defined($saved_results_boolean)) {
+              complain "learrning failed";
+          }
       }
     }
   }

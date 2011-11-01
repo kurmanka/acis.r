@@ -213,7 +213,8 @@ sub logoff_session {
   }
 
   # cardiff: call the command to sort refused
-  if($presenter->{'response'}->{'success'}) {
+  if( $app -> config( "learn-via-daemon" ) 
+      and $presenter->{'response'}->{'success'} ) {
     my $executable="$bindir/learn_known_items";
     debug "I have to learn the refused documents: $executable";
     if(-e $executable) {

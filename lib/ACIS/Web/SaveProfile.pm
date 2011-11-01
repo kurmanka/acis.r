@@ -62,10 +62,12 @@ sub save_profile {
     my $id = $record ->{'id'};
     $session -> set_current_record_no( $number );
 
-    ## learn all known items
-    use ACIS::Resources::Learn::KnownItems;
-    my $sql = $app -> sql_object();
-    &ACIS::Resources::Learn::KnownItems::learn_all_known($app,$sql);
+    if($app -> config( "learn-via-daemon" )) {
+        ## learn all known items
+        use ACIS::Resources::Learn::KnownItems;
+        my $sql = $app -> sql_object();
+        &ACIS::Resources::Learn::KnownItems::learn_all_known($app,$sql);
+    }
     ## unclear why there is a { here
     #{
     use ACIS::Web::Export;

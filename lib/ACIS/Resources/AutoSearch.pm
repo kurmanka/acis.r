@@ -238,31 +238,34 @@ sub search_for_resources_exact {
     logit "exact name: '$name_variation', found: $found";
     push(@{$results},@{$search});
   }
-  #logit "here is the result";
+
   #logit Dumper $results;  
   ## cardiff changes
-  logit "start learning";
-  ## defined in Resources/Learn.pm
-  ## adds the results to the existing contribution
-  logit "there are " . scalar @$results . " results";
-  my $learner=&form_learner($app,'search_for_resources_exact', $results);
-  logit "there are " . scalar @{$learner->{'suggested'}} . " suggestions in the learner"; 
-  ## defined in Resourcess/Learn/Suggested.pm
-  ## this also saves the results, if it returns true
-  my $saved_results_boolean=&learn_suggested($learner,$sql,$context,'exact-name-variation-match');
-  if($saved_results_boolean) {
-    logit "saved_results_boolean: $saved_results_boolean";
-  }
-  else {
-    logit "saved_results_boolean is not defined, no learning!";
-  }
-  ## so if this is not true, save the results with the local function
-  if(not $saved_results_boolean) {
-    logit('there has been no learning, I have to store');
-    logit(Dumper $results);
-    save_search_results( $context, 'exact-name-variation-match', $results );
+  if ($app->config("learn-via-daemon")) {
+      logit "start learning";
+      ## defined in Resources/Learn.pm
+      ## adds the results to the existing contribution
+      logit "there are " . scalar @$results . " results";
+      my $learner=&form_learner($app,'search_for_resources_exact', $results);
+      logit "there are " . scalar @{$learner->{'suggested'}} . " suggestions in the learner"; 
+      ## defined in Resourcess/Learn/Suggested.pm
+      ## this also saves the results, if it returns true
+      my $saved_results_boolean=&learn_suggested($learner,$sql,$context,'exact-name-variation-match');
+      if($saved_results_boolean) {
+          logit "saved_results_boolean: $saved_results_boolean";
+      } else {
+          ## so if this is not true, save the results with the local function
+          logit "saved_results_boolean is not defined, no learning!";
+          logit('there has been no learning, I have to store');
+          logit(Dumper $results);
+          save_search_results( $context, 'exact-name-variation-match', $results );
+      }
+  } else {
+      # learning disabled:
+      save_search_results( $context, 'exact-name-variation-match', $results );
   }
   ## end of cardiff change
+
   logit "search_for_resources_exact: exit";
   ## remember rosa sitting next to you? This line must stay!
   return 1;
