@@ -29,7 +29,7 @@
         <acis:form xsl:use-attribute-sets='form'>
           
           <xsl:call-template name='fieldset'>
-            <xsl:with-param name='content' xmlns='http://acis.openlib.org/fieldset'>
+            <xsl:with-param name='content'>
               
               <p>
                 <label for='em'>Email address.  Required: <br />
