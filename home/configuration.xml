@@ -51,6 +51,8 @@
   <table name='objects'>
     <field name='id'    sql-type="CHAR(250) NOT NULL PRIMARY KEY" />
     <field name='data'  sql-type='blob' />
+    <field name='timestamp' 
+       sql-type='TIMESTAMP default CURRENT_TIMESTAMP on update CURRENT_TIMESTAMP' />
   </table>
 
 
@@ -69,6 +71,8 @@
     <field name='name'     sql-type="VARCHAR(255) CHARACTER SET utf8 NOT NULL" />
     <field name='location' sql-type="VARCHAR(200) CHARACTER SET utf8" />
     <field name='data'     sql-type="BLOB NOT NULL" />
+    <field name='timestamp' 
+       sql-type='TIMESTAMP default CURRENT_TIMESTAMP on update CURRENT_TIMESTAMP' />
 
     <create-table-sql>
       FULLTEXT INDEX ( name ),
@@ -116,6 +120,9 @@
         <field name='location' sql-type=' TEXT CHARACTER SET utf8'/>
         <!-- synthetic string containg some other details of
              the document, see doc/citations.html -->
+
+        <field name='timestamp' 
+               sql-type='TIMESTAMP default CURRENT_TIMESTAMP on update CURRENT_TIMESTAMP' />
 
         <create-table-sql>
           FULLTEXT INDEX title_ft ( title ),
