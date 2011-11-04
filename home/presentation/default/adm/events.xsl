@@ -10,6 +10,7 @@
   <xsl:import href='../page.xsl'/>
 
 
+  <xsl:variable name='root'      select='/'/>
   <xsl:variable name='showing'   select='//showing'/>
   <xsl:variable name='timespan'  select='//showing/timespan'/>
   <xsl:variable name='options'   select='$showing/options'/>
@@ -336,7 +337,7 @@ span.switch { border: 1px solid transparent; padding: 3px;}
 
     </style>
 
-    <script>
+    <html:script>
 function no_brief_mode( id ) {
  set_class_if( id, "brief",   false );
  set_class_if( id, "nobrief", true );
@@ -363,7 +364,7 @@ function close_ses_boxes() {
 function showhide_log ( id ) {
   toggle_class( id, "closed" );
 }
-    </script>
+    </html:script>
 
 <!--
     <acis:script-onload>brief_mode("theEvents");</acis:script-onload>

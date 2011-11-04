@@ -60,20 +60,20 @@
       <xsl:when test='substring($start-date,12,8) != "00:00:00"'>
         
         <!-- there was an xmlns='http://nnn' on the next element -->
-        <acis:a
+        <a
          class='int'
          href='{$base-url}/adm/events/{substring($start-date,1,10)}{$link-suffix}'
          title='this day start'
-        >^&lt;&lt; day start</acis:a>
+        >^&lt;&lt; day start</a>
 
       </xsl:when>
       <xsl:otherwise>
 
         <!-- there was an xmlns='http://nnn' on the next element -->
-        <acis:a 
+        <a 
            class='int'
            href='{$base-url}{$previous-day-addr}{$link-suffix}'
-        >&lt;&lt;&lt; previous day</acis:a>
+        >&lt;&lt;&lt; previous day</a>
 
       </xsl:otherwise>
     </xsl:choose>
@@ -84,7 +84,7 @@
   <xsl:template name='go-forward'>
 
     <!-- there was an xmlns='http://nnn' on the next element -->
-    <acis:a class='int'
+    <a class='int'
        href='{$base-url}{$next-chunk-addr}{$link-suffix}'>
       <xsl:choose>
         <xsl:when test='$chunked'>next chunk </xsl:when>
@@ -94,7 +94,7 @@
       </xsl:choose>
 
       <xsl:text>&gt;&gt;&gt;</xsl:text>
-    </acis:a>
+    </a>
 
   </xsl:template>
 
