@@ -143,6 +143,7 @@ sub type {
 }
 
 use Digest::MD5;
+use Encode;
 
 sub md5checksum {
   my $self = shift;
@@ -154,7 +155,7 @@ sub md5checksum {
     if ( not ref( $_ ) ) { next; }
     
     my $s = " ";
-    $s .= $_->{ostring};
+    $s .= encode_utf8( $_->{ostring} );
     if ( $_->{trgdocid} ) {
       $s .= '@';
       $s .= $_->{trgdocid};
