@@ -837,10 +837,12 @@
       </xsl:choose>
     </noscript>    
   </xsl:template>
+
   <!-- create an empty node-set $parents -->
   <xsl:variable name='parents'/>
   <xsl:variable name='parents-set'
                 select='exsl:node-set($parents)'/>
+
   <!-- link filter for <hl> elements -->
   <xsl:template match='acis:hl[@screen]' mode='link-filter'>
     <xsl:variable name='screen'
@@ -864,8 +866,10 @@
       </xsl:otherwise>
     </xsl:choose>
   </xsl:template>
+
   <xsl:template match='acis:onsubmit|acis:check|acis:hint'
                 mode='null'/>
+
   <xsl:template match='acis:onsubmit|acis:check'
                 mode='link-filter'/>
   <xsl:template name='phrase'>
@@ -876,10 +880,12 @@
     <xsl:apply-templates select='exsl:node-set( $cont )'
                          mode='link-filter'/>
   </xsl:template>
+
   <xsl:template match='acis:phrase'
                 mode='link-filter'>
     <xsl:apply-templates mode='link-filter'/>
   </xsl:template>
+
   <xsl:template match='acis:phrase[@ref]'
                 mode='link-filter'>
     <xsl:variable name='ref' select='@ref'/>
@@ -890,7 +896,7 @@
       </xsl:when>
       <xsl:when test='$phrase/*[@id=$ref]'>
         <xsl:apply-templates mode='link-filter'
-                             select='$phrase/*[@id=$ref]/*'/>
+                             select='$phrase/*[@id=$ref]'/>
       </xsl:when>
       <xsl:otherwise>
         <xsl:apply-templates mode='link-filter'
@@ -898,10 +904,12 @@
       </xsl:otherwise>
     </xsl:choose>
   </xsl:template>
+
   <xsl:template match='acis:script-onload'
                 mode='scripting'>
     <xsl:copy-of select='text()'/>
   </xsl:template>
+
   <xsl:template match='acis:form[descendant::acis:onsubmit or descendant::acis:check]'
                 mode='scripting'>
     <xsl:text>function form_check_</xsl:text>
@@ -991,6 +999,7 @@
     }
     </xsl:text>
   </xsl:template>
+
   <xsl:template name='input-hint'>
     <span id='{@id}Hint' style='display: none;'>
       <xsl:if test='not(acis:hint/@side)'>
@@ -1018,6 +1027,7 @@
       </span>
     </span>
   </xsl:template>
+
   <!-- Will add a call to check_form_changes() javascript, if there -->
   <!--  is an "important" form on the page and there are changes -->
   <xsl:template name='link-attributes'>
