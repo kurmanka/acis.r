@@ -1,23 +1,55 @@
-<acis:phrasing
-    xmlns:acis="http://acis.openlib.org"
-    xmlns="http://www.w3.org/1999/xhtml">
+<?xml version="1.0" encoding="utf-8"?>
+<acis:phrasing xmlns:acis="http://acis.openlib.org"
+               xmlns="http://www.w3.org/1999/xhtml">
+  <acis:phrase id='research-identified-after-save-changes-button'>
+
+    <p>Please note that removing an item only removes it from
+    your profile, not from the database. Also, we discourage the
+    removal of old versions as links from old to newer versions
+    cannot be established.</p> 
+
+  </acis:phrase>
 
   <acis:phrase id='metadata-identifiers'>RePEc handles</acis:phrase>
 
-  <acis:phrase id='service-intro'>
+  <acis:phrase id='not-satisfied-with-automatic-search'>
 
-   <p class='slogan'><big><big
-   >Are you a researcher in Economics or a related field?  
+    <ol>
+
+       <li><p>Review your name variations (<a
+       ref='#variations'>below</a>).  The automatic search
+       will only find documents matching these name
+       variations.</p></li>
+
+       <li><p>Your name may be misspelled in our
+       bibliographic data. The automatic search will not
+       find papers where your name is misspelled.  Try using
+       <a ref='@research/search'>a manual search</a>.  If
+       you know the RePEc handle of a paper of yours, you
+       can use the search on the handle to find it and add
+       it to your profile.</p></li>
+
+       <li><p>It is likely that the documents you’d like to have
+       listed are not in our database.</p></li>
+
+    </ol>
+
+  </acis:phrase>
+
+ <acis:phrase id='service-intro'>
+
+   <p class='slogan'><big><big>
+     Are you a researcher in Economics or a related field?  
    Create and maintain a public profile of your work.</big></big>  
    <a ref='about!' >More about the service…</a>
    </p>
 
    <p style='float:right;text-align:right;width:150px;color:#666;'>
    <small>Hosted by <br/><a
-   href='http://research.stlouisfed.org' ><img
-   src='/img/STL-FRB-Research.png' 
-   alt='Research Department at the Federal Reserve Bank of St. Louis'
-   width='150' height='110'
+   href='http://www.econ.uconn.edu' ><img
+   src='/img/UConnEcon.jpg' 
+   alt='Department of Economics at the University of Connecticut'
+   width='150' height='80'
    border='0' /></a>
    </small>
    </p>	      
@@ -51,17 +83,6 @@
  <acis:phrase id='recent-news'>
 
  <li class='item'>
-     <span class='date'>October 27, 2011:</span>
-     There are now 30,000 authors registered in this service! <A 
-HREF="http://blog.repec.org/2011/10/29/30000-authors-now-registered-with-repec//">Read more</A>
-  </li>
-
-<li class='item'>
-     <span class='date'>September 8, 2011:</span>
-The service is now hosted by the Federal Reserve Bank of St. Louis. 
-</li>
-
- <li class='item'>
      <span class='date'>August 4, 2010:</span>
      There are now 25,000 authors registered in this service! <A 
 HREF="http://blog.repec.org/2010/08/04/repec-author-service-reaches-major-mark/">Read more</A>
@@ -72,8 +93,6 @@ HREF="http://blog.repec.org/2010/08/04/repec-author-service-reaches-major-mark/"
      We have reached the 20,000 threshold.
      <a href="http://blog.repec.org/2009/04/30/repec-author-service-now-20000-strong/">Read more</a>
   </li>
-<!--
-
 
 
    <li class='item'>
@@ -83,8 +102,7 @@ HREF="http://blog.repec.org/2010/08/04/repec-author-service-reaches-major-mark/"
      see it yourself.
    </li>
 
-
-
+<!--
    <li class='item'>
 
      <span class='date'>July 30, 2005:</span>
@@ -160,9 +178,10 @@ HREF="http://blog.repec.org/2010/08/04/repec-author-service-reaches-major-mark/"
        | <a ref='privacy-policy!' screen='privacy-policy'
        >PRIVACY POLICY</a>
 
-       | <a href='mailto:authors@repec.org' class='int'
-noscript='ADMIN EMAIL: AUTHORS at REPEC dot ORG'
+       | <a href='mailto:authors@repec.org'
+       class='int'
        >EMAIL ADMINISTRATOR</a>
+       <!-- noscript='ADMIN EMAIL: AUTHORS at REPEC dot ORG' -->
        | <a ref='/!' screen='homepage'>HOME</a>
        | <a href='http://repec.org/' title='external link'>RePEc</a>
 
@@ -174,93 +193,15 @@ noscript='ADMIN EMAIL: AUTHORS at REPEC dot ORG'
 
      </small>
    </p>
- </acis:phrase>
 
 
- <acis:phrase id='after-footer'>
-
-<script type="text/javascript">
-  var _gaq = _gaq || [];
-  _gaq.push(['_setAccount', 'UA-23765825-1']);
-  _gaq.push(['_setDomainName', '.repec.org']);
-  _gaq.push(['_trackPageview']);
-
-  (function() {
-    var ga = document.createElement('script'); ga.type = 
-'text/javascript'; ga.async = true;
-    ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 
-'http://www') + '.google-analytics.com/ga.js';
-    var s = document.getElementsByTagName('script')[0]; 
-s.parentNode.insertBefore(ga, s);
-  })();
-</script>
-
- </acis:phrase>
-
-
-
- <!-- affiliations profile -->
-
- <acis:phrase id='institution-search-instructions' >Enter main words of
- your institution name.  You may try acronyms, too. If you are unclear
- what should qualify as affiliation, <A
- HREF='http://blog.repec.org/2011/04/26/about-author-affiliations/'
- target ='NEW'>click here</A>.
  </acis:phrase>
 
  <acis:phrase id='affiliations-listing-prolog'>
 
-  <p>Coordinates for an institution listed above incorrect? Please
-  send email to <a email='zimmermann@stlouisfed.org' /> with
-  corrections. Do not remove the affiliation if you have not left this
-  institution.</p>
+  <p>Coordinates for an institution listed above incorrect? Please send email to <a
+email='zimmermann@stlouisfed.org' /> with corrections. Do not remove the affiliation if you have not left this institution.</p>
 
- </acis:phrase>
-
-
- <!-- research profile -->
-  <acis:phrase id='research-identified-after-save-changes-button'>
-
-    <p>Please note that removing an item only removes it from
-    your profile, not from the database. Also, we discourage the
-    removal of old versions as links from old to newer versions
-    cannot be established.</p> 
-
-  </acis:phrase>
-
-  <acis:phrase id='not-satisfied-with-automatic-search'>
-    <ol>
-       <li><p>Review your name variations (<a
-       ref='#variations'>below</a>).  The automatic search
-       will only find documents matching these name
-       variations.</p></li>
-
-       <li><p>Your name may be misspelled in our
-       bibliographic data. The automatic search will not
-       find papers where your name is misspelled.  Try using
-       <a ref='@research/search'>a manual search</a>.  If
-       you know the RePEc handle of a paper of yours, you
-       can use the search on the handle to find it and add
-       it to your profile.</p></li>
-
-       <li><p>It is likely that the documents you’d like to have
-       listed are not in our database.</p></li>
-
-    </ol>
-
-  </acis:phrase>
-
-
- <acis:phrase id='research-main-epilog'>
-
-   <h2>On adding your works</h2>
-   
-   <p>To add a work to your research profile, it must already be in
-   our documents database.  You cannot add other works yourself.  We
-   do not accept individual document submissions. However, you can
-   submit your work to <a href='http://mpra.repec.org/'
-   target='NEW'>MPRA</a>, that would integrate it in RePEc.</p>
-   
  </acis:phrase>
 
 
@@ -292,6 +233,8 @@ s.parentNode.insertBefore(ga, s);
  </acis:phrase>
 
 
+ <acis:phrase id='xxx-after-footer'>
+ </acis:phrase>
 
 
 <acis:phrase id='email-confirmation-about-registering'
@@ -336,6 +279,5 @@ success, see http://repec.org/.
 Christian Zimmermann
 for the RePEc Author Service team
 </acis:phrase>
-
 
 </acis:phrasing>
