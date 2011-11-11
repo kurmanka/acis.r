@@ -208,6 +208,10 @@ s.parentNode.insertBefore(ga, s);
  target ='NEW'>click here</A>.
  </acis:phrase>
 
+ <acis:phrase id='affiliations-submit-to'> our database (but first,
+ search for it in the form above).
+ </acis:phrase>
+
  <acis:phrase id='affiliations-listing-prolog'>
 
   <p>Coordinates for an institution listed above incorrect? Please

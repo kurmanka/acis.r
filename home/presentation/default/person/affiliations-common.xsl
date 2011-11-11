@@ -118,10 +118,7 @@
         <xsl:text>Submit a new institution record</xsl:text>
       </a>
       <xsl:text> to </xsl:text>
-      <a href="http://ariw.org/">
-        <xsl:text>ARIW</xsl:text>
-      </a>
-      <xsl:text>.</xsl:text>
+      <acis:phrase ref='affiliations-submit-to'/>
     </p>    
   </xsl:template>
   <xsl:variable name='to-go-options'>
