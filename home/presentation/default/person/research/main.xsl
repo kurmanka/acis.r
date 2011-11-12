@@ -581,7 +581,10 @@
               </a>
             </h2>
             <p>
-              <xsl:text>These works are automatically excluded from the search results, because you refused them.</xsl:text>
+              <xsl:text>These works are automatically excluded from
+              the search results, because you refused them, and
+              thus claim </xsl:text><u>not</u>
+              <xsl:text> to be their author.</xsl:text>
             </p>
           </td>
         </tr>

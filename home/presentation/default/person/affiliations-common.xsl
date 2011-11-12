@@ -111,7 +111,7 @@
   </xsl:template>
   <xsl:template name='submit-invitation'>
     <h2 id='submit'>
-      <xsl:text>Can not find your institution?</xsl:text>
+      <xsl:text>Cannot find your institution?</xsl:text>
     </h2>    
     <p style='margin-bottom: 2em;'>
       <a ref='@new-institution'>

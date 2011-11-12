@@ -32,6 +32,19 @@
       
       <h2>Institution</h2>
 
+<p>Before submitting a new institution, please make sure it is not
+already listed in the database: did you use the search function on the
+previous screen?</p>
+
+<p>Also, if you are submitting a university affiliation, please submit
+the department, institute or center you are affiliated with, including
+its web site. Simple university affiliations will not be added to the
+database. For universities, you need to have "University of X,
+Department of Y" with the department web page, for example. If you are
+not clear what count as a affiliation, <a
+HREF='http://blog.repec.org/2011/04/26/about-author-affiliations/'
+target ='new'>see here</a>.</p>
+
         <xsl:call-template name='fieldset'>
           <xsl:with-param name='content'>              
             <p>
@@ -49,7 +62,7 @@
               <label for='homepage'>Website address, required:</label><br />
               <acis:input name='homepage' id='homepage' size='50'/><br/>
               
-              <label for='email'>Email address, optional:</label><br />
+              <label for='email'>Email address of the institution (not yours), optional:</label><br />
               <acis:input name='email' id='email' size='50'/><br/>
               
               <!-- the following does not appear in AuthorClaim, this is checked by

@@ -280,14 +280,14 @@
                   <span class='refuse'>
                     <xsl:text>refused</xsl:text>
                   </span>
-                  <xsl:text> so far.</xsl:text>
+                  <xsl:text> so far, and thus claim not to have authored.</xsl:text>
                 </xsl:if>
                 <xsl:if test='$items-count = 1'>
                   <xsl:text>is the single item that you have </xsl:text>
                   <span class='refuse'>
                     <xsl:text>refused</xsl:text>
                   </span>
-                  <xsl:text> so far.</xsl:text>
+                  <xsl:text> so far, and thus claim not to have authored.</xsl:text>
                 </xsl:if>
                 <xsl:text> If you change your mind, you can </xsl:text>
                 <span class='accept'>

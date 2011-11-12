@@ -31,7 +31,7 @@
             <acis:input name='full-name' id='full' size='50'/>
           </p>
           <p>
-            <label for='fn'>First name, required:</label><br/>
+            <label for='fn'>First name, required. No titles:</label><br/>
             <acis:input name='first-name' id='fn' size='50'/>
             <br />
             <label for='mn'>Middle name:</label><br />
@@ -40,7 +40,7 @@
             <label for='ln'>Last name, required:</label><br />
             <acis:input name='last-name' id='ln' size='50'/>
             <br />
-            <label for='ns'>Name suffix, if any:</label><br />
+            <label for='ns'>Name suffix, if any (III, Jr., no titles):</label><br />
             <select name='name-suffix' class="suffix" id='ns' size='1'>
               <option selected='' value=''>- none -</option>
               <option>Sr.</option>
@@ -62,9 +62,13 @@
 
           <p id='variations'>
             
-            <label for='nvar'>The variations of your name, one per line.
-            We will use them to find your works in our database
-            automatically.</label>
+            <label for='nvar'>The variations of your name, one per
+            line.  We will use them to find your works in our database
+            automatically. We cannot find works where your name
+            appears differently than below. Include initials or middle
+            name if you published with such wording of your
+            name.</label>
+
           </p>
           
           <table>
