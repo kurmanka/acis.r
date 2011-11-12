@@ -40,7 +40,9 @@
       <xsl:value-of select='$user-login'/>
       <xsl:text>&#10;&#10;&#10;If you think this is wrong, please write to the system administrator&#10;at </xsl:text>
       <xsl:value-of select='$admin-email'/>
-      <xsl:text>&#10;&#10;&#10;&#10;</xsl:text>
+      <xsl:text>&#10;&#10;</xsl:text>
+      <xsl:text>If this email change coincides with an affiliation change,&#10;make sure to adjust your affiliation(s) as well.</xsl:text>
+      <xsl:text>&#10;&#10;</xsl:text>
     </xsl:with-param>
   </xsl:call-template>
 </xsl:template>

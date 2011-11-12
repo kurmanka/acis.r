@@ -93,6 +93,8 @@
               
               
               <h2>Your name</h2>
+
+              <p>Note: do not use titles.</p>
               
               <p>
                 <label for='fn'>First (given), required:</label><br/>

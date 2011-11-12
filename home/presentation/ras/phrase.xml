@@ -341,5 +341,12 @@ Christian Zimmermann
 for the RePEc Author Service team
 </acis:phrase>
 
+<acis:phrase id='email-arpm-after-saved-profile-link' 
+><br/>. Your profile on EconPapers and IDEAS will be updated within a day.</acis:phrase>
+
+<acis:phrase id='email-updated-userdata-after-saved-profile-link' 
+>The profiles on IDEAS and EconPapers will be updated within a day.</acis:phrase>
+  
+
 
 </acis:phrasing>

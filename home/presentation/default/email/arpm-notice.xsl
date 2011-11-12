@@ -144,9 +144,13 @@
     <xsl:apply-templates select='//original-suggestions'/>
     <xsl:if test='$anything-added and //saved-profiles//link'>
       <p>
-        <xsl:text>Your updated profile is at its permanent address:</xsl:text>
+        <xsl:text>Your updated profile is at its permanent address on the </xsl:text>
+        <xsl:value-of select='$site-name-long'/>
+        <xsl:text>:</xsl:text>
         <br/>
-      <xsl:value-of select='//saved-profiles//link'/></p>
+        <xsl:value-of select='//saved-profiles//link'/>
+        <acis:phrase ref='email-arpm-after-saved-profile-link'/>
+      </p>
     </xsl:if>    
     <p>
       <xsl:text>You may review and change your preferences with regard to automatic research profile updates at:</xsl:text>

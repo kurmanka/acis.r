@@ -37,6 +37,7 @@
       <xsl:text>.&#10;&#10;You may wish to check the updated profile at:&#10;&#10;</xsl:text>
       <xsl:value-of select='$response-data/permalink'/>
       <xsl:text>&#10;&#10;</xsl:text>
+      <acis:phrase ref='email-updated-userdata-after-saved-profile-link'/>
       </xsl:with-param>
     </xsl:call-template>
   </xsl:template>
