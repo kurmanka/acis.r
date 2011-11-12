@@ -36,7 +36,8 @@
         
               <xsl:when test='$record-about-owner and 
                               count( $response-data/saved-profiles/list-item ) = 1'>
-                <p>Check your <a href='{$response-data/permalink}' class='int'>updated profile page</a>.</p>
+                <p>Check your <a href='{$response-data/permalink}' class='int'>updated 
+                profile page</a><acis:phrase ref='good-bye-profile-page-updated-at'/>.</p>
               </xsl:when>
               
               <xsl:otherwise>
