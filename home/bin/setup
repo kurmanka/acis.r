@@ -151,6 +151,18 @@ echo serialization via $serialization_module
 . bin/setup.data_serialization > lib/ACIS/Data/Serialization.pm
 
 
+# copy needed phrases into the presentation dir
+phrases=$template_set
+if test $template_phrase_set; then
+    phrases=$template_phrase_set
+fi
+
+if test $phrases; then
+    rm $presentation_dir/phrase.xml
+    cp $presentation_dir/$phrases/phrase.xml $presentation_dir
+fi
+
+# copy static (css and javascript) files into the static_base_dir
 if test $tempate_set; then
     echo "template_set is $template_set"
     template_set='default'

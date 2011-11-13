@@ -116,8 +116,8 @@
   </xsl:variable>
   
   
-  <xsl:variable name='phrase'       select='document( "phrase.xml" )/acis:phrasing' />
-  <xsl:variable name='phrase-local' select='document( "phrase-local.xml")/acis:phrasing' />
+  <xsl:variable name='phrase'       select='document( "../phrase.xml" )/acis:phrasing' />
+  <xsl:variable name='phrase-local' select='document( "../phrase-local.xml" )/acis:phrasing' />
   
   <xsl:template name='req'>
     <span class='req'>required</span>
