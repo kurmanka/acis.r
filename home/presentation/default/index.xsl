@@ -42,7 +42,7 @@
           </xsl:when>
         </xsl:choose>
       </xsl:with-param>      
-      <xsl:with-param name='content' xml:space='preserve'>        
+      <xsl:with-param name='content'>        
         <acis:phrase ref='service-intro'/>        
         <acis:phrase ref='news'/>
         <div class="not_in_sorry_site">
