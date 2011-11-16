@@ -610,30 +610,30 @@
             </p>
           </td>
         </tr>
-        <!--[if-config(document-document-links-profile)] -->
-        <!-- <tr> -->
-        <!--   <td class='no' valign='top' align='right'> -->
-        <!--     <p><a ref='@research/doclinks'>6</a></p> -->
-        <!--   </td> -->
-        <!--   <td> -->
-        <!--     <h2><a ref='@research/doclinks' class='item' -->
-        <!--     >DOCUMENT TO DOCUMENT LINKS</a></h2> -->
-        <!--     <p>Connect your research works.</p> -->
-        <!--   </td> -->
-        <!-- </tr> -->
-        <!-- [end-if]-->
-        <!--[if-config(full-text-urls-recognition)] -->
-        <!-- <tr> -->
-        <!--   <td class='no' valign='top' align='right'> -->
-        <!--     <p><a ref='@research/fturls'>7</a></p> -->
-        <!--   </td> -->
-        <!--   <td> -->
-        <!--     <h2><a ref='@research/fturls' class='item' -->
-        <!--     >DOCUMENTS' FULL-TEXT LINKS</a></h2> -->
-        <!--     <p>Check the files.</p> -->
-        <!--   </td> -->
-        <!-- </tr> -->
-        <!-- [end-if]-->
+        <!--[if-config(document-document-links-profile)]-->
+          <tr> 
+           <td class='no' valign='top' align='right'>
+             <p><a ref='@research/doclinks'>6</a></p>
+           </td>
+           <td>
+             <h2><a ref='@research/doclinks' class='item'
+             >DOCUMENT TO DOCUMENT LINKS</a></h2>
+             <p>Connect your research works.</p>
+           </td>
+         </tr>
+        <!--[end-if]-->
+        <!--[if-config(full-text-urls-recognition)]-->
+        <tr>
+           <td class='no' valign='top' align='right'>
+             <p><a ref='@research/fturls'>7</a></p>
+           </td>
+           <td>
+             <h2><a ref='@research/fturls' class='item'
+             >DOCUMENTS' FULL-TEXT LINKS</a></h2>
+             <p>Check the files.</p>
+           </td>
+         </tr>
+        <!--[end-if]-->
       </xsl:if>
     </table>
     <acis:phrase ref='research-main-epilog'/>
@@ -698,20 +698,20 @@
                 </a>
                 <xsl:text> </xsl:text>
               </acis:hl>              
-              <!--[if-config(document-document-links-profile)] -->
-              <!-- <acis:hl screen='research/doclinks'> -->
-              <!--  <xsl:text> </xsl:text> --> 
-              <!--    <a ref='@research/doclinks'>document links</a> -->
-              <!--  <xsl:text> </xsl:text> -->
-              <!--     </acis:hl> -->
+              <!--[if-config(document-document-links-profile)]-->
+              <acis:hl screen='research/doclinks'>
+                <xsl:text> </xsl:text> 
+                  <a ref='@research/doclinks'>document links</a>
+                <xsl:text> </xsl:text>
+              </acis:hl>
               <!--[end-if]--> 
-              <!--[if-config(full-text-urls-recognition)] -->
-              <!-- <acis:hl screen='research/fturls'> -->
-              <!--   <xsl:text> </xsl:text> -->
-              <!--   <a ref='@research/fturls'>full-text links</a> -->
-              <!--   <xsl:text> </xsl:text> -->
-              <!-- </acis:hl> -->
-              <!-- [end-if]-->
+              <!--[if-config(full-text-urls-recognition)]-->
+              <acis:hl screen='research/fturls'>
+                <xsl:text> </xsl:text>
+                <a ref='@research/fturls'>full-text links</a>
+                <xsl:text> </xsl:text>
+              </acis:hl>
+              <!--[end-if]-->
             </xsl:if>            
           </span>
         </p>    
