@@ -30,6 +30,8 @@ package ACIS::Web::Contributions;  ### -*-perl-*-
 use strict;
 use Carp qw( cluck );
 use Carp::Assert;
+use Data::Dumper;
+
 use Web::App::Common;
 require ACIS::Data::DumpXML::Parser;
 
@@ -546,10 +548,36 @@ sub main_screen {
 }
 
 
-
 ###########################################################################
 ########   a u t o   s e a r c h   s t a t u s    s c r e e n    ##########
 ###########################################################################
+
+# check if the personal name (from the record) is mentioned as an
+# author (or an editor) of the document. Return 1 if it is, 0 otherwise.
+sub check_item_names {
+    my $item = shift;
+    my $record = $acis->session->current_record || die;
+    # XXX here we could (should?) check if the names-list-nice is up-to-date
+    my $names  = $record -> {contributions}{autosearch}{'names-list-nice'} 
+       || die Dumper($record);
+
+    my $authors = $item->{authors} || '';
+    my $editors = $item->{editors} || '';
+
+    #die Dumper($item) if $authors =~ m/ & /;
+    die Dumper($item) if not $authors and not $editors;
+
+    my $is_present = 0;
+    foreach ( @$names ) {
+        if ( index( $authors, $_ ) > -1 ) { $is_present = 1; last; }
+        if ( index( $editors, $_ ) > -1 ) { $is_present = 1; last; }
+        # XXX instead of using index() here we could have done a split
+        # on the ampersand and make sure the user name is present in
+        # the resource' data as a full string.
+    }
+    return $is_present;
+}
+
 
 sub accept_item {
   my $item = shift;
@@ -611,6 +639,15 @@ sub accept_item {
     }
   }
 
+  # check if the user's (person's) name is mentioned in the resource data.
+  # if it is not mentioned, we mark this item as suspicious.
+  if ($action) {
+      my $name_found = check_item_names( $item );
+      if (not $name_found) {
+          $action .= "-suspicious";
+      }
+  }
+      
   $item -> {'role'}         = $role;
   $already_accepted ->{$id} = $role;
 
@@ -764,6 +801,13 @@ sub process {
 
   my $mode   = $input -> {mode} || '';
   my $source = $input -> {source};
+
+  ## check for name variations?
+  # XXX this can be used, if we make the check_item_names() call
+  # optional, depending on where the item comes from. But for now we
+  # better check everything.
+  #my $check_names = 0;
+  #if ($source == 'search') { $check_names = 1; }
 
   my $pool;
   if ( $mode eq 'add' ) {
