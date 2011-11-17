@@ -582,6 +582,9 @@ sub check_item_names {
 sub accept_item {
   my $item = shift;
   my $role = shift || $item -> {'role'};
+  if (not $role) { 
+      debug "no role value at accept_item()";
+  }
   
   my $id   = $item -> {'id'};
   my $sid  = $item -> {sid};
@@ -834,7 +837,7 @@ sub process {
          and $val ) {            
       my $tid    = $1;
       my $handle = $input -> {"id_$tid"};
-      my $role   = $input -> {"role_$tid"};
+      my $role   = $input -> {"role_$tid"} || die 'no role given';
       
       if ( $handle
            and $role 
@@ -857,7 +860,7 @@ sub process {
         }
         my $sid = $item ->{'sid'};
         assert( $sid );
-        my $action = accept_item( $item );
+        my $action = accept_item( $item, $role );
         $statistics -> {$action} ++;
         $processed++; 
 
@@ -946,7 +949,7 @@ sub process {
           $item -> {role} = $role;
           my $sid = $item ->{'sid'};
           assert( $sid );
-          my $action = accept_item( $item );
+          my $action = accept_item( $item, $role );
           $statistics -> {$action} ++;
           $processed++; 
           
