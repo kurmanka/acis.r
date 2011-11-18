@@ -3,7 +3,6 @@
     xmlns:exsl='http://exslt.org/common'
     xmlns:acis='http://acis.openlib.org'
     xmlns:html='http://www.w3.org/1999/xhtml'
-    xmlns='http://www.w3.org/1999/xhtml'
     exclude-result-prefixes='exsl xml html acis #default'
     version='1.0'>  
   <!--  This is the global "page" template -->
@@ -13,11 +12,11 @@
   <xsl:import href='forms.xsl'/>
 
   <xsl:output
-      method="xml"
-      encoding="utf-8"
-      doctype-system="http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"
-      doctype-public="-//W3C//DTD XHTML 1.0 Transitional//EN" 
-      indent="yes" />
+      method="html"
+      doctype-public="-//W3C//DTD HTML 4.01//EN"
+      doctype-system="http://www.w3.org/TR/html4/strict.dtd"
+      omit-xml-declaration='yes'
+      encoding='utf-8'/>
 
   <!-- new page templates (Sep 9, 2003) -->
   <!-- default: -->  
@@ -58,7 +57,7 @@
     <xsl:param name='navigation'/>
     <xsl:param name='show-errors'/>
     <xsl:param name='headers'   />    
-    <html xmlns="http://www.w3.org/1999/xhtml">
+    <html>
       <head>
         <!-- title element -->
         <title>
@@ -103,7 +102,7 @@
         <meta http-equiv='Content-Script-Type' content='text/javascript'/>
         <script type='text/javascript' src='{$static-base-url}/script/main.js'/>        
         <script type='text/javascript'>
-          <xsl:for-each select='exsl:node-set( $content )//html:script[not(@insitu)]'>
+          <xsl:for-each select='exsl:node-set( $content )//script[not(@insitu)]'>
             <xsl:copy-of select='text()'/>
           </xsl:for-each>          
           <!-- Collect javascript code to be put in the header by runnng the -->
@@ -273,9 +272,11 @@
   <!-- blank link-filter rules -->
   <xsl:template match='html:style'
                 mode='link-filter'/>
-  <xsl:template match='acis:script-onload'
-                mode='link-filter'/>
   <xsl:template match='html:script'
+                mode='link-filter'/>
+  <xsl:template match='script'
+                mode='link-filter'/>
+  <xsl:template match='acis:script-onload'
                 mode='link-filter'/>
   <!-- link filter copies all attributes -->
   <xsl:template match='@*|*'

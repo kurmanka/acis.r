@@ -3,8 +3,7 @@
     xmlns:exsl="http://exslt.org/common"
     xmlns:acis="http://acis.openlib.org"
     xmlns:html="http://www.w3.org/1999/xhtml"
-    xmlns="http://www.w3.org/1999/xhtml"
-    exclude-result-prefixes="exsl xml html acis #default"
+    exclude-result-prefixes="exsl xsl html acis #default"
  version="1.0">
 
   <xsl:import href='../page.xsl'/>
@@ -337,7 +336,7 @@ span.switch { border: 1px solid transparent; padding: 3px;}
 
     </style>
 
-    <html:script>
+    <script>
 function no_brief_mode( id ) {
  set_class_if( id, "brief",   false );
  set_class_if( id, "nobrief", true );
@@ -364,7 +363,7 @@ function close_ses_boxes() {
 function showhide_log ( id ) {
   toggle_class( id, "closed" );
 }
-    </html:script>
+    </script>
 
 <!--
     <acis:script-onload>brief_mode("theEvents");</acis:script-onload>
