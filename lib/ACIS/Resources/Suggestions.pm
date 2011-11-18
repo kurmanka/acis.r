@@ -90,7 +90,9 @@ sub save_suggestions {
   my @replace;
 
   ## change for cardiff: added ? at the end
-  $sql -> prepare_cached ( "replace into rp_suggestions values (?,?,?,'$reason',now(),?)" );
+  $sql -> prepare_cached ( "replace into rp_suggestions 
+         (psid,dsid,role,reason,time,relevance) 
+         values (?,?,?,'$reason',now(),?)" );
   ## change for cardiff: added ? at the end
   foreach my $doc ( @$doclist ) {
     my $dsid = $doc ->{'sid'} || next;
