@@ -57,7 +57,7 @@
                   <span class='name' >
                     <xsl:value-of select='$user-name' />
                   </span>
-                  <xsl:text>(</xsl:text>
+                  <xsl:text> (</xsl:text>
                   <xsl:value-of select='$user-login' />
                   <xsl:text>)</xsl:text>
                 </a>
@@ -102,7 +102,7 @@
                   <xsl:text>Already logged-in as </xsl:text>
                   <span class='name' >
                   <xsl:value-of select='$user-name' /></span>
-                  <xsl:text>(</xsl:text>
+                  <xsl:text> (</xsl:text>
                   <xsl:value-of select='$user-login' />
                   <xsl:text>)</xsl:text>
                 </a>
