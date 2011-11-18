@@ -3,6 +3,19 @@ use vars qw( $acis );
 use FCGI;
 use ACIS::Web;
 
+# process id file
+my $pidfile = $homedir . "/fcgi.pid";
+if (open PID, ">$pidfile") {
+  print PID $$;
+  close PID;
+} else {
+  warn "can't create the pid file: $pidfile";
+  undef $pidfile;
+}
+END {
+  if ($pidfile) { unlink $pidfile; }
+}
+
 ## not sure why we need this
 umask 0000;
 ## create ACIS object
