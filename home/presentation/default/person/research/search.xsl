@@ -2,7 +2,7 @@
     xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
     xmlns:exsl="http://exslt.org/common"
     xmlns:acis="http://acis.openlib.org"
-    xmlns="http://www.w3.org/1999/xhtml"
+    
     exclude-result-prefixes="exsl xml html acis #default"
     version="1.0">
 

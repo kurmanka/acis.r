@@ -1,5 +1,5 @@
 <xsl:stylesheet
-  xmlns="http://www.w3.org/1999/xhtml"
+  
   xmlns:acis="http://acis.openlib.org"
   xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
   exclude-result-prefixes='exsl xml acis html #default'

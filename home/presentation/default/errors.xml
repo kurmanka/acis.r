@@ -1,6 +1,6 @@
 <acis:errors xmlns:acis="http://acis.openlib.org"
              xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
-             xmlns="http://www.w3.org/1999/xhtml">
+             >
   <!-- cardiff -->
   <!-- from ACIS::Web -->
   <acis:error id='screen-presentation-invalid'>

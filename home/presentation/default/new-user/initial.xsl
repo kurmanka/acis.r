@@ -3,7 +3,7 @@
     xmlns:exsl="http://exslt.org/common"
     xmlns:acis="http://acis.openlib.org"
     xmlns:html="http://www.w3.org/1999/xhtml"
-    xmlns="http://www.w3.org/1999/xhtml"
+    
     xmlns:fs="http://acis.openlib.org/fieldset"
     exclude-result-prefixes="exsl xml html acis #default fs"
     version="1.0">

@@ -1,5 +1,5 @@
 <xsl:stylesheet
-  xmlns="http://www.w3.org/1999/xhtml"
+  
   xmlns:acis="http://acis.openlib.org"
   xmlns:exsl="http://exslt.org/common"
   xmlns:html="http://www.w3.org/1999/xhtml"

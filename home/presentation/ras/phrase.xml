@@ -1,6 +1,6 @@
 <acis:phrasing
     xmlns:acis="http://acis.openlib.org"
-    xmlns="http://www.w3.org/1999/xhtml">
+    >
 
   <acis:phrase id='metadata-identifiers'>RePEc handles</acis:phrase>
 

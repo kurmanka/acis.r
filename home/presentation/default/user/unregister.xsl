@@ -1,6 +1,6 @@
 <xsl:stylesheet
     xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
-    xmlns="http://www.w3.org/1999/xhtml"
+    
     xmlns:acis="http://acis.openlib.org"
     exclude-result-prefixes='exsl xml acis html #default'
   version="1.0">  

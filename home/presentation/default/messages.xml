@@ -1,5 +1,5 @@
 <acis:messages xmlns:acis="http://acis.openlib.org" 
-               xmlns="http://www.w3.org/1999/xhtml">
+               >
 
   <acis:message id='personal-data-saved'>We saved your personal and contact information.</acis:message>
 
