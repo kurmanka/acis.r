@@ -1,7 +1,7 @@
 <xsl:stylesheet
   xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
   xmlns:acis="http://acis.openlib.org"
-  xmlns="http://www.w3.org/1999/xhtml"
+  
   xmlns:html="http://www.w3.org/1999/xhtml"
   exclude-result-prefixes="xml html acis #default"
   version="1.0">
