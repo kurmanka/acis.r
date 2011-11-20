@@ -123,7 +123,7 @@
 	  </xsl:text>
         </script>
         <!-- ToK 2008-04-03 add calls to external javascript. -->
-        <xsl:for-each select='exsl:node-set( $content )//html:script/@src'>
+        <xsl:for-each select='exsl:node-set( $content )//script/@src'>
           <script type='text/javascript'>
             <xsl:attribute name='src'>
               <xsl:value-of select='$static-base-url'/>
@@ -134,9 +134,9 @@
         </xsl:for-each>
         <!-- add the style sheet from <style> in the page  -->
         <!-- ToK 2008-03-30: wrap an if so we don't have it when there is nothing in it -->
-        <xsl:if test='exsl:node-set( $content )//html:style/text()'>
+        <xsl:if test='exsl:node-set( $content )//style/text()'>
           <style type='text/css'>
-            <xsl:copy-of select='exsl:node-set( $content )//html:style/text()'/>
+            <xsl:copy-of select='exsl:node-set( $content )//style/text()'/>
           </style>
         </xsl:if>
       </head>
@@ -270,9 +270,9 @@
                          mode='link-filter'/>
   </xsl:template>
   <!-- blank link-filter rules -->
-  <xsl:template match='html:style'
+  <xsl:template match='style'
                 mode='link-filter'/>
-  <xsl:template match='html:script'
+  <xsl:template match='script'
                 mode='link-filter'/>
   <xsl:template match='script'
                 mode='link-filter'/>
@@ -302,17 +302,17 @@
   </xsl:template>
   <!-- the link-filter rules for the fieldset elements -->
   <!-- in html: or null namespace, not when in acis: namespace -->
-  <xsl:template match='html:input|html:select|html:textarea|select|textarea|input'
+  <xsl:template match='input|select|textarea|select|textarea|input'
                 mode='link-filter'>    
     <xsl:variable name='class'>
       <!-- variable class is string "input@type" where @type is type attribute -->
-      <xsl:if test='name() = "html:input" or name()="input"'>
+      <xsl:if test='name() = "input"'>
         <xsl:text>input</xsl:text>
         <xsl:value-of select='@type'/>
       </xsl:if>
       <!-- append the class attrbiute value to the value of $class -->
       <xsl:if test='@class'>
-        <xsl:if test='name() = "html:input" or name()="input"'>
+        <xsl:if test='name() = "input"'>
           <xsl:text> </xsl:text>
         </xsl:if>
         <xsl:value-of select='@class'/>
@@ -379,12 +379,12 @@
         </xsl:attribute>
       </xsl:if>      
       <!-- for select, apply the linkfilter to children -->
-      <xsl:if test='name() = "html:select" or name() = "select"'>
+      <xsl:if test='name() = "select"'>
         <xsl:apply-templates mode='link-filter'/>
       </xsl:if>
       
       <!-- for textarea, copy the text -->
-      <xsl:if test='name()="html:textarea" or name()="textarea"'>
+      <xsl:if test='name()="textarea"'>
         <xsl:copy-of select='text()'/>
       </xsl:if>            
       <!-- but this is still in copy -->
@@ -546,7 +546,7 @@
     </xsl:element>
   </xsl:template>
   <!-- the link-filter for links with href -->
-  <xsl:template match='html:a[@href]' 
+  <xsl:template match='a[@href]' 
                 mode='link-filter'>
     <xsl:copy>
       <xsl:copy-of select='@*'/>
@@ -559,7 +559,7 @@
 
 
   <!-- the link-filter for links with ref -->
-  <xsl:template match='html:a[@ref]|acis:a[@ref]' name='aref' mode='link-filter'>
+  <xsl:template match='a[@ref]|acis:a[@ref]' name='aref' mode='link-filter'>
     <!--
     a[ref] element usage:
     <a ref='name'>names screen</a>
@@ -737,11 +737,11 @@
       <xsl:apply-templates mode='content-filter'/>
     </xsl:copy>
   </xsl:template>
-  <xsl:template match='html:a' mode='content-filter'>
+  <xsl:template match='a' mode='content-filter'>
     <xsl:apply-templates mode='content-filter'/>
   </xsl:template>
   <!-- the screens, used at the registration stage -->
-  <xsl:template match='html:a[@screen]' mode='link-filter'>
+  <xsl:template match='a[@screen]' mode='link-filter'>
     <xsl:variable name='screen' select='@screen'/>
     <xsl:choose>
       <xsl:when test='$parents-set/*[@id=$screen]'>
@@ -764,7 +764,7 @@
     </xsl:choose>
   </xsl:template>
   <!-- building an email link -->
-  <xsl:template match='html:a[@email]' mode='link-filter'>
+  <xsl:template match='a[@email]' mode='link-filter'>
     <xsl:variable name='address' select='@email'/>
     <xsl:variable name='user'    select='substring-before( $address, "@" )'/>
     <xsl:variable name='host'    select='substring-after(  $address, "@" )'/>
@@ -795,7 +795,7 @@
     </noscript>    
   </xsl:template>
   <!-- building an email link, mailto address  -->
-  <xsl:template match='html:a[starts-with( @href, "mailto:" )]' mode='link-filter'>
+  <xsl:template match='a[starts-with( @href, "mailto:" )]' mode='link-filter'>
     <xsl:variable name='address' select='substring-after( @href, ":" )'/>
     <xsl:variable name='user'    select='substring-before( $address, "@" )'/>
     <xsl:variable name='host'    select='substring-after(  $address, "@" )'/>
@@ -919,8 +919,8 @@
     <xsl:value-of select='@name'/>
     <xsl:text>() {    var element;    var value;</xsl:text>    
     <xsl:for-each select='.//*[name() = "acis:onsubmit" or name() = "acis:check"]'>
-      <xsl:if test='parent::html:input'>
-        <xsl:for-each select='parent::html:input'>
+      <xsl:if test='parent::input'>
+        <xsl:for-each select='parent::input'>
           <xsl:text>          {
           element = getRef( "</xsl:text>
           <xsl:value-of select='@id'/>
@@ -949,7 +949,7 @@
           </xsl:if>
         </xsl:for-each>
       </xsl:if>      
-      <xsl:if test='parent::html:input'>
+      <xsl:if test='parent::input'>
         <xsl:for-each select='parent::input'>
           <xsl:text>{
           element = getRef( "</xsl:text>
@@ -992,7 +992,7 @@
       <xsl:if test='name() = "acis:onsubmit"'>
         <xsl:value-of select='text()'/>
       </xsl:if>
-      <xsl:if test='parent::html:input'>
+      <xsl:if test='parent::input'>
        <xsl:text> }
        </xsl:text>
       </xsl:if>

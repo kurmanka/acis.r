@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <acis:phrasing xmlns:acis="http://acis.openlib.org"
-               xmlns="http://www.w3.org/1999/xhtml">
+               >
   <acis:phrase id='research-identified-after-save-changes-button'>
 
     <p>Please note that removing an item only removes it from

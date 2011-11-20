@@ -170,7 +170,7 @@
           </xsl:for-each>
         </xsl:variable>
 
-        <xsl:if test='exsl:node-set( $list )/html:li'>
+        <xsl:if test='exsl:node-set( $list )/li'>
           <p>Please provide values for these fields:</p>
           <ul>
             <xsl:copy-of select='$list'/>
