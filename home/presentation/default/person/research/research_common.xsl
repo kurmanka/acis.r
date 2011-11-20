@@ -250,23 +250,31 @@
     <h2 id='variations'>Name variations</h2>
     <xsl:call-template name='name-variations-display'/>
   </xsl:template>
+
   <xsl:template name='suggest-choice'>
+    <xsl:param name='checked'/>
     <!-- set the web id wid in the form -->
-    <xsl:variable name='wid' 
-                  select='generate-id(.)'/>
+    <xsl:variable name='wid' select='generate-id(.)'/>
+
     <!-- this code determines whether the box should be checked -->
-    <!-- <xsl:variable name='checked' xml:space='default'> -->
-    <!-- <xsl:choose> -->
-    <!-- <xsl:when test='status'> -->
-    <!-- <xsl:value-of select='status/text() = "1"'/> -->
-    <!-- </xsl:when> -->
-    <!-- <xsl:otherwise> -->
-    <!-- <xsl:value-of select='ancestor::list-item/status/text() = "1"'/> -->
-    <!-- </xsl:otherwise> -->
-    <!-- </xsl:choose> -->
-    <!-- </xsl:variable> -->
+    <!-- but it does not seem to work correctly for me, so, we use the
+         checked param instead (Ivan, 2011-11) -->
+    <xsl:variable name='checked-by-status' xml:space='default'>
+      <xsl:choose>
+        <xsl:when test='status'>
+          <xsl:value-of select='status/text() = "1"'/>
+        </xsl:when>
+        <xsl:otherwise> 
+          <xsl:value-of select='ancestor::list-item/status/text() = "1"'/> 
+        </xsl:otherwise>
+      </xsl:choose> 
+    </xsl:variable> 
+
     <!-- checking is always false here. That's why I commented out the previous element -->
-    <xsl:variable name='checked' select='false()'/>
+    <!-- That's Thomas. -->
+    <!-- 
+         <xsl:variable name='checked-true' select='true()'/>
+    -->
     <!-- the accept input -->
     <td class='checkbutton smallwidth' 
         valign='top' 
@@ -316,7 +324,7 @@
           <xsl:value-of select='$wid'/>
         </xsl:attribute>
         <!-- but still use old code to check for checking -->  
-        <xsl:if test='$checked = "true"'>
+        <xsl:if test='$checked != "true"'>
           <xsl:attribute name='checked'>checked</xsl:attribute>
         </xsl:if>
         <!-- <xsl:attribute name='value'><xsl:value-of select="'1'"/> </xsl:attribute> -->
@@ -510,7 +518,9 @@
     <tr class='resource{$alternate}{$checked-class}'
         id='row_{$wid}'>      
       <xsl:call-template name='item-description'/>
-      <xsl:call-template name='suggest-choice'/>
+      <xsl:call-template name='suggest-choice'>
+        <xsl:with-param name='checked' select='$checked'/>
+      </xsl:call-template>
     </tr>
   </xsl:template>
   <!-- builds the tab set at the top of the page -->
