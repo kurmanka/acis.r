@@ -1188,9 +1188,10 @@ sub adm_log_into {
     my $request = $app -> request;
     my $target_login = $app -> form_input -> {login} || die;
     my $session = $app -> session;
-
+ 
     # XXX should show an error message (or an explanation) instead
     die if not $session;
+    my $owner = $session->owner;
 
     # now check if the target account (userdata) is available
     my $paths = $app ->make_paths_for_login( $target_login );
@@ -1206,13 +1207,11 @@ sub adm_log_into {
     
     # now create a new session, with the needed type and owner and object and objectsavefileto
     ###  create a session for that user-data
-    my $owner = $session->owner;
 
-    $session_new = $app -> start_session( "admin-user", $owner );
+    my $session_new = $app -> start_session( "admin-user", $owner );
     $session_new -> object_set( $ud );
 
     my $user   = $ud->{owner};
-    my $ud_file;
     
     $app ->sevent ( -class => 'auth',
                   -action => 'granted',

@@ -900,8 +900,11 @@
  <screen id='adm/log_into'>
    <param name='login'/>
    <use module='ACIS::Web::Admin'/>
-   <call function='ACIS::Web::Admin::check_access'/>
-   <call function='ACIS::Web::Admin::adm_log_into'/>
+   <process>   
+     <call function='load_session_or_authenticate' />
+     <call function='ACIS::Web::Admin::check_access'/>
+     <call function='ACIS::Web::Admin::adm_log_into'/>
+   </process>
  </screen>
 
  <screen id='adm/user/republish'><!-- not implemented yet -->

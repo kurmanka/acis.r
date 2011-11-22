@@ -47,6 +47,7 @@ require ACIS::Web::Session;
 require ACIS::Web::Session::SNewUser;
 require ACIS::Web::Session::SOldUser;
 require ACIS::Web::Session::SMagic;
+require ACIS::Web::Session::SAdminUser;
 
 use vars qw ( $ACIS %SESSION_CLASS $SESSION_CLASS_MAIN );
 *ACIS = *Web::App::APP;

@@ -44,6 +44,18 @@
         </xsl:call-template>
       </xsl:when>
 
+      <xsl:when test='$session-type ="admin-user"'>
+        <xsl:call-template name='user-page'>
+          <xsl:with-param name='title'   select='$title'/>
+          <xsl:with-param name='navigation'>
+            <xsl:copy-of select='$navigation'/>
+          </xsl:with-param>
+          <xsl:with-param name='content'>
+            <xsl:copy-of select='$content'/>
+          </xsl:with-param>
+        </xsl:call-template>
+      </xsl:when>
+
       <xsl:when test='not( $session-type )'>
         <xsl:call-template name='page'>
           <xsl:with-param name='title' select='$title'/>

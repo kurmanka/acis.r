@@ -397,7 +397,8 @@ sub check_session_type {
   
   my $session = $app -> session || die 'must have a session';
   
-  if ( $session -> type ne 'user' ) {
+  if ( $session -> type ne 'user'
+       and $session -> type ne 'admin-user' ) {
     $app -> error( 'session-wrong-type' );
     $app -> set_presenter( 'sorry' );
     $app -> clear_process_queue();
