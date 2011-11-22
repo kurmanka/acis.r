@@ -53,7 +53,8 @@ sub cleanup {
       next; 
     }
     
-    if ( $session -> type() eq 'user' ) {
+    if ( $session -> type() eq 'user' 
+        or $session -> type() eq 'admin-user' ) {
       print "   user type\n";
       $acis -> log( "cleanup: going to log off session $_" );
       $acis -> session( $session ) ;

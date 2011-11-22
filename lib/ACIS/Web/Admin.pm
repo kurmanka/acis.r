@@ -341,7 +341,7 @@ sub userdata_offline_reload_contributions {
 sub get_hands_on_userdata {
   my $acis    = shift;
   my $userdata;
-  my $paths            = $acis -> paths;
+  my $paths            = shift || $acis -> paths;
   my $userdata_file    = $paths -> {'user-data'};
   my $userdata_lock    = $paths -> {'user-data-lock'};
   my $userdata_deleted = $paths -> {'user-data-deleted'};
@@ -1181,6 +1181,53 @@ sub resolve_times_in_history {
   }
 }
 
+# admin-in-disguise feature, /adm/log-into screen
 
+sub adm_log_into {
+    my $app = shift;
+    my $request = $app -> request;
+    my $target_login = $app -> form_input -> {login} || die;
+    my $session = $app -> session;
+
+    # XXX should show an error message (or an explanation) instead
+    die if not $session;
+
+    # now check if the target account (userdata) is available
+    my $paths = $app ->make_paths_for_login( $target_login );
+    my $ud_file = $paths->{'user-data'};
+    my $ud = get_hands_on_userdata( $app, $paths );
+
+    # now grab it, or complain and quit
+    die if not $ud;
+    
+    # now log off the current session
+    # $session is the old session
+    $app -> logoff_session;
+    
+    # now create a new session, with the needed type and owner and object and objectsavefileto
+    ###  create a session for that user-data
+    my $owner = $session->owner;
+
+    $session_new = $app -> start_session( "admin-user", $owner );
+    $session_new -> object_set( $ud );
+
+    my $user   = $ud->{owner};
+    my $ud_file;
+    
+    $app ->sevent ( -class => 'auth',
+                  -action => 'granted',
+                   -descr => 'admin entering into a user account',
+                   -file  => $ud_file,
+                   -login => $target_login,
+                 -process => $owner -> {login},
+               -humanname => $user->{name},
+                 );
+
+    # make this new session the current session
+
+    # redirect to the record's menu
+    $app -> redirect_to_screen( "/welcome" );
+
+} 
 
 1;

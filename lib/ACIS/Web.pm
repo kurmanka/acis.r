@@ -55,6 +55,7 @@ $SESSION_CLASS_MAIN = "ACIS::Web::Session";
  "user"     => "ACIS::Web::Session::SOldUser",
  "new-user" => "ACIS::Web::Session::SNewUser",
  "magic"    => "ACIS::Web::Session::SMagic",
+ "admin-user" => "ACIS::Web::Session::SAdminUser",
 );
 
 require ACIS::Web::UserData;
