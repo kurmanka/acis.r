@@ -4,7 +4,7 @@
     xmlns:acis="http://acis.openlib.org"
     xmlns:html="http://www.w3.org/1999/xhtml"
     
-    exclude-result-prefixes="exsl xml html acis #default date"
+    exclude-result-prefixes="exsl xml html acis date"
     xmlns:date="http://exslt.org/dates-and-times"
     version="1.0">
 

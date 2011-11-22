@@ -3,7 +3,7 @@
     xmlns:exsl="http://exslt.org/common"
     xmlns:acis="http://acis.openlib.org"
     
-    exclude-result-prefixes="exsl xml html acis #default"
+    exclude-result-prefixes="exsl xml html acis"
     version="1.0">
 
   <xsl:import href='main.xsl' />

@@ -4,7 +4,7 @@
   xmlns:exsl="http://exslt.org/common"
   xmlns:html="http://www.w3.org/1999/xhtml"
   xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
-  exclude-result-prefixes="exsl xml acis html #default"
+  exclude-result-prefixes="exsl xml acis html"
  version="1.0">
   
   <xsl:import href='../page.xsl'/>

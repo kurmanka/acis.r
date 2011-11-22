@@ -7,7 +7,7 @@
     xmlns:html="http://www.w3.org/1999/xhtml"
     
     xmlns:date="http://exslt.org/dates-and-times"
-    exclude-result-prefixes="exsl xml html acis #default"
+    exclude-result-prefixes="exsl xml html acis"
   version="1.0">  
 
 

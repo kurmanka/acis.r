@@ -4,7 +4,7 @@
   xmlns:acis='http://acis.openlib.org'
   xmlns:docrel='http://acis.openlib.org/2007/doclinks-relations'
   xmlns='http://amf.openlib.org'
-  exclude-result-prefixes="exsl xml acis #default"
+  exclude-result-prefixes="exsl xml acis"
   version='1.0'>
   <xsl:import href='../global.xsl'/>
   <xsl:import href='../indent.xsl'/>

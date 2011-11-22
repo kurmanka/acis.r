@@ -5,7 +5,7 @@
     xmlns:html="http://www.w3.org/1999/xhtml"
     
     xmlns:fs="http://acis.openlib.org/fieldset"
-    exclude-result-prefixes="exsl xml html acis #default fs"
+    exclude-result-prefixes="exsl xml html acis fs"
     version="1.0">
   
   <xsl:import href='page.xsl'/>
