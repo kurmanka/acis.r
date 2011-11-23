@@ -1,51 +1,39 @@
 // cardiff
 
-function ar_colors (target_element) {
-    // alert(input_element);
-    //alert(navigator.userAgent);
-    var event = find_event(target_element);
-    // find anti_event
-    if(event == 'accept') {
-        anti_event='refuse';
-    }    
-    if(event == 'refuse') {
-        anti_event='accept';
-    }    
-    // alert ('anti_event is ' + anti_event);
-    tr_element=find_ancestor(target_element,'tr');
-    // color the event
-    var input_elements=tr_element.getElementsByTagName('input');
-    // alert (input_elements.length);
-    var td_element;
-    for (input_count=0;
-         input_count < input_elements.length;
-         input_count++) {
-        // alert (input_count);
-        var my_input_element = input_elements[input_count];
-        // alert (my_input_element);
-        var type = my_input_element.getAttribute('type');
-        var ar = my_input_element.getAttribute('value');
-        // alert ('ar is ' + ar);
-        if(ar == event && type == 'radio') {
-            td_element=find_ancestor(my_input_element,'td');
-            control_class( td_element, event, true );
-            my_input_element.checked=true;
+function td_click_switch ( El ) {
+    //console.log( "clicked on " + El.tagName );
+    if ( El.tagName.toLowerCase() == 'td' ) { // sanity check
+        var yesno;
+        var inputs = El.getElementsByTagName( 'input' );
+        for ( input_count=0;
+              input_count < inputs.length;
+              input_count++ ) {
+            var inp = inputs[input_count];
+            if (inp.type == "radio") {
+                inp.checked = true;       
+                yesno = (inp.value == "accept"); // boolean expression
+            }
         }
-        if(ar == anti_event && type == 'radio') {
-            td_element=find_ancestor(my_input_element,'td');
-            control_class( td_element, anti_event, false );
-            my_input_element.checked=false;
-        }
+
+        var tr_element = find_ancestor( El, 'tr' );
+        control_class( tr_element, 'accept', yesno );
+        control_class( tr_element, 'refuse', !yesno );
+
+    } else {
+        //console.log( 'Do nothing.' );
     }
-    control_refuse_all_button(tr_element);
-    return true;
-    // alert ('gone');
+}
+
+function rbutton_click (El) {
+    var yesno = (El.value == "accept"); // boolean expression
+    var tr_element = find_ancestor( El, 'tr' );
+    control_class( tr_element, 'accept', yesno );
+    control_class( tr_element, 'refuse', !yesno );
 }
 
 
-
 // 
-// deorative color changes for changed fields
+// decorative color changes for changed fields
 //
 function c_colors (target_element,initial_state) {
     var name=target_element.nodeName.toLowerCase();
@@ -230,7 +218,7 @@ function find_ancestor (element, name) {
 }
 
 
-// control() func
+// control_class() func
 // Ensures that the element identified by id either has
 // cla as one of its classes or not, depending on the 
 // bool logical value.

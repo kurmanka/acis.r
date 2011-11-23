@@ -276,17 +276,15 @@
          <xsl:variable name='checked-true' select='true()'/>
     -->
     <!-- the accept input -->
-    <td class='checkbutton smallwidth' 
+    <td class='checkbutton smallwidth yes' 
         valign='top' 
-        onclick='ar_colors(this)'>
+        onclick='td_click_switch(this)'>
       <!-- there decision in the item -->
       <input type='radio' 
              id='accept_{$wid}' 
+             name='ar_{$wid}'
              value='accept'
-             onclick='ar_colors(this)'>
-        <xsl:attribute name='name'>
-          <xsl:text>ar_</xsl:text><xsl:value-of select='$wid'/>
-        </xsl:attribute>
+             onclick='rbutton_click(this)'>
         <!-- but still use old code to check for checking -->  
         <xsl:if test='$checked = "true"'>
           <xsl:attribute 
@@ -312,17 +310,14 @@
     </td>
     <!-- the refuse input. It is shorter so we don't get -->
     <!-- the same input twice, stacked onto an array in acis -->
-    <td class='checkbutton smallwidth'
+    <td class='checkbutton smallwidth no'
         valign='top' 
-        onclick='ar_colors(this)'>
+        onclick='td_click_switch(this)'>
       <input type='radio' 
              id='refuse_{$wid}' 
+             name='ar_{$wid}'
              value='refuse'
-             onclick='ar_colors(this)'>
-        <xsl:attribute name='name'>
-          <xsl:text>ar_</xsl:text>
-          <xsl:value-of select='$wid'/>
-        </xsl:attribute>
+             onclick='rbutton_click(this)'>
         <!-- but still use old code to check for checking -->  
         <xsl:if test='$checked != "true"'>
           <xsl:attribute name='checked'>checked</xsl:attribute>
@@ -486,6 +481,7 @@
       </xsl:for-each>
     </table>
   </xsl:template>
+
   <xsl:template name='suggest-item-row'>
     <xsl:variable name="wid" select='generate-id(.)'/>
     <xsl:variable name="id"  select='id'/>
@@ -512,10 +508,16 @@
         </xsl:otherwise>
       </xsl:choose>
     </xsl:variable>
-    <xsl:variable name='checked-class'>
-      <xsl:if test='$checked = "true"'> select</xsl:if>
-    </xsl:variable>    
-    <tr class='resource{$alternate}{$checked-class}'
+
+    <!-- accept/refuse class -->
+    <xsl:variable name='ar-class'>
+      <xsl:choose>
+        <xsl:when test='$checked = "true"'> accept</xsl:when>
+        <xsl:otherwise> refuse</xsl:otherwise>
+      </xsl:choose>
+    </xsl:variable>
+    
+    <tr class='resource{$alternate}{$ar-class}'
         id='row_{$wid}'>      
       <xsl:call-template name='item-description'/>
       <xsl:call-template name='suggest-choice'>

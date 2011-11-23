@@ -1241,7 +1241,11 @@ div.PSA p {
 }
 
 /* cardiff classes */
-.refuse { background-color: #FFbbbb; }
-.accept { background-color: #bbFFbb; }
+td.refuse { background-color: #FFbbbb; }
+td.accept { background-color: #bbFFbb; }
 .hide {visibility: hidden; }
+
+tr.accept td.yes { background-color: #bbFFbb; }
+tr.refuse td.no  { background-color: #FFbbbb; }
+
 /* end of cardiff classes */
