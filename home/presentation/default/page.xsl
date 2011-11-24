@@ -30,6 +30,7 @@
       </xsl:when>
     </xsl:choose>
   </xsl:template>
+
   <xsl:template name='profile-menu'>
     <xsl:choose>
       <xsl:when test='$session-type = "user"'>
@@ -43,11 +44,13 @@
       </xsl:otherwise>
     </xsl:choose>
   </xsl:template>
+
   <xsl:variable name='page-class'/>
   <xsl:variable name='page-id'/>
   <xsl:variable name='full-page-title'/>
   <xsl:variable name='page-title'/>
   <xsl:variable name='additional-head-stuff'/>
+
   <!-- GLOBAL ACIS PAGE TEMPLATE -->
   <xsl:template name='page'>
     <xsl:param name='content'/>
@@ -105,23 +108,28 @@
           <xsl:for-each select='exsl:node-set( $content )//script[not(@insitu)]'>
             <xsl:copy-of select='text()'/>
           </xsl:for-each>          
+
           <!-- Collect javascript code to be put in the header by runnng the -->
           <!-- scripting modes over the contents of acis:form elements -->
           <!-- This is the "form Javascript" -->
           <xsl:apply-templates select='exsl:node-set( $content )//acis:form' 
                                mode='scripting'/>          
+
 	  <!-- Collect other javascript from the acis:script-onload that the -->
 	  <!-- templates may have. Such javascript is put into a load function -->
-            <xsl:text>function onLoad() {
-            onload_show_switcher();</xsl:text>
+            <xsl:text>
+  function onLoad() {
+//    onload_show_switcher();</xsl:text>
+
           <!-- ToK 2008-04-02: do this only if it exists, adding an extra if -->
           <xsl:if test='exsl:node-set( $content )//acis:script-onload/text()'>            
             <xsl:copy-of select='exsl:node-set( $content )//acis:script-onload/text()'/>
           </xsl:if>
 	  <xsl:text>
-            }
+  }
 	  </xsl:text>
         </script>
+
         <!-- ToK 2008-04-03 add calls to external javascript. -->
         <xsl:for-each select='exsl:node-set( $content )//script/@src'>
           <script type='text/javascript'>
@@ -915,20 +923,26 @@
 
   <xsl:template match='acis:form[descendant::acis:onsubmit or descendant::acis:check]'
                 mode='scripting'>
-    <xsl:text>function form_check_</xsl:text>
+    <xsl:text>
+function form_check_</xsl:text>
     <xsl:value-of select='@name'/>
-    <xsl:text>() {    var element;    var value;</xsl:text>    
+    <xsl:text>() { 
+    var element;    
+    var value;
+</xsl:text>    
     <xsl:for-each select='.//*[name() = "acis:onsubmit" or name() = "acis:check"]'>
       <xsl:if test='parent::input'>
         <xsl:for-each select='parent::input'>
-          <xsl:text>          {
+          <xsl:text>
+    {
           element = getRef( "</xsl:text>
           <xsl:value-of select='@id'/>
           <xsl:text>" );
           value = element.value;          
-          </xsl:text>
+</xsl:text>
           <xsl:if test='acis:check/@nonempty'>
-            <xsl:text>if ( value == '' ) { 
+            <xsl:text>
+        if ( value == '' ) { 
             </xsl:text>
             <xsl:choose>
               <xsl:when test='acis:name'>
@@ -944,21 +958,27 @@
             <xsl:text>
               element.focus();
               return( false );
-              }            
-            </xsl:text>
+        }            
+</xsl:text>
           </xsl:if>
+          <xsl:text>
+    }
+</xsl:text>
         </xsl:for-each>
       </xsl:if>      
+
       <xsl:if test='parent::input'>
         <xsl:for-each select='parent::input'>
-          <xsl:text>{
+          <xsl:text>
+    {
           element = getRef( "</xsl:text>
           <xsl:value-of select='@id'/>
           <xsl:text>" );
           value = element.value;
-          </xsl:text>
+</xsl:text>
           <xsl:if test='acis:check/@nonempty'>           
-            <xsl:text>if ( value == '' ) { </xsl:text>
+            <xsl:text>
+          if ( value == '' ) { </xsl:text>
             <xsl:choose>
               <xsl:when test='acis:name'>                
                 <xsl:text>alert( "Please enter </xsl:text>
@@ -966,20 +986,22 @@
                 <xsl:text>." ); </xsl:text>
               </xsl:when>
               <xsl:otherwise>
-                <xsl:text> alert( "Please enter a value into the 
-                </xsl:text>
+                <xsl:text> alert( "Please enter a value into the </xsl:text>
                 <xsl:value-of select='@name'/>
-                <xsl:text> field." );
-                </xsl:text>
+                <xsl:text> field." ); </xsl:text>
               </xsl:otherwise>
             </xsl:choose>
             <xsl:text>element.focus();
             return( false );
-            }            
-            </xsl:text>
+          }
+</xsl:text>
           </xsl:if>
+          <xsl:text>
+    }
+</xsl:text>
         </xsl:for-each>
       </xsl:if>      
+
       <xsl:if test='name() = "acis:check" and @test'>
         <xsl:text>if ( </xsl:text>
         <xsl:value-of select='@test'/>
@@ -992,14 +1014,13 @@
       <xsl:if test='name() = "acis:onsubmit"'>
         <xsl:value-of select='text()'/>
       </xsl:if>
-      <xsl:if test='parent::input'>
-       <xsl:text> }
-       </xsl:text>
-      </xsl:if>
+
     </xsl:for-each>
-    <xsl:text>formChanged = false;
-    return true;
-    }
+
+    <xsl:text>
+     formChanged = false;
+     return true;
+ }
     </xsl:text>
   </xsl:template>
 
