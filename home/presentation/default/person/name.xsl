@@ -98,7 +98,6 @@
 
                 <acis:script-onload>
                   <![CDATA[
-                           onload_show_switcher();
                            nvar = getRef( "nvar" );
                            if ( nvar ) {
                              if (nvar.value ) {

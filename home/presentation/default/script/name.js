@@ -133,19 +133,3 @@ function reset_variations () {
     hide( "reset_nvar" );
 }
 
-
-function onLoad() {
-    onload_show_switcher();
-    nvar = getRef( "nvar" );
-    if ( nvar ) {
-        if ( nvar.value ) {
-            initial_variations = nvar.value || '';
-            if ( initial_variations ) {
-                if ( initial_variations.split ) {
-                    initial_list = initial_variations.split( /\n\r?|\r\n?/ );
-                }
-            }
-        }
-        show( "suggest" );
-    }   
-}
