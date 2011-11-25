@@ -6,7 +6,6 @@
     exclude-result-prefixes="exsl xml html acis"
     version="1.0"> 
  
-  
   <xsl:import href='page.xsl'/>
   <xsl:import href='user/page.xsl'/>
   <xsl:import href='new-user/page.xsl'/>
@@ -16,7 +15,6 @@
     <xsl:param name='title'/>
     <xsl:param name='navigation'/>
     <xsl:param name='content'/>
-
 
     <xsl:choose>
       <xsl:when test='$session-type ="new-user"'>
@@ -85,12 +83,13 @@
         </xsl:call-template>
       </xsl:when>
 
-      <xsl:when test='$session-type ="user"'>
+      <xsl:when test='$session-type ="user" or $session-type="admin-user"'>
         <xsl:call-template name='user-account-page'>
           <xsl:with-param name='title'   select='$title'/>
           <xsl:with-param name='content' select='$content'/>
         </xsl:call-template>
       </xsl:when>
+
       <xsl:when test='not( $session-type )'>
         <xsl:call-template name='page'>
           <xsl:with-param name='into-the-top'>

@@ -18,32 +18,6 @@
       omit-xml-declaration='yes'
       encoding='utf-8'/>
 
-  <!-- new page templates (Sep 9, 2003) -->
-  <!-- default: -->  
-  <xsl:template name='logged-notice'>
-    <xsl:choose>
-      <xsl:when test='$session-type = "user"'>
-        <xsl:call-template name='user-logged-notice'/>
-      </xsl:when>
-      <xsl:when test='$session-type = "new-user"'>
-        <xsl:call-template name='new-user-logged-notice'/>
-      </xsl:when>
-    </xsl:choose>
-  </xsl:template>
-
-  <xsl:template name='profile-menu'>
-    <xsl:choose>
-      <xsl:when test='$session-type = "user"'>
-        <xsl:call-template name='user-profile-menu'/>
-      </xsl:when>
-      <xsl:when test='$session-type = "new-user"'>
-        <xsl:call-template name='new-user-profile-menu'/>
-      </xsl:when>
-      <xsl:otherwise>
-        <p class='menu'></p>
-      </xsl:otherwise>
-    </xsl:choose>
-  </xsl:template>
 
   <xsl:variable name='page-class'/>
   <xsl:variable name='page-id'/>
