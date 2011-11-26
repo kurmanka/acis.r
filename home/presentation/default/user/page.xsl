@@ -94,7 +94,7 @@
             </xsl:choose>
 
             <xsl:text>&#160;|&#160;</xsl:text>               
-            <a ref='adm/search'>profile&#160;search</a>
+            <a ref='adm/search/person'>person&#160;search</a>
             <xsl:text>&#160;|&#160;</xsl:text>               
             <a ref='off' 
                screen='account-logoff'

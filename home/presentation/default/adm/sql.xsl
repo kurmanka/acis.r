@@ -9,11 +9,10 @@
 
   <xsl:import href='index.xsl'/>
 
+  <xsl:variable name='result' select='$response-data/result'/>
+  <xsl:variable name='query'  select='$form-input/body' />
 
-  <xsl:template match='/'>
-
-    <xsl:variable name='result' select='$response-data/result'/>
-    <xsl:variable name='query'  select='$form-input/body' />
+  <xsl:template match='/data'>
 
     <xsl:variable name='par1'  select='$form-input/par1' />
     <xsl:variable name='par2'  select='$form-input/par2' />
@@ -51,6 +50,16 @@
         </acis:form>
 
 
+        <xsl:call-template name='result-table'/>
+
+        <xsl:call-template name='adm-menu'/>
+
+
+      </xsl:with-param>
+    </xsl:call-template>
+  </xsl:template>
+
+  <xsl:template name='result-table'>
         <xsl:if test='$result'>
 
           <h2><xsl:value-of select='$query'/></h2>
@@ -86,14 +95,6 @@
 
         </xsl:if>
 
-
-        <xsl:call-template name='adm-menu'/>
-
-
-      </xsl:with-param>
-    </xsl:call-template>
-  </xsl:template>
-
+  </xsl:template>    
 
 </xsl:stylesheet>
-

@@ -19,29 +19,19 @@
 
     <p><a ref='adm'>adm/</a></p>
     <ul>
-
       <li><a ref='adm/sql'>sql</a></li>
       <li><a ref='adm/events/'>events/</a>
-
         <ul>
           <li><a ref='adm/events/recent'>recent</a></li>
           <li><a ref='adm/events/pref'>pref</a></li>
-<!--
-          <li><a ref='adm/events/raw'>raw</a></li>
--->
+          <!-- <li><a ref='adm/events/raw'>raw</a></li> -->
         </ul>
-   
       </li>
-      <li><a ref='adm/search'>search</a></li>
+      <li><a ref='adm/search'>search</a>
+          <ul><li><a ref='adm/search/person'>person</a></li></ul>
+      </li>
       <li><a ref='adm/get'>get</a></li>
       <li><a ref='adm/sessions'>sessions</a></li>
-      
-<!--
-      <li><a ref='adm/'>/adm/</a></li>
-      
-      <li><a ref='adm/'>/adm/</a></li>
--->
-      
     </ul>
   </xsl:template>
 
@@ -79,6 +69,12 @@ log of what happened in ACIS over time.
 <dd id='adm-search'>
 Check the most important ACIS' database tables.  Search for documents,
 for personal records or for users.</dd>
+
+<dt><code><a ref='adm/search/person'>/adm/search/person</a></code>
+</dt>
+
+<dd id='adm-search-person'>
+Search for personal records by email or short-id.</dd>
 
 
 <dt><code><a ref='adm/get'>/adm/get</a></code></dt>

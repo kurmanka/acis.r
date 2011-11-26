@@ -884,6 +884,21 @@
 
    <presentation type='xslt' filename='adm/search.xsl'/>
  </screen>
+
+ <screen id='adm/search/person'>
+   <param name='key' required='yes' />
+   <use module='ACIS::Web::Admin'/>
+   <call function='ACIS::Web::Admin::check_access'/>
+   <init>
+     <call function='prepare_form_data' />
+   </init>
+   <process>
+     <call function='check_input_parameters'/>
+     <call function='ACIS::Web::Admin::prepare_env'/>
+     <call function='ACIS::Web::Admin::adm_search_person'/>
+   </process>
+   <presentation type='xslt' filename='adm/search-person.xsl'/>
+ </screen>
  
  <screen id='adm/search/doc'>
    <presentation type='xslt' filename='adm/search-res-doc.xsl'/>

@@ -626,7 +626,8 @@ sub sql_query_execute {
   if ( not $pre_res ) {
     $result -> {problem} {'bad-statement'} = 1;
   }
-
+  
+  debug( "execute with @para" );
   $sql_res = $sql -> execute( @para );
   
   if ( not $sql_res ) {
@@ -953,6 +954,42 @@ sub adm_search_for_users {
 
   $wa -> clear_process_queue;
   $wa -> set_presenter( "adm/search/usr" );
+}
+
+
+sub adm_search_person {
+  my $app = shift;
+  my $table;
+  my $key = $input -> {key};  
+  if ($key =~ /.+@.+/ ) {
+      # email
+      $input ->{by} = 'owner';
+  } elsif ($key =~ /^p\w+\d+/) {
+      # shortid
+      $input ->{by} = 'shortid';
+  } else {
+      die;
+  }
+  $table = 'records';
+
+  my $q = analyse_search_parameters( );
+  my $query_text = join( '', 
+                    $q -> {what},
+                    " from $table ",
+                    $q -> {where},
+                    $q -> {limit} );
+  debug "QUERY: $query_text";
+  $result -> {query} = $query_text;
+  $result -> {key}   = $key;
+
+  if ( sql_query_execute( $query_text, $key ) ) {
+    build_general_results_list('DECODE_UTF8');
+  } else {
+    debug "no result";
+  }
+
+  #$app -> set_presenter( "adm/search/rec" );
+  #$app -> set_presenter( "adm/sql" );
 }
 
 
