@@ -3,14 +3,16 @@
     xmlns:exsl="http://exslt.org/common"
     xmlns:acis="http://acis.openlib.org"
     xmlns:html="http://www.w3.org/1999/xhtml"
-    
     exclude-result-prefixes="exsl xml html acis"
-  version="1.0">
+    version="1.0">
   <xsl:import href='page.xsl'/>
   <xsl:import href='../person/page.xsl'/>
+  <xsl:import href='../adm/index.xsl'/>
+
   <xsl:variable name='current-screen-id'>
     <xsl:text>personal-menu</xsl:text>
   </xsl:variable>
+
   <xsl:template match='/data'>
     <xsl:call-template name='user-page'>
       <xsl:with-param name='title'>
@@ -69,6 +71,11 @@
             </xsl:otherwise>
           </xsl:choose>
         </ul>
+
+        <xsl:if test='$user-type/admin'>
+          <xsl:call-template name='adm-menu'/>
+        </xsl:if>
+
       </xsl:with-param>
     </xsl:call-template>
   </xsl:template>
