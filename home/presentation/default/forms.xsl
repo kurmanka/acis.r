@@ -46,7 +46,7 @@
     </acis:form>
   </xsl:template>
   
-  <xsl:template match='input[@type="text" 
+  <xsl:template match='acis:input[@type="text" 
                        or @type="password" 
                        or not(@type)]' 
                 mode='fs'>
