@@ -44,33 +44,35 @@
           </a>
           <xsl:text>.</xsl:text>
         </p>
-        <p>
-          <xsl:text>Manage your account:</xsl:text>
-        </p>
-        <ul class='menu'>
-          <li>
-            <a ref='settings'
-               title='account settings'>
-              <xsl:text>change account email and password</xsl:text>
-            </a>
-          </li>
-          <!-- there used to be an xml:space='default' attribute on the next element -->
-          <xsl:choose>
-            <xsl:when test='not( $advanced-user )'>
-              <li>
-                <a ref='unregister'>
-                  <xsl:text>delete your account</xsl:text>
-                </a>
-              </li>
-            </xsl:when>
-            <xsl:otherwise>
-              <li>
-                <xsl:text>delete this record -- not implemented yet</xsl:text>
-              </li>
-              <!-- XXX deleting a particular record of an advanced user -->
-            </xsl:otherwise>
-          </xsl:choose>
-        </ul>
+        <xsl:if test='$session-type != "admin-user"'>
+          <p>
+            <xsl:text>Manage your account:</xsl:text>
+          </p>
+          <ul class='menu'>
+            <li>
+              <a ref='settings'
+                 title='account settings'>
+                <xsl:text>change account email and password</xsl:text>
+              </a>
+            </li>
+            <!-- there used to be an xml:space='default' attribute on the next element -->
+            <xsl:choose>
+              <xsl:when test='not( $advanced-user )'>
+                <li>
+                  <a ref='unregister'>
+                    <xsl:text>delete your account</xsl:text>
+                  </a>
+                </li>
+              </xsl:when>
+              <xsl:otherwise>
+                <li>
+                  <xsl:text>delete this record -- not implemented yet</xsl:text>
+                </li>
+                <!-- XXX deleting a particular record of an advanced user -->
+              </xsl:otherwise>
+            </xsl:choose>
+          </ul>
+        </xsl:if>
 
         <xsl:if test='$user-type/admin'>
           <xsl:call-template name='adm-menu'/>

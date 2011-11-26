@@ -1244,6 +1244,7 @@ sub adm_log_into {
     
     # now create a new session, with the needed type and owner and object and objectsavefileto
     ###  create a session for that user-data
+    $owner->{'logged-in-as'} = $target_login;
 
     my $session_new = $app -> start_session( "admin-user", $owner );
     $session_new -> object_set( $ud );

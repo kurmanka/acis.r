@@ -68,8 +68,8 @@
       <xsl:with-param name='content'>        
         <p class='logged-notice'>
           <xsl:text>Admin as </xsl:text>
-          <span class='name' title='{$user-name}'>
-            <xsl:value-of select='$user-login'/>
+          <span class='name' title='{$user/logged-in-as}'>
+            <xsl:value-of select='$session/current-record/name'/>
           </span>
           <xsl:text>: </xsl:text>
           <span class='menu'>               
