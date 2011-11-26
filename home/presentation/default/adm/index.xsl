@@ -17,21 +17,17 @@
 
     <p style='text-align: center'>*  *  *</p>
 
-    <p><a ref='adm'>adm/</a></p>
+    <p><a ref='adm'>admin tools</a></p>
     <ul>
-      <li><a ref='adm/sql'>sql</a></li>
-      <li><a ref='adm/events/'>events/</a>
-        <ul>
-          <li><a ref='adm/events/recent'>recent</a></li>
-          <li><a ref='adm/events/pref'>pref</a></li>
-          <!-- <li><a ref='adm/events/raw'>raw</a></li> -->
-        </ul>
+      <li><a ref='adm/events/'>events</a>: 
+          <a ref='adm/events/recent'>recent</a>, <a ref='adm/events/pref'>preferences</a>
       </li>
-      <li><a ref='adm/search'>search</a>
-          <ul><li><a ref='adm/search/person'>person</a></li></ul>
+      <li><a ref='adm/search/person'>search for personal records</a> or 
+          <a ref='adm/search'>documents, etc.</a>
       </li>
-      <li><a ref='adm/get'>get</a></li>
-      <li><a ref='adm/sessions'>sessions</a></li>
+      <li><a ref='adm/sessions'>sessions list</a></li>
+      <li><a ref='adm/get'>RePEc-Index data</a></li>
+      <li><a ref='adm/sql'>sql console</a></li>
     </ul>
   </xsl:template>
 
