@@ -3,10 +3,10 @@
     xmlns:xsl='http://www.w3.org/1999/XSL/Transform'
     xmlns:exsl='http://exslt.org/common'
     xmlns:acis='http://acis.openlib.org'
-    xmlns:html='http://www.w3.org/1999/xhtml'
-    
+    xmlns:html='http://www.w3.org/1999/xhtml'    
     exclude-result-prefixes='exsl xml html acis'
     version='1.0'>
+
   <!-- part of cardiff -->
   <xsl:variable name='chunk-size' select='$config/chunk-size/text()'/>
   <!-- pitman project -->
@@ -29,20 +29,24 @@
     <input type='submit' 
            name='save_and_continue' 
            value='Process selections' 
+           class='important'
            title='Process all the choices you have made and return to this screen.'/>         
   </xsl:variable>
   <xsl:variable name='save-and-next-chunk-input'>
     <input type='submit' 
            name='save_and_continue_next_chunk' 
            value='Process selections and move to next screen' 
+           class='important'
            title='Process all the choices you have made, and move to the next screen.'/>         
   </xsl:variable>
   <xsl:variable name='save-and-exit-input'>
     <input type='submit' 
            name='save_and_exit' 
            value='Process selections and move to research' 
+           class='important'
            title='Process all the choices you have made and go the main research screen.'/>         
   </xsl:variable>
+
   <xsl:template name='suggestions-sublist-explanation'>
     <xsl:param name='list'/>
     <xsl:for-each select='$list'>
@@ -86,6 +90,7 @@
       </xsl:choose>
     </xsl:for-each>
   </xsl:template>
+
   <xsl:variable name='search-status'>
     <xsl:choose>
       <xsl:when test='$back-search-started'>
@@ -117,6 +122,7 @@
       </xsl:when>
     </xsl:choose>
   </xsl:variable>
+
   <xsl:variable name='new-if-new'>
     <xsl:choose>
       <xsl:when test='count( $accepted/list-item )'>
@@ -166,6 +172,7 @@
       </xsl:otherwise>
     </xsl:choose>
   </xsl:variable>
+
   <xsl:template name='page-introduction'>
     <xsl:choose>
       <xsl:when test='$items-count'>
@@ -190,6 +197,7 @@
       </xsl:otherwise>
     </xsl:choose>
   </xsl:template>
+
   <xsl:template name='the-contributions'>
     <h1>
       <xsl:text>Automatic search</xsl:text>
@@ -216,6 +224,7 @@
     </xsl:text>
     <xsl:call-template name='epilog'/>
   </xsl:template>
+
   <xsl:template name='epilog'>
     <xsl:if test='not( $back-search-running )'>      
       <div class='block'>
@@ -246,6 +255,7 @@
       </xsl:otherwise>
     </xsl:choose>    
   </xsl:template>
+
   <xsl:template name='name-variations-display-with-heading'>
     <h2 id='variations'>Name variations</h2>
     <xsl:call-template name='name-variations-display'/>
@@ -328,6 +338,7 @@
       </xsl:text>
     </td>
   </xsl:template>
+
   <xsl:variable name='suggestions-introduction-phrase'>
     <xsl:text> We have </xsl:text>
     <xsl:value-of select='$items-count'/>
@@ -379,16 +390,15 @@
       <xsl:text> it, meaning you have nothing to do with it.</xsl:text>
     </span>
   </xsl:variable>
+
   <xsl:variable name='process-and-continue-button'>
     <button type='submit'
             name='save_and_continue'
             class='sofar important'
+            id='res-process-continue'
             title='Process all the choices you have made, learn from them to bring the document you will most likely accept to the top, stay in this screen.'>
       <span>
         <xsl:text>Process selections</xsl:text>
-      </span>
-      <span class='hidden'>
-        <xsl:text> so far</xsl:text>
       </span>
     </button>
   </xsl:variable>
@@ -404,6 +414,7 @@
       </tr>
     </table>
   </xsl:variable>
+
   <xsl:template name='refuse-choice'>
     <!-- set the web id wid in the form -->
     <xsl:variable name="wid" 
@@ -438,6 +449,7 @@
       </xsl:if>
     </td>
   </xsl:template>
+
   <xsl:template name='suggestions-table'>
     <table class='suggestions resources'
            summary='Suggestions for the research profile.'

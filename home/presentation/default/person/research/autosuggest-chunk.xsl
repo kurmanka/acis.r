@@ -33,12 +33,10 @@
                 select='//auto-search-not-needed'/>
   <xsl:variable name='back-search-start-failed'
                 select='//auto-search-start-failed'/>
+
   <xsl:variable name='process-button'>
-    <input type='submit' 
-           name='save_and_continue' 
-           value='Process selections' 
-           title='Process all the choices you have made. If there ara more suggestions, we learn from your previous choices to bring the most likely documents to the top.'/>	      
   </xsl:variable>
+
   <xsl:variable name='started-that-ago'>
     <xsl:variable name='search-start'
                   select='//last-autosearch-time/text()'/>
@@ -86,14 +84,19 @@
           <xsl:if test='count( $suggestions/list-item/list/list-item[id] )'>
             <table width="100%" class='suggestions resources'>
               <tr>
-                <td align="left">
-                  <xsl:copy-of select='$process-button'/>
+                <td align='center'>
+                  <button type='submit' 
+                          name='save_and_continue' 
+                          class='important'
+                          title='Process all the choices you have made.'
+                          >Process selections and see the next portion</button>
                 </td>
                 <td align="center">
-                  <input type='submit' 
+                  <button type='submit' 
                          name='save' 
-                         value='Process selections and go to research' 
-                         title='Save all the choices you made above and stop working on suggestions.'/>	      
+                         class='important'
+                         title='Save all the choices you made above and stop working on suggestions.'
+                         >Process selections and go to research</button>
                 </td>
 <!--[if-config(learn-via-daemon)]-->
                 <td id='refuse_all_button' align="right">

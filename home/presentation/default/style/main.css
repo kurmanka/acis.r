@@ -63,6 +63,11 @@ label {
 
 .highlight { border: 1px solid #c66; }
 
+input.inputsubmit {
+ padding: 4px 10px;
+}
+
+
 
 /****  errors and messages  ****/
 

@@ -1081,7 +1081,7 @@ sub process {
   
   # if the save and exit button was pressed, move
   # to the research screen
-  if($input->{'save'}) {
+  if(exists $input->{'save'}) {
     $app -> redirect_to_screen( 'research' );
   }
   debug "end of function 'process'";
