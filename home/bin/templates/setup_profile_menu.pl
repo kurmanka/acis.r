@@ -11,6 +11,8 @@ my @f = grep {$_} split m/\s+/, qq(
   $homedir/presentation/default/person/page.xsl
   $homedir/presentation/default/person/research/main.xsl
   $homedir/presentation/default/user/records-menu.xsl
+  $homedir/presentation/default/person/research/autosuggest-all.xsl
+  $homedir/presentation/default/person/research/autosuggest-chunk.xsl
 );
 
 foreach my $file ( @f ) {

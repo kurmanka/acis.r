@@ -2,8 +2,7 @@
     xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
     xmlns:exsl="http://exslt.org/common"
     xmlns:acis="http://acis.openlib.org"
-    xmlns:html="http://www.w3.org/1999/xhtml"
-    
+    xmlns:html="http://www.w3.org/1999/xhtml"    
     exclude-result-prefixes="exsl xml html acis"
     version="1.0">
   <xsl:import href='main.xsl' />
@@ -96,12 +95,14 @@
                          value='Process selections and go to research' 
                          title='Save all the choices you made above and stop working on suggestions.'/>	      
                 </td>
+<!--[if-config(learn-via-daemon)]-->
                 <td id='refuse_all_button' align="right">
                   <input type='button'
                          onclick='refuse_all_undecided()' 
                          value='Refuse all undecided suggestions'
                          title='Refuse all documents that are undecided at this time.'/>	      
                 </td>
+<!--[end-if]-->
               </tr>
             </table>
           </xsl:if>          
