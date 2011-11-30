@@ -26,7 +26,7 @@ sub restart {
     if ($pid) { 
       print "    pid: $pid\n";
       kill 15, $pid; 
-      $killed = 1;
+      $killed++;
     }
   }
   if ($killed) {
