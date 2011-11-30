@@ -2,10 +2,10 @@
     xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
     xmlns:exsl="http://exslt.org/common"
     xmlns:acis="http://acis.openlib.org"
-    xmlns:html="http://www.w3.org/1999/xhtml"
-    
+    xmlns:html="http://www.w3.org/1999/xhtml"    
     exclude-result-prefixes="exsl xml html acis"
     version="1.0">
+
    <!-- evcino -->
    <xsl:import href='../../page-universal.xsl' />
    <xsl:import href='../../forms.xsl'/>
@@ -683,7 +683,7 @@
               </a>
               <xsl:text> </xsl:text>
             </acis:hl>            
-            <xsl:if test='$session-type = "user"'>              
+            <xsl:if test='$session-type = "user" or $session-type="admin-user"'>
               <acis:hl screen='research/refused'>
                 <xsl:text> </xsl:text>
                 <a ref='@research/refused-chunk'>
