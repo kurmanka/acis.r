@@ -2,14 +2,15 @@
     xmlns:xsl='http://www.w3.org/1999/XSL/Transform'
     xmlns:exsl='http://exslt.org/common'
     xmlns:acis='http://acis.openlib.org'
-    xmlns:html='http://www.w3.org/1999/xhtml'
-    
+    xmlns:html='http://www.w3.org/1999/xhtml'    
     exclude-result-prefixes='exsl xml html acis'
     version='1.0'>
+
   <!-- part of cardiff -->
   <xsl:import href='main.xsl' />
   <xsl:import href='../../widgets.xsl' />
   <xsl:import href='research_common.xsl' />
+
   <!-- what perl script needs to be called -->
   <xsl:variable name='the-screen'>accepted</xsl:variable>
   <xsl:variable name='parents'>
@@ -33,6 +34,7 @@
                 select='$contributions/accepted'/>
   <xsl:variable name='config-object-types' 
                 select='$contributions/config/types'/> 
+
   <xsl:template name='table-resources-for-editing'>
     <xsl:param name='list'/>
     <tr class='here'>

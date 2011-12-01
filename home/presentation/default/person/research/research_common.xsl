@@ -24,27 +24,31 @@
   <xsl:variable name='by-you-header'>
     <th style='width: 2em'>yours?</th>
   </xsl:variable>
+
   <!-- input elements for submission -->
   <xsl:variable name='save-and-continue-input'>
-    <input type='submit' 
+    <button type='submit' 
            name='save_and_continue' 
-           value='Process selections' 
+           value='1'
            class='important'
-           title='Process all the choices you have made and return to this screen.'/>         
+           title='Process all the choices you have made and return to this screen.'
+           >Process selections</button>
   </xsl:variable>
   <xsl:variable name='save-and-next-chunk-input'>
-    <input type='submit' 
+    <button type='submit' 
            name='save_and_continue_next_chunk' 
-           value='Process selections and move to next screen' 
+           value='1'
            class='important'
-           title='Process all the choices you have made, and move to the next screen.'/>         
+           title='Process all the choices you have made, and move to the next screen.'
+           >Process selections and move to next screen</button>
   </xsl:variable>
   <xsl:variable name='save-and-exit-input'>
-    <input type='submit' 
+    <button type='submit' 
            name='save_and_exit' 
-           value='Process selections and move to research' 
+           value='1'
            class='important'
-           title='Process all the choices you have made and go the main research screen.'/>         
+           title='Process all the choices you have made and go the main research screen.'
+           >Process selections and move to research</button>
   </xsl:variable>
 
   <xsl:template name='suggestions-sublist-explanation'>
