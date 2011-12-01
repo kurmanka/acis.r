@@ -152,6 +152,12 @@
                 <xsl:value-of select='$role'/>
                 <xsl:text>)</xsl:text>
               </span>            
+              <!-- role with the document -->
+              <xsl:if test='role'>
+                <input type='hidden' 
+                       name='role_{$wid}' 
+                       value='{role}'/>
+              </xsl:if>
             </xsl:otherwise>
           </xsl:choose>
         </td>
@@ -173,18 +179,6 @@
           <input type='hidden' 
                  name='handle_{$wid}' 
                  value='{id}'/>
-          <!-- role with the document -->
-          <xsl:if test='role'>
-            <input type='hidden' 
-                   name='role_{$wid}' 
-                   value='{role}'/>
-            <xsl:if test='role/text() != $default-role'>
-              <br/>
-              <xsl:text>(</xsl:text>
-              <xsl:value-of select='role'/>
-              <xsl:text>)</xsl:text>
-            </xsl:if>
-          </xsl:if>
         </td>
       </tr>      
     </xsl:for-each>
