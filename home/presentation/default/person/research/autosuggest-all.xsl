@@ -80,7 +80,7 @@
 	  <xsl:if test='count( $suggestions/list-item/list/list-item[id] )'>
 	    <table width="100%" class='suggestions resources'>
               <tr>
-                <td align="center">
+                <td align="right">
                   <button type='submit'
                          name='save_and_exit' 
                          class='important'
