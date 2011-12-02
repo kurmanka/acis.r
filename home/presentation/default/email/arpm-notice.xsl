@@ -5,9 +5,11 @@
     xmlns:exsl="http://exslt.org/common"
     xmlns:acis="http://acis.openlib.org"
     xmlns:html="http://www.w3.org/1999/xhtml"
-    exclude-result-prefixes="exsl xml html acis"
+    exclude-result-prefixes="exsl xsl html acis"
     version="1.0">  
+
   <xsl:import href='general.xsl'/>
+
   <xsl:template match='/data'
                 name='arpm-notice'>
     <xsl:call-template name='format-message'>
@@ -26,6 +28,7 @@
       </xsl:with-param>      
     </xsl:call-template>
   </xsl:template>
+
   <!--  Some useful variables: -->
   <xsl:variable name='added-by-handle' 
                 select='//added-by-handle/list-item'/>
@@ -59,11 +62,12 @@
                 select='$anything-by-name and $anything-by-handle'/>
   <xsl:variable name='original-suggestions'
                 select='//original-suggestions/list-item'/>
+  <xsl:variable name='original-suggestions-count'
+                select='count(//original-suggestions/list-item)'/>
   <!-- evcino: add a parameter to show relevance -->
   <xsl:variable name='with_relevance'
                 select='count(//with_relevance_in_email)'/>
-  <xsl:variable name='original-suggestions-count'
-                select='count(//original-suggestions/list-item)'/>
+
   <xsl:template name='list-works'>
     <xsl:param name='works'/>
     <ul>
@@ -101,6 +105,7 @@
       </xsl:for-each>
     </ul>
   </xsl:template>
+
   <xsl:template name='arpm-email'>
     <!-- the next p is the crucial header/body separator -->
     <p/>
