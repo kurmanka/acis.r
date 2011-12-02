@@ -108,7 +108,6 @@
 
   <xsl:template name='arpm-email'>
     <!-- the next p is the crucial header/body separator -->
-    <p/>
     <p>
       <xsl:text>Dear </xsl:text>
       <xsl:value-of select='$user-name'/>
@@ -167,13 +166,8 @@
         </xsl:attribute>
       <xsl:value-of select='$base-url'/>/research/autoupdate</a>
     </p>
-    <xsl:if test='$user-pass and not($user-type/hide-password)'>
-      <p>
-        <xsl:text>Your password in our service is: </xsl:text>
-        <xsl:value-of select='$user-pass'/>
-      </p>
-    </xsl:if>   
   </xsl:template>
+
   <xsl:template name='by-handle-intro'>
     <xsl:choose>
       <xsl:when test='$both-bys'>
@@ -194,6 +188,7 @@
     </xsl:choose>
     <xsl:text>to your personal record through its short-id. </xsl:text>    
   </xsl:template>      
+
   <xsl:template match='added-by-handle'>
     <p>
       <xsl:call-template name='by-handle-intro'/>
@@ -275,6 +270,7 @@
       </p>      
     </xsl:if>
   </xsl:template>
+
   <!-- this should not appear in AuthorClaim since there is no automated adding -->
   <xsl:template name='invite-to-fix-added'>
     <xsl:if test='$anything-added'>

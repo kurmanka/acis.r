@@ -3,14 +3,14 @@
     xmlns:exsl="http://exslt.org/common"
     xmlns:acis="http://acis.openlib.org"
     xmlns:html="http://www.w3.org/1999/xhtml"
-    
-    exclude-result-prefixes="exsl xml html acis"
+    exclude-result-prefixes="exsl xsl html acis"
     version="1.0"> 
   <xsl:import href='../global.xsl'/>
   <!-- evcino --> 
   <!-- for the link-filter mode -->
   <xsl:import href='../page.xsl'/>
   <xsl:output method='text' encoding='utf-8'/>
+
   <xsl:template name='message'>
     <xsl:param name='to'/>
     <xsl:param name='cc'/>
@@ -39,8 +39,11 @@
     <xsl:value-of select='$site-name'/>
     <xsl:text>] </xsl:text>
     <xsl:value-of select='$subject'/>
+    <xsl:text>&#10;&#10;</xsl:text>
+
     <xsl:apply-templates select='exsl:node-set( $content )' 
                          mode='link-filter'/>    
+
     <xsl:call-template name='phrase'>
       <xsl:with-param name='ref'>email-footer</xsl:with-param>
     </xsl:call-template>
@@ -51,6 +54,7 @@
     <xsl:value-of select='$home-url'/>
     <xsl:text>&#10;</xsl:text>
   </xsl:template>
+
   <xsl:template name='format-message'>
     <xsl:param name='to'/>
     <xsl:param name='cc'/>
@@ -70,6 +74,8 @@
     <xsl:text>] </xsl:text>
     <xsl:value-of select='$subject'/>
     <xsl:text>&#10;</xsl:text>
+    <xsl:text>&#10;</xsl:text>
+
     <!-- specially formatted body -->
     <xsl:call-template name='format-email'>
       <xsl:with-param name='data'>    
@@ -84,11 +90,13 @@
     <xsl:value-of select='$home-url'/>
     <xsl:text>&#10;</xsl:text>
   </xsl:template>
+
   <xsl:template name='format-email'>
     <xsl:param name='data'/>    
     <xsl:apply-templates select='exsl:node-set($data)/*' 
                          mode='format'/>
   </xsl:template>
+
   <xsl:template mode='format'
                 match='*'>
     <xsl:copy>
@@ -124,4 +132,5 @@
                 match='a|ul'>
     <xsl:apply-templates mode='format'/>
   </xsl:template>
+
 </xsl:stylesheet>
