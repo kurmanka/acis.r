@@ -60,6 +60,15 @@ sub send_mail {
   my $textref = $app -> run_presenter( $stylesheet, @presenteropt );
   # run_presenter() may return a string or a reference to a string:
   if (not ref $textref) { my $t = $textref; $textref = \$t; }
+
+  if ( my $log = $app -> config( 'debug-email-data-log' ) ) {
+    if ( open F, ">>:utf8", $log ) {
+      print F scalar( localtime ), "\n";
+      print F $$textref, "\n";
+      close F;
+    }
+  }
+  
   ###
   #print "presenter generated: '''$$textref'''";
   ###
