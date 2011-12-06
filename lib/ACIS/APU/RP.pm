@@ -380,6 +380,7 @@ sub search {
   if(scalar(@{$vars->{'suggest-by-name'}})) {
     $send_email=1;
   }
+
   if( $send_email ) {
     logit "sending mail...";    
     require Web::App::Email;
@@ -403,14 +404,17 @@ sub search {
       delete $vars->{'with_relevance_in_email'};
       Web::App::Email::send_mail( $app, "email/arpm-notice.xsl", %params );
       logit "email sent to user";    
-    }    
-    ## now send mail to the administrator
-    $params{-to} = $app -> config( "admin-email" );
-    undef $params{-bcc};
-    ## set the with-relevance parameter
-    $vars->{'with_relevance_in_email'}=1;
-    Web::App::Email::send_mail( $app, "email/arpm-notice.xsl", %params );
-    logit "email sent to admin";    
+
+    } else {
+      ## now send mail to the administrator
+      $params{-to} = $app -> config( "admin-email" );
+      undef $params{-bcc};
+      ## set the with-relevance parameter
+      #$vars->{'with_relevance_in_email'}=1;
+      Web::App::Email::send_mail( $app, "email/arpm-notice.xsl", %params );
+      logit "email sent to admin";    
+    }
+
     ## done with mailing
     foreach ( qw( added-by-handle added-by-name 
                   with_relevance_in_email old_suggestions old_and_new_suggestions

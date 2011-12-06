@@ -22,6 +22,7 @@ my $queue;
 my $auto = 1;
 my $failed = 0;
 my $interactive = 0;
+my $mail_user = 0;
 
 foreach ( @::ARGV ) {
   if ( m/^\-\-pre(t(e(nd?)?)?)?$/ ) {
@@ -31,6 +32,11 @@ foreach ( @::ARGV ) {
   } elsif ( m/^\-\-noauto$/ ) {
     # disable auto rebuilding of the queue table 
     undef $auto;
+    undef $_;
+
+  } elsif ( m/^\-\-sendmail$/ ) {
+    # disable auto rebuilding of the queue table 
+    $mail_user = 1;
     undef $_;
 
   } elsif ( m/^\-\-fail(ed?)?$/ ) {
@@ -69,8 +75,10 @@ if ( $queue ) {
     $clearlock = $lockfile;
     system( "echo $$ >$lockfile/pid" );
     ACIS::APU::run_apu_by_queue($howmuch, -auto => $auto, 
-                                  -failed => $failed, 
-                                  -interactive => $interactive );
+                                -failed => $failed, 
+                                -interactive => $interactive,
+                                -mail_user => $mail_user,
+                               );
   } else {
     print "can't obtain the lock: $lockfile\n";
     exit 1;

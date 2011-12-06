@@ -166,7 +166,7 @@ sub run_apu_by_queue {
       ##  offline_userdata_service expects an indentifier if anything on
       ##  4th parameter position
       ## evcino: the remaining parameters are passed to the function in the 3rd place, add mail_user
-      $res = ACIS::Web::Admin::offline_userdata_service( $ACIS, $login, 'ACIS::APU::record_apu', $rid, $class, $mail_user,$only_do) || 'FAIL';
+      $res = ACIS::Web::Admin::offline_userdata_service( $ACIS, $login, 'ACIS::APU::record_apu', $rid, $class, $mail_user, $only_do) || 'FAIL';
       ## 
     };
     if ($@) { 
