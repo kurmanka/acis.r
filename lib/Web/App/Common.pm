@@ -128,9 +128,7 @@ sub debug {
 
   $message = "[$subroutine($line)] $message\n";
 
-  if ( #$Web::App::DEBUGIMMEDIATELY
-       #and 
-           $Web::App::DEBUGLOGFILE
+  if ( $Web::App::DEBUGLOGFILE
        and open (DEBUGLOG, ">>:utf8", $Web::App::DEBUGLOGFILE)
      ) {
       print DEBUGLOG $message;
