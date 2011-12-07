@@ -644,6 +644,10 @@ tr.error {
  font-weight: bold;
 }
 
+tr.warn {
+ color: #900;
+}
+
 .events td.time {
  vertical-align: top;
 }

@@ -557,24 +557,35 @@ sub main_screen {
 sub check_item_names {
     my $item = shift;
     my $record = $acis->session->current_record || die;
-    # XXX here we could (should?) check if the names-list-nice is up-to-date
+    # XXX here we could (should?) check if the names-list is up-to-date
     my $names  = $record -> {contributions}{autosearch}{'names-list-nice'} 
        || die Dumper($record);
 
-    my $authors = $item->{authors} || '';
-    my $editors = $item->{editors} || '';
+    my $authors = lc $item->{authors} || '';
+    my $editors = lc $item->{editors} || '';
 
     #die Dumper($item) if $authors =~ m/ & /;
     die Dumper($item) if not $authors and not $editors;
 
     my $is_present = 0;
     foreach ( @$names ) {
-        if ( index( $authors, $_ ) > -1 ) { $is_present = 1; last; }
-        if ( index( $editors, $_ ) > -1 ) { $is_present = 1; last; }
+        if ( index( $authors, lc $_ ) > -1 ) { $is_present = 1; last; }
+        if ( index( $editors, lc $_ ) > -1 ) { $is_present = 1; last; }
         # XXX instead of using index() here we could have done a split
         # on the ampersand and make sure the user name is present in
         # the resource' data as a full string.
     }
+
+    # debug suspicious claim detection (now disabled):
+    if ( 0 and not $is_present ) {
+        my $app = $ACIS::Web::ACIS;
+        $app-> log( "check_item_names: $authors" ) if $authors;
+        $app-> log( "check_item_names: $editors (editors)" ) if $editors;
+        foreach ( @$names ) {
+            $app -> log( "name: <", lc $_, ">" );
+        }
+    }
+
     return $is_present;
 }
 
@@ -594,6 +605,7 @@ sub accept_item {
   assert( $acis );
   my $already_accepted = $contributions -> {'already-accepted'};
   my $action;
+  my $event_type;
 
   my $type = $item ->{type};
 
@@ -648,6 +660,7 @@ sub accept_item {
       my $name_found = check_item_names( $item );
       if (not $name_found) {
           $action .= "-suspicious";
+          $event_type = 'warn';
       }
   }
       
@@ -655,13 +668,14 @@ sub accept_item {
   $already_accepted ->{$id} = $role;
 
   if ( $action ) {
-      $acis -> sevent(   -class => 'contrib',
-                         -action => $action,
-                         ($role ne 'author') ? ( -role => $role ) : (),
-                       -descr => $item->{title} . " ($item->{type}, $item->{'id'})",
-                         -URL => $item ->{'url-about'},
+      $acis -> sevent(  -class => 'contrib',
+                       -action => $action,
+ ($role ne 'author') ? ( -role => $role ) : (),
+                        -descr => $item->{title} . " ($item->{type}, $item->{'id'})",
+                          -URL => $item ->{'url-about'},
  (exists $item->{authors}) ? ( -authors  => $item -> {authors} ) : (),
  (exists $item->{editors}) ? ( -editors  => $item -> {editors} ) : (),
+ ( $event_type ?       ( -type => $event_type ) : () ),
                      );
   }
 
