@@ -51,6 +51,7 @@ sub configuration_parameters {
     'profile-pages-dir', 'profile/',
     'compact-redirected-profile-urls', "not-defined",
     'cgi-perl-wrapper',  'not-defined',
+    'service-mode',      'not-defined',
 
     ## contributions
     'chunk-size', '12',

@@ -30,6 +30,7 @@
   <xsl:variable name='static-base-url'    select='$config/static-base-url/text()'/>
   <xsl:variable name='problem-report-url' select='$config/problem-report-url/text()'/>
   <xsl:variable name='auto-search-disabled' select='$config/research-auto-search-disabled/text()'/>
+  <xsl:variable name='RAS-mode'   select='$config/service-mode/text() = "ras"' />
 
 
   <xsl:variable name='home-url'>
