@@ -768,11 +768,14 @@ sub send_submitted_institutions_at_session_close {
   my $session = shift;
   my $acis = $ACIS::Web::ACIS;
   my $submitted = $session->{'submitted-institutions'};
+  my $template = 'email/new-institution.xsl';
+  if ($acis->config( 'service-mode' ) eq 'ras') { $template = 'email/new-institution-ras.xsl'; }
+
   if ( $submitted and ref $submitted ) {
     foreach ( @$submitted ) {
       next if not $_;
       $acis ->variables ->{institution} = $_;
-      $acis ->send_mail( 'email/new-institution.xsl' );
+      $acis ->send_mail( $template );
       undef $_;
     }
   }

@@ -3,9 +3,8 @@
     xmlns:exsl="http://exslt.org/common"
     xmlns:acis="http://acis.openlib.org"
     xmlns:html="http://www.w3.org/1999/xhtml"
-    
     exclude-result-prefixes="exsl xml html acis"
-  version="1.0">
+    version="1.0">
   
   <xsl:import href='../affiliations-common.xsl'/>
   <xsl:import href='../../forms.xsl'/>
@@ -15,7 +14,6 @@
   </xsl:variable>
 
   <xsl:variable name='current-screen-id'>new-institution</xsl:variable>
-
   
   <!--   new institution screen   -->
 
@@ -65,13 +63,12 @@ target ='new'>see here</a>.</p>
               <label for='email'>Email address of the institution (not yours), optional:</label><br />
               <acis:input name='email' id='email' size='50'/><br/>
               
-              <!-- the following does not appear in AuthorClaim, this is checked by
-                   looking at the /id --> 
-              
-              <xsl:if test='$form-values/id'>
+              <!-- the following should appear in RAS and should not
+                   in AuthorClaim, and this is checked by looking at
+                   the $RAS-mode variable (service-mode conf param)  -->
+              <xsl:if test='$RAS-mode'>
                 
-                <label for='postal'>Postal address
-                </label>
+                <label for='postal'>Postal address</label>
                 <br/>
                 <acis:input name='postal' id='postal' size='50'/><br/>
                 
@@ -83,7 +80,9 @@ target ='new'>see here</a>.</p>
                 <br/>
                 <acis:input name='fax' id='fax' size='50'/><br/>
                 
-                <acis:input type='hidden' name='id'/>
+                <xsl:if test='$form-values/id'>
+                  <acis:input type='hidden' name='id'/>
+                </xsl:if>              
               </xsl:if>              
             </p>
             
@@ -102,7 +101,7 @@ target ='new'>see here</a>.</p>
           </xsl:with-param>
         </xsl:call-template>
         <p>
-        <input type='submit' name='action' value='SUBMIT' class='important'/>
+          <input type='submit' name='action' value='SUBMIT' class='important'/>
         </p>
     </acis:form> 
       
