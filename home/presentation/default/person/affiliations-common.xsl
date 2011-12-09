@@ -2,12 +2,13 @@
     xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
     xmlns:exsl="http://exslt.org/common"
     xmlns:acis="http://acis.openlib.org"
-    xmlns:html="http://www.w3.org/1999/xhtml"
-    
-    exclude-result-prefixes="exsl xml html acis"
+    xmlns:html="http://www.w3.org/1999/xhtml"    
+    exclude-result-prefixes="exsl xsl html acis"
     version="1.0">
+
   <xsl:import href='../page-universal.xsl' />
   <xsl:import href='../forms.xsl'/>
+
   <!--   u t i l i t y   t e m p l a t e   -->
   <xsl:template name='show-institutions'>
     <xsl:param name='list'/>
@@ -109,6 +110,7 @@
       </acis:form>
     </xsl:for-each>
   </xsl:template>
+
   <xsl:template name='submit-invitation'>
     <h2 id='submit'>
       <xsl:text>Cannot find your institution?</xsl:text>
@@ -134,6 +136,7 @@
       <xsl:text>next registration step: research</xsl:text>
     </a>
   </xsl:variable>
+
   <xsl:template name='additional-page-navigation'>
     <xsl:call-template name='link-filter'>
       <xsl:with-param name='content'>        
@@ -178,4 +181,5 @@
       </xsl:with-param>
     </xsl:call-template>    
   </xsl:template>  
+
 </xsl:stylesheet>
