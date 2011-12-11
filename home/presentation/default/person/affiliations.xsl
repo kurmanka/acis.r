@@ -24,8 +24,7 @@
       <xsl:text>Affiliations</xsl:text>
     </h1>
     <xsl:call-template name='show-status'>
-      <xsl:with-param name='fields-spec-uri'
-                      select='"fields-institution.xml"'/>
+      <xsl:with-param name='fields-spec-uri' select='"fields-institution.xml"'/>
     </xsl:call-template>
 
     <div id='currentList'>
@@ -33,14 +32,20 @@
         <xsl:text>Your affiliations</xsl:text>
       </h2>
       <xsl:if test='$affiliations/list-item'>
-        <div class='institutions'>
-          <xsl:call-template name='show-institutions'
-                             xml:space='default'>
-            <xsl:with-param name='list' select='$affiliations'/>
-            <xsl:with-param name='mode' select='"remove"'/>
-          </xsl:call-template>
-        </div>
-        <acis:phrase ref='affiliations-listing-prolog'/>
+        <acis:form screen='@affiliations' class='light'>
+          <table class='institutions'>
+            <tr><th></th><th></th><th class='share'>Share</th></tr>
+            <tr>
+              <xsl:call-template name='institutions-table' xml:space='default'>
+                <xsl:with-param name='list' select='$affiliations'/>
+              </xsl:call-template>
+            </tr>
+          </table>
+          <p style='text-align: right'><input type='submit' name='saveshare' value='Save share changes'/>
+          </p>
+            
+          <acis:phrase ref='affiliations-listing-prolog'/>
+        </acis:form>
       </xsl:if>
       <xsl:if test='not( $affiliations/list-item )'>
         <p>

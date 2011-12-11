@@ -10,6 +10,111 @@
   <xsl:import href='../forms.xsl'/>
 
   <!--   u t i l i t y   t e m p l a t e   -->
+  <xsl:template name='institution-description'>
+    <xsl:param name='full'/>
+          <span class='title'>
+            <xsl:value-of select='name'/>
+          </span>
+          <ul class='details'>
+            <xsl:if test='name-english/text()'>
+              <li>
+                <xsl:text>English name: </xsl:text>
+                <span class='title'>
+                  <xsl:value-of select='name-english/text()'/>
+                </span>
+              </li>
+            </xsl:if>
+            <xsl:if test='name_en/text()'>
+              <li>
+                <xsl:text>English name: </xsl:text>
+                <span class='title'>
+                  <xsl:value-of select='name_en/text()'/>
+                </span>
+              </li>
+            </xsl:if>
+            <xsl:if test='location/text()'>
+              <li>
+                <xsl:text>located in: </xsl:text>
+                <xsl:value-of select='location/text()'/>
+              </li>
+            </xsl:if>
+            <xsl:if test='homepage'>
+              <li>
+                <a href='{homepage}' title='External link'>
+                  <xsl:text>website</xsl:text>
+                </a>
+              </li>
+            </xsl:if>
+            <xsl:if test='email/text()'>
+              <li>
+                <xsl:text>email: </xsl:text>
+                <xsl:value-of select='email/text()'/>
+              </li>
+            </xsl:if>
+            <xsl:if test='$full = "yes"'>
+              <xsl:if test='not(location/text()) and postal/text()'>
+                <li>
+                  <xsl:text>postal address: </xsl:text>
+                  <xsl:value-of select='postal/text()'/>
+                </li>
+              </xsl:if>
+              <xsl:if test='phone/text()'>
+                <li>
+                  <xsl:text>phone: </xsl:text>
+                  <xsl:value-of select='phone/text()'/>
+                </li>
+              </xsl:if>
+              <xsl:if test='fax/text()'>
+                <li>
+                  <xsl:text>fax: </xsl:text>
+                  <xsl:value-of select='fax/text()'/>
+                </li>
+              </xsl:if>
+              <xsl:if test='submitted-by/text()'>
+                <li>
+                  <xsl:text>submitted by: </xsl:text>
+                  <xsl:value-of select='submitted-by/text()'/>
+                </li>
+              </xsl:if>
+            </xsl:if>
+          </ul>
+  </xsl:template>
+
+  <xsl:template name='institutions-table'>
+    <!-- assuming form and table around this template -->
+    <xsl:param name='list'/>
+    <xsl:param name='full' select='"yes"'/>
+    <xsl:for-each select='$list/list-item' xml:space='preserve'>
+      <xsl:variable name='alter' xml:space='default'>
+        <xsl:if test='(position()) mod 2'>
+          <xsl:text> alternate</xsl:text>
+        </xsl:if>
+      </xsl:variable>      
+      <xsl:variable name='rownum' select='position()-1'/>
+
+      <tr class='{$alter}'>
+        <td title='Is that your institution?' class='action'>
+          <input type='submit'           name='remove{$rownum}'  value='remove'/>
+          <xsl:if test='id/text()'>
+            <input type='hidden'         name='id{$rownum}'      value='{id}'/>
+          </xsl:if>
+          <xsl:if test='not(id/text())'>
+            <input type='hidden'         name='name{$rownum}'    value='{name}'/>
+          </xsl:if>
+        </td>
+        <td class='description'>          
+          <xsl:call-template name='institution-description'>
+            <xsl:with-param name='full' select='$full'/>
+          </xsl:call-template>
+        </td>
+        <td class='share' style='text-align:center'>
+          <input type='text'             name='share{$rownum}'   value='{share}' size='2'/>
+        </td>
+      </tr>
+    </xsl:for-each>
+  </xsl:template>
+
+
   <xsl:template name='show-institutions'>
     <xsl:param name='list'/>
     <xsl:param name='mode'/>

@@ -25,6 +25,11 @@ form.narrow { padding-top: 4px; padding-bottom: 4px; }
 form.narrow p { padding: 0; }
 form.narrow p { margin-top: 4px; margin-bottom: 4px; }
 
+form.light {
+ background: none;
+ padding: 0;
+}
+
 
 .smallwidth {
    width: 6%;
@@ -769,6 +774,43 @@ form.alternate {
  margin-top: 3px; 
  margin-bottom: 1px; 
 }
+
+.affiliationsScreen table th {
+ font-weight: normal;
+}
+.affiliationsScreen table.institutions {
+ border-collapse: collapse;
+}
+.affiliationsScreen table tr.alternate {
+ background: #f4f4f4; 
+}
+.affiliationsScreen table.institutions td {
+ margin: 10px;
+ padding: 10px;
+ vertical-align: top;
+}
+.affiliationsScreen table.institutions td.action {
+ padding-right: 20px;
+}
+.affiliationsScreen table.institutions td.action input.inputsubmit {
+ -webkit-appearance: push-button;
+}
+.affiliationsScreen table.institutions td.share {
+ border-left: 1px solid black;
+ padding: 10px 20px;
+}
+.affiliationsScreen table.institutions th.share {
+ border-left: 1px solid black;
+ padding: 1ex;
+}
+.affiliationsScreen table.institutions td.share input {
+ width: 3ex;
+}
+.affiliationsScreen table.institutions {
+ padding-bottom: 1em;
+}
+
+
 
 
 /****

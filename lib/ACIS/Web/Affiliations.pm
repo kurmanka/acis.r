@@ -616,6 +616,38 @@ sub general_handler {
     if ( $input -> {remove} ) { remove( $app ); $cha = 1; }
     if ( $input -> {search} ) { search( $app ); }
 
+    # go through the input params (from the form), analyse them,
+    # understand, what the user wants.
+    #
+    # parameters that we expect here: id<N>, remove<N>, name<N>,
+    # share<N>, where <N> is an integer number.
+
+    my $form = [];
+    my $save_shares = 0;
+    foreach my $k (keys %$input) {
+        my $v = $input->{$k};
+        if( $k =~ m/^(\w+)(\d+)/ ) { $form->[$2]{$1} = $v; debug "affiliations form: param $1 of $2 ='$v'"; next; }
+        if( $k eq 'saveshare' ) {    $save_shares = 1;  }
+    }
+    foreach ( @$form ) {
+        my $idorname = $_->{id} || $_->{name};
+        if (not $idorname) {
+            debug "no id and no name item";
+            next;
+        }
+        if( $_->{remove} ) { 
+            debug "remove $idorname";
+            next;
+        }
+        if ( $_->{share} ) {
+            debug "set share of $idorname to " . $_->{share};
+        }
+    }
+    if ($save_shares) {
+        debug "Save shares command";
+    }
+
+
     if ( $session -> type eq 'new-user' and $cha ) {
       $app -> message( "saved" );
       $app -> set_presenter( 'affiliations-ir-guide' );
