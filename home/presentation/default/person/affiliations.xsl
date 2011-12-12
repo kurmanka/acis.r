@@ -34,7 +34,9 @@
       <xsl:if test='$affiliations/list-item'>
         <acis:form screen='@affiliations' class='light'>
           <table class='institutions'>
-            <tr><th></th><th></th><th class='share'>Share</th></tr>
+            <tr><th></th><th></th><th class='share' 
+title='For multiple affiliations, please attribute a share to each. These will be used to determine the main affiliation and allocate ranking scores across affiliations. With affiliations in different regions or countries, your ranking scores will also be weighted accordingly.'
+            >Share</th></tr>
             <tr>
               <xsl:call-template name='institutions-table' xml:space='default'>
                 <xsl:with-param name='list' select='$affiliations'/>

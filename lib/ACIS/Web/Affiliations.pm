@@ -72,6 +72,25 @@ sub load_institution {
 }
 
 
+sub sanity_check_affiliations_unfolded {
+    my $affiliations = shift;
+    my $unfolded = shift;
+
+    assert( scalar @$affiliations == scalar @$unfolded );
+    my $i = 0;
+    foreach ( @$affiliations ) {
+        if ($_->{id}) {
+            assert( $_->{id}   eq $unfolded->[$i]->{id} );
+        } else {
+            assert( $_->{name} eq $unfolded->[$i]->{name} );
+        }
+    } continue {
+        $i++;
+    }
+    return;
+}
+
+
 
 sub prepare {   ### XXX here is a great place for optimization in
                 ### terms of unloading the server, and making the
@@ -98,19 +117,33 @@ sub prepare {   ### XXX here is a great place for optimization in
   }
 
   foreach ( @$affiliations ) {
+
     if ( ref $_ eq 'HASH' ) {
-      push @$unfolded, $_;
-    } else {
+      if( exists $_->{name} ) {
+        push @$unfolded, $_;
+
+      } else {
+        my $i = load_institution( $app, $_->{id} );
+        if (exists $_->{share}) { $i->{share} = $_->{share}; }
+        push @$unfolded, $i;
+      }
+
+    } else { # legacy support
       my $institution = load_institution( $app, $_ );
       if ( $institution ) {
         push @$unfolded, $institution;
+        $_ = { id => $_ };
       } else { 
         undef $_;
+        # XXX shares need to be adjusted after that, if any
       }
     }
   }
 
   clear_undefined( $affiliations );
+  
+  sanity_check_affiliations_unfolded( $affiliations, $unfolded );
+
   $app -> variables->{affiliations} = $session->{$id}{affiliations} = $unfolded;
 }
 
@@ -121,9 +154,10 @@ sub prepare {   ### XXX here is a great place for optimization in
 
 sub add {
   my $app = shift;
+  my $instid = shift;
+  
   my $config      = $app -> config;
   my $metadata_db = $config->{'metadata-db-name'};
-  my $instid      = $app -> get_form_value( 'id' );
   my $form_input  = $app -> form_input;
   my $session = $app -> session;
   my $record  = $session -> current_record;
@@ -135,7 +169,7 @@ sub add {
   my $unfolded = $session ->{$id}{affiliations} ||= [];
   
   # xslt uses handles
-  if ( $form_input ->{add} ) {
+  if ( $instid ) {
     debug 'adding institution: $instid';
     $app -> userlog( "affil: add an item, id: $instid" );
     
@@ -165,7 +199,11 @@ sub add {
     } 
 
     push @$unfolded,     $institution;
-    push @$affiliations, $instid;
+    push @$affiliations, { id => $instid };
+
+    # XXX affiliation shares need to be adjusted 
+
+    sanity_check_affiliations_unfolded( $affiliations, $unfolded );
 
     $app -> sevent ( -class => 'affil',
                     -action => 'add',
@@ -183,6 +221,8 @@ sub add {
 
 sub remove {
   my $app = shift;
+  my $instid = shift || '';
+  my $name   = shift || '';
   
   my $session = $app -> session;
   my $record  = $session -> current_record;
@@ -193,68 +233,51 @@ sub remove {
   
   return 
     unless defined $affiliations and scalar @$affiliations;
-
-  my $instid = $app -> get_form_value ( 'id' )     || '';
-  my $name   = $app -> get_form_value ( 'name'   ) || '';
   
   assert( $name or $instid );
   debug "remove institution id: $instid, n: $name";
   $app -> userlog( "affil: request to remove an item, id: $instid, n: $name" );
 
-  my @old_affs = @$affiliations;
-  my @old_unfolded = @$unfolded;
-  @$affiliations = ();
-  @$unfolded = ();
+  sanity_check_affiliations_unfolded( $affiliations, $unfolded );
 
-  my $removed_inst;
+  my $remove;
+  my $i = 0;
+  foreach $_ ( @$affiliations ) {
 
-  debug "copying affiliations, skipping removed";
+      #debug "remove $_->{id} / $_->{name}?";
+      if ( $instid and $_->{id} 
+           and $_->{id} eq $instid ) {
+          $remove = $unfolded->[$i];
 
-  foreach my $institution ( @old_affs ) {
-    my $unfolded_i = shift @old_unfolded;
-
-    if ( ref $institution ) {
-      debug "checking $institution->{name}";
-      if ( $institution -> {id} 
-           and $institution -> {id} eq $instid ) {
-        $removed_inst = $unfolded_i;
-        debug "skipped";
-        next;
+      } elsif ( $name and not $_->{id} and $_->{name} 
+           and $name eq $_->{name} ) {
+          $remove = $_;
       }
 
-      if ( $institution -> {name} eq $name ) {  
-        debug "skipped";
-        $removed_inst = $unfolded_i;
-        next;
-      }
-      
-    } else {
-      debug "checking $institution";
-      if ( $institution eq $instid ) {
-        debug "skipped";
-        $removed_inst = $unfolded_i;
-        next;
-      }
-    }
-    
-    push @$affiliations, $institution;
-    push @$unfolded,     $unfolded_i;
-  }
-  
-  if ( scalar @$affiliations < scalar @old_affs ) {
-    $app -> userlog( "affil: removing success" );
-
-    $app -> sevent ( -class => 'affil',
-                     -action=> 'remove',
-                     -descr => $removed_inst ->{name},
-                  -location => $removed_inst ->{location},
-                       -id  => $removed_inst ->{id},
+      if ($remove) {
+          undef $_;
+          undef $unfolded->[$i];
+          
+          $app -> userlog( "affil: removed affiliation " . ( $instid ? $instid : $name )  );
+          $app -> sevent ( -class => 'affil',
+                           -action=> 'remove',
+                           -descr => $remove ->{name},
+                        -location => $remove ->{location},
+                             -id  => $remove ->{id},
                    );
+          last;
+      }
 
-  } else {
+  } continue {
+      $i++;
+  }
+
+  clear_undefined( $affiliations );
+  clear_undefined( $unfolded );
+
+  if ( not $remove ) {
     $app -> userlog( "affil: removing didn't work" );
     $app -> error  ( "affil-remove-failed" );
-
   }
 
   $app -> variables ->{processed} = 1;
@@ -612,8 +635,8 @@ sub general_handler {
   } else {
     
     my $cha;
-    if ( $input -> {add}    ) { add( $app );    $cha = 1; }
-    if ( $input -> {remove} ) { remove( $app ); $cha = 1; }
+    if ( $input -> {add}    ) { add( $app, $input->{id} );    $cha = 1; }
+    #if ( $input -> {remove} ) { remove( $app ); $cha = 1; }
     if ( $input -> {search} ) { search( $app ); }
 
     # go through the input params (from the form), analyse them,
@@ -637,6 +660,7 @@ sub general_handler {
         }
         if( $_->{remove} ) { 
             debug "remove $idorname";
+            remove( $app, $_->{id}, $_->{name} );
             next;
         }
         if ( $_->{share} ) {
