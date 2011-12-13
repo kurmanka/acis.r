@@ -2,11 +2,12 @@
     xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
     xmlns:exsl="http://exslt.org/common"
     xmlns:acis="http://acis.openlib.org"
-    xmlns:html="http://www.w3.org/1999/xhtml"
-    
+    xmlns:html="http://www.w3.org/1999/xhtml"    
     exclude-result-prefixes="exsl xml html acis"
     version="1.0">
+
   <xsl:import href='../page.xsl'/>  
+
   <xsl:template match='/'>
     <xsl:call-template name='page'>
       <xsl:with-param name='title'>
@@ -38,13 +39,11 @@
             <xsl:text>going back in history</xsl:text>
           </li>
           <li>
-            <a href='/contact_us'>
-              <xsl:text>contacting us</xsl:text>
-            </a>
-            <xsl:text>.</xsl:text>
+            <xsl:text>emailing us (email link in the page footer).</xsl:text>
           </li>
         </ul>      
       </xsl:with-param>
     </xsl:call-template>
   </xsl:template>
+
 </xsl:stylesheet>
