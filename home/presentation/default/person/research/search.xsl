@@ -2,8 +2,7 @@
     xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
     xmlns:exsl="http://exslt.org/common"
     xmlns:acis="http://acis.openlib.org"
-    
-    exclude-result-prefixes="exsl xml html acis"
+    exclude-result-prefixes="exsl xsl acis"
     version="1.0">
 
   <xsl:import href='main.xsl' />

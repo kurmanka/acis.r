@@ -2,11 +2,12 @@
     xmlns:xsl='http://www.w3.org/1999/XSL/Transform'
     xmlns:exsl='http://exslt.org/common'
     xmlns:acis='http://acis.openlib.org'
-    xmlns:html='http://www.w3.org/1999/xhtml'
-    
-    exclude-result-prefixes='exsl xml html acis'
+    xmlns:html='http://www.w3.org/1999/xhtml'    
+    exclude-result-prefixes='exsl xsl html acis'
     version='1.0'>
+
   <xsl:import href='person-listings.xsl'/>
+
   <!--   u t i l i t y   t e m p l a t e s  -->
   <!-- generate description of a document (or another resource) -->  
   <xsl:template name='present-resource'>
@@ -111,6 +112,7 @@
       </xsl:if>
     </xsl:for-each>   
   </xsl:template>
+
   <xsl:template name='list-resources'>
     <xsl:param name='list'/>
     <!-- there was an xml:space= preserve on the next element -->
@@ -144,6 +146,7 @@
       </xsl:if>
     </xsl:if>
   </xsl:template>
+
   <!--   L I S T   R E S O U R C E S   W I T H   L I M I T   -->
   <xsl:template name='list-resources-with-limit'>
     <xsl:param name='list'/>
@@ -183,6 +186,7 @@
       </xsl:otherwise>
     </xsl:choose>
   </xsl:template>
+
   <!-- what do do with author names. this needs to be -->
   <!-- defined for person-listings to work -->
   <xsl:template name='what-to-do-with-person-name'>
@@ -193,6 +197,7 @@
       </em>
     </span>
   </xsl:template>
+
   <!--   L I S T   R E S O U R C E S   W I T H   L I M I T   H I D E   -->
   <xsl:template name='list-resources-with-limit-hide'>
     <xsl:param name='list'/>
@@ -261,6 +266,7 @@
       </xsl:when>
     </xsl:choose>
   </xsl:template>
+
   <xsl:template name='suggestions-sublist'>
     <xsl:param name='sublist'/>
     <xsl:param name='from'
@@ -298,6 +304,7 @@
       </xsl:otherwise>
     </xsl:choose>
   </xsl:template>
+
 </xsl:stylesheet>
 
 

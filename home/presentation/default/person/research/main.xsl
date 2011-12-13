@@ -3,7 +3,7 @@
     xmlns:exsl="http://exslt.org/common"
     xmlns:acis="http://acis.openlib.org"
     xmlns:html="http://www.w3.org/1999/xhtml"    
-    exclude-result-prefixes="exsl xml html acis"
+    exclude-result-prefixes="exsl xsl html acis"
     version="1.0">
 
    <!-- evcino -->
@@ -17,6 +17,7 @@
    <xsl:variable name='default-role'>
      <xsl:text>author</xsl:text>
    </xsl:variable>
+
    <!--    v a r i a b l e s    -->
    <xsl:variable name='contributions' 
                  select='$response-data/contributions'/> 
@@ -38,6 +39,7 @@
                  select='$suggestions-count'/>
    <xsl:variable name='config-object-types'
                  select='$contributions/config/types'/> 
+
    <xsl:template name='contributions-breadcrumb'>
      <p class='breadCrumb'>
       <xsl:call-template name='connector'/>
@@ -753,6 +755,7 @@
       <xsl:text>next registration step: confirmation email</xsl:text>
     </a>
   </xsl:variable>
+
   <!--   n o w   t h e   p a g e   t e m p l a t e    -->  
   <xsl:template match='/data'>
     <xsl:call-template name='research-page'>
@@ -761,5 +764,6 @@
       </xsl:with-param>
     </xsl:call-template>
   </xsl:template>
+
 </xsl:stylesheet>
 
