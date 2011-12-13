@@ -751,7 +751,6 @@
     <xsl:variable name='user'    select='substring-before( $address, "@" )'/>
     <xsl:variable name='host'    select='substring-after(  $address, "@" )'/>
     <script>
-      <xsl:comment>
         <xsl:text>Obfuscate( '</xsl:text>
         <xsl:value-of select='$host'/>
         <xsl:text>','</xsl:text>
@@ -767,8 +766,8 @@
           </xsl:if>
         </xsl:for-each>
         <xsl:text>class="email </xsl:text>
-        <xsl:value-of select='@class'/>"<xsl:text/>' );
-      </xsl:comment>
+        <xsl:value-of select='@class'/>
+	<xsl:text>"' );</xsl:text>
     </script>                                                                                  
     <noscript>
       <span>
@@ -802,9 +801,7 @@
       <xsl:text>class="email </xsl:text>
       <xsl:value-of select='@class'/>
       <xsl:text>"',</xsl:text> 
-      '<xsl:value-of 
-      disable-output-escaping='yes' 
-      select='string( $content )'/>
+      '<xsl:value-of disable-output-escaping='yes' select='string( $content )'/>
       <xsl:text>' );</xsl:text>
     </script>
     <noscript>
