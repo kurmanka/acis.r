@@ -93,7 +93,8 @@
 	  <!-- templates may have. Such javascript is put into a load function -->
             <xsl:text>
   function onLoad() {
-//    onload_show_switcher();</xsl:text>
+//    onload_show_switcher();
+	    </xsl:text>
 
           <!-- ToK 2008-04-02: do this only if it exists, adding an extra if -->
           <xsl:if test='exsl:node-set( $content )//acis:script-onload/text()'>            

@@ -1,8 +1,7 @@
 <xsl:stylesheet
-    xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
-    
+    xmlns:xsl="http://www.w3.org/1999/XSL/Transform"    
     xmlns:acis="http://acis.openlib.org"
-    exclude-result-prefixes='exsl xml acis html'
+    exclude-result-prefixes='xsl acis'
     version="1.0">
   
   <xsl:import href='../page-universal.xsl'/>
