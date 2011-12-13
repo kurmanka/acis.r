@@ -29,10 +29,10 @@ my $sql = $ARDB -> sql_object;
 #  the SQL to run
 my @q = (
     qq!
-alter table rdb.objects
+alter table objects
    add column timestamp TIMESTAMP default 0 on update CURRENT_TIMESTAMP !,
     qq!
-alter table rdb.objects
+alter table objects
   modify column timestamp TIMESTAMP 
     default CURRENT_TIMESTAMP 
     on update CURRENT_TIMESTAMP !,
