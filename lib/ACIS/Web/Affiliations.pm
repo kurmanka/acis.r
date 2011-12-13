@@ -110,10 +110,19 @@ sub prepare {   ### XXX here is a great place for optimization in
    unless defined $affiliations and scalar @$affiliations;
 
   if ( $session->{$id}{affiliations} ) {
-    # already prepared
-    # just put it into variables for the presenter and quit
-    $app -> variables->{affiliations} = $session->{$id}{affiliations};
-    return;
+      # already prepared
+
+      # $session->{$id}{affiliations} is an arrayref, but in the old
+      # days it was a list of ids, now it is always a list of
+      # hashes. For transition, we need this check. If false, we
+      # populate it and $unfolded from scratch. It is only needed for
+      # the existing older sessions to work with the new code. After
+      # the full session changeover, it can be removed. XXX
+      if ( ref $session->{$id}{affiliations}[0] ) {
+          # just put it into variables for the presenter and quit
+          $app -> variables->{affiliations} = $session->{$id}{affiliations};
+          return;
+      }
   }
 
   foreach ( @$affiliations ) {
