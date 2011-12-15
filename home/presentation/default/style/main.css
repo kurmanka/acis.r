@@ -796,11 +796,11 @@ form.alternate {
  -webkit-appearance: push-button;
 }
 .affiliationsScreen table.institutions td.share {
- border-left: 1px solid black;
+ border-left: 1px solid #ccc;
  padding: 10px 20px;
 }
 .affiliationsScreen table.institutions th.share {
- border-left: 1px solid black;
+ border-left: 1px solid #ccc;
  padding: 1ex;
 }
 .affiliationsScreen table.institutions td.share input {

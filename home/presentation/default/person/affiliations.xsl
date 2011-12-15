@@ -42,9 +42,12 @@ title='For multiple affiliations, please attribute a share to each. These will b
                 <xsl:with-param name='list' select='$affiliations'/>
               </xsl:call-template>
             </tr>
+            <tr align='right'>
+              <td colspan='3'>
+                <input type='submit' name='saveshare' value='Save share changes'/>
+              </td>
+            </tr>
           </table>
-          <p style='text-align: right'><input type='submit' name='saveshare' value='Save share changes'/>
-          </p>
             
           <acis:phrase ref='affiliations-listing-prolog'/>
         </acis:form>
