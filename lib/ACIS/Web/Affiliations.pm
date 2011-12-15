@@ -92,9 +92,7 @@ sub sanity_check_affiliations_unfolded {
 
 
 
-sub prepare {   ### XXX here is a great place for optimization in
-                ### terms of unloading the server, and making the
-                ### service work quicker
+sub prepare {
   my $app = shift;
 
   debug "preparing affiliations - copying unfolded and resolving handles into institutions";
@@ -103,45 +101,40 @@ sub prepare {   ### XXX here is a great place for optimization in
   my $record  = $session -> current_record();
   my $id      = $record -> {id};
   
-  my $affiliations = $record -> {affiliations};
-  my $unfolded = [];
+  my $affiliations = 
+      $app->variables ->{affiliations} = 
+        $record -> {affiliations};
   
   return
-   unless defined $affiliations and scalar @$affiliations;
+      unless defined $affiliations and scalar @$affiliations;
 
-  if ( $session->{$id}{affiliations} ) {
+  if ( $session->{$id}{prepared_affiliations} ) {
       # already prepared
-
-      # $session->{$id}{affiliations} is an arrayref, but in the old
-      # days it was a list of ids, now it is always a list of
-      # hashes. For transition, we need this check. If false, we
-      # populate it and $unfolded from scratch. It is only needed for
-      # the existing older sessions to work with the new code. After
-      # the full session changeover, it can be removed. XXX
-      if ( ref $session->{$id}{affiliations}[0] ) {
-          # just put it into variables for the presenter and quit
-          $app -> variables->{affiliations} = $session->{$id}{affiliations};
-          return;
-      }
+      return;
   }
 
+  # reload each affiliation, which has an id from the database
   foreach ( @$affiliations ) {
 
     if ( ref $_ eq 'HASH' ) {
-      if( exists $_->{name} ) {
-        push @$unfolded, $_;
-
-      } else {
-        my $i = load_institution( $app, $_->{id} );
-        if (exists $_->{share}) { $i->{share} = $_->{share}; }
-        push @$unfolded, $i;
+        
+      if ( $_->{id} ) {
+         my $i = load_institution( $app, $_->{id} );
+         if ($i) {
+             if (exists $_->{share}) { $i->{share} = $_->{share}; }
+             $_ = $i;
+         } else {
+             undef $_;
+             # XXX shares need to be adjusted after that, if any
+         }
       }
+      # else: do nothing
 
-    } else { # legacy support
+    } else { 
+      # legacy support: just a string, not a hash
       my $institution = load_institution( $app, $_ );
       if ( $institution ) {
-        push @$unfolded, $institution;
-        $_ = { id => $_ };
+        $_ = $institution;
       } else { 
         undef $_;
         # XXX shares need to be adjusted after that, if any
@@ -151,9 +144,9 @@ sub prepare {   ### XXX here is a great place for optimization in
 
   clear_undefined( $affiliations );
   
-  sanity_check_affiliations_unfolded( $affiliations, $unfolded );
+  $app -> variables->{affiliations} = $affiliations;
 
-  $app -> variables->{affiliations} = $session->{$id}{affiliations} = $unfolded;
+  $session->{$id}{prepared_affiliations} = 1;
 }
 
 
@@ -163,7 +156,7 @@ sub prepare {   ### XXX here is a great place for optimization in
 
 sub add {
   my $app = shift;
-  my $instid = shift;
+  my $instid = shift || die;
   
   my $config      = $app -> config;
   my $metadata_db = $config->{'metadata-db-name'};
@@ -175,53 +168,46 @@ sub add {
   my $search_rec   = $session -> {$id} {'institution-search'} ;
   my $search_items = $search_rec -> {items};
   my $affiliations = $record ->{affiliations}   ||= [];
-  my $unfolded = $session ->{$id}{affiliations} ||= [];
   
-  # xslt uses handles
-  if ( $instid ) {
-    debug 'adding institution: $instid';
-    $app -> userlog( "affil: add an item, id: $instid" );
+  debug "adding institution: $instid";
+  $app -> userlog( "affil: add an item, id: $instid" );
     
-    foreach ( @$unfolded ) {
+  # already present?
+  foreach ( @$affiliations ) {
       if ( defined $_ -> {id}
            and $_ -> {id} eq $instid ) {
-        return;
+          return;
       }
-    }
-    
-    my $institution;
-    my $counter = 0;
-    foreach ( @$search_items ) {
+  }
+  
+  my $institution;
+  my $counter = 0;
+  foreach ( @$search_items ) {
       if ( $_ -> {id} eq $instid ) {
-        $institution = 'found';
-        last;
+          $institution = 'found';
+          last;
       }
       $counter++; 
-    }
-    
-    if ( $institution ) {
+  }
+  
+  if ( $institution ) {
       $institution = splice @$search_items, $counter, 1;
       $search_rec -> {results} --;
       
-    } else {
+  } else {
       $institution = load_institution( $app, $instid );
-    } 
+  } 
+  
+  push @$affiliations, $institution;
+  
+  # XXX affiliation shares need to be adjusted 
 
-    push @$unfolded,     $institution;
-    push @$affiliations, { id => $instid };
-
-    # XXX affiliation shares need to be adjusted 
-
-    sanity_check_affiliations_unfolded( $affiliations, $unfolded );
-
-    $app -> sevent ( -class => 'affil',
-                    -action => 'add',
-                     -descr => $institution ->{name},
-                  -location => $institution ->{location},
-       ( $instid ) ? ( -id  => $instid ) : (),
-                   );
-
-  } ### if not just the institution handle
+  $app -> sevent ( -class => 'affil',
+                  -action => 'add',
+                   -descr => $institution ->{name},
+                -location => $institution ->{location},
+     ( $instid ) ? ( -id  => $instid ) : (),
+                 );
 
   $app -> variables ->{processed} = 1;
 }
@@ -235,10 +221,7 @@ sub remove {
   
   my $session = $app -> session;
   my $record  = $session -> current_record;
-  my $id      = $record -> {id};
-
   my $affiliations = $record -> {affiliations};
-  my $unfolded     = $session -> {$id} {affiliations};
   
   return 
     unless defined $affiliations and scalar @$affiliations;
@@ -247,16 +230,13 @@ sub remove {
   debug "remove institution id: $instid, n: $name";
   $app -> userlog( "affil: request to remove an item, id: $instid, n: $name" );
 
-  sanity_check_affiliations_unfolded( $affiliations, $unfolded );
-
   my $remove;
-  my $i = 0;
   foreach $_ ( @$affiliations ) {
 
       #debug "remove $_->{id} / $_->{name}?";
       if ( $instid and $_->{id} 
            and $_->{id} eq $instid ) {
-          $remove = $unfolded->[$i];
+          $remove = $_;
 
       } elsif ( $name and not $_->{id} and $_->{name} 
            and $name eq $_->{name} ) {
@@ -265,7 +245,6 @@ sub remove {
 
       if ($remove) {
           undef $_;
-          undef $unfolded->[$i];
           
           $app -> userlog( "affil: removed affiliation " . ( $instid ? $instid : $name )  );
           $app -> sevent ( -class => 'affil',
@@ -277,12 +256,9 @@ sub remove {
           last;
       }
 
-  } continue {
-      $i++;
   }
 
   clear_undefined( $affiliations );
-  clear_undefined( $unfolded );
 
   if ( not $remove ) {
     $app -> userlog( "affil: removing didn't work" );
@@ -302,10 +278,8 @@ sub search {
   
   my $session = $app -> session;
   my $record  = $session -> current_record;
-  my $id      = $record -> {id};
-  my $affiliations = $session -> {$id} {affiliations};
+  my $affiliations = $session -> current_record->{affiliations};
 
-  my $cgi     = $app -> request -> {CGI};
   my $input   = $app -> form_input;
   my $sql     = $app -> sql_object;
   my $db = $app -> config( 'metadata-db-name' );
@@ -596,43 +570,16 @@ sub extract_institution_search_results {
 
 
 
-
-
-sub make_it_visible {
-  my $app = shift;
-  
-  my $session = $app -> session;
-  my $record  = $session -> current_record;
-  my $id      = $record -> {id};
-
-#  my $search = $session -> {$id} {'institution-search'};
-#  $app -> variables -> {'institution-search'} = $search
-#    if defined $search 
-#      and ref( $search->{items} ) 
-#      and scalar @{ $search -> {items} };
-  
-  my $affiliations = $session -> {$id} {affiliations};
-  $app -> variables -> {affiliations} = $affiliations
-    if defined $affiliations 
-      and scalar @$affiliations;
-}
-
-
 sub general_handler {
   my $app   = shift;
   
   debug "running affiliation service screen";
-  
-
   my $session = $app -> session;
   my $record  = $session -> current_record;
-  my $id      = $record -> {id};
-  my $cgi     = $app -> request -> {CGI};
-
   my $input   = $app -> form_input;
+  my $affiliations = $record -> {affiliations};
    
   if ( $input -> {continue} ) { 
-
     if ( $session -> type eq 'new-user' ) {
       $app -> redirect_to_screen_for_record ( 'research' );
       
@@ -641,14 +588,13 @@ sub general_handler {
       $app -> redirect_to_screen_for_record ( 'menu' );
     }
     
-  } else {
-    
+  } else {  
     my $cha;
-    if ( $input -> {add}    ) { add( $app, $input->{id} );    $cha = 1; }
-    #if ( $input -> {remove} ) { remove( $app ); $cha = 1; }
+    if ( $input -> {add}
+         and $input->{id} ) { add( $app, $input->{id} ); $cha = 1; }
     if ( $input -> {search} ) { search( $app ); }
 
-    # go through the input params (from the form), analyse them,
+    # cycle through the input params (from the form), analyse them,
     # understand, what the user wants.
     #
     # parameters that we expect here: id<N>, remove<N>, name<N>,
@@ -661,6 +607,7 @@ sub general_handler {
         if( $k =~ m/^(\w+)(\d+)/ ) { $form->[$2]{$1} = $v; debug "affiliations form: param $1 of $2 ='$v'"; next; }
         if( $k eq 'saveshare' ) {    $save_shares = 1;  }
     }
+
     foreach ( @$form ) {
         my $idorname = $_->{id} || $_->{name};
         if (not $idorname) {
@@ -673,11 +620,16 @@ sub general_handler {
             next;
         }
         if ( $_->{share} ) {
-            debug "set share of $idorname to " . $_->{share};
+            debug "set share of $idorname to " . $_->{share};            
+            foreach ( @$affiliations ) {
+                # set the share
+            }
         }
     }
+    
     if ($save_shares) {
         debug "Save shares command";
+        #save_shares( $app, $form );
     }
 
 
@@ -687,12 +639,16 @@ sub general_handler {
     }
     
   }
-  
-  make_it_visible( $app );
-
 }
 
-
+sub save_shares() {
+    my $app = shift || die;
+    my $data = shift || die;
+    
+    foreach (@$data) {
+        
+    }
+}
 
 
 sub submit_institution {
@@ -701,12 +657,10 @@ sub submit_institution {
   my $institution = {};
   my $input = $app -> form_input;
   my $name    = $input -> {name};
-  my $oldname = $input -> {oldname} || '';
   my $id      = $input -> {id} || '';
 
   assert( $name );
   debug "submit: name: $name";
-  debug "submit:  old: $oldname";
   debug "submit:   id: $id";
 
   foreach ( qw( name name-english location homepage 
@@ -732,7 +686,6 @@ sub submit_institution {
 
     foreach ( @$list ) {
       if( $_ -> {name} eq $name 
-          or $_ -> {name} eq $oldname   ### this is when user wants to edit an institution
           or ( $_->{id} and $id and ( $_->{id} eq $id ) )  ) {
         $replace = $counter; last;
       }
@@ -753,29 +706,25 @@ sub submit_institution {
 ACIS::Web::Affiliations::send_submitted_institutions_at_session_close( $self );' );
   }
 
-
   # adding an institution to the profile
   if ( $input -> {'add-to-profile'} ) {
     debug "adding a submitted institution ($name) to the record";
     $app -> userlog( "affil: add a submitted institution, name: $name", $id ? " id: $id" : '' );
   
     my $record  = $session -> current_record;
-    my $id      = $record -> {id};
     assert( $record->{type} eq 'person' );
-    $record -> {affiliations} = []
-      if not defined $record -> {affiliations};
-    $session -> {$id} {affiliations} = []
-      if not defined $session -> {$id} {affiliations} ;
-
+    if ( not defined $record -> {affiliations} ) {
+        $record -> {affiliations} = [];
+        $app -> variables ->{affiliations} = $record->{affiliations};
+    }
     my $affiliations = $record->{affiliations};
-    my $unfolded     = $session->{$id}{affiliations};
+
  
     ### additional check
     my $replace;
     my $counter = 0;
-    foreach ( @$unfolded ) {
+    foreach ( @$affiliations ) {
       if ( ($_->{name} eq $name) 
-           or ($_->{name} eq $oldname) 
            or ( defined $_->{id} 
                 and $id
                 and ($_->{id} eq $id) )
@@ -790,12 +739,10 @@ ACIS::Web::Affiliations::send_submitted_institutions_at_session_close( $self );'
     if ( defined $replace ) {
       debug "replacing item no $replace";
       $$affiliations[$replace] = $institution;
-      $$unfolded[$replace]     = $institution;
       
     } else {
       debug "adding new item";
       push @$affiliations, $institution;
-      push @$unfolded,     $institution;
 
     $app -> sevent ( -class => 'affil',
                     -action => 'submit-add',
@@ -820,7 +767,6 @@ ACIS::Web::Affiliations::send_submitted_institutions_at_session_close( $self );'
   $app  -> message( "institution-submission-accepted" );
 
   if ( $session -> type eq 'new-user' ) {
-    make_it_visible( $app );
     $app -> set_presenter( 'affiliations-ir-guide' );
     
   } else {

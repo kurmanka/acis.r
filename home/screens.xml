@@ -140,11 +140,7 @@
     <param name='remove'      type='printable'/>
     
     <call function='load_session_or_authenticate' />
-    
-    <init>
-     <call function='ACIS::Web::Affiliations::prepare'/>
-     <call function='ACIS::Web::Affiliations::make_it_visible'/>
-    </init>
+    <call function='ACIS::Web::Affiliations::prepare'/>
     
     <process>
       <call function='check_input_parameters' />
@@ -194,6 +190,7 @@
     <param name='add-institution'/>
 
     <call function='load_session_or_authenticate' />
+    <call function='ACIS::Web::Affiliations::prepare'/>
     
     <process>
       <call function='check_input_parameters' />
