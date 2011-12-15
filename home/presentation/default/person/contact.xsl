@@ -20,7 +20,7 @@
   <xsl:template match='/data'>
     <xsl:call-template name='user-page'>
       <xsl:with-param name='title'>Contact details</xsl:with-param>
-      <xsl:with-param name='content' xml:space='preserve'>
+      <xsl:with-param name='content'>
 
         <h1>Contact details</h1>
         

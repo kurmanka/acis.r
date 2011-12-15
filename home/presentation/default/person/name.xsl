@@ -14,7 +14,7 @@
   <xsl:variable name='current-screen-id'>personal-name</xsl:variable>
 
   
-  <xsl:template name='the-name-details' xml:space='preserve'>
+  <xsl:template name='the-name-details' xml:space='default'>
     
     <h1>Name details</h1>
     

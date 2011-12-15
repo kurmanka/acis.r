@@ -1,13 +1,15 @@
 <xsl:stylesheet
-    xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
-    
+    xmlns:xsl="http://www.w3.org/1999/XSL/Transform"    
     xmlns:acis="http://acis.openlib.org"
-    exclude-result-prefixes='exsl xml acis html'
-  version="1.0">  
+    exclude-result-prefixes='acis'
+   version="1.0">  
+
   <xsl:import href='page.xsl'/>
+
   <xsl:variable name='current-screen-id'>
     <xsl:text>delete-account</xsl:text>
   </xsl:variable>
+
   <xsl:template match='/data'>
     <xsl:call-template name='user-account-page'>
       <xsl:with-param name='title'>
@@ -37,4 +39,5 @@
       </xsl:with-param>
     </xsl:call-template>
   </xsl:template>
+
 </xsl:stylesheet>
