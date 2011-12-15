@@ -614,15 +614,21 @@ sub general_handler {
             debug "no id and no name item";
             next;
         }
-        if( $_->{remove} ) { 
+        if ( $_->{remove} ) { 
             debug "remove $idorname";
             remove( $app, $_->{id}, $_->{name} );
             next;
         }
         if ( $_->{share} ) {
+            my $input = $_;
             debug "set share of $idorname to " . $_->{share};            
             foreach ( @$affiliations ) {
                 # set the share
+                if ( ($_->{id} and ($_->{id} eq $idorname))
+                     or ($_->{name} eq $idorname )) {
+                    $_->{share} = $input->{share};
+                    last;
+                }
             }
         }
     }
