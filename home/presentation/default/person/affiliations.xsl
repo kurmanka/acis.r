@@ -18,6 +18,9 @@
   <xsl:variable name='found-items'  select='$search/results'/> 
   <xsl:variable name='search-what'  select='$form-values/search-what/text()'/> 
 
+  <xsl:variable name='with-shares'  select='$response-data/with-shares' />
+
+
   <!--  main affiliations screen template -->
   <xsl:template name='the-affiliations'>
     <h1>
@@ -34,19 +37,32 @@
       <xsl:if test='$affiliations/list-item'>
         <acis:form screen='@affiliations' class='light'>
           <table class='institutions'>
-            <tr><th></th><th></th><th class='share' 
+            <tr><th></th><th></th>
+            <xsl:if test='$with-shares'>
+<th class='share' 
 title='For multiple affiliations, please attribute a share to each. These will be used to determine the main affiliation and allocate ranking scores across affiliations. With affiliations in different regions or countries, your ranking scores will also be weighted accordingly.'
-            >Share</th></tr>
+>Share</th>
+            </xsl:if>
+</tr>
             <tr>
-              <xsl:call-template name='institutions-table' xml:space='default'>
-                <xsl:with-param name='list' select='$affiliations'/>
-              </xsl:call-template>
+              <xsl:if test='$with-shares'>
+                <xsl:call-template name='institutions-table-with-shares' xml:space='default'>
+                  <xsl:with-param name='list' select='$affiliations'/>
+                </xsl:call-template>
+              </xsl:if>
+              <xsl:if test='(not($with-shares))'>
+                <xsl:call-template name='institutions-table-without-shares' xml:space='default'>
+                  <xsl:with-param name='list' select='$affiliations'/>
+                </xsl:call-template>
+              </xsl:if>
             </tr>
-            <tr align='right'>
-              <td colspan='3'>
-                <input type='submit' name='saveshare' value='Save share changes'/>
-              </td>
-            </tr>
+            <xsl:if test='$with-shares'>
+              <tr align='right'>
+                <td colspan='3'>
+                  <input type='submit' name='saveshare' value='Save share changes'/>
+                </td>
+              </tr>
+            </xsl:if>
           </table>
             
           <acis:phrase ref='affiliations-listing-prolog'/>

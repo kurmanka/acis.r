@@ -72,30 +72,10 @@ sub load_institution {
 }
 
 
-sub sanity_check_affiliations_unfolded {
-    my $affiliations = shift;
-    my $unfolded = shift;
-
-    assert( scalar @$affiliations == scalar @$unfolded );
-    my $i = 0;
-    foreach ( @$affiliations ) {
-        if ($_->{id}) {
-            assert( $_->{id}   eq $unfolded->[$i]->{id} );
-        } else {
-            assert( $_->{name} eq $unfolded->[$i]->{name} );
-        }
-    } continue {
-        $i++;
-    }
-    return;
-}
-
-
-
 sub prepare {
   my $app = shift;
 
-  debug "preparing affiliations - copying unfolded and resolving handles into institutions";
+  debug "prepare affiliations - reload institution records from db, if needed";
   my $config  = $app -> config;
   my $session = $app -> session;
   my $record  = $session -> current_record();
@@ -144,12 +124,18 @@ sub prepare {
 
   clear_undefined( $affiliations );
   
-  $app -> variables->{affiliations} = $affiliations;
-
   $session->{$id}{prepared_affiliations} = 1;
 }
 
 
+sub prepare_for_presenter {
+    my $app = shift;
+    my $affiliations = $app->session->current_record->{affiliations} || [];
+    if (scalar ( @$affiliations ) > 1) {
+        $app->variables->{'with-shares'} = 1;
+    }
+    $app -> variables->{affiliations} = $affiliations;
+}
 
 
 
@@ -637,7 +623,6 @@ sub general_handler {
         debug "Save shares command";
         #save_shares( $app, $form );
     }
-
 
     if ( $session -> type eq 'new-user' and $cha ) {
       $app -> message( "saved" );

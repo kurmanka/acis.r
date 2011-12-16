@@ -146,6 +146,8 @@
       <call function='check_input_parameters' />
       <call function='ACIS::Web::Affiliations::general_handler'/>
     </process>
+
+    <call function='ACIS::Web::Affiliations::prepare_for_presenter'/>
     
     <presentation type='xslt' filename='person/affiliations.xsl' />
   </screen>

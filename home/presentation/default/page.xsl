@@ -78,6 +78,7 @@
         <xsl:copy-of select='$additional-head-stuff'/>
         <meta http-equiv='Content-Script-Type' content='text/javascript'/>
         <script type='text/javascript' src='{$static-base-url}/script/main.js'/>        
+        <script type='text/javascript' src='{$static-base-url}/script/jquery.js'/>        
         <script type='text/javascript'>
           <xsl:for-each select='exsl:node-set( $content )//script[not(@insitu)]'>
             <xsl:copy-of select='text()'/>

@@ -80,10 +80,11 @@
           </ul>
   </xsl:template>
 
-  <xsl:template name='institutions-table'>
+  <xsl:template name='institutions-table-without-shares'>
     <!-- assuming form and table around this template -->
     <xsl:param name='list'/>
     <xsl:param name='full' select='"yes"'/>
+
     <xsl:for-each select='$list/list-item' xml:space='preserve'>
       <xsl:variable name='alter' xml:space='default'>
         <xsl:if test='(position()) mod 2'>
@@ -94,7 +95,104 @@
 
       <tr class='{$alter}'>
         <td title='Is that your institution?' class='action'>
-          <input type='submit'           name='remove{$rownum}'  value='remove'/>
+          <input type='submit'           name='remove{$rownum}'  value='remove' />
+          <xsl:if test='id/text()'>
+            <input type='hidden'         name='id{$rownum}'      value='{id}'/>
+          </xsl:if>
+          <xsl:if test='not(id/text())'>
+            <input type='hidden'         name='name{$rownum}'    value='{name}'/>
+          </xsl:if>
+        </td>
+        <td class='description'>          
+          <xsl:call-template name='institution-description'>
+            <xsl:with-param name='full' select='$full'/>
+          </xsl:call-template>
+        </td>
+      </tr>
+    </xsl:for-each>
+  </xsl:template>
+
+
+
+  <xsl:template name='institutions-table-with-shares'>
+    <!-- assuming form and table around this template -->
+    <xsl:param name='list'/>
+    <xsl:param name='full' select='"yes"'/>
+
+<!-- 2011-12-16, iku:
+
+If a form has several submit buttons, and at least one text input
+field, it is a problem. User may be entering text into an input field,
+and then hit Enter button on his keyboard. That would submit the form
+with the first or random submit button activated. As if he has clicked
+on it.
+
+This is why the remove buttons in the form below are so-called
+"push-buttons", not submit buttons. <input type='button' ... /> But we
+need them to submit the form - i.e. delete the institution, when
+clicked.
+
+For this we employ javascript here. We use jQuery to attach the onclick
+handler - buttonClick function - to these buttons.
+
+The buttonClick function uses the "spare" input (type=hidden), to pass
+the needed value back to the server. And it submits the form.
+
+Initially, I hoped that simple trick of 
+
+    onclick="this.type='submit';" 
+
+would work, but it only works in non-IE browsers. IE wouldn't let you
+change the type of input under no conditions (at least, that is how it
+looks to me).
+
+All this also means that the form would not work with javascript disabled.
+
+-->
+
+
+    <acis:script-onload>
+      $('input.[type="button"]').click( buttonClick );
+    </acis:script-onload>
+
+    <script>
+function buttonClick () {
+    var f = document.forms[0];
+    var name = $(this).attr('name');
+    var value = $(this).attr('value');
+    $( f.spare ).attr( 'name', name ).attr( 'value', value );
+    f.submit();
+    return false;
+}
+
+
+//  These are the initial attempts of a quickfix:
+/*
+    this.type='submit';  // works in Chrome and FF
+    $(this).attr('type', 'submit'); // does not work in Chrome, says type can't be changed
+    return true;
+*/
+    </script>
+
+    <noscript>
+<p>This form wouldn't work correctly without javascript. Sorry.</p>
+    </noscript>
+
+    <input type='hidden' name='spare' value='' />
+
+
+    <xsl:for-each select='$list/list-item' xml:space='preserve'>
+      <xsl:variable name='alter' xml:space='default'>
+        <xsl:if test='(position()) mod 2'>
+          <xsl:text> alternate</xsl:text>
+        </xsl:if>
+      </xsl:variable>      
+      <xsl:variable name='rownum' select='position()-1'/>
+
+
+      <tr class='{$alter}'>
+        <td title='Is that your institution?' class='action'>
+          <input type='button'           name='remove{$rownum}'  value='remove' />
           <xsl:if test='id/text()'>
             <input type='hidden'         name='id{$rownum}'      value='{id}'/>
           </xsl:if>
@@ -113,6 +211,7 @@
       </tr>
     </xsl:for-each>
   </xsl:template>
+
 
 
   <xsl:template name='show-institutions'>
