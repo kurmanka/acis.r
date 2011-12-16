@@ -94,6 +94,7 @@ sub prepare {
   }
 
   # reload each affiliation, which has an id from the database
+  my $adjust_shares = 0;
   foreach ( @$affiliations ) {
 
     if ( ref $_ eq 'HASH' ) {
@@ -105,7 +106,7 @@ sub prepare {
              $_ = $i;
          } else {
              undef $_;
-             # XXX shares need to be adjusted after that, if any
+             $adjust_shares = 1;
          }
       }
       # else: do nothing
@@ -117,11 +118,14 @@ sub prepare {
         $_ = $institution;
       } else { 
         undef $_;
-        # XXX shares need to be adjusted after that, if any
+        $adjust_shares = 1;
       }
     }
   }
 
+  if ($adjust_shares) {
+      adjust_shares( $app );
+  }
   clear_undefined( $affiliations );
   
   $session->{$id}{prepared_affiliations} = 1;
@@ -185,8 +189,8 @@ sub add {
   } 
   
   push @$affiliations, $institution;
-  
-  # XXX affiliation shares need to be adjusted 
+
+  adjust_shares( $app );
 
   $app -> sevent ( -class => 'affil',
                   -action => 'add',
@@ -620,8 +624,8 @@ sub general_handler {
     }
     
     if ($save_shares) {
-        debug "Save shares command";
-        #save_shares( $app, $form );
+        debug "Saved shares; need checking";
+        adjust_shares( $app );
     }
 
     if ( $session -> type eq 'new-user' and $cha ) {
@@ -632,13 +636,119 @@ sub general_handler {
   }
 }
 
-sub save_shares() {
+
+sub adjust_shares() {
     my $app = shift || die;
-    my $data = shift || die;
-    
-    foreach (@$data) {
-        
+    my $affiliations = $app->session->current_record->{affiliations};
+
+    return if scalar @$affiliations == 0;
+
+    debug "affiliations share adjustment";
+
+    # rules:
+    #  1. total must be exactly 100
+    #  2. each item must be in the 1..99 range, inclusively
+    #  3. if we adjust the values, we adjust them proportionally
+
+    # set undef values to a default
+    my $share_default = 20;
+    foreach (@$affiliations) {
+        my $idorname = $_->{id} || $_->{name};
+        debug "  " . $idorname  . ": " . $_->{share};
+        if (not $_->{share}) {
+            $_->{share} = $share_default;
+        }
     }
+
+    # calculate current total
+    my $init_total = 0;
+    foreach (@$affiliations) {
+        $init_total += $_->{share};
+    }
+    debug "initial total: $init_total";
+
+    if ($init_total == 100) { return 1; }
+
+    # adjustment coefficient? (rule 3)
+    my $adjust_by = 100 / $init_total;
+
+    foreach (@$affiliations) {
+        $_->{share} *= $adjust_by;
+    }
+
+    my $total;
+    foreach (@$affiliations) {
+        $total += $_->{share};
+    }
+    debug "total after coefficient adjustment: $total";
+    
+    # smart rounding, rule 2
+    $total = 0;
+    foreach (@$affiliations) {
+        if ($_->{share} < 1) { $_->{share} = 1; }
+        elsif ($_->{share}>99) { $_->{share} = 99; }
+        else { $_->{share} = sprintf( "%u", $_->{share} ); }
+        $total += $_->{share};
+    }
+
+
+    # final adjustments, rule 1
+    while ( $total != 100 ) {
+        if ( $total > 100 ) {
+            # find largest and cut it
+            my $max;
+            my $max_i;
+            my $index = 0;
+            foreach (@$affiliations) {
+                if ( not $max ) {
+                    $max = $_->{share};
+                    $max_i = 0;
+                } elsif ( $_->{share} > $max ) {
+                    $max = $_->{share};
+                    $max_i = $index;
+                    last;
+                }
+                $index ++;   
+            }
+            $affiliations->[$max_i]->{share}--;
+            
+        } else {
+            # find smallest and add to it
+            my $min;
+            my $min_i;
+            my $index = 0;
+            foreach (@$affiliations) {
+                if ( not $min ) {
+                    $min = $_->{share};
+                    $min_i = 0;
+                } elsif ( $_->{share} < $min ) {
+                    $min = $_->{share};
+                    $min_i = $index;
+                    last;
+                }
+                $index ++;   
+            }
+            $affiliations->[$min_i]->{share}++;
+        }
+
+    } continue {
+        $total = 0;
+        foreach (@$affiliations) {
+            if ($_->{share} < 1) { $_->{share} = 1; }
+            elsif ($_->{share}>99) { $_->{share} = 99; }
+            else { $_->{share} = sprintf( "%u", $_->{share} ); }
+            $total += $_->{share};
+        }
+    }
+
+    debug "result: ";
+    foreach (@$affiliations) {
+        my $idorname = $_->{id} || $_->{name};
+        debug "  " . $idorname  . ": " . $_->{share};
+    }
+    
+    return 1;
+    
 }
 
 
