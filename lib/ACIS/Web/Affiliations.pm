@@ -626,6 +626,7 @@ sub general_handler {
     if ($save_shares) {
         debug "Saved shares; need checking";
         adjust_shares( $app );
+        sort_by_share( $app );
     }
 
     if ( $session -> type eq 'new-user' and $cha ) {
@@ -637,7 +638,7 @@ sub general_handler {
 }
 
 
-sub adjust_shares() {
+sub adjust_shares {
     my $app = shift || die;
     my $affiliations = $app->session->current_record->{affiliations};
 
@@ -752,6 +753,15 @@ sub adjust_shares() {
 }
 
 
+sub sort_by_share {
+    my $app = shift;
+    my $affiliations = $app->session->current_record->{affiliations};
+    
+    @$affiliations = sort { $b->{share} <=> $a->{share} } @$affiliations;
+}
+
+
+
 sub submit_institution {
   my $app = shift;
   my $session = $app -> session;
@@ -844,6 +854,8 @@ ACIS::Web::Affiliations::send_submitted_institutions_at_session_close( $self );'
     } else {
       debug "adding new item";
       push @$affiliations, $institution;
+      adjust_shares( $app );
+      sort_by_share( $app );
 
     $app -> sevent ( -class => 'affil',
                     -action => 'submit-add',
