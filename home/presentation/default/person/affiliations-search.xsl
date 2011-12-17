@@ -3,20 +3,23 @@
     xmlns:exsl="http://exslt.org/common"
     xmlns:acis="http://acis.openlib.org"
     xmlns:html="http://www.w3.org/1999/xhtml"
-    
-    exclude-result-prefixes="exsl xml html acis"
+    exclude-result-prefixes="exsl xsl html acis"
     version="1.0">
+
   <xsl:import href='affiliations-common.xsl' />
   <xsl:variable name='parents'>
     <acis:par id='affiliations'/>
   </xsl:variable>
+
   <!-- ToK 2008-04-06: was affiliations/search -->
   <xsl:variable name='current-screen-id'>affiliations/search</xsl:variable>  
+
   <!--    v a r i a b l e s    -->
   <xsl:variable name='affiliations' select='$response-data/affiliations'/>
   <xsl:variable name='search'       select='$response-data/institution-search'/> 
   <xsl:variable name='found-items'  select='$search/results'/> 
   <xsl:variable name='search-what'  select='$form-values/search-what/text()'/>   
+
   <xsl:template name='search-form'>    
     <p id='search-instructions'>
       <acis:phrase ref='institution-search-instructions'/>
@@ -65,20 +68,24 @@
             <br/>            
             <xsl:call-template name='fieldset'>
               <xsl:with-param name='content'>
-                <!-- support search by name only -->
-                <input type='hidden' 
-                       name='search-by' 
-                       value='name'/>
-                <!-- <label for='search-by-name' onclick='javascript:search_focus();'> -->
-                <!-- <acis:input type='radio' name='search-by' id='search-by-name' value='name' checked=''/> -->
-                <!-- <span onclick='javascript:search_focus();'>institution name</span> -->
-                <!-- </label> -->
-                <!-- <xsl:text>&#160; </xsl:text>                 -->
-                <!-- <acis:input type='radio' name='search-by' id='search-by-location' value='location' -->
-                <!-- onclick='javascript:search_focus();'/> -->
-                <!-- <xsl:text> </xsl:text> -->
-                <!-- <label for='search-by-location' title='city or town name' -->
-                <!-- onclick='javascript:search_focus();'>city or town</label> -->
+		<xsl:choose>
+		  <xsl:when test='$RAS-mode'>
+                    <label for='search-by-name' onclick='javascript:search_focus();'>
+                      <input type='radio' name='search-by' id='search-by-name' value='name' checked=''/>
+		      <span onclick='javascript:search_focus();'>institution name</span>
+		    </label>
+		    <xsl:text>&#160; </xsl:text>
+		    <input type='radio' name='search-by' id='search-by-location' value='location'
+			   onclick='javascript:search_focus();'/> 
+		    <xsl:text> </xsl:text>
+                    <label for='search-by-location' title='city or town name'
+			   onclick='javascrip:search_focus();'>city or town</label> 
+		  </xsl:when>
+		  <xsl:otherwise>
+		    <!-- support search by name only -->
+		    <input type='hidden' name='search-by' value='name'/>
+		  </xsl:otherwise>
+		</xsl:choose>
               </xsl:with-param>
             </xsl:call-template>
           </td>
@@ -113,6 +120,7 @@
       </acis:onsubmit>      
     </acis:form> 
   </xsl:template>
+
   <!--  main affiliations search screen template -->
   <xsl:template name='the-affiliations-search'>    
     <h1>
@@ -259,6 +267,7 @@
     </xsl:if>  
     <xsl:call-template name='submit-invitation'/>
   </xsl:template>
+
   <!--   n o w   t h e   p a g e   t e m p l a t e    -->  
   <xsl:template match='/data'>
     <xsl:call-template name='appropriate-page'>
@@ -268,4 +277,5 @@
       </xsl:with-param>
     </xsl:call-template>
   </xsl:template>
+
 </xsl:stylesheet>

@@ -1385,7 +1385,7 @@ sub process_accepted {
       if($ar) {
           next;
       }
-      my $role   = $input -> {"role_$wid"};
+      my $role   = $input -> {"role_$wid"} || '';
       my $handle = $input -> {"handle_$wid"};
       
       debug "refuse with $wid handle $handle role $role" ;
