@@ -10,10 +10,12 @@
   <xsl:import href='../indent.xsl'/>
   
   <xsl:output method='text' encoding='utf-8'/>
+
   
   <xsl:template match='text()'/>
 
   <xsl:template match='//record[id and type="person"]'>
+  <xsl:variable name='affiliations-count' select='count(affiliations/list-item)'/>
 Template-Type: ReDIF-Person 1.0<xsl:text />
 <xsl:if test='name/prefix/text()'>
 Name-Prefix: <xsl:value-of select='name/prefix'/>
@@ -33,12 +35,12 @@ Name-ASCII: <xsl:value-of select='name/latin'/>
 </xsl:if>
 
 <xsl:for-each select='affiliations/list-item' >
+Workplace-Name: <xsl:value-of select='name'/>
   <xsl:choose>
     <xsl:when test='id'>
-Workplace-Organization: <xsl:value-of select='text()'/>
+Workplace-Institution: <xsl:value-of select='id'/>
     </xsl:when>
-    <xsl:when test='name'><!-- organization cluster -->
-Workplace-Name: <xsl:value-of select='name'/>
+    <xsl:when test='name'>
 Workplace-Location: <xsl:value-of select='location'/>
       <xsl:if test='name-english/text()'>
 Workplace-Name-English: <xsl:value-of select='name-english'/>
@@ -48,6 +50,9 @@ Workplace-Homepage: <xsl:value-of select='homepage'/>
       </xsl:if>
     </xsl:when>
   </xsl:choose>
+  <xsl:if test='$affiliations-count &gt; 1'>
+Workplace-Share: <xsl:value-of select='share'/>
+  </xsl:if>
 </xsl:for-each>
 
 <xsl:for-each select='contact'>
