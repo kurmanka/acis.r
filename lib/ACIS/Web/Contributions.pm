@@ -37,7 +37,6 @@ require ACIS::Data::DumpXML::Parser;
 
 
 use sql_helper;
-use Data::Dumper;
 use ACIS::Resources::AutoSearch;
 use ACIS::Resources::Search;
 use ACIS::Resources::Suggestions;
@@ -170,8 +169,13 @@ sub prepare {
     my $type = $key ->{'type'};
     my $role = $key ->{'role'};
     
+    if (not $id) {
+	debug Dumper( $key );
+	next;
+    }
+    
     if ( $already_accepted ->{$id} ) {
-      undef $key;  ### double item
+        undef $key;  ### double item
     } 
     else {
         $already_accepted ->{$id} = $role;
@@ -328,13 +332,14 @@ sub find_refused_item {
 # look in suggestions or search results
 #
 sub find_accepted_item { 
-  my $id            = shift;
-  assert( $id ,    '$id is untrue');
+  my $id = shift;
+  assert( $id, '$id is untrue');
   #assert( $accepted,'$accepted is untrue');
   debug "find_accepted_item: $id";
 
   foreach my $item ( @{ $accepted } ) {
     #debug "item is" . Dumper $item;
+    next if not $item->{id};
     if( $item ->{'id'} eq $id ) {
       #debug "id is $item->{'id'}";
       return $item; 
@@ -1430,6 +1435,7 @@ sub process_accepted {
   
   foreach my $key ( @$accepted ) {
     my $id   = $key ->{'id'};
+    next if not $id;
     if ( not $already_accepted->{$id} ) {
       
       undef $key;
