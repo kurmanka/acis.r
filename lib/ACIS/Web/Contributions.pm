@@ -1647,7 +1647,7 @@ sub reload_accepted_contributions {
   foreach my $item ( @$accepted ) {
     my $id   = $item -> {'id'};
     my $type = $item -> {'type'};
-    my $role = $item -> {'role'};
+    my $role = $item -> {'role'} || '';
     
     # if there is no id the contribution, debug the contribution
     if(not $id) {
@@ -1665,24 +1665,21 @@ sub reload_accepted_contributions {
       debug "contribution $id can't be reloaded";
       my $today = time;
       my $long_ago = $today - $grace_period;
-      
+
       if ( $item ->{'frozen'} ) {
         if ( $item ->{'frozen'} <= $long_ago ) {
-          # clear
-          undef $item;
-          
-          my $title = $item ->{'title'};
-          
+	  # log it
           $app -> userlog( "clearing a contribution: id $id, role $role" );
-          $app -> userlog( "contribution: '$title' (type: $item->{type})" );
-          
           $app -> sevent( -class  => 'contrib',
                           -action => 'cleared lost',
-                          -descr  => $title . " ($type, $id)",
+                          -descr  => $id,
                           -URL    => $item ->{'url-about'},
                           (exists $item->{authors}) ? ( -authors  => $item -> {authors} ) : (),
                           (exists $item->{editors}) ? ( -editors  => $item -> {editors} ) : (),
                         );
+
+          # clear
+          undef $item;
         }
       }
       else {

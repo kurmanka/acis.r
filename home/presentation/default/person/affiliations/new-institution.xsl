@@ -17,7 +17,7 @@
   
   <!--   new institution screen   -->
 
-  <xsl:template name='the-new-institution' xml:space='preserve'>
+  <xsl:template name='the-new-institution'>
     
     <h1>Submit new institution record</h1>
     

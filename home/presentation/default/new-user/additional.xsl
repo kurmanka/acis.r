@@ -13,7 +13,7 @@
   <xsl:template match='/data'>
     <xsl:call-template name='new-user-page'>
       <xsl:with-param name='title'>name variations</xsl:with-param>
-      <xsl:with-param name='content' xml:space='preserve'>
+      <xsl:with-param name='content'>
 
         <h1>Name details</h1>
         
@@ -69,7 +69,7 @@
         </acis:form>
         
         <acis:script-onload>
-          <xsl:choose xml:space='default'>
+          <xsl:choose>
             <xsl:when test='$response-data/ask-latin-name'>
               document.theform.elements['name-latin'].focus();
             </xsl:when>
