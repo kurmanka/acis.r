@@ -744,7 +744,6 @@ sub adm_search {
 
 
 sub analyse_search_parameters {
-  
   my $select_what = $input -> {show} || '*'; 
   my $limit       = $input -> {limit};
   my $field       = $input -> {by};
@@ -967,8 +966,13 @@ sub adm_search_person {
   } elsif ($key =~ /^p\w+\d+/) {
       # shortid
       $input ->{by} = 'shortid';
+
+  } elsif ( length $key > 3) {
+      $key = $input->{key} = "\%$key\%";
+      $input ->{by} = 'owner';
+
   } else {
-      die;
+      die "We need a short-id or an email; '$key' does not look like either";
   }
   $table = 'records';
 
