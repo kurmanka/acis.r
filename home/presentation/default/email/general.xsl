@@ -5,10 +5,13 @@
     xmlns:html="http://www.w3.org/1999/xhtml"
     exclude-result-prefixes="exsl xsl html acis"
     version="1.0"> 
+
   <xsl:import href='../global.xsl'/>
+
   <!-- evcino --> 
   <!-- for the link-filter mode -->
   <xsl:import href='../page.xsl'/>
+
   <xsl:output method='text' encoding='utf-8'/>
 
   <xsl:template name='message'>

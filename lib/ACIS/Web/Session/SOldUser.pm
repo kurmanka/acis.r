@@ -51,9 +51,10 @@ sub close {
 
   if ( $userdata ) {
     my $owner = $userdata -> {owner};
-    if ( $self -> has_userdata_changed ) {
 
+    if ( $self -> has_userdata_changed ) {
       $owner -> {'last-change-date'} = date_now();
+
       ###  process userdata owner login change
       if ( $owner -> {'old-login'} ) {
         $app -> userlog ( "log off: login change from ", 
@@ -61,6 +62,10 @@ sub close {
                           " to ", 
                           $owner->{login}
                         );
+
+        if ( $self->type eq 'admin-user' ) {
+            $app->variables->{'modified-owner'} = $owner;
+        }
         
         $app -> send_mail ( 'email/user-login-changed.xsl' );
         
