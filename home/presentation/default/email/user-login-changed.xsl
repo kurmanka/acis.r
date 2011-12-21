@@ -87,7 +87,7 @@
       <xsl:value-of select='$admin-email'/>
       <xsl:text>&#10;&#10;</xsl:text>
       <xsl:text>If this email change coincides with an affiliation change,&#10;make sure to adjust your affiliation(s) as well.</xsl:text>
-      <xsl:text>&#10;&#10;</xsl:text>
+      <xsl:text>&#10;</xsl:text>
     </xsl:with-param>
     </xsl:call-template>
   </xsl:template>
