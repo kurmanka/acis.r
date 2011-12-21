@@ -1240,7 +1240,8 @@ sub adm_log_into {
     my $ud = get_hands_on_userdata( $app, $paths );
 
     # now grab it, or complain and quit
-    die if not $ud;
+    die "the userdata file $ud_file is locked, or something is wrong"
+        if not $ud;
     
     # now log off the current session
     # $session is the old session

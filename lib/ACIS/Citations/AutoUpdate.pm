@@ -106,19 +106,18 @@ sub auto_processing {
     if ( $acis->config( "citations-profile" ) 
          and not $acis->config( "disable-citation-mails" ) ) {
 
-      my %params = ();
+      my $params = {};
       my $echoapu = $acis -> config( "echo-apu-mails" );
       if ( not defined $echoapu ) {
         $echoapu =  $acis -> config( "echo-arpu-mails" );
       }
       if ( $acis->config( "test-citations" ) ) {
-        $params{-to} = $acis -> config( "admin-email" );
+        $params->{-to} = $acis -> config( "admin-email" );
       } elsif ( $echoapu ) {
-        $params{-bcc} = $acis -> config( "admin-email" );
+        $params->{-bcc} = $acis -> config( "admin-email" );
       }
       
-      require Web::App::Email;
-      Web::App::Email::send_mail( $acis, "email/citations-auto-profile-update.xsl", %params );
+      $acis->send_mail( "email/citations-auto-profile-update.xsl", $params, 1 );
       debug "email sent";
       logit "email sent";
     }

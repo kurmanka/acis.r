@@ -583,73 +583,16 @@ sub dump_variables_xml {
 
 sub sql { $_[0]->sql_object }
 
-##############################################################
-####################   EMAIL  SENDING   ######################
-##############################################################
 
+# send_mail() method wrapper around Web::App::Email
+
+require Web::App::Email;
 sub send_mail {
   my $self = shift;
   my $stylesheet = shift;
-  
-  debug "sending email with template '$stylesheet'";
-  my $config = $self -> config;
-
-  my $header;
-  my $body;
-  { 
-    my $messageref = $self -> run_presenter( $stylesheet );
-    if (not ref $messageref) { $messageref = \$messageref; }
-  
-    # split on header and body
-    my $splitspot = index( $$messageref, "\n\n" );
-    if ( $splitspot > 0 ) {
-      $header = substr( $$messageref, 0, $splitspot );
-      $body   = substr( $$messageref, $splitspot+2 );
-      $body  =~ s/^\n+//;
-    }
-  }
-  die if not $header or not $body;
-
-  my @headers = split /\s*\n/, $header;
-  $header = '';
-  my %head = ();
-  foreach ( @headers ) {
-    my ( $name, $value ) = split (/:\s*/, $_);
-    $head{ lc $name } = $value;
-    my $val = encode( 'MIME-Q', $value );
-
-    ### ZZZ a nasty hack to fix Encode's header folding "feature":
-    $val =~ s!\"\n\s+!\"!;  
-    $header .= "$name: $val\n";
-  }
-  
-  $header .= "MIME-Version: 1.0\n";
-  $header .= "Content-Type: text/plain; charset=utf-8\n";
-  $header .= "Content-Transfer-Encoding: 8bit\n";
-
-  my $sendmail = $config -> {sendmail};
-  unless ( defined $sendmail and $sendmail ) {
-    debug "can't send email message, because no sendmail path defined";
-    return;
-  }
-
-  if ( open MESSAGE, "|-:utf8", $sendmail ) {
-    print MESSAGE $header, "\n", $body;
-    close MESSAGE;
-
-  } else {
-    $self -> errlog( "can't open sendmail pipe: $sendmail" );
-    return undef;
-  }
-
-  my $to = $head{to};
-  my $cc = $head{cc};
-  $self -> sevent ( -class => 'email',
-                   -action => 'sent',
-                 -template => $stylesheet,
-                       -to => $to,
-                    ($cc) ? ( -cc => $cc ) : ()
-                  );
+  my $params = shift;
+  my $format = shift;
+  return Web::App::Email::send_mail( $self, $stylesheet, $params, $format );
 }
 
 

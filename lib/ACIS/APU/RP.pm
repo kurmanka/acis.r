@@ -383,18 +383,20 @@ sub search {
 
   if( $send_email ) {
     logit "sending mail...";    
-    require Web::App::Email;
     delete $vars -> {'contributions'} -> {'suggest'};    
+
     ## save the profile if we have added something by name or handle
     if( $vars -> {'added-by-name'} 
          or $vars -> {'added-by-handle'} ) {
       require ACIS::Web::SaveProfile;
       ACIS::Web::SaveProfile::save_profile( $app );
     }    
+
     my %params = ();
     ## | if mail_user is  set, send the admin a copy
     ## | if a config parameter is set  
     if($mail_user) {
+
       ## evcino: always send a bcc
       if ( $app -> config( "echo-apu-mails" ) ) {
         $params{-bcc} = $app -> config( "admin-email" );
@@ -402,7 +404,7 @@ sub search {
       }
       ## make sure we are not echoing the relevance
       delete $vars->{'with_relevance_in_email'};
-      Web::App::Email::send_mail( $app, "email/arpm-notice.xsl", %params );
+      $app ->send_mail( "email/arpm-notice.xsl", \%params, 1 );
       logit "email sent to user";    
 
     } else {
@@ -411,7 +413,7 @@ sub search {
       undef $params{-bcc};
       ## set the with-relevance parameter
       #$vars->{'with_relevance_in_email'}=1;
-      Web::App::Email::send_mail( $app, "email/arpm-notice.xsl", %params );
+      $app ->send_mail( "email/arpm-notice.xsl", \%params, 1 );
       logit "email sent to admin";    
     }
 

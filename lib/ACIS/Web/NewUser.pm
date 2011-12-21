@@ -481,10 +481,7 @@ sub confirm {
     $app -> error( "confirmation-obstructed" ); 
     $app -> clear_process_queue;
 
-    require Web::App::Email;
-    Web::App::Email::send_mail( $app,
-                                "email/notify-admin-problem.xsl",
-                              );
+    $app -> send_mail( "email/notify-admin-problem.xsl", undef, 1 );
   }
 }
 
