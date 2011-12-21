@@ -109,6 +109,9 @@ sub send_mail {
     $body = $pbody;
   }
 
+  die 'this looks like message body needs to be formatted'
+    if ($body =~ m/\^\^\^/);
+
   ###  Now the user-supplied header parameters override the default
   ###  and the presenter's ones.
   foreach ( keys %$para ) {
