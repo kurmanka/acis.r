@@ -11,6 +11,11 @@ if ( not $dest or not scalar @$src ) {
 
 my $acis = ACIS::Web -> new();
 my $login = $dest;
-my $res = ACIS::Web::Admin::offline_userdata_service($acis, $login, 'ACIS::Web::Admin::move_records');
+my $res = ACIS::Web::Admin::offline_userdata_service( 
+                                  $acis, 
+                                  $login, 
+                                  'ACIS::Web::Admin::move_records', 
+                                  undef, 
+                                  $src );
 
 

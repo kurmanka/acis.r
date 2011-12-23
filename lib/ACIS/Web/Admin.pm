@@ -439,8 +439,7 @@ use ACIS::Web::Person;
 
 sub move_records {
   my $acis = shift;
-  
-  my $src  = main::get_sources();
+  my $src  = shift || die; 
 
   # $src is a list of items. Each item may be a short-id, or an ARRAY
   # of [ LOGIN, SHORTID ] pairs.
