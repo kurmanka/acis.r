@@ -17,13 +17,14 @@ use Web::App::Common;
 sub sysvar {
   my ($self, $name) = @_;
   my $d = $self->{home} . '/state/';
-  debug "sysvar( $name )";
+  #debug "sysvar( $name )";
   $name =~ s!(?:\.\.|/|\||\>|\<)!!g;
   if ( not -r "$d$name" ) { return undef; }
   if ( open V, "<:utf8", "$d$name" ) {
     # extract first line of the file
     my $v = join( '', <V>);
     close V;
+    debug "sysvar( $name )!";
     return $v
   } else {
     return 0;
@@ -34,10 +35,10 @@ sub sysvar {
 sub sysflag {
   my ($self, $name) = @_;
   my $d = $self->{home} . '/state/';
-  debug "checking for system flag file $name in $d";
+  #debug "checking for system flag file $name in $d";
   $name =~ s!(?:\.\.|/|\||\>|\<)!!g;
   if ( -f "$d$name" ) { 
-    debug "found flag file $name";
+    debug "found system flag file $name in $d";
     return 1; 
   }
   return undef;
