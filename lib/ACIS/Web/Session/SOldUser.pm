@@ -105,6 +105,13 @@ sub close {
 }
 
 
+sub object {
+    my $self = shift;
+    my ($package, $filename, $line, $subr) = caller(1);
+    debug "->object() from $subr";
+    return $self->SUPER::object( @_ );
+}
+
 
 
 sub notify_user_about_profile_changes {

@@ -38,9 +38,8 @@ use ACIS::Web::SysProfile;
 sub save_profile {
   my $app = shift;
 
-  my $session          = $app       -> session ;
-  my $session_object        = $session   -> object  ;
-  my $session_object_string = $session_object -> dump_xml;
+  my $session  = $app       -> session ;
+  my $userdata = $session   -> object  ;
 
   my @profiles = ();
 
@@ -48,28 +47,34 @@ sub save_profile {
 
   use Storable qw( dclone );
   
-  $variables ->{'profile-owner'} = dclone $session -> object -> {owner};
+  my $ud_owner = $session->userdata_owner;
 
-  my $login      = $session -> object -> {owner} {login};
+  # i think we use deep clone (dclone) here because the same structure
+  # MAY (but not necessarily) be present in the presenter data
+  # structure in a different part of it -- in the request user part:
+  $variables ->{'profile-owner'} = dclone $ud_owner;
+
+  my $login      = $ud_owner ->{login};
   my $last_login = get_sysprof_value( $login, "last-login-date" );
   if ( $last_login ) {
     $variables ->{'profile-owner'} {'last-login-date'} = $last_login;
   }
 
-  ## a user may have several records
+  ## a user may have several records, and here we go through each of
+  ## them, even though this may be unnecessary. We just do not know,
+  ## which of the profiles have changed in the course of the session.
   my $number   =  0;
-  foreach my $record ( @{ $session_object ->{records} } ) {
+  foreach my $record ( @{ $userdata ->{records} } ) {
     my $id = $record ->{'id'};
     $session -> set_current_record_no( $number );
 
-    if($app -> config( "learn-via-daemon" )) {
+    if ( $app -> config( "learn-via-daemon" ) ) {
         ## learn all known items
-        use ACIS::Resources::Learn::KnownItems;
+        require ACIS::Resources::Learn::KnownItems;
         my $sql = $app -> sql_object();
         &ACIS::Resources::Learn::KnownItems::learn_all_known($app,$sql);
     }
-    ## unclear why there is a { here
-    #{
+
     use ACIS::Web::Export;
     my $res = ACIS::Web::Export::redif( $app, $record );
     debug( "ReDIF export: ", (($res) ? "OK" : "FAILED") );
@@ -79,9 +84,9 @@ sub save_profile {
     
     $res = ACIS::Web::Export::amf( $app, $record );
     debug( "AMF export: ", (($res) ? "OK" : "FAILED") );
-    ## commented out closeing brace
-    #}
-  
+
+    # there are only personal records now, and no plans to introduce
+    # other types. but still we check here, just to be cautious.
     if ( $record ->{'type'} eq 'person' ) {
       my $sid   = $record ->{'sid'};      
       ### update the personal profile
@@ -91,17 +96,17 @@ sub save_profile {
                           link => $link };
         ## run the command the system-command-after-profile-change
         ## defined in acis.conf
-        my $command_to_run=$app->config('system-command-after-profile-change');
+        my $command_to_run = $app->config('system-command-after-profile-change');
         ## run it in the background if it's an excecutable file
-        if(defined($command_to_run) and -X $command_to_run) {
+        if (defined($command_to_run) and -X $command_to_run) {
           system("$command_to_run $sid &");
         }
       }
     } # if type == "person"
-  }
-  continue {
+
+  }  continue {
     $number ++;    
-  } # for each of the records in session
+  } # for each of the records in the userdata
     
   $variables -> {'saved-profiles'} = \@profiles;
   $app -> success( 1 );

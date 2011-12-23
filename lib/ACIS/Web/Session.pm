@@ -47,15 +47,18 @@ sub new {
 
 sub find_userdata_record_by_sid {
   my $self = shift;
-  my $id  = shift;
+  my $id   = shift;
   
+  my $cr = $self->current_record;
+  if ($cr and $cr->{sid} eq $id) { return $self->{'.userdata.current_record.no'}; }
+
   my $userdata = $self     -> object;
   my $records  = $userdata -> {records};
 
   if ( scalar( @$records ) == 1 ) {
 
     if ( $records -> [0] {sid} eq $id ) { return 0; }
-    if ( $records -> [0] {id}  eq $id )  { return 0; }
+    if ( $records -> [0] {id}  eq $id ) { return 0; }
     
   } elsif ( scalar( @$records ) > 1 ) {    
 
@@ -100,6 +103,10 @@ sub load {
 sub current_record { 
   my $self = shift;
 
+  if ($self->{'.userdata.current_record'}) {
+      return( $self->{'.userdata.current_record'} );
+  }
+  
   my $userdata = $self-> object;
 
   if ( defined $userdata
@@ -107,14 +114,15 @@ sub current_record {
        and scalar @{ $userdata -> {records} } 
      ) {
 
-    my $rec_no = $self -> {'current-record-number'};
+    my $rec_no = $self -> {'.userdata.current_record.no'};
 
     if ( not defined $rec_no ) {
       $rec_no = 0;
       $self -> set_current_record_no( $rec_no );
     }
 
-    return $userdata -> {records} -> [$rec_no];
+    my $rec = $userdata -> {records} -> [$rec_no];
+    return $self->{'.userdata.current_record'} = $rec;
   }
 
   return undef;
@@ -140,7 +148,7 @@ sub choose_record {
 
 sub get_current_record_no {
   my $self = shift;
-  return $self -> {'current-record-number'};
+  return $self -> {'.userdata.current_record.no'};
 }
 
 sub set_current_record_no {
@@ -149,15 +157,19 @@ sub set_current_record_no {
 
   assert( defined $no );
 
+  my $old = $self -> {'.userdata.current_record.no'};
+  if ( defined $old and ($old == $no) ) { return $old; }
+
+  $self -> {'.userdata.current_record.no'} = $no;
+
   my $userdata = $self-> object;
   if ( defined $userdata
        and defined $userdata   ->{records}
        and scalar @{ $userdata ->{records} } 
      ) {
     my $records = $userdata ->{records};
+
     if ( scalar @$records ) {
-      my $old = $self -> {'current-record-number'};
-      $self -> {'current-record-number'} = $no;
 
       if ( not defined $old or $old != $no ) {
 
@@ -289,7 +301,13 @@ sub set_object_file {
   return $self -> SUPER::set_object_file( $newfile );
 }
 
-
+sub userdata_owner { 
+    my $self = shift;
+    if ($self->{'.userdata.owner'}) { return $self->{'.userdata.owner'}; }
+    my $userdata = $self->object;
+    if ($userdata) { return $userdata->{owner}; }
+    return undef;
+}
 
 sub save_userdata {
   my $self = shift;

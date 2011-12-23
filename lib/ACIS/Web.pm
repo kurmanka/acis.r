@@ -291,10 +291,9 @@ sub clear_auth_cookies {
 sub get_auto_logon_mode {
   my $self = shift;
   my $session = $self -> session;
-  if ( $session ) {
-    my $ud    = $session -> object;
-    my $owner = $ud -> {owner};
 
+  if ( $session ) {
+    my $owner = $session -> userdata_owner;
     my $login = $owner -> {login};
     my $pass  = $owner -> {password};
 
@@ -438,11 +437,11 @@ sub session {
     
   my $id       = $session ->id;
   my $type     = $session ->type;
-  my $userdata = $session ->object;
-  my $realuser = '';
-  if ( $userdata ) { $realuser = $userdata->{owner}->{login}; }
-  if ( $realuser ) { $realuser = " for user $realuser";  }
-  #$self -> userlog ( "using session $id ($type)$realuser" );
+#  my $userdata = $session ->object;
+#  my $realuser = '';
+#  if ( $userdata ) { $realuser = $userdata->{owner}->{login}; }
+#  if ( $realuser ) { $realuser = " for user $realuser";  }
+#  $self -> userlog ( "using session $id ($type)$realuser" );
 
   my $record = $session -> current_record;
   if ( $record ) {
@@ -467,11 +466,11 @@ sub update_paths {
   if ( defined $self -> {session} ) {
     my $session = $self -> session;
     my $home    = $self -> {home};
-    my $userdata = $session ->object;
+    my $owner   = $session -> userdata_owner;
     
-    if ( $userdata ) {
-      my $login    = $userdata ->{owner} ->{login};
-      my $oldlogin = $userdata ->{owner} ->{'old-login'};
+    if ( $owner ) {
+      my $login    = $owner ->{login};
+      my $oldlogin = $owner ->{'old-login'};
       if ( $login ) {
         $paths = $self ->update_paths_for_login( $login );
       }
