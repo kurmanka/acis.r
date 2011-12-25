@@ -558,13 +558,9 @@ sub login_start_session {
   }
   $owner -> {IP} = $ENV{'REMOTE_ADDR'};
 
-  my $session = $app -> start_session( "user", $owner,
-                                       object => $udata,
-                                       file   => $udata_file );
+  my $session = $app -> start_session( "user", $owner );
+  $session -> set_userdata( $udata, $udata_file );
 
-  ### make a copy of userdata in session
-  #$session -> object_set( $udata, $udata_file );
-  #session_start( $session );
   my $sid = $session -> id;
   assert( $sid );
   $app -> sevent(  -class => 'auth',
@@ -582,8 +578,11 @@ sub login_start_session {
   if ( not $records ) {
     $records = $udata ->{records} = [];
   }
+
   foreach ( @$records ) {
     if ( $_->{type} eq 'person' ) {
+      # XXX this may be a source of huge delays when working with
+      # multi-record accounts
       ACIS::Web::Person::bring_up_to_date( $app, $_, $udata );
     }
   }

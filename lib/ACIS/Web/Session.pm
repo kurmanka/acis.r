@@ -20,9 +20,6 @@ package ACIS::Web::Session;   ### -*-perl-*-
 #  along with this program; if not, write to the Free Software
 #  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 #
-#  ---
-#  $Id$
-#  ---
 
 use strict;
 use Storable;
@@ -39,38 +36,7 @@ sub new {
   my $acis  = shift;
   my $self  = $class -> SUPER::new( $acis, @_ ); 
   session_start( $self );
-  # maybe:
-  #  $acis -> session_start_hook( $self );
   return $self;
-}
-
-
-sub find_userdata_record_by_sid {
-  my $self = shift;
-  my $id   = shift;
-  
-  my $cr = $self->current_record;
-  if ($cr and $cr->{sid} eq $id) { return $self->{'.userdata.current_record.no'}; }
-
-  my $userdata = $self     -> object;
-  my $records  = $userdata -> {records};
-
-  if ( scalar( @$records ) == 1 ) {
-
-    if ( $records -> [0] {sid} eq $id ) { return 0; }
-    if ( $records -> [0] {id}  eq $id ) { return 0; }
-    
-  } elsif ( scalar( @$records ) > 1 ) {    
-
-    my $no = 0;
-    foreach ( @$records ) {
-      if ( $_ ->{sid} eq $id ) { return $no; }
-      if ( $_ ->{id}  eq $id ) { return $no; }
-      $no++;
-    }
-  }
-
-  return undef;
 }
 
 
@@ -86,10 +52,8 @@ sub load {
     if ( my $sid = $app -> {request} {'short-id'} ) {
       debug "request -> sid:$sid";
       
-      my $number = $self -> find_userdata_record_by_sid( $sid );
-      if ( defined $number ) {
-        $self -> set_current_record_no( $number );
-        
+      if ( $self -> choose_record_by_id( $sid ) ) {
+        # good
       } else {
         $app  -> error( "bad-short-id-in-request" );
       } 
@@ -107,33 +71,31 @@ sub current_record {
       return( $self->{'.userdata.current_record'} );
   }
   
-  my $userdata = $self-> object;
+  my $userdata = $self-> userdata;
+  if ( defined $userdata ) {
 
-  if ( defined $userdata
-       and defined $userdata   -> {records}
-       and scalar @{ $userdata -> {records} } 
-     ) {
+    my $rec_no = $self -> {'.userdata.current_record.no'} || 0;
+    $self -> set_current_record_no( $rec_no );
 
-    my $rec_no = $self -> {'.userdata.current_record.no'};
-
-    if ( not defined $rec_no ) {
-      $rec_no = 0;
-      $self -> set_current_record_no( $rec_no );
-    }
-
-    my $rec = $userdata -> {records} -> [$rec_no];
-    return $self->{'.userdata.current_record'} = $rec;
+    return $self->{'.userdata.current_record'};
   }
 
   return undef;
 }
 
 
-sub choose_record {
+sub choose_record_by_id {
   my $self = shift;
   my $id   = shift || die;
+
+  my $cr = $self->{'.userdata.current_record'};
+  if ($cr) {
+      if ($cr->{sid} eq $id) { return 1; }
+      if ($cr->{id} eq $id)  { return 1; }
+  }
+
   my $num  = 0;
-  my $list = $self->object->{records};
+  my $list = $self->userdata->{records};
   foreach ( @$list ) {
     if ( $_ ->{id} eq $id 
          or $_ ->{sid} eq $id ) { 
@@ -162,7 +124,7 @@ sub set_current_record_no {
 
   $self -> {'.userdata.current_record.no'} = $no;
 
-  my $userdata = $self-> object;
+  my $userdata = $self-> userdata;
   if ( defined $userdata
        and defined $userdata   ->{records}
        and scalar @{ $userdata ->{records} } 
@@ -175,6 +137,7 @@ sub set_current_record_no {
 
         my $app = $self ->{'.app'};
         my $rec = $userdata ->{records} [$no]; 
+        $self->{'.userdata.current_record'} = $rec;
 
         if ( $rec->{id} ) {
           $app -> sevent( -class => 'record',
@@ -295,16 +258,31 @@ sub object_set {
 sub set_object_file {
   my $self    = shift;
   my $newfile = shift;
-
   my $inner = $self ->{_};
-  $inner ->{object} ->  set_save_to_file( $newfile ); ### XX UserData interface
+  $inner ->{object} -> set_save_to_file( $newfile ); ### XX UserData interface
   return $self -> SUPER::set_object_file( $newfile );
+}
+
+
+sub userdata {
+  my $self   = shift;
+  return $self -> object( @_ );
+}
+
+sub set_userdata {
+  my $self   = shift;
+  return $self -> object_set( @_ );
+}
+
+sub set_userdata_file {
+  my $self   = shift;
+  return $self -> set_object_file( @_ );
 }
 
 sub userdata_owner { 
     my $self = shift;
     if ($self->{'.userdata.owner'}) { return $self->{'.userdata.owner'}; }
-    my $userdata = $self->object;
+    my $userdata = $self->userdata;
     if ($userdata) { return $userdata->{owner}; }
     return undef;
 }
@@ -316,7 +294,6 @@ sub save_userdata {
   my $udatadir = $app -> userdata_dir;
   ###  save the userdata
 
-  
   my $udata_file = $self -> object -> save;
   
   $app -> userlog ( "log off: wrote ", $udata_file );

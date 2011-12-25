@@ -263,7 +263,7 @@ sub offline_userdata_service {
   $acis -> {'presenter-data'} {request} {user} {login} = $ulogin;
   
   if ( $rec ) {
-    if ( not $session -> choose_record( $rec ) ) {
+    if ( not $session -> choose_record_by_id( $rec ) ) {
       debug "No such record $rec";
       $acis -> errlog( "No such record $rec" );
       die "can't run offline service for record $rec because the record is not found in account";
