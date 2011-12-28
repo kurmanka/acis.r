@@ -52,12 +52,13 @@ sub login {
 sub welcome {  
   my $app = shift;
   my $session  = $app -> session || die 'must have a session';
-  my $userdata = $session -> object;
-  my $records  = $userdata -> {records};
-  
-  if ( $userdata -> {owner} {type} {advanced} 
-       or scalar( @$records ) > 1 ) {
-    $app -> variables -> {records} = $records; 
+
+  my $reclist  = $session ->userdata_record_list;
+  my $owner    = $session ->userdata_owner;
+
+  if ( $owner->{type}{advanced} 
+       or scalar( @$reclist ) > 1 ) {
+    $app -> variables -> {records} = $reclist; 
     $app -> set_presenter( 'records-menu' );
   }
 }
@@ -268,7 +269,7 @@ sub set_user_login {
     }
 
     $owner   -> {login} = $new;
-    $session -> set_object_file( $f );
+    $session -> set_userdata_saveto_file( $f );
     $app     -> update_paths_for_login( $newlc );
 
     require ACIS::Web::SysProfile;

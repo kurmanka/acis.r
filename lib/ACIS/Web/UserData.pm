@@ -118,8 +118,7 @@ sub dump_xml {
 
 sub save {
   my $self = shift;
-
-  my $file = $self -> {_} {file_save_to};
+  my $file = shift || $self -> {_} {file_save_to};
   
   debug "user-data saving to '$file'";
 

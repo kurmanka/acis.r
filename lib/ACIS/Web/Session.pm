@@ -67,16 +67,17 @@ sub load {
 sub current_record { 
   my $self = shift;
 
+  debug "->current_record";
   if ($self->{'.userdata.current_record'}) {
+      debug "giving {.userdata.current_record}";
       return( $self->{'.userdata.current_record'} );
   }
   
-  my $userdata = $self-> userdata;
-  if ( defined $userdata ) {
+  my $userdata = $self-> userdata || die; 
 
+  if ( defined $userdata ) {
     my $rec_no = $self -> {'.userdata.current_record.no'} || 0;
     $self -> set_current_record_no( $rec_no );
-
     return $self->{'.userdata.current_record'};
   }
 
@@ -292,9 +293,9 @@ sub save_userdata {
   my $app  = shift;
   
   my $udatadir = $app -> userdata_dir;
-  ###  save the userdata
 
-  my $udata_file = $self -> object -> save;
+  ###  save the userdata
+  my $udata_file = $self -> save_userdata_file;
   
   $app -> userlog ( "log off: wrote ", $udata_file );
   $app -> sevent ( -class  => 'session',
@@ -302,8 +303,6 @@ sub save_userdata {
                    -descr  => 'userdata',
                    -file   => $udata_file );
   
-  ###  XXX write out the metadata ?
-
   ###  request RI update
   eval {
     my $relative = substr( $udata_file, length( "$udatadir/" ) );
@@ -316,6 +315,14 @@ sub save_userdata {
 
 }
 
+
+# this is overriden in the SOldUser class
+sub save_userdata_file {
+    my $self = shift;
+    ###  save the userdata
+    my $udata_file = $self -> object -> save;
+}
+    
 
 sub close_without_saving {
   my $self = shift;

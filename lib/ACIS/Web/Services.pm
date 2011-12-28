@@ -558,8 +558,10 @@ sub login_start_session {
   }
   $owner -> {IP} = $ENV{'REMOTE_ADDR'};
 
-  my $session = $app -> start_session( "user", $owner );
-  $session -> set_userdata( $udata, $udata_file );
+  ### XXXXXXXsomething breaks here
+  my $session = $app -> start_session( "user", $owner,
+                                       object => $udata, 
+                                       file   => $udata_file );
 
   my $sid = $session -> id;
   assert( $sid );
@@ -572,20 +574,6 @@ sub login_start_session {
                -humanname => $owner->{name},
                  );
    
-  ### now do some compatibility checks for the userdata
-  use ACIS::Web::Person;
-  my $records = $udata -> {records};
-  if ( not $records ) {
-    $records = $udata ->{records} = [];
-  }
-
-  foreach ( @$records ) {
-    if ( $_->{type} eq 'person' ) {
-      # XXX this may be a source of huge delays when working with
-      # multi-record accounts
-      ACIS::Web::Person::bring_up_to_date( $app, $_, $udata );
-    }
-  }
   put_sysprof_value( $login, 'last-login-date', date_now() );
 
   my $auto_login = $app -> form_input ->{'auto-login'} || '';

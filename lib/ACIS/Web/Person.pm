@@ -77,8 +77,8 @@ sub compile_name_variations {
 
 
 sub bring_up_to_date {
-  my $app    = shift;
-  my $record = shift;
+  my $app    = shift || die "need \$app";
+  my $record = shift || die "need a record";
 #  my $udata  = shift;
 
 

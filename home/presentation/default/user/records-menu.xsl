@@ -75,25 +75,19 @@
     <xsl:variable name='id'  select='$rec/id/text()'/>
     <xsl:variable name='sid' select='$rec/sid/text()'/>
 
-    <xsl:choose>
-      <xsl:when test='$rec/type="person"'>
-        <strong><span class='name'><xsl:value-of select='$rec/name/full'/></span></strong>:
-        <a ref='@({$sid})profile-overview'>overview</a> | <a ref='@({$sid})menu'>menu</a>
-        <br/>
-        <small>
-        <a ref='@({$sid})/name'>name</a> 
-        | <a ref='@({$sid})/contact'>contact</a>
-        | <a ref='@({$sid})/affiliations'>affiliations</a>
-        | <a ref='@({$sid})/research'>research</a>
-    <!--[if-config(citations-profile)]
+    <!-- we absolutely assume record type="person" here -->
+    <strong><span class='name'><xsl:value-of select='$rec/name'/></span></strong>:
+    <a ref='@({$sid})profile-overview'>overview</a> | <a ref='@({$sid})menu'>menu</a>
+    <br/>
+    <small>
+      <a ref='@({$sid})/name'>name</a> 
+      | <a ref='@({$sid})/contact'>contact</a>
+      | <a ref='@({$sid})/affiliations'>affiliations</a>
+      | <a ref='@({$sid})/research'>research</a>
+      <!--[if-config(citations-profile)]
         | <a ref='@({$sid})/citations'>citations</a>
-    [end-if]-->
-        </small>
-      </xsl:when>
-      <xsl:otherwise>
-
-      </xsl:otherwise>
-    </xsl:choose>
+          [end-if]-->
+    </small>
   </xsl:template>
 
 
