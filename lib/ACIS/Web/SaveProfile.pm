@@ -38,17 +38,15 @@ use ACIS::Web::SysProfile;
 sub save_profile {
   my $app = shift;
 
-  my $session  = $app       -> session ;
-  my $userdata = $session   -> object  ;
-
+  my $variables = $app     ->variables;
+  my $session   = $app     ->session ;
+  my $userdata  = $session ->userdata;
+  my $ud_owner  = $session ->userdata_owner;
+  my $reclist   = $session ->userdata_record_list;
   my @profiles = ();
-
-  my $variables = $app -> variables;
 
   use Storable qw( dclone );
   
-  my $ud_owner = $session->userdata_owner;
-
   # i think we use deep clone (dclone) here because the same structure
   # MAY (but not necessarily) be present in the presenter data
   # structure in a different part of it -- in the request user part:
@@ -60,12 +58,22 @@ sub save_profile {
     $variables ->{'profile-owner'} {'last-login-date'} = $last_login;
   }
 
-  ## a user may have several records, and here we go through each of
-  ## them, even though this may be unnecessary. We just do not know,
-  ## which of the profiles have changed in the course of the session.
+  ## A user may have several records, and here we go through each of
+  ## them. If we have $reclist, then we know, which of the profiles
+  ## have changed in the course of the session. So, in that case we
+  ## only export those.
+  ## If we have no $reclist, then we go through all of the profiles.
   my $number   =  0;
   foreach my $record ( @{ $userdata ->{records} } ) {
     my $id = $record ->{'id'};
+
+    if ($reclist
+        and $reclist->[$number]
+        and not $reclist->[$number]{modified}) {
+        # this record is not modified, so we skip it
+        next;
+    }
+
     $session -> set_current_record_no( $number );
 
     if ( $app -> config( "learn-via-daemon" ) ) {
@@ -104,7 +112,7 @@ sub save_profile {
       }
     } # if type == "person"
 
-  }  continue {
+  } continue {
     $number ++;    
   } # for each of the records in the userdata
     

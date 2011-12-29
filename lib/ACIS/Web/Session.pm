@@ -288,6 +288,8 @@ sub userdata_owner {
     return undef;
 }
 
+sub userdata_record_list { return undef; }
+
 sub save_userdata {
   my $self = shift;
   my $app  = shift;
