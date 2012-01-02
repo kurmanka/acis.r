@@ -112,7 +112,12 @@ sub close {
       
       if ( $prob ) { die $prob; }
       $self -> notify_user_about_profile_changes( $app );
+
+    } else {
+      # delete the tempfile, if exists
+      unlink $self->{'.userdata.tempfile'};
     }
+
   } else {
     debug "no userdata";
   }
@@ -194,6 +199,14 @@ sub set_userdata {
         $self->{'.userdata.tempfile'} = $ud_file . ".new";
         $self->{'.userdata.saveto'}   = $ud_file;
         $self->{'.userdata.readfrom'} = $ud_file;
+        
+        # just for safety, we should check if the tempfile already
+        # exists, and clean it up.  we could delete it. Or we could
+        # move it to another file, just to avoid deleting someone's
+        # changes.
+        if ( -e $self->{'.userdata.tempfile'} ) {
+            unlink $self->{'.userdata.tempfile'};
+        }
     } else {
         die "userdata set, but the userdata filenames are not";
     }
