@@ -643,6 +643,7 @@ sub adjust_shares {
     my $affiliations = $app->session->current_record->{affiliations};
 
     return if scalar @$affiliations == 0;
+    return if scalar @$affiliations == 1; # with just one affiliation there's nothing to adjust, really
 
     debug "affiliations share adjustment";
 
