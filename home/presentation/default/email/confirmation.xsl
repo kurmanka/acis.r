@@ -30,13 +30,13 @@
         <xsl:text>confirm your registration</xsl:text>
       </xsl:with-param>
       <xsl:with-param name='content'>
-        <xsl:text>&#10;&#10;&#10;Hello </xsl:text>
+        <xsl:text>Hello </xsl:text>
         <xsl:value-of select='$user-name'/>
         <xsl:text>,&#10;&#10;welcome to the </xsl:text>
         <xsl:value-of select='$site-name-long'/>
         <xsl:text>. To finalize the &#10;registration process, please click on the following address &#10;or paste it into your browser:&#10;&#10;</xsl:text>
         <xsl:value-of select='$confirmation-url'/>
-        <xsl:text>&#10;&#10;If you believe to have received this email by error, please ignore it.</xsl:text>
+        <xsl:text>&#10;&#10;If you believe to have received this email by error, please ignore it.&#10;</xsl:text>
         <acis:phrase ref='email-confirmation-about-registering'/>
         <xsl:text>&#10;</xsl:text>  
         <xsl:choose>
