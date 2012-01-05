@@ -14,9 +14,23 @@ if (open PID, ">$pidfile") {
 }
 
 # clean-up pid file after myself:
-END {  if ($pidfile) { unlink $pidfile; undef $pidfile; } }
+END {  
+  if ($pidfile) { 
+    unlink $pidfile; 
+    undef $pidfile; 
+    if ($acis) {
+      $acis->log( "END. removing $pidfile" );
+    }
+  } 
+}
 local $SIG{TERM} = sub {
-       if ($pidfile) { unlink $pidfile; undef $pidfile; }  
+  if ($pidfile) { 
+    if ($acis) {
+      $acis->log( "TERM signal. removing $pidfile" );
+    }
+    unlink $pidfile; 
+    undef $pidfile; 
+  }  
 };
 
 ## not sure why we need this
