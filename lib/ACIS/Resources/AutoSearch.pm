@@ -80,6 +80,8 @@ sub prepare_search_context {
           id      => $id, 
           sid     => $sid,
           already_suggested => $already_suggested,
+          'suggestions-count-total' => 0,
+          'suggestions-count-exact' => 0,          
          };
 }
 
@@ -229,7 +231,7 @@ sub search_for_resources_exact {
   my $autosearch  = $contributions -> {'autosearch'};
   my $namelist    = $autosearch -> {'names-list'};
   ## cardiff change: $results contains all results
-  my $results;
+  my $results = [];
   foreach my $name_variation ( @$namelist ) {
     next if not $name_variation;
     ## defined in Resources/Search.pm
@@ -238,6 +240,10 @@ sub search_for_resources_exact {
     logit "exact name: '$name_variation', found: $found";
     push(@{$results},@{$search});
   }
+
+  # note the numbers
+  $context->{'suggestions-count-exact'} = 
+    $context->{'suggestions-count-total'} = scalar @$results;
 
   #logit Dumper $results;  
   ## cardiff changes
@@ -367,6 +373,7 @@ sub additional_searches {
     if ( $search and scalar @$search ) {
       if ( $found < 200 ) { 
         save_search_results( $context, 'name-variation-part-match', $search );
+        $context->{'suggestions-count-total'} += $found;
       } else {
         logit "too many hits, ignoring";
       }
@@ -378,7 +385,10 @@ sub additional_searches {
     my $email = $record -> {contact} {email};
     if ( $email ) {
       my $by_email = search_resources_by_creator_email($sql, $context, $email);
+      my $found = scalar @$by_email;
       save_search_results( $context, 'exact-email-match', $by_email );
+      $context->{'suggestions-count-exact'} += $found;
+      $context->{'suggestions-count-total'} += $found;
     }
   }
 
@@ -392,6 +402,7 @@ sub additional_searches {
     if ( $found > 0 ) {
       if ( $found < 200 ) { 
         save_search_results( $context, 'surname-part-match', $suggestions_3 );
+        $context->{'suggestions-count-total'} += $found;
       } else {
         logit "too many hits, ignoring";
       }
@@ -407,7 +418,9 @@ sub do_auto_search {
   my $app = shift;
   my $settings = shift;
   my $session = $app -> session;
-  my $id      = $session -> current_record -> {id};
+  my $rec     = $session -> current_record;  
+  my $id      = $rec->{id};
+  my $sid     = $rec->{sid};
 
   my $context = prepare_search_context( $app, $settings );
   if ( not $session -> {$id} -> {'reloaded-accepted-contributions'} ) {
@@ -424,9 +437,17 @@ sub do_auto_search {
       ## APU?  If via the web, check if that's ok for fuzzy search.
       if ( not $settings->{'via_web'} 
            or $app->config( "fuzzy-name-search-via-web" ) ) {
-        run_fuzzy_searches( $app, $context );
+        run_fuzzy_searches( $app, $context ); 
       }
     }
+  }
+  
+  # save suggestions counts
+  if (defined $context->{'suggestions-count-total'}) {
+    put_sysprof_value( $sid, "research-suggestions-total", $context->{'suggestions-count-total'} );
+  }
+  if (defined $context->{'suggestions-count-exact'}) {
+    put_sysprof_value( $sid, "research-suggestions-exact", $context->{'suggestions-count-exact'} );
   }
 }
 

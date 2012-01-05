@@ -43,6 +43,9 @@ sub run_fuzzy_searches {
     my $found = ( defined $search ) ? scalar( @$search ) : 'nothing';
     logit "fuzzy name: '$_', found: $found";
     ACIS::Resources::AutoSearch::save_search_results($context, 'fuzzy-name-variation-match', $search);
+    if ( scalar @$search ) {
+      $context->{'suggestions-count-total'} += $found;
+    }
   }
 
   logit "search_for_resources_fuzzy: exit";

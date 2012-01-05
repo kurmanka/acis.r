@@ -113,6 +113,7 @@ sub save_suggestions {
   if($debug) {
     close LOG;
   }
+
   #debug "save_suggestions(): end";
 }
   
@@ -253,6 +254,7 @@ sub load_suggestions_into_contributions {
 
   my $r = run_load_suggestions_query($app, $psid);
   my $counter = 0;
+  my $counter_exact = 0;
   my $reasons = {};
   my $group;  ### suggestions are grouped by reason (and role)
   my $list ;
@@ -325,6 +327,7 @@ sub load_suggestions_into_contributions {
       if ( $exact ) {
         ## add to the head of the list
         unshift @$result, $group;
+        $counter_exact++;
       } else {
         ## add to the tail of the list
         push @$result, $group;
@@ -343,7 +346,9 @@ sub load_suggestions_into_contributions {
   debug "$counter items";
   debug "load_suggestions_into_contributions: exit";
   ## we are overwriting what was there, but that should be ok
-  $contributions -> {'suggest'} = $result; 
+  $contributions ->{'suggest'} = $result; 
+  $contributions ->{'suggestions-count-exact'} = $counter_exact;
+  $contributions ->{'suggestions-count-total'} = $counter;
   ## if no suggestion
   if($counter==0) {
     return $result;

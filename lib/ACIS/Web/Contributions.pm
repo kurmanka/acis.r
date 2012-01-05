@@ -978,7 +978,6 @@ sub process {
           if ( $sid ) {  
             $clear_from_suggestions_sid -> {$sid}= 1;  
           }
-          $clear_from_suggestions_sid -> {$sid} = 1;
           
           # start of refuse code
         }
