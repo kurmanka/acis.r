@@ -360,5 +360,55 @@ sub generate_name_variations {
 
 }
 
+
+## resolve long id & short id into email address of the owner. 
+# this function was initially in ACIS::APU, and was named
+# get_login_from_queue_item(). Now used from mvrec.pl.
+# it needs the ACIS sql_helper object.
+sub get_login_from_person_id {
+  my $sql  = shift || die; # ACIS db sql_helper
+  my $item = shift || die; # email or id or short-id
+  my $login;
+ 
+  if ( length( $item ) > 8 
+       and $item =~ /^.+\@.+\.\w+$/ ) {
+    $sql -> prepare( "select owner from records where owner=?" );
+    my $r = $sql -> execute( lc $item );
+    if ( $r and $r -> {row} ) {
+      $login = $r ->{row} {owner};      
+    } 
+    else {
+      debug "get_login_from_person_id: email $item not found";
+    }    
+
+  } else {
+
+     if ( length( $item ) > 15
+         or index( $item, ":" ) > -1 ) {
+      $sql -> prepare( "select owner from records where id=?" );
+      my $r = $sql -> execute( lc $item );
+      if ( $r and $r -> {row} ) {
+        $login = $r ->{row} {owner};
+      } 
+      else {
+        debug "get_login_from_person_id: id $item not found";
+      }
+
+    } elsif ( $item =~ m/^p[a-z]+\d+$/ 
+            and length( $item ) < 15 ) {
+      $sql -> prepare( "select owner,id from records where shortid=?" );
+      my $r = $sql -> execute( $item );
+      if ( $r and $r -> {row} ) {
+        $login = $r ->{row} {owner};        
+      } else {
+        debug "get_login_from_person_id: sid $item not found";
+      }
+    }
+  }
+  return $login;
+}
+
+
+
 1;
 

@@ -229,8 +229,8 @@ sub offline_userdata_service {
   my $paths = $acis ->{paths};
   my $session;
   my $userdata;
-  my $userdata_file;
   $acis -> update_paths_for_login( $login );
+  my $userdata_file = $paths -> {'user-data'} || die;
   eval {
     $userdata = get_hands_on_userdata( $acis );
   };
@@ -241,17 +241,20 @@ sub offline_userdata_service {
 
   ###  create a session for that user-data
   my $owner = {login=>$0, IP=>'0.0.0.0'};
-  $session = $acis -> start_session( "magic", $owner );
-  $session -> object_set( $userdata );
+  $session = $acis -> start_session( "magic", $owner,
+                                     object => $userdata, 
+                                     file   => $userdata_file );
+                                     
+  #$session -> set_userdata( $userdata, $userdata_file );
+  #die Dumper( $session );
 
-  my $user = $userdata->{owner};
+  my $user = $session->userdata_owner;
   my $ulogin= $user   ->{login};
-  my $udata_file = $acis -> paths -> {'user-data'};
 
   $acis ->sevent ( -class => 'auth',
                   -action => 'granted',
                    -descr => 'offline service for account',
-                   -file  => $udata_file,
+                   -file  => $userdata_file,
                    -login => $ulogin,
                  -process => $owner -> {login},
                -humanname => $user->{name},
@@ -420,6 +423,7 @@ sub user_republish {
 }
 
 
+use ACIS::Web::Person;
 
 sub move_records {
   my $acis = shift;
@@ -435,8 +439,18 @@ sub move_records {
   debug "sources: @$src";
   
   foreach ( @$src ) {
-    my $l = $_;
-    
+    my $l = ACIS::Web::Person::get_login_from_person_id( $acis->sql_object, $_ );
+
+    if (not $l) {
+        debug "no login for $_";
+        next;
+    }
+
+    if ($l eq $login) {
+        debug "source record $_ is already in the destination account $login!";
+        next;
+    }
+
     my $file = $acis ->userdata_file_for_login( $l );
     if ( not -e $file ) { 
       debug "no such file: $file";
