@@ -312,7 +312,7 @@ sub save_userdata {
     send_update_request( 'ACIS', $relative );
   };
   if ( $@ ) {
-    warn "sending update request failed: $@";
+    warn "sending update request for $udata_file ($udatadir) failed: $@";
   }
 
 }

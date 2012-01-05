@@ -53,7 +53,7 @@ sub new {
   return $self;
 }
 
-
+sub current_record { return $_[0]->userdata->{records}->[0]; }
 
 sub close {
   my $self = shift;

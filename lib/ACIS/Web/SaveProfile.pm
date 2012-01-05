@@ -76,6 +76,8 @@ sub save_profile {
 
     $session -> set_current_record_no( $number );
 
+    die "no cur rec" if not $session ->current_record;
+
     if ( $app -> config( "learn-via-daemon" ) ) {
         ## learn all known items
         require ACIS::Resources::Learn::KnownItems;

@@ -130,14 +130,22 @@ sub set_userdata_saveto_file {
 
 sub has_userdata_changed {
     my $self = shift;
-
+    debug "->has_userdata_changed()?";
+    
     if ($self->{'.userdata.owner.modified'}) {
+        debug "owner modified";
         return 1;
     }
     my $reclist = $self->{'.userdata.record_list'};
+    my $n = 0;
     foreach ( @$reclist ) {
-        if ($_->{modified}) { return 1; }
+        if ($_->{modified}) { debug "rec $n modified"; return 1; }
+        $n++;
     }
+
+    my $userdata = $self->userdata;
+    my $records  = $userdata->{records};
+    if (scalar @$records != scalar @$reclist) { debug "number of records has changed"; return 1; }
     return 0;
 }
 
@@ -193,6 +201,11 @@ sub set_userdata {
     if ( not $self->make_lock_for( $ud_file ) ) {
         return undef;
     }
+
+    if (scalar @$rl == 1) {
+        # if there is just one record, choose the first one as the default
+        $self->set_current_record_no( 0 );
+    }
     
     return 1;
 }
@@ -207,6 +220,7 @@ sub make_lock_for {
   if ( open L, '>', $lock ) {
       print L $self->id;
       CORE::close L;
+      $self ->{_}{lock} = $lock; # compatibility measure for Web::App::Session compatibility
       $self ->{'.userdata.lock'} = $lock;
   } else {
       warn "can't create lock $lock";
@@ -291,9 +305,10 @@ sub save_userdata_final {
     my $success = rename( $tmp, $final );
     if (not $success) {
         debug "can't move temporary file to the final: $tmp -> $final",
+        return undef;
     }
 
-    return $success;
+    return $final;
 }
 
 sub save_userdata_file {
@@ -303,7 +318,7 @@ sub save_userdata_file {
 
 
 sub set_current_record_no {
-    my $self = shift;
+    my $self = shift || die;
     my $no   = shift;
     debug "->set_current_record_no( $no )";
 
@@ -320,28 +335,44 @@ sub set_current_record_no {
         }
     }
     
-    if ($reclist->[$no]) {
-        my $rec  = $self->userdata->{records}->[$no];
-        $self->{'.userdata.current_record'}    = $rec;
-        $self->{'.userdata.current_record.no'} = $no;
-
-        debug "record $no is now current";
-
-        # now do some compatibility checks for the record
-        if (not $reclist->[$no]->{upgradechecked}) {
-            $reclist->[$no]->{upgradechecked} = 1;
-            require ACIS::Web::Person;
-            ACIS::Web::Person::bring_up_to_date( $ACIS::Web::ACIS, $rec );
-        }
+    if (not $reclist->[$no]) {
+        debug "this record is not in the reclist!";
+    }
+    
+    my $rec  = $self->userdata->{records}->[$no];
+    if (not $rec) { die "no such record: $no"; }
+    $self->{'.userdata.current_record'}    = $rec;
+    $self->{'.userdata.current_record.no'} = $no;
+    
+    debug "record $no is now current";
+    
+    # now do some compatibility checks for the record
+    if (not $reclist->[$no]->{upgradechecked}) {
+        $reclist->[$no]->{upgradechecked} = 1;
+        require ACIS::Web::Person;
+        ACIS::Web::Person::bring_up_to_date( $ACIS::Web::ACIS, $rec );
     }
     
     return $cur_no;
 }
 
+sub current_record { 
+  my $self = shift;
+
+  debug "->current_record";
+  if ($self->{'.userdata.current_record'}) {
+      return( $self->{'.userdata.current_record'} );
+  }
+
+  return undef;
+}
+
+
 
 sub save_current_record {
     my $self = shift;
     my $closeit = shift; # boolean
+    debug "->save_current_record()";
     
     my $ud      = $self->userdata;
     my $reclist = $self->{'.userdata.record_list'} || die;
@@ -363,6 +394,7 @@ sub save_current_record {
             $reclist ->[$cur_no]{name}   = $cr->{name}{full};
             $reclist ->[$cur_no]{modified} = 1;
             $ret = 1;
+            debug "previous current record $cur_no has changed. new digest: $digest_new";
         }
 
         if ($closeit) {
