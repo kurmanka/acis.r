@@ -227,12 +227,13 @@
                 </p>
               </acis:phrase>
             </div>            
-            <!-- <acis:phrase ref='after-footer'/> -->
+            <acis:phrase ref='after-footer'/>
           </xsl:with-param>
         </xsl:call-template>  
       </body>
     </html>
   </xsl:template>
+
   <!-- this closes the global page template --> 
   <!-- by default, the additional-page-navigation and the content-bottom-navigation are empty -->
   <xsl:template name='additional-page-navigation'/>
@@ -242,9 +243,11 @@
   <xsl:variable name='current-screen-id-real'>
     <xsl:value-of select='$current-screen-id'/>
   </xsl:variable>
+
   <!-- by default, there is no scription on elements and text --> 
   <xsl:template match='*'      mode='scripting'/>
   <xsl:template match='text()' mode='scripting'/>
+
   <!-- the main definition of the link-filter: -->
   <!-- pipe all children through all templates in the link-filter mode -->
   <xsl:template name='link-filter'>
@@ -252,12 +255,9 @@
     <xsl:apply-templates select='exsl:node-set( $content )'
                          mode='link-filter'/>
   </xsl:template>
+
   <!-- blank link-filter rules -->
   <xsl:template match='style'
-                mode='link-filter'/>
-  <xsl:template match='script'
-                mode='link-filter'/>
-  <xsl:template match='script'
                 mode='link-filter'/>
   <xsl:template match='acis:script-onload'
                 mode='link-filter'/>
@@ -723,6 +723,7 @@
   <xsl:template match='a' mode='content-filter'>
     <xsl:apply-templates mode='content-filter'/>
   </xsl:template>
+
   <!-- the screens, used at the registration stage -->
   <xsl:template match='a[@screen]' mode='link-filter'>
     <xsl:variable name='screen' select='@screen'/>
@@ -746,6 +747,7 @@
       </xsl:otherwise>
     </xsl:choose>
   </xsl:template>
+
   <!-- building an email link -->
   <xsl:template match='a[@email]' mode='link-filter'>
     <xsl:variable name='address' select='@email'/>
@@ -776,6 +778,7 @@
       </span>
     </noscript>    
   </xsl:template>
+
   <!-- building an email link, mailto address  -->
   <xsl:template match='a[starts-with( @href, "mailto:" )]' mode='link-filter'>
     <xsl:variable name='address' select='substring-after( @href, ":" )'/>
