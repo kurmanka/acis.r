@@ -145,6 +145,11 @@ sub run_thread {
     # the child 
     logit "forked from $parent to run $func";
 
+    # Set a global flag.
+    # Checked for in home/bin/template/acis.fcgi.pl (bin/acis.fcgi)
+    $::acis_forked_child = 1;
+
+    # re-init sql helper
     undef $sql;
     $sql = $app -> sql_object;
     $sql->{'back'}=1;

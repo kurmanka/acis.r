@@ -13,18 +13,20 @@ if (open PID, ">$pidfile") {
   undef $pidfile;
 }
 
-# clean-up pid file after myself:
+# clean-up pid file after myself.  $::acis_forked_child is set in
+# ACIS::Web::Background at forking. Only the main (parent) process
+# should do the cleanup.
 END {  
-  if ($pidfile) { 
-    unlink $pidfile; 
-    undef $pidfile; 
+  if (not $::acis_forked_child and $pidfile) { 
     if ($acis) {
       $acis->log( "END. removing $pidfile" );
     }
+    unlink $pidfile; 
+    undef $pidfile; 
   } 
 }
 local $SIG{TERM} = sub {
-  if ($pidfile) { 
+  if (not $::acis_forked_child and $pidfile) { 
     if ($acis) {
       $acis->log( "TERM signal. removing $pidfile" );
     }
@@ -32,6 +34,8 @@ local $SIG{TERM} = sub {
     undef $pidfile; 
   }  
 };
+
+
 
 ## not sure why we need this
 umask 0000;
