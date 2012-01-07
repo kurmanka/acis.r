@@ -265,6 +265,7 @@ sub load_suggestions_into_contributions {
       debug "enough suggestions: $counter";
       last;
     }
+
     my $row    = $r->{'row'};
     my $reason = $row ->{'reason'};
     my $data   = $row ->{'data'};
@@ -272,6 +273,7 @@ sub load_suggestions_into_contributions {
     ## cardiff change: adding relevance
     my $relevance = $row -> {'relevance'};
     ## end cardiff change: adding relevance
+
     if( not defined $dsid ) { 
       warn "No dsid in a resource suggestion record!";
       next; 
@@ -282,6 +284,7 @@ sub load_suggestions_into_contributions {
     elsif ( $already_refused ->{$dsid} ) {
       next; 
     }
+
     ## schmorp
     #my $item = eval { thaw($data); };
     my $item = inflate($data);
@@ -290,6 +293,7 @@ sub load_suggestions_into_contributions {
       next;
     }
     ## /schmorp
+
     ## 4 september change
     $item ->{'role'} ||= $row ->{'role'};    
     ## cardiff change: adding relevance
@@ -297,8 +301,7 @@ sub load_suggestions_into_contributions {
       $item->{'relevance'}=$relevance;
     }
     ## end cardiff change: adding relevance
-    ##
-    ##
+
     ## should the item be preselected for the user or not?
     my $status;  
     if ( $reason =~ s/\-s(\d)$//g ) {  
@@ -322,12 +325,13 @@ sub load_suggestions_into_contributions {
       elsif ( $reason =~ m/exact/ ) { 
         $exact = 1; 
       }
+
       $list = $group -> {'list'} = [];
       $reasons -> {$reason} = $group;
       if ( $exact ) {
         ## add to the head of the list
         unshift @$result, $group;
-        $counter_exact++;
+        $group->{exact} = 1;
       } else {
         ## add to the tail of the list
         push @$result, $group;
@@ -335,15 +339,19 @@ sub load_suggestions_into_contributions {
     } 
     else {
       $list = $reasons->{$reason} ->{'list'};
-    }    
+    }
+
+    #debug "adding an item [$counter]: $dsid ($reason)";
+    if ($reasons->{$reason}{exact}) { $counter_exact++; }
     push @$list, $item;
+
     ## evcino: try to do without this
     $already_suggested -> {$dsid} = $reason;
   } 
   continue {
     $r -> next;
   }
-  debug "$counter items";
+  debug "$counter items, $counter_exact exact ones";
   debug "load_suggestions_into_contributions: exit";
   ## we are overwriting what was there, but that should be ok
   $contributions ->{'suggest'} = $result; 

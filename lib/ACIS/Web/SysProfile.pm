@@ -85,6 +85,7 @@ sub get_sysprof_values {
 
       $res -> {$pa} = $va;
       ###  XX UTF8 decoding?
+      $r->next;
     }
   }
   return $res;

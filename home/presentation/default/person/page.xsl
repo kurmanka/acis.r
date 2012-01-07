@@ -9,6 +9,17 @@
   <xsl:import href='../user/page.xsl'/>
   <xsl:variable name='current-screen-id'></xsl:variable>
 
+  <xsl:variable name='research-suggestions-number-text'>
+    <xsl:if test='$response-data/*[name()=$record-sid]/research-suggestions-total and 
+                  number($response-data/*[name()=$record-sid]/research-suggestions-total/text()) &gt; 0'>
+      <span class='notification-number'>
+        <xsl:value-of select='$response-data/*[name()=$record-sid]/research-suggestions-total'/>
+      </span>
+      <xsl:text>&#160;</xsl:text>
+    </xsl:if>
+  </xsl:variable>
+
+
   <xsl:template name='user-person-profile-menu'>
     <xsl:call-template name='link-filter'>
       <xsl:with-param name='content'>
@@ -57,6 +68,7 @@
       <xsl:text>&#160;</xsl:text>
       <a ref='@research' title='research profile' >research</a>
       <xsl:text>&#160;</xsl:text>
+      <xsl:copy-of select='$research-suggestions-number-text'/>
     </acis:hl>
 
     <!--[if-config(citations-profile)]

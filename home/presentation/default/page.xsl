@@ -239,6 +239,7 @@
   <!-- by default, the additional-page-navigation and the content-bottom-navigation are empty -->
   <xsl:template name='additional-page-navigation'/>
   <xsl:template name='content-bottom-navigation'/>
+
   <!-- I don't understand this --> 
   <xsl:variable name='current-screen-id' select='""'/>
   <xsl:variable name='current-screen-id-real'>
@@ -258,32 +259,31 @@
   </xsl:template>
 
   <!-- blank link-filter rules -->
-  <xsl:template match='style'
-                mode='link-filter'/>
+  <xsl:template match='style'  mode='link-filter'/>
   <xsl:template match='acis:script-onload'
-                mode='link-filter'/>
+                               mode='link-filter'/>
+
   <!-- link filter copies all attributes -->
-  <xsl:template match='@*|*'
-                mode='link-filter'>
+  <xsl:template match='@*|*'   mode='link-filter'>
     <xsl:copy>
       <xsl:copy-of select='@*'/>
       <xsl:apply-templates mode='link-filter'/>
     </xsl:copy>
   </xsl:template>
+
   <!-- make acis:comments a comment in the output -->
   <!-- there are such comments in research/autosuggest-chunk -->  
-  <xsl:template match='acis:comment'
-                mode='link-filter'>
+  <xsl:template match='acis:comment' mode='link-filter'>
     <xsl:comment>
-      <xsl:apply-templates
-          mode='link-filter'/>
+      <xsl:apply-templates mode='link-filter'/>
     </xsl:comment>
   </xsl:template>
+
   <!-- pass the acis hint through the link filter -->
-  <xsl:template match='acis:hint'
-                mode='link-filter'>
+  <xsl:template match='acis:hint' mode='link-filter'>
     <xsl:apply-templates mode='link-filter'/>
   </xsl:template>
+
   <!-- the link-filter rules for the fieldset elements -->
   <!-- in html: or null namespace, not when in acis: namespace -->
   <xsl:template match='input|select|textarea|select|textarea|input'
@@ -378,6 +378,7 @@
       <xsl:call-template name='input-hint'/>
     </xsl:if>    
   </xsl:template>  
+
   <!-- the link-filter for the form --> 
   <xsl:template match='acis:form' mode='link-filter'>
     <xsl:text>
@@ -529,9 +530,9 @@
       <xsl:apply-templates mode='link-filter'/>
     </xsl:element>
   </xsl:template>
+
   <!-- the link-filter for links with href -->
-  <xsl:template match='a[@href]' 
-                mode='link-filter'>
+  <xsl:template match='a[@href]' mode='link-filter'>
     <xsl:copy>
       <xsl:copy-of select='@*'/>
       <!-- <xsl:copy-of select='@href|@tabindex|@class|@title|@id|@name|@style|@onclick|@accesskey'/> -->
@@ -539,7 +540,6 @@
       <xsl:apply-templates mode='link-filter'/>
     </xsl:copy>
   </xsl:template>
-
 
 
   <!-- the link-filter for links with ref -->
@@ -670,7 +670,7 @@
       </xsl:choose>
     </xsl:variable>
 
-    <!-- start building the catual link -->
+    <!-- start building the actual link -->
     <a>
       <xsl:copy-of select='@title|@tabindex|@onclick'/>
 
@@ -715,14 +715,23 @@
       <xsl:apply-templates mode='link-filter'/>
     </a>
   </xsl:template>
+
   <xsl:template match='*' mode='content-filter'>
     <xsl:copy>
       <xsl:copy-of select='@*'/>
       <xsl:apply-templates mode='content-filter'/>
     </xsl:copy>
   </xsl:template>
+
   <xsl:template match='a' mode='content-filter'>
     <xsl:apply-templates mode='content-filter'/>
+  </xsl:template>
+
+  <xsl:template match='span' mode='content-filter'>
+    <xsl:copy>
+      <xsl:copy-of select='@*'/>
+      <xsl:apply-templates mode='content-filter'/>
+    </xsl:copy>
   </xsl:template>
 
   <!-- the screens, used at the registration stage -->
@@ -857,24 +866,21 @@
   <xsl:template match='acis:onsubmit|acis:check|acis:hint'
                 mode='null'/>
 
-  <xsl:template match='acis:onsubmit|acis:check'
-                mode='link-filter'/>
+  <xsl:template match='acis:onsubmit|acis:check' mode='link-filter'/>
+
   <xsl:template name='phrase'>
     <xsl:param name='ref'/>
     <xsl:variable name='cont'>
       <acis:phrase ref='{$ref}'/>
     </xsl:variable>
-    <xsl:apply-templates select='exsl:node-set( $cont )'
-                         mode='link-filter'/>
+    <xsl:apply-templates select='exsl:node-set( $cont )' mode='link-filter'/>
   </xsl:template>
 
-  <xsl:template match='acis:phrase'
-                mode='link-filter'>
+  <xsl:template match='acis:phrase' mode='link-filter'>
     <xsl:apply-templates mode='link-filter'/>
   </xsl:template>
 
-  <xsl:template match='acis:phrase[@ref]'
-                mode='link-filter'>
+  <xsl:template match='acis:phrase[@ref]' mode='link-filter'>
     <xsl:variable name='ref' select='@ref'/>
     <xsl:choose>
       <xsl:when test='$phrase-local/*[@id=$ref]'>
@@ -892,8 +898,7 @@
     </xsl:choose>
   </xsl:template>
 
-  <xsl:template match='acis:script-onload'
-                mode='scripting'>
+  <xsl:template match='acis:script-onload' mode='scripting'>
     <xsl:copy-of select='text()'/>
   </xsl:template>
 
@@ -1043,4 +1048,5 @@ function form_check_</xsl:text>
       </xsl:if>
     </xsl:if>    
   </xsl:template>
+
 </xsl:stylesheet>

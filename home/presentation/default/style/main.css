@@ -273,8 +273,18 @@ p.menu a {
 span.menu a:hover,
 p.menu a:hover { }
 
+p.menu span.notification-number {
+ font-weight: normal;
+ font-size: 80%;
+ color: red;
+ display: inline-block;
+ padding: 2px;
+}
 
-
+p.menu .here span.notification-number {
+ color: white;
+ background: red;
+}
 
 /*  REGISTRATION PROCESS STEPS */
 

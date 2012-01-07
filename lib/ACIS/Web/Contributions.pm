@@ -136,8 +136,20 @@ sub prepare {
   my $record  = $session -> current_record;
 
   return if not $record;
-  my $id      = $record  -> {'id'}; 
+  my $id      = $record ->{'id'}; 
+  my $sid     = $record ->{sid};
   assert( $id );
+  
+  # suggestion counts: get from sysprof, put into session
+  if ($sid) {
+      my $counts = get_sysprof_values( $sid, 'research-suggestions-' );
+      my $count_total = $counts->{'research-suggestions-total'};
+      my $count_exact = $counts->{'research-suggestions-exact'};
+      debug "got suggestion counts: total: $count_total, exact: $count_exact";
+      $session->{$sid}{"research-suggestions-total"} = $count_total;
+      $session->{$sid}{"research-suggestions-exact"} = $count_exact;
+      $session->make_sticky( $sid );
+  }
 
   #
   # process the chunk information
