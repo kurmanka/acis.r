@@ -134,6 +134,8 @@ sub prepare {
   my $session = $app -> session;
   my $vars    = $app -> variables;
   my $record  = $session -> current_record;
+
+  return if not $record;
   my $id      = $record  -> {'id'}; 
   assert( $id );
 
