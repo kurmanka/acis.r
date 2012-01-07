@@ -435,7 +435,7 @@ sub settings_prepare {
   my $session = $app -> session;
   my $mode    = $app -> get_auto_logon_mode;
 
-  my $login = $session -> object -> {owner} {login};
+  my $login = $session -> userdata_owner-> {login};
   $app -> set_form_value( "email", $login );
 
   $vars -> {'auto-log-mode'} = $mode;
@@ -462,8 +462,7 @@ sub settings {
   my $input   = $app -> form_input;
   my $session = $app -> session;
   my $record  = $session -> current_record;
-  my $owner   = $session -> object -> {owner};
-
+  my $owner   = $session -> userdata_owner;
 
   my $OK  = 1;
 
