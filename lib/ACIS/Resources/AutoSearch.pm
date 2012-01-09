@@ -443,12 +443,10 @@ sub do_auto_search {
   }
   
   # save suggestions counts
-  if (defined $context->{'suggestions-count-total'}) {
-    put_sysprof_value( $sid, "research-suggestions-total", $context->{'suggestions-count-total'} );
-  }
-  if (defined $context->{'suggestions-count-exact'}) {
-    put_sysprof_value( $sid, "research-suggestions-exact", $context->{'suggestions-count-exact'} );
-  }
+  update_suggestions_counts_sysprof( $sid, 
+                                     $context->{'suggestions-count-total'}, 
+                                     $context->{'suggestions-count-exact'});
+
 }
 
 

@@ -140,15 +140,20 @@ sub prepare {
   my $sid     = $record ->{sid};
   assert( $id );
   
-  # suggestion counts: get from sysprof, put into session
+  # suggestions counts: get from sysprof, put into session (but only do that once)
   if ($sid) {
-      my $counts = get_sysprof_values( $sid, 'research-suggestions-' );
-      my $count_total = $counts->{'research-suggestions-total'};
-      my $count_exact = $counts->{'research-suggestions-exact'};
-      debug "got suggestion counts: total: $count_total, exact: $count_exact";
-      $session->{$sid}{"research-suggestions-total"} = $count_total;
-      $session->{$sid}{"research-suggestions-exact"} = $count_exact;
-      $session->make_sticky( $sid );
+      if ( not $session->{$sid} 
+           or not $session->{$sid}{"research-suggestions-total"} ) {
+          my $counts = get_sysprof_values( $sid, 'research-suggestions-' );
+          my $count_total = $counts->{'research-suggestions-total'};
+          my $count_exact = $counts->{'research-suggestions-exact'};
+          debug "got suggestions counts: total: $count_total, exact: $count_exact";
+          $session->{$sid}{"research-suggestions-total"} = $count_total;
+          $session->{$sid}{"research-suggestions-exact"} = $count_exact;
+
+          # make the above always available to the presenter:
+          $session->make_sticky( $sid );
+      }
   }
 
   #
@@ -385,6 +390,8 @@ sub clear_some_suggestions {
   
   my $suggest = $contributions -> {suggest};
   my $count_total = 0;
+  my $removed_total = 0;
+  my $removed_exact = 0;
   my @clean_suggest = ();
 
   foreach my $key ( @$suggest ) {
@@ -395,6 +402,8 @@ sub clear_some_suggestions {
       my $id = $item ->{'id'};
       if ( exists $hash_to_clear ->{$id} ) {
         undef $item;
+        $removed_total++;
+        if ($key->{exact}) { $removed_exact++; }
       } else {
         $count++;
         $count_total++;
@@ -408,6 +417,11 @@ sub clear_some_suggestions {
   }
 
   clear_undefined $suggest;
+
+  # suggestions counts: update the counters after clearing some suggestions
+  $contributions->{'suggestions-count-total'} -= $removed_total;
+  $contributions->{'suggestions-count-exact'} -= $removed_exact;
+
   return $count_total;
 }
 
@@ -1066,7 +1080,9 @@ sub process {
 
   $contributions -> {actions} = $statistics;
 
+  # clear from $contributions->{suggest}
   my $sug_count = clear_some_suggestions( $contributions, $clear_from_suggestions );
+  # clear from the rp_suggestions table 
   clear_from_autosearch_suggestions($app, $psid, $clear_from_suggestions_sid);
 
 
@@ -1851,6 +1867,15 @@ sub show_whats_suggested {
 
   my $suggestions = load_suggestions_into_contributions( $app, $psid, $contributions );
   my $groups = scalar @$suggestions;
+
+  # suggestions counts: update the counter
+  if ( exists $contributions->{'suggestions-count-total'} ) {
+      $session ->{$psid} {'research-suggestions-total'} = $contributions->{'suggestions-count-total'};
+  }
+  if ( exists $contributions->{'suggestions-count-exact'} ) {
+      $session ->{$psid} {'research-suggestions-exact'} = $contributions->{'suggestions-count-exact'};
+  }
+
   debug "found groups: $groups";
   debug "show_whats_suggested: exit";
 }

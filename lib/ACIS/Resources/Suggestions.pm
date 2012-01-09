@@ -15,6 +15,7 @@ use vars qw(@EXPORT);
               clear_from_autosearch_suggestions
               send_suggestions_to_learning_daemon
               load_and_unbundle_suggestions 
+              update_suggestions_counts_sysprof
 );
 
 ## schmorp
@@ -27,6 +28,7 @@ use ACIS::Web::Background qw(logit);
 use ACIS::Resources::Learn qw(form_learner);
 use Carp;
 
+use ACIS::Web::SysProfile qw(put_sysprof_value);
 
 my $MAX_SUGGESTIONS_LIMIT = 1000;
 
@@ -415,6 +417,33 @@ sub send_suggestions_to_learning_daemon {
 }
 
 
+# update suggestions counts in sysprof table
+sub update_suggestions_counts_sysprof {
+  my $psid = shift || die;
+  my $count_total = shift; # if not supplied, would count by itself
+  my $count_exact = shift; # if not supplied, would count by itself
+
+  my $acis = $ACIS::Web::ACIS;
+  my $sql = $acis->sql_object;
+  if (not defined $count_total) {
+    # find out
+    $sql->prepare( "select count(*) as c from rp_suggestions where psid=?" );
+    my $r = $sql->execute( $psid );
+    $count_total = $r->{row}{c};
+  }
+  if (not defined $count_exact) {
+    # find out
+    $sql->prepare( 'select count(*) as c from rp_suggestions where psid=? and reason like "%exact%" ' );
+    my $r = $sql->execute( $psid );
+    $count_exact = $r->{row}{c};
+  }
+  if (defined $count_total) {
+    put_sysprof_value( $psid, "research-suggestions-total", $count_total );
+  }
+  if (defined $count_exact) {
+    put_sysprof_value( $psid, "research-suggestions-exact", $count_exact );
+  }
+}
 
 
 sub clear_from_autosearch_suggestions {
@@ -432,6 +461,10 @@ sub clear_from_autosearch_suggestions {
   warn if $sql->error;
   debug "sql error: " . $sql->error 
     if $sql->error;
+
+  # update suggestions counts
+  update_suggestions_counts_sysprof( $psid );
+
   debug "clear_from_autosearch_suggestions: finished";
 }
 
