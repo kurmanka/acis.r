@@ -935,7 +935,7 @@ sub process_form_data {
       my ( $prefix, $place ) = split ':', $to;
 
       if ( $prefix eq 'owner' ) {
-        $data = $self -> session -> object -> {owner}; 
+        $data = $self -> session -> userdata_owner; 
       
       } elsif ( $prefix eq 'record' ) { 
         $data = $self -> session -> current_record; ### XX ACIS-specific

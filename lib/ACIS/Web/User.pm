@@ -241,7 +241,7 @@ sub set_user_login {
   my $new  = shift;
   
   my $session = $app -> session;
-  my $owner   = $session -> object -> {owner};
+  my $owner   = $session -> userdata_owner;
 
   my $old      = $owner -> {login};
   my $original = $owner -> {'old-login'};

@@ -147,7 +147,7 @@ sub prepare {
           my $counts = get_sysprof_values( $sid, 'research-suggestions-' );
           my $count_total = $counts->{'research-suggestions-total'};
           my $count_exact = $counts->{'research-suggestions-exact'};
-          debug "got suggestions counts: total: $count_total, exact: $count_exact";
+          debug "got suggestions counts for $sid: total: $count_total, exact: $count_exact";
           $session->{$sid}{"research-suggestions-total"} = $count_total;
           $session->{$sid}{"research-suggestions-exact"} = $count_exact;
 
