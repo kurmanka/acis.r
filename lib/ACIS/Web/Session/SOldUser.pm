@@ -176,10 +176,27 @@ sub object_set { shift->set_userdata(@_); }
 sub set_userdata {
     my $self = shift;
     my $ud   = shift;
-    my $ud_file = shift ;
+    my $ud_file = shift;
+
+    if (not defined $ud) {
+        # no userdata
+        debug "->set_userdata(): undef userdata";
+        foreach (qw( .userdata 
+                     .userdata.owner
+                     .userdata.owner.modified
+                     .userdata.record_list 
+                     .userdata.saveto 
+                     __.userdata.readfrom 
+                     __.userdata.tempfile
+                     .userdata.current_record
+                     .userdata.current_record_no )) {
+            delete $self->{$_};
+        }
+        return;
+    }
+
     my $owner   = $ud->{owner};
     my $records = $ud->{records};
-
     debug "->set_userdata(): owner $owner + ", scalar @$records, " record(s)";
     
     $self->{'.userdata.owner'} = $owner;

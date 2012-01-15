@@ -25,10 +25,6 @@ package ACIS::Web::User; ### -*-perl-*-
 #  along with this program; if not, write to the Free Software
 #  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 #
-#  ---
-#  $Id$
-#  ---
-
 
 use strict;
 use warnings;
@@ -365,7 +361,7 @@ sub remove_account {
     }
   }
     
-  $session -> object_set( undef );
+  $session -> set_userdata( undef );
   $app -> send_mail( 'email/account-deleted.xsl' );
 
   $app -> sevent ( -class  => 'account', 
