@@ -40,6 +40,7 @@ use Carp::Assert;
 use Web::App::Common;
 
 use ACIS::Data::DumpXML qw( &dump_xml );
+use ACIS::Web::Person;
 
 
 my $initial_sid;
