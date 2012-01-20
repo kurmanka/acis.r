@@ -101,7 +101,8 @@
           </xsl:call-template>
         </xsl:when>
         <xsl:when test='$request-screen = "new-user/additional"
-                        or $request-screen = "name"'>
+                        or $request-screen = "name"
+                        or $request-screen = "new-user/really"'>
           <xsl:call-template name='registration-step-number-x'>
             <xsl:with-param name='x' select='"2"'/>
           </xsl:call-template>

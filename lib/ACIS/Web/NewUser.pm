@@ -317,6 +317,8 @@ sub additional_process {
   require ACIS::Web::Person;
   ACIS::Web::Person::compile_name_variations( $app, $record );
 
+  # check 
+  my $similar_name_profiles = ACIS::Web::Person::check_name_variations_for_uniqueness( $app, $record );
 
   my $reg_date = $session -> {'registration-date'};
   my $id  = make_person_handle ( $app, $record, $reg_date );
@@ -332,11 +334,54 @@ sub additional_process {
   ###  assign temporary short id -- use session id for that
   $record -> {sid} = $session -> id;
 
-  $app -> redirect_to_screen( 'affiliations' );
+  if ($similar_name_profiles) {
+      $session->{"similar-name-profiles"} = $similar_name_profiles;
+      $app->redirect_to_screen( "new-user/really" );
+  } else {
+      $app -> redirect_to_screen( 'affiliations' );
+  }
 
   $app -> userlog ( "initial: additional processed, moving towards affilations" );
     
 }
+
+
+### check if a person with a similar name is already registered
+
+sub really_prepare {
+    my $app = shift;
+    
+    my $sample = [ { name => 'Vladimir Lenin', url => "http://lenin.org" } ];
+    #$app->variables->{'similar-name-profiles'} = $sample;
+
+    my $session = $app->session;
+    if ($session->{'similar-name-profiles'}) {
+        $app->variables->{'similar-name-profiles'} = $session->{'similar-name-profiles'};
+    }
+}
+
+sub really_process {
+    my $app = shift;
+    my $input = $app->form_input;
+    
+    if ($input->{continue}) {
+        $app -> redirect_to_screen( 'affiliations' );
+
+    } elsif ($input->{cancel}) {
+        $app -> userlog ( "new-user/really: user chose to cancel registration" );
+        # XXX kill the session?
+        # XXX redirect to home
+        $app -> session -> close_without_saving( $app );
+        $app -> clear_session_cookie;
+        undef $app -> request -> {'session-id'};
+        undef $app -> {session};
+        $app -> redirect_to_screen( '' );
+
+    } else {        
+    }
+    
+}
+
 
 
 

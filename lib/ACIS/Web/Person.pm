@@ -25,10 +25,7 @@ package ACIS::Web::Person;  ### -*-perl-*-
 #  You should have received a copy of the GNU General Public License
 #  along with this program; if not, write to the Free Software
 #  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
-#
-#  ---
-#  $Id$
-#  ---
+
 
 use strict;
 
@@ -73,6 +70,65 @@ sub compile_name_variations {
     $name -> {'last-change-date'} = time;
     $app -> userlog( "name data changed: variations" );
   }
+}
+
+
+sub check_name_variations_for_uniqueness {
+    my $app = shift;
+    my $record = shift || die;
+
+    debug "check_name_variations_for_uniqueness(): start";
+    my $names = $record ->{name}{variations};
+    my $profiles = [];
+    foreach ( @$names ) {
+        debug "search for $_";
+        push @$profiles, search_profiles_by_name( $app, $_ );
+    }
+
+    # remove duplicates, if any 
+    my $ids = {};
+    foreach (@$profiles) {
+        if ($ids->{$_->{id}}) {
+            undef $_;
+        } else {
+            $ids->{$_->{id}} = 1;
+        }
+    }
+    clear_undefined $profiles;
+
+    if (not scalar @$profiles) { 
+        debug "check_name_variations_for_uniqueness(): end empty", 
+        return undef; 
+    }
+    debug "check_name_variations_for_uniqueness(): end with ", 
+       scalar @$profiles,
+       " items found";
+    return $profiles;
+}
+
+sub search_profiles_by_name {
+    my $app = shift;
+    my $name = shift || die;
+
+    my $res = [];
+    my $sql = $app->sql_object;
+
+    $sql->prepare_cached( "select * from names left join records using (shortid) where names.name=?" );
+    my $d = $sql->execute( $name );
+
+    while ($d and $d->{row}) {
+        my $row = $d->{row};
+        my $i = { url  => $row->{profile_url},
+                  name => $row->{namefull},
+                  id   => $row->{id}          # id is not necessary, i guess, but may be useful
+        };
+        push @$res, $i;
+
+    } continue {
+        $d->next;
+    }
+
+    return @$res;
 }
 
 
