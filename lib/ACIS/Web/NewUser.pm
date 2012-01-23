@@ -306,9 +306,15 @@ sub additional_process {
   $record -> {name} {'additional-variations'} = 
     [ split ( /\s*[\n\r]+/, $app -> get_form_value('name-variations') ) ];
 
+  my $varcount = scalar @{ $record->{name}{'additional-variations'} };
+  if ($varcount < 4) {
+      #$app -> form_invalid_value( 'name-variations' );
+      $app -> error( 'need-4-variations' );
+      return;
+  }
+
 
   require ACIS::Web::Person;
-
   ACIS::Web::Person::compile_name_variations( $app, $record );
 
 

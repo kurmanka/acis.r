@@ -44,7 +44,7 @@
                   Your name may appear in different ways in bibliographies.  We need to
                   know those ways to recognize your works in the bibliographic
                   database.  Please review and, if necessary, amend the list below.  Put
-                  one variation per line:
+                  one variation per line, <b>at least four items</b>:
                 </label>
               <br />
               

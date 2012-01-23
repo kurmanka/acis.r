@@ -736,9 +736,7 @@
 
     <param name='name-latin'      if-not-empty='1' type='latinname'
            place='record:name/latin' />
-    <param name='name-variations' required='yes'
-           maxlen='2000'
-           />
+    <param name='name-variations' required='yes'   maxlen='2000' />
 
     <call function='load_session' />
 

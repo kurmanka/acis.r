@@ -86,4 +86,11 @@
   <acis:error id='auto-search-start-failed'>
     <xsl:text>An attempt to start automatic search for your works failed.</xsl:text>
   </acis:error>
+  <acis:error id='need-4-variations'>
+    You need to have at least four name variations. By default, the
+    system provides four. Amend those and add more, if necessary. We
+    need all possible ways your name may appear in bibliographies and
+    citations.
+  </acis:error>
+
 </acis:errors>
