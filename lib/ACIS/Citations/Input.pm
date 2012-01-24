@@ -10,6 +10,7 @@ my $sql;
 my $adb;
 
 use Digest::MD5;
+use Encode;
 use ACIS::Citations::Utils qw( make_citation_nstring );
 sub DEBUG() { 1 }
 
@@ -111,7 +112,8 @@ sub process_record {
       @moretrgdocids = ();
       $prev_ostring = 
         my $ost = $_->{ostring};
-      my $md5 = Digest::MD5::md5_base64( $ost );
+      my $ost_bytes = encode( "utf8", $ost ); 
+      my $md5 = Digest::MD5::md5_base64( $ost_bytes );
       my $clid = "$srcdocsid-$md5";
       delete $index->{$clid};
       $cit -> {clid}     = $clid;
