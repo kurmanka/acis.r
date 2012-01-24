@@ -84,8 +84,19 @@ sub prepare() {
     $session -> {$id} {'citations-checked-and-cleaned'} = 1;
   }
 
-  $mat = $session ->{simmatrix} ||= load_similarity_matrix( $record ); 
-  $mat && $mat -> upgrade( $acis, $record ); 
+  # check {simmatrix} in the session; has it been loaded for this record? or for a different one?
+  if (    $session->{simmatrix_for_sid}
+      and $session->{simmatrix_for_sid} ne $sid) {
+    delete $session->{simmatrix};
+    delete $session->{simmatrix_for_sid};
+  }
+
+  if (not $session->{simmatrix}) {
+    $session->{simmatrix} = load_similarity_matrix( $record );
+    $session->{simmatrix} -> upgrade( $acis, $record ); 
+    $session->{simmatrix_for_sid} = $sid;
+  }
+  $mat = $session ->{simmatrix};
 
   $dsid = $params->{dsid} || $acis->{request}{subscreen};
   if ( $dsid ) {
