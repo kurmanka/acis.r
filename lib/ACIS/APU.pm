@@ -184,6 +184,59 @@ sub run_apu_by_queue {
   }
 }
 
+
+sub run_apu_for_item {
+  my $qitem = shift;
+
+  my %para  = @_;
+  $interactive  = $para{-interactive};
+  ## allows to implement only one type of search (research/citations)
+  my $only_do   = $para{-only_do} || ''; 
+  ## mail the user?
+  my $mail_user = $para{-mail_user} || 0;
+
+  $ACIS || die;
+  my $sql = $ACIS->sql_object || die;
+
+
+  my $login = get_login_from_queue_item( $sql, $qitem );
+  if ( not $login ) {
+    set_item_processing_result( $sql, $qitem, 'FAIL', 'not found' );
+    next;
+  }
+  my $rid = $qitem; # this we assume
+  if ( $rid ne $login ) { 
+    logit "about to process: $rid ($login)";
+  } else {
+    logit "about to process: $login";
+  }
+  
+  require ACIS::Web::Admin;
+  my $res;
+  my $error;
+  eval {
+    ##  get hands on the userdata (if possible),
+    ##  create a session and then do the work      
+    ##  XXX $qitem is not always a record identifier, but
+    ##  offline_userdata_service expects an indentifier if anything on
+    ##  4th parameter position
+    ## evcino: the remaining parameters are passed to the function in the 3rd place, add mail_user
+    $res = ACIS::Web::Admin::offline_userdata_service( $ACIS, $login, 'ACIS::APU::record_apu', $rid, 1, $mail_user, $only_do) || 'FAIL';
+    ## 
+  };
+  if ($@) { 
+    $error = $@; 
+    $res   = "FAIL"; 
+  }    
+  logit "apu for $login/$rid result: $res";
+  if ( $error ) {
+    logit "error from offline_userdata_service: '$error'";
+  }    
+  set_item_processing_result( $sql, $rid, $res, $error );
+
+}
+
+
 ## fixme: this should not be down here
 use ACIS::Web::SysProfile;
 require ACIS::APU::RP;
