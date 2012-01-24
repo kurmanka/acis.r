@@ -35,6 +35,8 @@ use Carp::Assert;
 use Web::App::Common qw( debug );
 use ACIS::Data::DumpXML qw(dump_xml);
 
+use ACIS::Web::Person;
+
 
 
 sub login {
@@ -106,8 +108,6 @@ sub name_screen_init {
 }
 
 
-use ACIS::Web::Person;
-
 
 sub name_screen_process1 {
   my $app = shift;
@@ -138,15 +138,21 @@ sub name_screen_process2 {
   
   debug "running personal data screen";
   
-  my $variations = $app -> get_form_value ('name-variations');
-  $variations =~ s/ +/ /g;
-  $variations = [ split /\s*[\n\r]+/, $variations ];
-  
   my $session = $app -> session;
   my $record  = $session -> current_record;
   my $name    = $record -> {name};
 
-  $name -> {'additional-variations'} = $variations;
+  my $variations = ACIS::Web::Person::parse_name_variations( $app->get_form_value('name-variations') );
+  $record -> {name} {'additional-variations'} = $variations;
+  $app->set_form_value( 'name-variations', join( "\n", @$variations ));
+
+  my $varcount = scalar @$variations;
+  if ($varcount < 4) {
+      $app -> error( 'need-4-variations' );
+      $app -> clear_process_queue;
+      return;
+  }
+
   ACIS::Web::Person::compile_name_variations( $app, $record );
 
   ###  check if anything really changed

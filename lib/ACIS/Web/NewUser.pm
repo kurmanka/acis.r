@@ -304,18 +304,17 @@ sub additional_process {
   my $record = $session -> current_record;
 
   assert( defined $app -> get_form_value('name-variations') );
-  $record -> {name} {'additional-variations'} = 
-    [ split ( /\s*[\n\r]+/, $app -> get_form_value('name-variations') ) ];
+  my $variations = ACIS::Web::Person::parse_name_variations( $app->get_form_value('name-variations') );
+  $record -> {name} {'additional-variations'} = $variations;
+  $app->set_form_value( 'name-variations', join( "\n", @$variations ));
 
-  my $varcount = scalar @{ $record->{name}{'additional-variations'} };
+  my $varcount = scalar @$variations;
   if ($varcount < 4) {
-      #$app -> form_invalid_value( 'name-variations' );
       $app -> error( 'need-4-variations' );
       return;
   }
 
-
-  require ACIS::Web::Person;
+  # post-process name variations
   ACIS::Web::Person::compile_name_variations( $app, $record );
 
   # check 
@@ -339,7 +338,7 @@ sub additional_process {
       $session->{"similar-name-profiles"} = $similar_name_profiles;
       $app->redirect_to_screen( "new-user/really" );
   } else {
-      $app -> redirect_to_screen( 'affiliations' );
+      $app->redirect_to_screen( 'affiliations' );
   }
 
   $app -> userlog ( "initial: additional processed, moving towards affilations" );

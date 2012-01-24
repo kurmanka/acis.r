@@ -34,6 +34,22 @@ use Carp::Assert;
 use Web::App::Common qw( &date_now &clear_undefined debug );
 use ACIS::Web::HumanNames qw(normalize_and_filter_names);
 
+sub parse_name_variations {
+    my $string = shift;
+    $string =~ s/[ \t]+/ /g;
+    my $list = [ split ( /\s*[\n\r]+/, $string ) ];
+    my $hash;
+    foreach ( @$list ) {
+        # not a single word character? 
+        if ($_ !~ m/\w/ ) { undef $_; }
+        # a repeated value?
+        if ($hash->{lc $_}) {  undef $_; }
+        $hash->{lc $_}++;
+    }
+    clear_undefined $list;
+    return $list;
+}
+
 sub compile_name_variations {
   my $app    = shift;
   my $record = shift;
