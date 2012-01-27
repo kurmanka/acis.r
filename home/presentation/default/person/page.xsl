@@ -19,6 +19,16 @@
     </xsl:if>
   </xsl:variable>
 
+  <xsl:variable name='citation-suggestions-number-text'>
+    <xsl:if test='$response-data/*[name()=$record-sid]/citation-suggestions-new-total and 
+                  number($response-data/*[name()=$record-sid]/citation-suggestions-new-total/text()) &gt; 0'>
+      <span class='notification-number'>
+        <xsl:value-of select='$response-data/*[name()=$record-sid]/citation-suggestions-new-total'/>
+      </span>
+      <xsl:text>&#160;</xsl:text>
+    </xsl:if>
+  </xsl:variable>
+
 
   <xsl:template name='user-person-profile-menu'>
     <xsl:call-template name='link-filter'>
@@ -77,6 +87,7 @@
       <xsl:text>&#160;</xsl:text>
       <a ref='@citations' title='citation profile' >citations</a>
       <xsl:text>&#160;</xsl:text>
+      <xsl:copy-of select='$citation-suggestions-number-text'/>
     </acis:hl>
     [end-if]-->
 

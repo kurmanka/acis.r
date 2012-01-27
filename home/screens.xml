@@ -5,6 +5,7 @@
 <!-- cardiff -->
  <set var='config-params-for-presenters' 
       value=''/>
+
 <!--  common system screens -->
  <screen id='index' process-on-POST='1'>
    <use module='ACIS::Web::Site'/>
@@ -18,17 +19,21 @@
    <presentation type='xslt'
                  filename='index.xsl' />
  </screen>
+
  <!--  user screens -->
   <screen id='welcome'>
     <use module='ACIS::Web::User'/>
     <use module='ACIS::Web::Contributions' />
+    <use module='ACIS::Web::Citations' />
     <call function='load_session_or_authenticate' />
     <call function='ACIS::Web::User::check_session_type' />
     <call function='ACIS::Web::Contributions::prepare'/>
     <call function='ACIS::Web::User::welcome' />
+    <call function='ACIS::Web::Citations::prepare_suggestion_count'/>
     <presentation type='xslt'
                   filename='user/welcome.xsl' />
   </screen>
+
 <!--  this screen should check the requested short-id, check what type of -->
 <!--  record that record is, and choose the presenter based on the type. -->
   <screen id='menu'>
@@ -38,6 +43,7 @@
     <presentation type='xslt'
                   filename='user/welcome.xsl' /> 
   </screen>
+
   <screen id='records-menu'>
     <presentation type='xslt'
                   filename='user/records-menu.xsl'/>
@@ -604,6 +610,7 @@
     <call function='ACIS::Web::Citations::prepare'/>
     <process>
       <call function='ACIS::Web::Citations::process_potential'/>
+      <call function='ACIS::Web::Citations::update_suggestion_count'/>
     </process>
     <call function='ACIS::Web::Citations::prepare_potential'/>
     <presentation type='xslt' filename='citations/potential.xsl' />
@@ -615,6 +622,7 @@
     <call function='ACIS::Web::Citations::prepare'/>
     <process>
       <call function='ACIS::Web::Citations::process_identified'/>
+      <call function='ACIS::Web::Citations::update_suggestion_count'/>
     </process>
     <call function='ACIS::Web::Citations::prepare_identified'/>
     <presentation type='xslt' filename='citations/identified.xsl' />
@@ -634,6 +642,7 @@
     <call function='ACIS::Web::Citations::prepare'/>
     <process>
       <call function='ACIS::Web::Citations::process_autosug'/>
+      <call function='ACIS::Web::Citations::update_suggestion_count'/>
     </process>
     <call function='ACIS::Web::Citations::prepare_autosug'/>
     <presentation type='xslt' filename='citations/potential.xsl' />
@@ -645,6 +654,7 @@
     <call function='ACIS::Web::Citations::prepare'/>
     <process>
       <call function='ACIS::Web::Citations::process_refused'/>
+      <call function='ACIS::Web::Citations::update_suggestion_count'/>
     </process>
     <call function='ACIS::Web::Citations::prepare_refused'/>
     <presentation type='xslt' filename='citations/refused.xsl' />

@@ -145,6 +145,7 @@ sub DESTROY {
 }
 
 
+
 # how much interestingness do new suggestions represent
 sub _calculate_totals {
   my $self   = shift;
@@ -362,7 +363,9 @@ sub remove_citation {
   my $self = shift || die;
   my $cit  = shift || die; 
 
+
   die if not $acis;
+
   die if not $rec;
   my $psid = $self->{psid} || die;
   my $sql  = $acis->sql_object() || die;

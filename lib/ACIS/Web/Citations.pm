@@ -6,6 +6,7 @@ use Carp qw( confess );
 use Carp::Assert;
 
 use Web::App::Common;
+use ACIS::Web::SysProfile;
 
 use ACIS::Citations::Utils;
 use ACIS::Citations::Suggestions qw( store_cit_sug add_cit_old_sug );
@@ -93,10 +94,10 @@ sub prepare() {
 
   if (not $session->{simmatrix}) {
     $session->{simmatrix} = load_similarity_matrix( $record );
-    $session->{simmatrix} -> upgrade( $acis, $record ); 
     $session->{simmatrix_for_sid} = $sid;
   }
   $mat = $session ->{simmatrix};
+  $mat -> upgrade( $acis, $record ); 
 
   $dsid = $params->{dsid} || $acis->{request}{subscreen};
   if ( $dsid ) {
@@ -104,6 +105,41 @@ sub prepare() {
   }
 }
 
+
+sub prepare_suggestion_count {
+  my $app = shift;
+  my $session = $app->session;
+  my $sid = $session->current_record->{sid};
+
+  # suggestions counts: get from sysprof, put into session (but only do that once)
+  if ($sid) {
+      if ( not $session->{$sid} 
+           or not $session->{$sid}{"citation-suggestions-new-total"} ) {
+          my $count = get_sysprof_value( $sid, 'citation-suggestions-new-total' );
+          debug "got cit suggestions count for $sid: $count";
+          $session->{$sid}{"citation-suggestions-new-total"} = $count;
+          # make the above always available to the presenter:
+          $session->make_sticky( $sid );
+      }
+  }
+}
+
+
+sub update_suggestion_count {
+  my $app = shift;
+
+  # suggestions counts: get from simmatrix, put into session
+  if ($sid and $mat and $session) {
+    my $old = $session ->{$sid}{'citation-suggestions-new-total'};
+    my $new = $mat->number_of_new_potential;
+    $session ->{$sid}{'citation-suggestions-new-total'} = $new;
+    # save updated value to sysprof
+    if ($old != $new) {
+      put_sysprof_value( $sid, 'citation-suggestions-new-total', $new );
+    }
+  }
+
+}
 
 sub prepare_citations_list($) {
   # prepare new citations list

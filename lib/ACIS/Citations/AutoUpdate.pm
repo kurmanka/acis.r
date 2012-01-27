@@ -12,6 +12,7 @@ use ACIS::Citations::Utils;
 use ACIS::Citations::Search qw( personal_search_by_names 
                                 personal_search_by_documents 
                                 personal_search_by_coauthors );
+use ACIS::Citations::SimMatrix qw( load_similarity_matrix );
 use ACIS::Citations::Profile;
 use ACIS::Web::SysProfile;
 use ACIS::APU qw(&logit);
@@ -100,6 +101,7 @@ sub auto_processing {
     }
     $vars->{'docs-w-cit'}   = \@docs;
 
+
     require ACIS::Web::SaveProfile;
     ACIS::Web::SaveProfile::save_profile( $acis );
   
@@ -128,8 +130,13 @@ sub auto_processing {
     
   }
 
+  my $simmatrix = load_similarity_matrix( $rec );
+  my $new_potential = $simmatrix -> number_of_new_potential;
+
   put_sysprof_value( $sid, "last-auto-citations-time", time );
   put_sysprof_value( $sid, "last-auto-citations-date", today );
+  put_sysprof_value( $sid, "citation-suggestions-new-total", $new_potential );
+
 }
 
 
