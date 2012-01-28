@@ -15,30 +15,35 @@
   <xsl:template match='/'>
 
     <xsl:call-template name='user-account-page'>
-
+      
       <xsl:with-param name='title'>Records menu</xsl:with-param>
 
       <xsl:with-param name='content'>
 
 <h1>Records menu</h1>
 
-<p>Here are the records that you own:</p>
+<p><xsl:value-of select="count( $records )" /> records</p>
 
 <xsl:choose>
   <xsl:when test='count( $records )'>
 
-<ul class='records'> 
+<table class='records sql'>
+<tr>
+<th>name</th>
+<xsl:call-template name='record-actions-th'/>
+</tr>
 
 <xsl:for-each select='$records'>
 
-<li><!-- <xsl:value-of select='name/full'/><br /> -->
-<xsl:call-template name='record-brief-menu'>
+<tr>
+<td><xsl:value-of select='name'/></td>
+<xsl:call-template name='record-actions-td'>
   <xsl:with-param name='rec' select='.'/>
 </xsl:call-template>
-</li>
-
+</tr>
 </xsl:for-each>
-</ul>
+
+</table>
   </xsl:when>
 </xsl:choose>
 
@@ -66,6 +71,29 @@
 
 
 
+  </xsl:template>
+
+
+  <xsl:template name='record-actions-th'>
+    <th colspan='7'>actions</th>
+  </xsl:template>
+
+  <xsl:template name='record-actions-td'>
+    <xsl:param name='rec'/>
+    <xsl:variable name='id'  select='$rec/id/text()'/>
+    <xsl:variable name='sid' select='$rec/sid/text()'/>
+
+    <td class='act'><a ref='@({$sid})menu'>enter</a></td>
+    <td class='act'><a ref='@({$sid})/name'>name</a></td>
+    <td class='act'><a ref='@({$sid})/contact'>contact</a></td>
+    <td class='act'><a ref='@({$sid})/affiliations'>affiliations</a></td>
+    <td class='act'><a ref='@({$sid})/research'>research</a></td>
+    <td class='act'>
+      <!--[if-config(citations-profile)]
+       <a ref='@({$sid})/citations'>citations</a>
+          [end-if]-->
+    </td>
+    <td class='act'> <a ref='@({$sid})profile-overview'>overview</a> </td>
   </xsl:template>
 
 
