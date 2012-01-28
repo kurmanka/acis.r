@@ -109,7 +109,8 @@ sub prepare() {
 sub prepare_suggestion_count {
   my $app = shift;
   my $session = $app->session;
-  my $sid = $session->current_record->{sid};
+  my $rec = $session->current_record || {};
+  my $sid = $rec->{sid};
 
   # suggestions counts: get from sysprof, put into session (but only do that once)
   if ($sid) {
