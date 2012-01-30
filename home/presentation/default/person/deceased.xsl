@@ -36,7 +36,7 @@
           
           <p xml:space='default'>
             <input type='submit' class='important'
-                   value='SAVE AND RETURN TO MENU' name='continue' />
+                   value='SAVE CHANGES' name='continue' />
           </p>
         </acis:form>      
         
