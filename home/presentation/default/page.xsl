@@ -5,7 +5,8 @@
     xmlns:html='http://www.w3.org/1999/xhtml'
     exclude-result-prefixes='exsl xml html acis'
     version='1.0'>  
-  <!--  This is the global "page" template -->
+
+  <!-- This is the global "page" template -->
   <!-- has the global variables, error and handling -->
   <xsl:import href='global.xsl'/>
   <!-- has the fieldset templates -->

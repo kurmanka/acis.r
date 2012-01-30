@@ -75,7 +75,7 @@
 
 
   <xsl:template name='record-actions-th'>
-    <th colspan='7'>actions</th>
+    <th colspan='8'>actions</th>
   </xsl:template>
 
   <xsl:template name='record-actions-td'>
@@ -83,7 +83,7 @@
     <xsl:variable name='id'  select='$rec/id/text()'/>
     <xsl:variable name='sid' select='$rec/sid/text()'/>
 
-    <td class='act'><a ref='@({$sid})menu'>enter</a></td>
+    <td class='act'><a ref='@({$sid})/menu'>enter</a></td>
     <td class='act'><a ref='@({$sid})/name'>name</a></td>
     <td class='act'><a ref='@({$sid})/contact'>contact</a></td>
     <td class='act'><a ref='@({$sid})/affiliations'>affiliations</a></td>
@@ -93,7 +93,8 @@
        <a ref='@({$sid})/citations'>citations</a>
           [end-if]-->
     </td>
-    <td class='act'> <a ref='@({$sid})profile-overview'>overview</a> </td>
+    <td class='act'><a ref='@({$sid})/deceased'>deceased</a></td>
+    <td class='act'> <a ref='@({$sid})/profile-overview'>overview</a> </td>
   </xsl:template>
 
 
