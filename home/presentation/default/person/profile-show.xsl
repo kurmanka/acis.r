@@ -36,6 +36,17 @@
       <p>Short-id: <span class='value'><xsl:value-of select='$record-sid'/></span>
       </p>
     </xsl:if>
+
+    <xsl:if test='$person/deceased'>
+    <p class='deceased'>
+      <xsl:text>(Deceased</xsl:text>
+      <xsl:if test='string-length($person/deceased/text())'>
+        <xsl:text> since </xsl:text>
+        <xsl:value-of select='$person/deceased/text()'/>
+      </xsl:if>
+      <xsl:text>)</xsl:text>
+    </p>
+    </xsl:if>
     
     <h2>Names
     <xsl:call-template name='change-link'>

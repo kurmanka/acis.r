@@ -682,6 +682,24 @@
   </screen>
 
 
+  <screen id='deceased'>
+    <use module='ACIS::Web::Deceased' />
+    <!--
+    <param name='dead'     place='record:deceased/'
+    <param name='date'     place='record:deceased/date'/>
+    -->
+    <call function='load_session_or_authenticate' />
+    <init>
+      <call function='prepare_form_data' />
+      <call function='ACIS::Web::Deceased::prepare'/>
+    </init>
+    <process>
+      <call function='process_form_data' />
+      <call function='ACIS::Web::Deceased::process'/>
+    </process>
+    <presentation type='xslt' filename='person/deceased.xsl' />
+  </screen>
+
 
 <!--  new user registration screens -->
 

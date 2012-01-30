@@ -97,6 +97,17 @@ Interests: <xsl:value-of select='interests/freetext'/>
 Photo-URL: <xsl:value-of select='photo/url'/>
 </xsl:if>
 
+<xsl:if test='deceased'>
+  <xsl:text>
+Deceased: </xsl:text>
+  <xsl:if test='deceased/text()'>
+    <xsl:value-of select='deceased/text()'/>
+  </xsl:if>
+  <xsl:if test='not(deceased/text())'>
+    <xsl:text>0000-00-00</xsl:text>
+  </xsl:if>
+</xsl:if>
+
 <xsl:text></xsl:text>
 Short-Id: <xsl:value-of select='sid'/>
 Handle: <xsl:value-of select='id'/>
