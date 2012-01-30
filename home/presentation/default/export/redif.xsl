@@ -98,13 +98,14 @@ Photo-URL: <xsl:value-of select='photo/url'/>
 </xsl:if>
 
 <xsl:if test='deceased'>
+  <!-- ReDIF format: YYYY[-MM[-DD]] -->
   <xsl:text>
 Deceased: </xsl:text>
   <xsl:if test='deceased/text()'>
     <xsl:value-of select='deceased/text()'/>
   </xsl:if>
   <xsl:if test='not(deceased/text())'>
-    <xsl:text>0000-00-00</xsl:text>
+    <xsl:text>0000</xsl:text>
   </xsl:if>
 </xsl:if>
 
