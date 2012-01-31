@@ -53,13 +53,33 @@ sub welcome {
   my $app = shift;
   my $session  = $app -> session || die 'must have a session';
 
+
   my $reclist  = $session ->userdata_record_list;
   my $owner    = $session ->userdata_owner;
 
   if ( $owner->{type}{advanced} 
        or scalar( @$reclist ) > 1 ) {
-    $app -> variables -> {records} = $reclist; 
-    $app -> set_presenter( 'records-menu' );
+
+      # the following line is needed to make recent changes to the current
+      # record visible on the menu page. For example, changing the
+      # deceased date.
+      if ($session->current_record) { 
+          $session->save_current_record('closeit'); 
+          $session->save_userdata_temp;
+      }
+
+      my $records =  $session->userdata->{records};
+
+      my @list = map { name => $_->{name}{full}, 
+                       id   => $_->{id},
+                       sid  => $_->{sid},
+                       (exists $_->{deceased})
+                           ? ( deceased => $_->{deceased} )
+                           : (),
+      }, @$records;
+
+      $app -> variables -> {records} = \@list; 
+      $app -> set_presenter( 'records-menu' );
   }
 }
 

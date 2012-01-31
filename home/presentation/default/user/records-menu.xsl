@@ -93,7 +93,21 @@
        <a ref='@({$sid})/citations'>citations</a>
           [end-if]-->
     </td>
-    <td class='act'><a ref='@({$sid})/deceased'>deceased</a></td>
+    <td class='act'>
+      <a ref='@({$sid})/deceased'>
+        <xsl:choose>
+          <xsl:when test='$rec/deceased/text()'>
+            <xsl:value-of select='$rec/deceased/text()'/>
+          </xsl:when>
+          <xsl:when test='$rec/deceased'>
+            <xsl:text>(yes)</xsl:text>
+          </xsl:when>
+          <xsl:otherwise>
+            <xsl:text>(no)</xsl:text>
+          </xsl:otherwise>
+        </xsl:choose>
+      </a>
+  </td>
     <td class='act'> <a ref='@({$sid})/profile-overview'>overview</a> </td>
   </xsl:template>
 

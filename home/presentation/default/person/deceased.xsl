@@ -22,10 +22,10 @@
         <acis:form xsl:use-attribute-sets='form' >
 
           <p>
-            <acis:input type='checkbox' name='dead'/>  
+            <acis:input type='checkbox' name='dead' id='dead'/>  
             <label for='dead'>the person is deceased</label>
             <br />
-            <label for='date'>Date of death: </label>
+            <label for='date-y'>Date of death: </label>
             <acis:input name='date-y' id='date-y' size='4'/>
             <xsl:text>-</xsl:text>
             <acis:input name='date-m' id='date-m' size='2'/>

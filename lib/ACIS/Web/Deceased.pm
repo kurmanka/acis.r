@@ -55,6 +55,7 @@ sub process {
     delete $rec->{deceased};
   }
 
+  $app ->message("saved");
   prepare($app);
 }
 
