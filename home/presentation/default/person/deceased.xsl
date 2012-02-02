@@ -27,9 +27,25 @@
             <br />
             <label for='date-y'>Date of death: </label>
             <acis:input name='date-y' id='date-y' size='4'/>
-            <xsl:text>-</xsl:text>
+            <!--
             <acis:input name='date-m' id='date-m' size='2'/>
-            <xsl:text>-</xsl:text>
+            -->
+            <acis:select name='date-m' id='date-m'>
+              <option value=''>-</option>
+              <option name='January' value='01'>January</option>
+              <option name='February' value='02'>February</option>
+              <option name='March' value='03'>March</option>
+              <option name='April' value='04'>April</option>
+              <option name='May' value='05'>May</option>
+              <option name='June' value='06'>June</option>
+              <option name='July' value='07'>July</option>
+              <option name='August' value='08'>August</option>
+              <option name='September' value='09'>September</option>
+              <option name='October' value='10'>October</option>
+              <option name='November' value='11'>November</option>
+              <option name='December' value='12'>December</option>
+            </acis:select>
+
             <acis:input name='date-d' id='date-d' size='2'/>
             <br />
           </p>

@@ -91,6 +91,25 @@
     </xsl:element>
   </xsl:template>
   
+
+
+  <!-- select/option -->
+  <xsl:template match='option' mode='fs'>
+    <xsl:variable name='select' select='parent::acis:select'/>
+    <xsl:variable name='name'   select='$select/@name'/>
+    <xsl:variable name='value'  select='@value|text()'/>
+    <xsl:element name='option'>
+      <xsl:copy-of select='@*'/>
+      <xsl:if test='$form-values/*[name()=$name][./text()=$value]'>
+        <xsl:attribute name='selected'>1</xsl:attribute>
+      </xsl:if>
+      <xsl:copy-of select='text()'/>
+    </xsl:element>
+  </xsl:template>
+
+
+
+
   <!-- checkbox -->
   
   <xsl:template match='acis:input[@type="checkbox"]' mode='fs'>
