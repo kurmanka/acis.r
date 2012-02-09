@@ -899,6 +899,9 @@
     </xsl:choose>
   </xsl:template>
 
+  <xsl:template match='script[@src]' mode='link-filter'/>
+ 
+
   <xsl:template match='acis:script-onload' mode='scripting'>
     <xsl:copy-of select='text()'/>
   </xsl:template>
