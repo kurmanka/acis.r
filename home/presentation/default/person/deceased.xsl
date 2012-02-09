@@ -21,8 +21,9 @@
       <xsl:with-param name='content'>
         <acis:form xsl:use-attribute-sets='form' >
 
+          <script type='text/javascript' src='deceased.js'></script>
           <p>
-            <acis:input type='checkbox' name='dead' id='dead'/>  
+            <acis:input type='checkbox' name='dead' id='dead' onclick='dead_checkbox_click(this)'/>  
             <label for='dead'>the person is deceased</label>
             <br />
             <label for='date-y'>Date of death: </label>
