@@ -36,7 +36,7 @@ use Web::App::Common qw( debug );
 use ACIS::Data::DumpXML qw(dump_xml);
 
 use ACIS::Web::Person;
-
+use ACIS::Web::SysProfile; 
 
 
 sub login {
@@ -76,11 +76,39 @@ sub welcome {
                            : (),
       }, @$records;
 
+
+      # XXX load research and citation suggestions from sysprof
+      load_suggestion_counts_for_records( $app, \@list );
+
       $app -> variables -> {records} = \@list; 
       $app -> set_presenter( 'records-menu' );
   }
 }
 
+sub load_suggestion_counts_for_records {
+    my $app =  shift;
+    my $list = shift;
+
+    # use SysProfile functions and session...
+    my $session = $app->session;
+    
+    foreach ( @$list ) {
+        my $sid = $_->{sid};
+        my $r = get_sysprof_value( $sid, "research-suggestions-total" );
+        my $c = get_sysprof_value( $sid, "citation-suggestions-new-total" );
+        # an optimization
+        #if ($r or $c) {
+            $session->{$sid}{"research-suggestions-total"} = $r;
+            $session->{$sid}{"citation-suggestions-new-total"} = $c;
+            $session->make_sticky( $sid );
+        #}
+    }
+
+    # XXX: or bypass the SysProfile tools and directly query the sysprof
+    # table for these two parameters for all these records, and only
+    # get those that are non-zero.
+    
+}
 
 
 sub name_screen_init {

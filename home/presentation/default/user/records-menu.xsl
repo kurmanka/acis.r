@@ -88,15 +88,40 @@
     <xsl:param name='rec'/>
     <xsl:variable name='id'  select='$rec/id/text()'/>
     <xsl:variable name='sid' select='$rec/sid/text()'/>
+    <xsl:variable name='record-sid' select='$rec/sid/text()'/>
+
+  <xsl:variable name='research-suggestions-number-text'>
+    <xsl:if test='$response-data/*[name()=$record-sid]/research-suggestions-total and 
+                  number($response-data/*[name()=$record-sid]/research-suggestions-total/text()) &gt; 0'>
+      <xsl:text> </xsl:text>
+      <span class='notification-number'>
+        <xsl:value-of select='$response-data/*[name()=$record-sid]/research-suggestions-total'/>
+      </span>
+    </xsl:if>
+  </xsl:variable>
+
+  <xsl:variable name='citation-suggestions-number-text'>
+    <xsl:if test='$response-data/*[name()=$record-sid]/citation-suggestions-new-total and 
+                  number($response-data/*[name()=$record-sid]/citation-suggestions-new-total/text()) &gt; 0'>
+      <xsl:text> </xsl:text>
+      <span class='notification-number'>
+        <xsl:value-of select='$response-data/*[name()=$record-sid]/citation-suggestions-new-total'/>
+      </span>
+    </xsl:if>
+  </xsl:variable>
+
 
     <td class='act'><a ref='@({$sid})/menu'>enter</a></td>
     <td class='act'><a ref='@({$sid})/name'>name</a></td>
     <td class='act'><a ref='@({$sid})/contact'>contact</a></td>
     <td class='act'><a ref='@({$sid})/affiliations'>affiliations</a></td>
-    <td class='act'><a ref='@({$sid})/research'>research</a></td>
+    <td class='act'><a ref='@({$sid})/research'>research</a>
+        <xsl:copy-of select='$research-suggestions-number-text'/>
+    </td>
     <td class='act'>
       <!--[if-config(citations-profile)]
        <a ref='@({$sid})/citations'>citations</a>
+       <xsl:copy-of select='$citation-suggestions-number-text'/>
           [end-if]-->
     </td>
     <td class='act'>

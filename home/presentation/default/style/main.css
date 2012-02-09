@@ -286,6 +286,15 @@ p.menu .here span.notification-number {
  background: red;
 }
 
+/* in the records-menu */
+table.records span.notification-number {
+ color: red;
+ font-weight: bold;
+ font-size: 80%;
+}
+
+
+
 /*  REGISTRATION PROCESS STEPS */
 
 .steps span { 
