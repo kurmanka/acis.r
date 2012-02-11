@@ -73,6 +73,7 @@
        </a>
      </p>
    </xsl:template>
+
    <xsl:template name='search-form'>
      <xsl:variable name='field'>
        <xsl:choose>
@@ -80,11 +81,11 @@
          <xsl:otherwise>title</xsl:otherwise>
        </xsl:choose>
      </xsl:variable>
-     <!-- <h2 id='manualSearch'>Manual search</h2> -->
-     <!-- there used to be a name='searchform' attribute on the next element -->
+
      <acis:form screen='@research/search'
-                id='searchform'>
-       <!--  <table style='float: left; margin-right: 0.5em; margin-bottom: 1em;'>-->
+                name='searchform'>
+       <!-- The name= attribute above is important! -->
+
        <table border='0'
               summary='form to search for documents'>       
          <tr>

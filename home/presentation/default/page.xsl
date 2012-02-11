@@ -388,7 +388,7 @@
     <xsl:element name='form'
                  use-attribute-sets='form'>      
       <!-- copy all attributes except screen=. maybe there is name= to add here -->
-      <xsl:copy-of select='@*[name()!="screen" and name()!="name"]'/>      
+      <xsl:copy-of select='@*[name()!="screen"]'/>      
       <!-- where is the action=? It is in the screen= -->
       <xsl:attribute name='action'>
         <xsl:choose>

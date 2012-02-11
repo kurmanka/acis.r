@@ -26,11 +26,14 @@
     </p>
     <script type='text/javascript' 
             src='affiliations.js'></script>
-    <!-- there was name='searchform' -->
     <acis:form screen='@affiliations/search' 
                xsl:use-attribute-sets='form' 
                class='narrow'
                name='searchform'>
+      <!-- The name attribute above is important! It is used in the
+           affiliations.js to refer to this page via document
+           object. -->
+
       <xsl:text> </xsl:text>
       <div id='please-wait' style='position: absolute; display: none; z-index: 1;'>
         <p style='width: auto; padding: 10px; position: static;'  class='Hint'>
