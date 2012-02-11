@@ -75,7 +75,7 @@
               </p>
               
               <p>
-                <acis:input type='submit' class='important' value=' SAVE '/>
+                <input type='submit' class='important' value=' SAVE '/>
               </p>
               
               
