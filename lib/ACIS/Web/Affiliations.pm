@@ -123,6 +123,12 @@ sub prepare {
     }
   }
 
+  # to set initial shares for the existing accounts with multiple shares
+  if ( scalar @$affiliations > 1
+       and not exists $affiliations->[0]{share} ) { 
+      $adjust_shares = 1; 
+  }
+
   if ($adjust_shares) {
       adjust_shares( $app );
   }
