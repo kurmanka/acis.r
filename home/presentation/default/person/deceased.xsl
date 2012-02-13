@@ -23,14 +23,21 @@
 
           <script src='deceased.js'/>
           <p>
-            <acis:input type='checkbox' name='dead' id='dead' onclick='dead_checkbox_click(this)'/>  
+            <acis:input type='checkbox' name='dead' id='dead' onclick='dead_checkbox_click(this)'/>
             <label for='dead'>the person is deceased</label>
             <br />
-            <label for='date-y'>Date of death: </label>
-            <acis:input name='date-y' id='date-y' size='4'/>
-            <!--
-            <acis:input name='date-m' id='date-m' size='2'/>
-            -->
+
+            <table class='date'>
+              <caption>
+                <label for='date-y'>Date of death</label>
+              </caption>
+              <tr><th>year</th><th>month</th><th>day</th></tr>
+              <tr>
+                <td>
+                  <acis:input name='date-y' id='date-y' size='4'/>
+                </td>
+                <td>
+
             <acis:select name='date-m' id='date-m'>
               <option value=''>-</option>
               <option name='January' value='01'>January</option>
@@ -46,9 +53,12 @@
               <option name='November' value='11'>November</option>
               <option name='December' value='12'>December</option>
             </acis:select>
-
-            <acis:input name='date-d' id='date-d' size='2'/>
-            <br />
+                </td>
+                <td>
+                  <acis:input name='date-d' id='date-d' size='2'/>
+                </td>
+              </tr>
+            </table>
           </p>
           
           <p xml:space='default'>

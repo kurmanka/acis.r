@@ -1319,3 +1319,10 @@ tr.accept td.yes { background-color: #bbFFbb; }
 tr.refuse td.no  { background-color: #FFbbbb; }
 
 /* end of cardiff classes */
+
+table.date tr th {
+  font-size: 80%;
+  font-weight: normal;
+  color: #777;
+}
+
