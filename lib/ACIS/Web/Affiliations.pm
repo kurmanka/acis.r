@@ -613,6 +613,7 @@ sub general_handler {
         if ( $_->{remove} ) { 
             debug "remove $idorname";
             remove( $app, $_->{id}, $_->{name} );
+            $save_shares = 1;
             next;
         }
         if ( $_->{share} ) {
