@@ -210,7 +210,11 @@
    <xsl:text>
    </xsl:text>
    <li class='institution'>
-     <span class='title'><xsl:value-of select='name/text()'/></span>
+     <span class='title'><xsl:value-of select='name/text()'/></span> 
+     <xsl:if test='share/text()'> 
+       <xsl:text> </xsl:text>
+       <small> (weight: <xsl:value-of select='share/text()'/>%)</small>
+     </xsl:if>
      
      <!--
          <xsl:choose
