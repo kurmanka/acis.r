@@ -97,11 +97,11 @@ sub load_suggestion_counts_for_records {
         my $r = get_sysprof_value( $sid, "research-suggestions-total" );
         my $c = get_sysprof_value( $sid, "citation-suggestions-new-total" );
         # an optimization
-        #if ($r or $c) {
+        if (defined $r or defined $c) {
             $session->{$sid}{"research-suggestions-total"} = $r;
             $session->{$sid}{"citation-suggestions-new-total"} = $c;
             $session->make_sticky( $sid );
-        #}
+        }
     }
 
     # XXX: or bypass the SysProfile tools and directly query the sysprof
