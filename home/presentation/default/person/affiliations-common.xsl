@@ -152,7 +152,11 @@ All this also means that the form would not work with javascript disabled.
 
 
     <acis:script-onload>
-      $('input.[type="button"]').click( buttonClick );
+$('input.[type="button"]').click( buttonClick );
+$('input.share').keypress( recalculate_total );
+$('input.share').keyup( recalculate_total );
+$('input.share').change( recalculate_total );
+recalculate_total();
     </acis:script-onload>
 
     <script>
@@ -172,6 +176,19 @@ function buttonClick () {
     $(this).attr('type', 'submit'); // does not work in Chrome, says type can't be changed
     return true;
 */
+
+function recalculate_total() {
+    var total = 0;
+    $('input.share').each( function (i,el) { total += $(el).val() - 0; } );
+    //console.log( 'total: ' + total );
+    $('input.total').val(total);    
+    if (total == 100) {
+      $('input.total').addClass('good');
+    } else {
+      $('input.total').removeClass('good');
+    }
+}
+
     </script>
 
     <noscript>
@@ -206,10 +223,17 @@ function buttonClick () {
           </xsl:call-template>
         </td>
         <td class='share' style='text-align:center'>
-          <input type='text'             name='share{$rownum}'   value='{share}' size='2'/>
+          <input type='text'             name='share{$rownum}'   value='{share}' size='2' class='share'/>
         </td>
       </tr>
     </xsl:for-each>
+
+    <tr>
+      <td colspan='3' align='right' style="vertical-align:middle"
+          >Total:
+          <input type='text' disabled='yes' class='total' size='2'/>%</td>
+    </tr>
+
   </xsl:template>
 
 

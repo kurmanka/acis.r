@@ -41,7 +41,7 @@
             <xsl:if test='$with-shares'>
 <th class='share' 
 title='For multiple affiliations, please attribute a share to each. These will be used to determine the main affiliation and allocate ranking scores across affiliations. With affiliations in different regions or countries, your ranking scores will also be weighted accordingly.'
->Share</th>
+>Share, %</th>
             </xsl:if>
 </tr>
             <tr>

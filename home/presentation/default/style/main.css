@@ -810,6 +810,13 @@ form.alternate {
  padding-bottom: 1em;
 }
 
+.affiliationsScreen table.institutions input.good {
+ color: #060;
+}
+.affiliationsScreen table.institutions .total  {
+ color: #600;
+}
+
 
 
 
