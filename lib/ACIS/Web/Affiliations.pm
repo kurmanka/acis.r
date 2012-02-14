@@ -660,7 +660,11 @@ sub adjust_shares {
     #  3. if we adjust the values, we adjust them proportionally
 
     # set undef values to a default
-    my $share_default = 20;
+    # Christian requested this to be 5 in an email: 
+    # On Tue, Feb 14, 2012 at 8:14 PM, Christian Zimmermann <zimmermann@stlouisfed.org> wrote:
+    # > Yes, 5 is good. It does not change too much the others.
+    my $share_default = 5;
+
     foreach (@$affiliations) {
         my $idorname = $_->{id} || $_->{name};
         debug "  " . $idorname  . ": " . $_->{share};
