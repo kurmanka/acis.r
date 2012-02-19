@@ -875,54 +875,47 @@
   </screen>
 
 
+  <!-- Admin screens -->
   <screen id='adm/pass'>
     <presentation type='xslt' filename='adm/pass.xsl'/>
   </screen>
 
   <screen id='adm'>
     <use module='ACIS::Web::Admin'/>
-
     <call function='ACIS::Web::Admin::check_access'/>
     <presentation type='xslt' filename='adm/index.xsl'/>
- </screen>
-
+  </screen>
 
   <screen id='adm/sessions'>
     <use module='ACIS::Web::Admin'/>
-
     <call function='ACIS::Web::Admin::check_access'/>
     <call function='ACIS::Web::Admin::show_sessions'/>
     <presentation type='xslt' filename='adm/sessions.xsl'/>
- </screen>
+  </screen>
 
-
- <screen id='adm/session'>
-   
+  <screen id='adm/session'>
    <use module='ACIS::Web::Admin'/>
-
    <call function='ACIS::Web::Admin::check_access'/>
    <call function='ACIS::Web::Admin::session_act'/>
    <presentation type='xslt' filename='adm/session.xsl'/>
- </screen>
+  </screen>
 
- <screen id='adm/session/deleted'>
+  <screen id='adm/session/deleted'>
    <presentation type='xslt' filename='adm/session-deleted.xsl'/>
- </screen>
+  </screen>
 
- <screen id='adm/search'>
+  <screen id='adm/search'>
    <use module='ACIS::Web::Admin'/>
    <call function='ACIS::Web::Admin::check_access'/>
-   
    <process>
      <call function='ACIS::Web::Admin::prepare_env'/>
      <call function='ACIS::Web::Admin::adm_search'/>
      <call function='ACIS::Web::Admin::dump_presenter_data'/>
    </process>
-
    <presentation type='xslt' filename='adm/search.xsl'/>
- </screen>
+  </screen>
 
- <screen id='adm/search/person'>
+  <screen id='adm/search/person'>
    <param name='key' required='yes' />
    <use module='ACIS::Web::Admin'/>
    <call function='ACIS::Web::Admin::check_access_allow_deceased_volunteer_and_admin'/>
@@ -935,21 +928,21 @@
      <call function='ACIS::Web::Admin::adm_search_person'/>
    </process>
    <presentation type='xslt' filename='adm/search-person.xsl'/>
- </screen>
+  </screen>
  
- <screen id='adm/search/doc'>
+  <screen id='adm/search/doc'>
    <presentation type='xslt' filename='adm/search-res-doc.xsl'/>
- </screen>
+  </screen>
 
- <screen id='adm/search/rec'>
+  <screen id='adm/search/rec'>
    <presentation type='xslt' filename='adm/search-res-rec.xsl'/>
- </screen>
+  </screen>
 
- <screen id='adm/search/usr'>
+  <screen id='adm/search/usr'>
    <presentation type='xslt' filename='adm/search-res-usr.xsl'/>
- </screen>
+  </screen>
  
- <screen id='adm/log_into'>
+  <screen id='adm/log_into'>
    <param name='login'/>
    <use module='ACIS::Web::Admin'/>
    <process>   
@@ -957,41 +950,30 @@
      <call function='ACIS::Web::Admin::check_access'/>
      <call function='ACIS::Web::Admin::adm_log_into'/>
    </process>
- </screen>
+  </screen>
 
- <screen id='adm/user/republish'><!-- not implemented yet -->
-
+  <screen id='adm/user/republish'><!-- not implemented yet -->
    <param name='login'/>
-   
    <use module='ACIS::Web::Admin'/>
-   
    <call function='ACIS::Web::Admin::check_access'/>
    <call function='ACIS::Web::Admin::user_republish'/>
    <presentation type='xslt' filename='adm/user-republish.xsl'/>
-  
- </screen>
- 
+  </screen> 
 
   <screen id='adm/events/raw'>
-
     <use module='ACIS::Web::Admin'/>
     <use module='ACIS::Web::Admin::Events'/>
-    
     <call function='ACIS::Web::Admin::check_access'/>
     <call function='ACIS::Web::Admin::Events::recent_events_raw'/>
     <presentation type='xslt' filename='adm/events-raw.xsl'/>
-    
   </screen>
 
   <screen id='adm/events/decode'>
-    
     <use module='ACIS::Web::Admin'/>
     <use module='ACIS::Web::Admin::Events'/>
-
     <call function='ACIS::Web::Admin::check_access'/>
     <call function='ACIS::Web::Admin::Events::recent_events_decode'/>
     <presentation type='xslt' filename='adm/events-decode.xsl'/>
-    
   </screen>
 
   <screen id='adm/events/overview'>
@@ -1001,25 +983,17 @@
   <screen id='adm/events/pref'>
     <use module='ACIS::Web::Admin'/>
     <use module='ACIS::Web::Admin::Events'/>
-
     <call function='ACIS::Web::Admin::check_access'/>
     <call function='ACIS::Web::Admin::Events::preferences'/>
-    
     <presentation type='xslt' filename='adm/events-pref.xsl'/>
   </screen>
 
-
-
   <screen id='adm/events'>
-    
     <use module='ACIS::Web::Admin'/>
     <use module='ACIS::Web::Admin::Events'/>
-
     <call function='ACIS::Web::Admin::check_access'/>
     <call function='ACIS::Web::Admin::Events::events'/>
-
     <presentation type='xslt' filename='adm/events-decode.xsl'/>
-    
   </screen>
 
   <screen id='adm/events/archive'>
@@ -1035,10 +1009,8 @@
     <use module='ACIS::Web::Admin::Events'/>
     <call function='ACIS::Web::Admin::check_access'/>
     <call function='ACIS::Web::Admin::Events::events_recent'/>
-
     <presentation type='xslt' filename='adm/events-recent.xsl'/>
   </screen>    
-
 
   <screen id='adm/events/show'>
     <use module='ACIS::Web::Admin'/>
@@ -1047,31 +1019,20 @@
     <call function='ACIS::Web::Admin::Events::events_show_screen'/>
   </screen>    
 
-
-
-
   <screen id='adm/sql'>
-
     <use module='ACIS::Web::Admin'/>
-    
     <call function='ACIS::Web::Admin::check_access'/>
-    
     <process>
       <call function='ACIS::Web::Admin::prepare_env'/>
       <call function='ACIS::Web::Admin::sql_query_analyze'/>
     </process>
-
     <presentation type='xslt' filename='adm/sql.xsl'/>
   </screen>
 
-
   <screen id='adm/get'>
-
     <use module='ACIS::Web::Admin'/>
-    
     <call function='ACIS::Web::Admin::check_access'/>
     <call function='ACIS::Web::Admin::adm_get'/>
-
     <presentation type='xslt' filename='adm/get.xsl'/>
   </screen>
 
@@ -1084,6 +1045,7 @@
     <call function='ACIS::Web::Admin::move_record_handler'/>
     <presentation type='xslt' filename='adm/move_record.xsl'/>    
   </screen>
+
 
   <screen id='application-error'>
     <presentation type='xslt' filename='misc/application-error.xsl'/>
