@@ -76,7 +76,9 @@ co {
                   </a>
                 </td>
                 <td><xsl:value-of select='id'/></td>
-                <td></td>
+                <td>
+                  <a ref='adm/move-record?from={owner}&amp;sid={shortid}'>move to self</a>
+                </td>
               </tr>
             </xsl:for-each>
 

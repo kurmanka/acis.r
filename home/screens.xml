@@ -1075,6 +1075,15 @@
     <presentation type='xslt' filename='adm/get.xsl'/>
   </screen>
 
+  <screen id='adm/move-record'>
+    <param name='to'   required='no'/>
+    <param name='from' required='yes'/>
+    <param name='sid'  required='yes'/>
+    <use module='ACIS::Web::Admin'/>
+    <call function='ACIS::Web::Admin::check_access'/>
+    <call function='ACIS::Web::Admin::move_record_handler'/>
+    <presentation type='xslt' filename='adm/move_record.xsl'/>    
+  </screen>
 
   <screen id='application-error'>
     <presentation type='xslt' filename='misc/application-error.xsl'/>

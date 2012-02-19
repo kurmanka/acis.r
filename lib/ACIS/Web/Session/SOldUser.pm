@@ -417,4 +417,40 @@ sub build_record_list {
     return \@list;
 }
 
+sub add_record_to_userdata {
+    my $self   = shift || die;
+    my $record = shift || die;
+
+    my $ud      = $self->userdata;
+    my $rec     = $ud->{records};
+    push @$rec, $record;
+    
+    $self->update_record_list_for_added_record( $record );
+    $self->save_userdata_temp;
+    ### XXX Here we could make sure that the record is not yet
+    ### included, but for that we need a record index. Or we could
+    ### cycle through the record_list and see. As an option.
+}
+
+
+sub update_record_list_for_added_record {
+    my $self   = shift || die;
+    my $record = shift || die;
+    my $list = $self->{'.userdata.record_list'} || die;
+
+    my $brief;
+    for ( $record ) {
+        $brief = { name => $_->{name}{full}, 
+                   id   => $_->{id},
+                   sid  => $_->{sid},
+                   digest => digest( $_ ),
+                   modified => 1,
+        };
+    }
+    
+    push @$list, $brief;
+}
+
+
+
 1;

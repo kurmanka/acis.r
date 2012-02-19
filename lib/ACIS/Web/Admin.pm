@@ -430,35 +430,47 @@ sub move_records {
   
   my $src  = main::get_sources();
 
+  # $src is a list of items. Each item may be a short-id, or an ARRAY
+  # of [ LOGIN, SHORTID ] pairs.
+
   my $session = $acis ->session;
-  my $ud      = $session ->object;
+  my $ud      = $session ->userdata;
   my $login   = $ud ->{owner} {login};
   my $dest    = $ud ->{records};
+  my $moved   = 0;
 
   debug "move records to $login account";
   debug "sources: @$src";
   
   foreach ( @$src ) {
-    my $l = ACIS::Web::Person::get_login_from_person_id( $acis->sql_object, $_ );
+    my $src_login;
+    my $src_sid;
 
-    if (not $l) {
+    if ( ref $_ eq 'ARRAY' ) {
+        $src_login = $_->[0];
+        $src_sid   = $_->[1];
+    } else {
+        $src_login = ACIS::Web::Person::get_login_from_person_id( $acis->sql_object, $_ );
+    }
+
+    if (not $src_login) {
         debug "no login for $_";
         next;
     }
 
-    if ($l eq $login) {
+    if ($src_login eq $login) {
         debug "source record $_ is already in the destination account $login!";
         next;
     }
 
-    my $file = $acis ->userdata_file_for_login( $l );
+    my $file = $acis ->userdata_file_for_login( $src_login );
     if ( not -e $file ) { 
       debug "no such file: $file";
       next;
     }
     
     if ( -e "$file.lock" ) {
-      debug "account $l is locked";
+      debug "account $src_login is locked";
       next;
     }
 
@@ -466,24 +478,41 @@ sub move_records {
     my $srcud = ACIS::Web::UserData -> load( $file );
 
     if ( not $srcud ) { next; }
-    debug "openned $l";
+    debug "opened $src_login userdata";
     
     my $srcrec = $srcud ->{records};
+    my $should_remove = scalar @$srcrec;
 
     foreach ( @$srcrec ) {
+      if ( $src_sid 
+           and ($src_sid ne $_->{sid}) ) { 
+          debug "skipping $_->{sid}";
+          $should_remove = 0;
+          next; 
+      }
+
       my $name = $_ ->{name}{full};
-      debug "record of $name";
-      
-      push @$dest, $_;
+      debug "record of $name: moving it";
       delete $_ -> {'about-owner'};
+
+      # the add_record_to_userdata() is a more careful way to do the same:
+      #push @$dest, $_;
+      $session -> add_record_to_userdata( $_ );
+      $moved++;
     }
 
-    remove_account( $acis, -login => $l );
+    ### XXX this could be deferred until the session end.
+    ### XXX run it via ->run_at_close()?
+    if ( $should_remove ) {
+        remove_account( $acis, -login => $src_login );
+    }
     if ( scalar @$dest > 1 ) {
       $ud ->{owner} {type} {advanced} = 1;
     }
+    
   }
 
+  return $moved;
 }
 
 
@@ -497,13 +526,10 @@ sub remove_account {
 
   assert( $login );
 
-
   my $paths   = $app -> make_paths_for_login( $login );
-
   
   my $file    = $paths -> {'user-data'};
   my $bakfile = $paths -> {'user-data-deleted'};
-  
 
   $app -> sevent ( -class  => 'account', 
                    -action => 'delete',
@@ -511,7 +537,6 @@ sub remove_account {
                    -backup => $bakfile,
                  );
   
-
   while ( -e $bakfile ) {
     debug "backup file $bakfile already exists";
     $bakfile =~ s/\.xml(\.(\d+))?$/".xml." . ($2+1)/eg;
@@ -524,7 +549,7 @@ sub remove_account {
     debug "failed";
     $app -> errlog ( "Can't move $file file to $bakfile" );
     $app -> error ( "cant-remove-account" );
-    return;
+    return 0;
   }
 
   ## find if there is a user. if there is no user, 
@@ -541,14 +566,11 @@ sub remove_account {
   $app -> log( "requesting RI update for $relative" );
   RePEc::Index::UpdateClient::send_update_request( 'ACIS', $relative );
 
-
-  
   if ( $clean ) {
     ### delete the profile pages
     debug "clean-up after deletion";
     
     require ACIS::Web::UserData;
-    
     my $udata = ACIS::Web::UserData -> load( $bakfile );
     
     foreach ( @{ $udata-> {records} } ) {
@@ -579,7 +601,41 @@ sub remove_account {
     debug "clean-up after deletion";
   }
   
+  return 1; # success
 }
+
+
+sub move_record_handler {
+    my $acis = shift;
+    my $session = $acis->session;
+    my $input   = $acis->form_input;
+
+    my $is_admin = 1; ### could be 0 if the user is a deceased account volunteer
+
+    #my $to = $input->{to};
+    #if ( $to 
+    #     and not $is_admin
+    #     and $session->owner->{login} eq $to ) {
+    #    die "only admin 
+
+    # here we would move a record from another account into this
+    # current account.
+    my $from = $input->{from} || die;
+    my $sid  = $input->{sid}  || die;
+    
+    debug "move record $sid from account $from";
+
+    my $ret = move_records( $acis, [ [$from, $sid] ] );
+    
+    debug "got return from move_records(): $ret";
+    if ($ret) {
+        $acis->success(1);
+    } else {
+        $acis->success(0);
+    }
+
+}
+
 
 
 
