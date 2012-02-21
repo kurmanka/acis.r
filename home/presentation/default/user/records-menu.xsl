@@ -56,18 +56,11 @@
   
   <li><a ref='settings' title='email, password, etc.' >account settings</a></li>
 
-<!-- YYY <li><a ref='new-person' title='does not work'>create new personal record</a> 
-  <xsl:text> </xsl:text>
-  <i>(Does not yet work)</i>
-  </li> -->
-
 <xsl:if test='$request/user/type/deceased-list-manager'>
   <li><a ref='adm/search/person'>personal profile search</a></li>
 </xsl:if>
 
   <li><a ref='off'>log off</a></li>
-
-  <li><a ref='unregister' >delete your account</a></li>
 
 </ul>
 
