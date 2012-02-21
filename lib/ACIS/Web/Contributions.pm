@@ -569,8 +569,7 @@ sub check_item_names {
     my $authors = lc $item->{authors} || '';
     my $editors = lc $item->{editors} || '';
 
-    #die Dumper($item) if $authors =~ m/ & /;
-    die Dumper($item) if not $authors and not $editors;
+    return 0 if not $authors and not $editors; # could happen in series
 
     my $is_present = 0;
     foreach ( @$names ) {
