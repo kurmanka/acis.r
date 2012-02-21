@@ -13,6 +13,9 @@
   <xsl:variable name='result' select='$response-data/result'/>
   <xsl:variable name='items'  select='$result/data/list-item'/>
 
+  <xsl:variable name='admin-mode'                 select='not(//deceased-list-manager-mode)'/>
+  <xsl:variable name='deceased-list-manager-mode' select='//deceased-list-manager-mode'/>
+
   <xsl:template match='/data'>
     <xsl:call-template name='page'>
       <xsl:with-param name='title'>adm/search/person</xsl:with-param>
@@ -71,13 +74,20 @@ co {
                 <td><xsl:value-of select='shortid'/></td>
                 <td><xsl:value-of select='namefull'/></td>
                 <td>
-                  <a ref='adm/log_into?login={owner}'>
-                    <xsl:value-of select='owner'/>
-                  </a>
+                  <xsl:value-of select='owner'/>
                 </td>
                 <td><xsl:value-of select='id'/></td>
                 <td>
-                  <a ref='adm/move-record?from={owner}&amp;sid={shortid}'>move to self</a>
+                  <xsl:choose>
+                    <xsl:when test='$admin-mode'>
+                      <a ref='adm/log_into?login={owner}'>
+                        log into account
+                      </a>
+                    </xsl:when>
+                    <xsl:otherwise>
+                      <a ref='adm/move-record?from={owner}&amp;sid={shortid}'>add to my account</a>
+                    </xsl:otherwise>
+                  </xsl:choose>
                 </td>
               </tr>
             </xsl:for-each>
@@ -86,7 +96,9 @@ co {
 
         </xsl:if>
         
-        <xsl:call-template name='adm-menu'/>
+        <xsl:if test='$admin-mode'>
+          <xsl:call-template name='adm-menu'/>
+        </xsl:if>
       
       </xsl:with-param>
     </xsl:call-template>

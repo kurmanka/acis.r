@@ -13,10 +13,17 @@
 
         <xsl:choose>
           <xsl:when test='$success'>
-            <p>Successfully moved record <xsl:value-of select='$form-input/sid'/>!</p>
+
+            <p>Successfully added profile of <xsl:value-of select='//new-record-name'/> to your account.</p>
+
+            <p>Would you like to see his/hers <a ref='{//new-record-sid}/overview'>profile overview</a>
+            or <a ref='{//new-record-sid}/deceased'>deceased details</a>?</p>
+
           </xsl:when>
           <xsl:otherwise>
-            <p>Failed while moving record <xsl:value-of select='$form-input/sid'/>.</p> 
+
+            <p>Failed while moving record <xsl:value-of select='$form-input/sid'/> to your account.</p> 
+
           </xsl:otherwise>
         </xsl:choose>
         

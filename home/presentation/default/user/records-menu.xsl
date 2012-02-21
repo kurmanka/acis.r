@@ -48,6 +48,11 @@
 </xsl:choose>
 
 
+<xsl:if test='$request/user/type/deceased-list-manager'>
+  <p>Add a profile: <a ref='adm/search/person'>person search</a></p>
+</xsl:if>
+
+
 <p>Other options:</p>
 
 <ul class='menu'>
@@ -58,6 +63,10 @@
   <xsl:text> </xsl:text>
   <i>(Does not yet work)</i>
   </li> -->
+
+<xsl:if test='$request/user/type/deceased-list-manager'>
+  <li><a ref='adm/search/person'>personal profile search</a></li>
+</xsl:if>
 
   <li><a ref='off'>log off</a></li>
 

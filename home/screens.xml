@@ -925,7 +925,7 @@
  <screen id='adm/search/person'>
    <param name='key' required='yes' />
    <use module='ACIS::Web::Admin'/>
-   <call function='ACIS::Web::Admin::check_access'/>
+   <call function='ACIS::Web::Admin::check_access_allow_deceased_volunteer_and_admin'/>
    <init>
      <call function='prepare_form_data' />
    </init>
@@ -1080,7 +1080,7 @@
     <param name='from' required='yes'/>
     <param name='sid'  required='yes'/>
     <use module='ACIS::Web::Admin'/>
-    <call function='ACIS::Web::Admin::check_access'/>
+    <call function='ACIS::Web::Admin::check_access_allow_deceased_volunteer'/>
     <call function='ACIS::Web::Admin::move_record_handler'/>
     <presentation type='xslt' filename='adm/move_record.xsl'/>    
   </screen>

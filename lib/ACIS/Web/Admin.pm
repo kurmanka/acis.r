@@ -52,7 +52,8 @@ sub check_access {
 
 sub check_access_real {
   my $acis = shift;
-  my $pass    = $acis -> config( 'admin-access-pass' );
+  my $allow_deceased_list_manager = shift || 0;
+  my $pass = $acis -> config( 'admin-access-pass' );
   debug "pass real = $pass";
 
   if ( $pass and length( $pass ) > 5 ) { 
@@ -76,11 +77,22 @@ sub check_access_real {
 
   if ( $acis -> load_session_if_possible ) {
     my $session = $acis -> session;
+    
     if ( $session 
          and $session -> owner -> {type}
          and exists $session -> owner -> {type} {admin} ) {
       return 1;
     }
+
+    if ($allow_deceased_list_manager) {
+        if ( $session 
+             and $session -> owner -> {type}
+             and exists $session -> owner -> {type} {'deceased-list-manager'} ) {
+            $acis->variables->{'deceased-list-manager-mode'} = 1;
+            return 1;
+        }
+    }
+
   }
 
   $acis -> clear_process_queue;
@@ -437,7 +449,7 @@ sub move_records {
   my $ud      = $session ->userdata;
   my $login   = $ud ->{owner} {login};
   my $dest    = $ud ->{records};
-  my $moved   = 0;
+  my $moved   = [];
 
   debug "move records to $login account";
   debug "sources: @$src";
@@ -498,7 +510,7 @@ sub move_records {
       # the add_record_to_userdata() is a more careful way to do the same:
       #push @$dest, $_;
       $session -> add_record_to_userdata( $_ );
-      $moved++;
+      push @$moved, $_;
     }
 
     ### XXX this could be deferred until the session end.
@@ -605,12 +617,14 @@ sub remove_account {
 }
 
 
+
 sub move_record_handler {
     my $acis = shift;
-    my $session = $acis->session;
+    my $session = $acis->session || die;
     my $input   = $acis->form_input;
 
     my $is_admin = 1; ### could be 0 if the user is a deceased account volunteer
+    #my $deceased = 1;
 
     #my $to = $input->{to};
     #if ( $to 
@@ -628,8 +642,11 @@ sub move_record_handler {
     my $ret = move_records( $acis, [ [$from, $sid] ] );
     
     debug "got return from move_records(): $ret";
-    if ($ret) {
+    if ( scalar @$ret
+         and $ret->[0] ) {
         $acis->success(1);
+        $acis->variables->{'new-record-sid'}  = $sid;
+        $acis->variables->{'new-record-name'} = $ret->[0]{name}{full};
     } else {
         $acis->success(0);
     }
@@ -637,6 +654,32 @@ sub move_record_handler {
 }
 
 
+# this is for the deceased list manager volunteer
+sub check_access_allow_deceased_volunteer {
+    my $acis = shift;
+    if ( $acis -> load_session_if_possible ) {
+        my $session = $acis -> session;
+        if ( $session 
+             and $session -> owner -> {type} ) {
+            if ( $session -> owner -> {type} {admin} ) {
+                return 1;
+            }
+            if ( exists $session -> owner -> {type} {'deceased-list-manager'} ) {
+                $acis->variables->{'deceased-list-manager-mode'} = 1;
+                return 1;
+            }
+        }
+    }
+    
+    $acis -> clear_process_queue;
+    $acis -> set_presenter( 'adm/pass' ); # XXX this is of no use for the deceased-list-manager
+    return 0;
+}
+
+sub check_access_allow_deceased_volunteer_and_admin {
+  my $acis = shift;
+  my $check = check_access_real( $acis, 'allow deceased manager' );
+}
 
 
 
