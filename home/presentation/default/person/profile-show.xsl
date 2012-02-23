@@ -119,7 +119,7 @@
 
   </xsl:if> <!-- if we have any contact info -->
 
-    <xsl:if test='$response-data/affiliations/list-item'>
+    <xsl:if test='$person/affiliations/list-item'>
 
       <h2>Affiliations
 
@@ -129,7 +129,7 @@
       </h2>
       
       <ul class='institutions'>
-        <xsl:apply-templates select='$response-data/affiliations'/>
+        <xsl:apply-templates select='$person/affiliations'/>
       </ul>
       
     </xsl:if>
@@ -205,13 +205,13 @@
    </xsl:if>
  </xsl:template>
  
- <xsl:template match='affiliations/list-item|items/list-item' xml:space='default'>
+ <xsl:template match='affiliations/list-item' xml:space='default'>
 
    <xsl:text>
    </xsl:text>
    <li class='institution'>
      <span class='title'><xsl:value-of select='name/text()'/></span> 
-     <xsl:if test='share/text()'> 
+     <xsl:if test='(count(../list-item) &gt; 1) and share/text()'> 
        <xsl:text> </xsl:text>
        <small> (weight: <xsl:value-of select='share/text()'/>%)</small>
      </xsl:if>
