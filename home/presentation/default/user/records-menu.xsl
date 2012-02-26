@@ -84,11 +84,11 @@
     <xsl:variable name='record-sid' select='$rec/sid/text()'/>
 
   <xsl:variable name='research-suggestions-number-text'>
-    <xsl:if test='$response-data/*[name()=$record-sid]/research-suggestions-total and 
-                  number($response-data/*[name()=$record-sid]/research-suggestions-total/text()) &gt; 0'>
+    <xsl:if test='$response-data/*[name()=$record-sid]/research-suggestions-exact and 
+                  number($response-data/*[name()=$record-sid]/research-suggestions-exact/text()) &gt; 0'>
       <xsl:text> </xsl:text>
       <span class='notification-number'>
-        <xsl:value-of select='$response-data/*[name()=$record-sid]/research-suggestions-total'/>
+        <xsl:value-of select='$response-data/*[name()=$record-sid]/research-suggestions-exact'/>
       </span>
     </xsl:if>
   </xsl:variable>

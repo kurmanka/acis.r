@@ -10,10 +10,10 @@
   <xsl:variable name='current-screen-id'></xsl:variable>
 
   <xsl:variable name='research-suggestions-number-text'>
-    <xsl:if test='$response-data/*[name()=$record-sid]/research-suggestions-total and 
-                  number($response-data/*[name()=$record-sid]/research-suggestions-total/text()) &gt; 0'>
+    <xsl:if test='$response-data/*[name()=$record-sid]/research-suggestions-exact and 
+                  number($response-data/*[name()=$record-sid]/research-suggestions-exact/text()) &gt; 0'>
       <span class='notification-number'>
-        <xsl:value-of select='$response-data/*[name()=$record-sid]/research-suggestions-total'/>
+        <xsl:value-of select='$response-data/*[name()=$record-sid]/research-suggestions-exact'/>
       </span>
       <xsl:text>&#160;</xsl:text>
     </xsl:if>
