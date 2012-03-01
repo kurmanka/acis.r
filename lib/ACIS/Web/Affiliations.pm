@@ -72,6 +72,58 @@ sub load_institution {
 }
 
 
+sub reload_institutions {
+    my $app = shift;
+    my $affiliations = shift;
+    my $adjust_shares = 0;
+    
+    foreach ( @$affiliations ) {
+        
+        if ( ref $_ eq 'HASH' ) {
+            if ( $_->{id} ) {
+                my $i = load_institution( $app, $_->{id} );
+                if ($i) {
+                    if (exists $_->{share}) { $i->{share} = $_->{share}; }
+                    $_ = $i;
+                } else {
+                    undef $_;
+                    $adjust_shares = 1;
+                }
+            }
+            # else: do nothing
+            
+        } else { 
+            # legacy support: just a string, not a hash
+            my $institution = load_institution( $app, $_ );
+            if ( $institution ) {
+                $_ = $institution;
+            } else { 
+                undef $_;
+                $adjust_shares = 1;
+            }
+        }
+    }
+    return $adjust_shares;
+}
+
+
+sub upgrade_affiliations_list {
+  my $app    = shift;
+  my $record = shift || die;
+
+  debug "upgrade affiliations list";
+  my $id      = $record -> {id};
+  my $affiliations = $record -> {affiliations};
+  
+  return
+      unless defined $affiliations and scalar @$affiliations;
+
+  # reload each affiliation, which has an id from the database
+  my $adjust_shares = reload_institutions( $app, $affiliations );
+
+  debug "upgrade affiliations list: done";
+}
+
 sub prepare {
   my $app = shift;
 
@@ -94,34 +146,7 @@ sub prepare {
   }
 
   # reload each affiliation, which has an id from the database
-  my $adjust_shares = 0;
-  foreach ( @$affiliations ) {
-
-    if ( ref $_ eq 'HASH' ) {
-        
-      if ( $_->{id} ) {
-         my $i = load_institution( $app, $_->{id} );
-         if ($i) {
-             if (exists $_->{share}) { $i->{share} = $_->{share}; }
-             $_ = $i;
-         } else {
-             undef $_;
-             $adjust_shares = 1;
-         }
-      }
-      # else: do nothing
-
-    } else { 
-      # legacy support: just a string, not a hash
-      my $institution = load_institution( $app, $_ );
-      if ( $institution ) {
-        $_ = $institution;
-      } else { 
-        undef $_;
-        $adjust_shares = 1;
-      }
-    }
-  }
+  my $adjust_shares = reload_institutions( $app, $affiliations );
 
   # to set initial shares for the existing accounts with multiple shares
   if ( scalar @$affiliations > 1
@@ -141,7 +166,8 @@ sub prepare {
 sub prepare_for_presenter {
     my $app = shift;
     my $affiliations = $app->session->current_record->{affiliations} || [];
-    if (scalar ( @$affiliations ) > 1) {
+    if ( scalar ( @$affiliations ) > 1
+         and exists $affiliations->[0]{share} ) {
         $app->variables->{'with-shares'} = 1;
     }
     $app -> variables->{affiliations} = $affiliations;

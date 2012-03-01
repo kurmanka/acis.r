@@ -80,9 +80,9 @@
           <xsl:value-of select='contact/fax'/>
         </fax>
       </xsl:if>
-      <xsl:if test='$response-data/affiliations/list-item'>
+      <xsl:if test='affiliations/list-item'>
         <ispartof>
-          <xsl:for-each select='$response-data/affiliations/list-item'>
+          <xsl:for-each select='affiliations/list-item'>
             <organization>
               <xsl:if test='id/text()'>
                 <xsl:attribute name='ref'>

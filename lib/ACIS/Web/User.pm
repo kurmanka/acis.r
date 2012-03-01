@@ -415,9 +415,6 @@ sub profile_overview {
   my $app = shift;
   
   $app -> variables -> {record} = $app -> session -> current_record();
-
-  require ACIS::Web::Affiliations;
-  ACIS::Web::Affiliations::prepare( $app );
 }
 
 

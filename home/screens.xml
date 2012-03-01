@@ -218,11 +218,9 @@
  <screen id='profile-overview'>
  
    <use module='ACIS::Web::User'/>
-   <use module='ACIS::Web::Affiliations'/>
    <use module='ACIS::Web::Contributions' />
 
    <call function='load_session' />
-   <call function='ACIS::Web::Affiliations::prepare'/>
    <call function='ACIS::Web::Contributions::prepare_the_role_list'/>
 
    <call function='ACIS::Web::User::profile_overview'/>

@@ -50,7 +50,7 @@ Workplace-Homepage: <xsl:value-of select='homepage'/>
       </xsl:if>
     </xsl:when>
   </xsl:choose>
-  <xsl:if test='$affiliations-count &gt; 1'>
+  <xsl:if test='($affiliations-count &gt; 1) and (share/text())'>
 Workplace-Share: <xsl:value-of select='share'/>
   </xsl:if>
 </xsl:for-each>

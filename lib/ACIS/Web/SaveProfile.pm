@@ -138,10 +138,7 @@ sub write_outside_personal_profile {
   $variables ->{record} = $record;
 
 
-  ###  prepare affiliations 
-  $variables ->{affiliations} = undef;
-  require ACIS::Web::Affiliations;
-  ACIS::Web::Affiliations::prepare( $app );
+  ###  prepare affiliations -- no need to prepare
 
   ###  prepare contributions 
   require ACIS::Web::Contributions;

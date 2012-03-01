@@ -167,10 +167,7 @@ sub make_amf_record {
   ACIS::Web::Contributions::prepare_the_role_list( $acis );
   delete $variables ->{contributions};
 
-  ###  prepare affiliations 
-  $variables ->{affiliations} = undef;
-  require ACIS::Web::Affiliations;
-  ACIS::Web::Affiliations::prepare( $acis );
+  ###  prepare affiliations -- no need to
 
   ### prepare doclinks
   require ACIS::Web::DocLinks;

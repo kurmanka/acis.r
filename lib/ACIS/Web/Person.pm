@@ -34,6 +34,8 @@ use Carp::Assert;
 use Web::App::Common qw( &date_now &clear_undefined debug );
 use ACIS::Web::HumanNames qw(normalize_and_filter_names);
 
+use ACIS::Web::Affiliations;
+
 sub parse_name_variations {
     my $string = shift;
     $string =~ s/[ \t]+/ /g;
@@ -253,6 +255,9 @@ sub bring_up_to_date {
       delete $record->{temporarysid};
     }
   }
+
+  ACIS::Web::Affiliations::upgrade_affiliations_list( $app, $record );
+  
 }
 
 
