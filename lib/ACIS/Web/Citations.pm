@@ -116,7 +116,7 @@ sub prepare_suggestion_count {
   if ($sid) {
       if ( not $session->{$sid} 
            or not $session->{$sid}{"citation-suggestions-new-total"} ) {
-          my $count = get_sysprof_value( $sid, 'citation-suggestions-new-total' );
+          my $count = get_sysprof_value( $sid, 'citation-suggestions-new-total' ) || 0;
           debug "got cit suggestions count for $sid: $count";
           $session->{$sid}{"citation-suggestions-new-total"} = $count;
           # make the above always available to the presenter:
