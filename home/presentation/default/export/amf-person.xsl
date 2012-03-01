@@ -6,17 +6,20 @@
   xmlns='http://amf.openlib.org'
   exclude-result-prefixes="exsl xml acis"
   version='1.0'>
+
   <xsl:import href='../global.xsl'/>
   <xsl:import href='../indent.xsl'/>
-  <xsl:output method='xml'
-              encoding='utf-8'/>
+  <xsl:output method='xml' encoding='utf-8'/>
+
   <!-- cardiff -->
   <xsl:variable name='person-roles'>
     <author/>
     <editor/>
     <publisher/>
   </xsl:variable>  
+
   <xsl:template match='text()'/>  
+
   <xsl:template match='/data'>
     <amf xmlns='http://amf.openlib.org'
          xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance'
@@ -24,6 +27,7 @@
       <xsl:apply-templates select='//record'/>
     </amf>
   </xsl:template>
+
   <xsl:template match='//record[id and type="person"]'>
     <xsl:variable name='record'
                   select='.'/>
@@ -80,6 +84,7 @@
           <xsl:value-of select='contact/fax'/>
         </fax>
       </xsl:if>
+
       <xsl:if test='affiliations/list-item'>
         <ispartof>
           <xsl:for-each select='affiliations/list-item'>
@@ -106,6 +111,7 @@
           </xsl:for-each>
         </ispartof>
       </xsl:if>
+
       <!-- name variations -->
       <xsl:choose>
         <xsl:when test='$response-data/name/additional-variations/list-item'>
@@ -121,6 +127,7 @@
           <acis:no_additional_names/>
         </xsl:otherwise>
       </xsl:choose>
+
       <!--  research profile -->
       <xsl:if test='contributions/accepted/list-item'>
         <xsl:call-template name='accepted-texts'>
@@ -142,6 +149,7 @@
         <xsl:value-of select='sid'/>
       </acis:shortid>
     </person>
+
     <!-- doclinks  -->
     <xsl:variable name='doclinks-conf' 
                   select='$response-data/doclinks-conf'/>
@@ -176,6 +184,7 @@
       </text>
     </xsl:for-each>
   </xsl:template>    
+
   <xsl:template name='accepted-texts'>
     <xsl:param name='current'/>
     <xsl:param name='citations'/>
@@ -213,6 +222,7 @@
       </xsl:if>
     </xsl:for-each>
   </xsl:template>
+
   <xsl:template name='refused-texts'>
     <xsl:param name='current'/>
     <xsl:param name='citations'/>
@@ -244,6 +254,7 @@
         </xsl:for-each>
       </xsl:element>
   </xsl:template>
+
   <!-- template to convert texts -->
   <xsl:template name='text'>
     <xsl:param name='text'/>
@@ -264,6 +275,7 @@
       </xsl:call-template>
     </text>
   </xsl:template>
+
   <!-- recursive template to split author name string -->
   <xsl:template name='allauthors'>
     <xsl:param name='author-string'/>
@@ -297,6 +309,7 @@
       </xsl:otherwise>
     </xsl:choose>
   </xsl:template>
+
   <!-- author name without trailing comma -->
   <xsl:template name='author-without-comma'>
     <xsl:param name='author-name'/>
@@ -327,4 +340,5 @@
       </person>
     </hasauthor>
   </xsl:template>
+
 </xsl:stylesheet>

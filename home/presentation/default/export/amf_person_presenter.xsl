@@ -6,17 +6,22 @@
   xmlns='http://amf.openlib.org'
   exclude-result-prefixes="exsl xml acis"
   version='1.0'>
+
   <xsl:import href='../global.xsl'/>
   <xsl:import href='../indent.xsl'/>
   <xsl:import href='../person/research/person-listings.xsl'/>
+
   <xsl:output method='xml'
               encoding='utf-8'/>
+
   <xsl:variable name='person-roles'>
     <author/>
     <editor/>
     <publisher/>
   </xsl:variable>  
+
   <xsl:template match='text()'/>  
+
   <xsl:template match='/data'>
     <amf xmlns='http://amf.openlib.org'
          xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance'
@@ -24,6 +29,7 @@
       <xsl:apply-templates select='//record'/>
     </amf>
   </xsl:template>
+
   <xsl:template match='//record[id and type="person"]'> 
     <xsl:call-template name='amf-person'>
     <xsl:with-param name='record'
@@ -34,6 +40,7 @@
                     select='citations/identified'/>
     </xsl:call-template>
   </xsl:template>
+
   <xsl:template name='amf-person'>
     <xsl:param name='record'/>
     <xsl:param name='citations'/>
@@ -101,9 +108,10 @@
           <xsl:value-of select='//last-change-date/text()'/> 
         </acis:last-change-date>
       </xsl:if>
-      <xsl:if test='$input-data/affiliations/list-item'>
+
+      <xsl:if test='affiliations/list-item'>
         <ispartof>
-          <xsl:for-each select='$input-data/affiliations/list-item'>
+          <xsl:for-each select='affiliations/list-item'>
             <organization>
               <xsl:if test='id/text()'>
                 <xsl:attribute name='ref'>
@@ -127,6 +135,7 @@
           </xsl:for-each>
         </ispartof>
       </xsl:if>
+
       <!-- name variations -->     
       <xsl:choose>
         <xsl:when test='contributions/autosearch/names-list/list-item'>
@@ -142,6 +151,7 @@
           <acis:no_additional_names/>
         </xsl:otherwise>
       </xsl:choose>
+
       <!--  research profile -->
       <xsl:if test='contributions/accepted/list-item'>
         <xsl:call-template name='accepted-texts'>
@@ -165,6 +175,7 @@
       </xsl:if>
       <xsl:text>&#x0a;</xsl:text>
     </person>
+
     <xsl:variable name='doclinks-conf' 
                   select='$input-data/doclinks-conf'/>
     <xsl:for-each select='doclinks/list-item'>
@@ -197,6 +208,7 @@
       </text>
     </xsl:for-each>
   </xsl:template>    
+
   <xsl:template name='accepted-texts'>
     <xsl:param name='current'/>
     <xsl:param name='citations'/>
@@ -236,6 +248,7 @@
       </xsl:if>
     </xsl:for-each>
   </xsl:template>
+
   <xsl:template name='refused-texts'>
     <xsl:param name='current'/>
     <xsl:param name='citations'/>
@@ -269,6 +282,7 @@
       </xsl:element>
     </xsl:for-each>
   </xsl:template>
+
   <!-- template to convert texts -->
   <xsl:template name='text'>
     <xsl:param name='text'/>
@@ -294,6 +308,7 @@
       </acis:relevance>
     </text>
   </xsl:template>
+
   <!-- needs to be defined for person-listings.xsl to work -->
   <xsl:template name='what-to-do-with-person-name'>
     <xsl:param name='person-name'/>
@@ -305,4 +320,5 @@
       </person>
     </hasauthor>
   </xsl:template>
+
 </xsl:stylesheet>
