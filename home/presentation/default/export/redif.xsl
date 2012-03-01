@@ -35,7 +35,7 @@ Name-ASCII: <xsl:value-of select='name/latin'/>
 </xsl:if>
 
 <xsl:for-each select='affiliations/list-item' >
-Workplace-Name: <xsl:value-of select='name'/>
+Workplace-Name: <xsl:value-of select='translate(name/text(),"&#x2192;","/")'/>
   <xsl:choose>
     <xsl:when test='id'>
 Workplace-Institution: <xsl:value-of select='id'/>
@@ -43,7 +43,7 @@ Workplace-Institution: <xsl:value-of select='id'/>
     <xsl:when test='name'>
 Workplace-Location: <xsl:value-of select='location'/>
       <xsl:if test='name-english/text()'>
-Workplace-Name-English: <xsl:value-of select='name-english'/>
+Workplace-Name-English: <xsl:value-of select='translate(name-english/text(),"&#x2192;","/")'/>
       </xsl:if>
       <xsl:if test='homepage/text()'>
 Workplace-Homepage: <xsl:value-of select='homepage'/>
