@@ -29,6 +29,7 @@ use strict;
 use Carp::Assert;
 use Data::Dumper;
 use Digest::MD5 qw(md5 md5_base64);
+use Carp qw(confess);
 
 use Web::App::Common qw( &date_now debug );
 
@@ -306,9 +307,9 @@ sub userdata {
 
 sub load_userdata_temp {
     my $self = shift;
-    my $file = $self->{'.userdata.tempfile'} || die "no tempfile defined";
+    my $file = $self->{'.userdata.tempfile'} || confess "no tempfile defined";
     if (not -f $file) {
-        $file = $self->{'.userdata.readfrom'} || die "no readfrom file defined";
+        $file = $self->{'.userdata.readfrom'} || confess "no readfrom file defined";
     }
     debug "->load_userdata_temp(): $file";
     return ACIS::Web::UserData->load( $file );
