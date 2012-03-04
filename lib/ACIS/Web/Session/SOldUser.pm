@@ -196,6 +196,10 @@ sub set_userdata {
         return;
     }
 
+    if (not $ud_file) {
+        $ud_file = $ud ->read_from_file || $ud->save_to_file || confess "userdata filename is undefined";
+    }
+
     my $owner   = $ud->{owner};
     my $records = $ud->{records};
     debug "->set_userdata(): owner $owner + ", scalar @$records, " record(s)";
@@ -213,21 +217,19 @@ sub set_userdata {
     # this will stay there until ->save()
     $self->{'.userdata'} = $ud;
 
-    if ($ud_file) {
-        $self->{'.userdata.tempfile'} = $ud_file . ".new";
-        $self->{'.userdata.saveto'}   = $ud_file;
-        $self->{'.userdata.readfrom'} = $ud_file;
-        
-        # just for safety, we should check if the tempfile already
-        # exists, and clean it up.  we could delete it. Or we could
-        # move it to another file, just to avoid deleting someone's
-        # changes.
-        if ( -e $self->{'.userdata.tempfile'} ) {
-            unlink $self->{'.userdata.tempfile'};
-        }
-    } else {
-        die "userdata set, but the userdata filenames are not";
+    $self->{'.userdata.tempfile'} = $ud_file . ".new";
+    $self->{'.userdata.saveto'}   = $ud_file;
+    $self->{'.userdata.readfrom'} = $ud_file;
+    
+    # just for safety, we should check if the tempfile already
+    # exists, and clean it up.  we could delete it. Or we could
+    # move it to another file, just to avoid deleting someone's
+    # changes.
+    if ( -e $self->{'.userdata.tempfile'} ) {
+        unlink $self->{'.userdata.tempfile'};
     }
+
+    $self->{'.app'} ->update_paths;
 
     if ( not $self->make_lock_for( $ud_file ) ) {
         return undef;
@@ -302,7 +304,10 @@ sub prepare_userdata_for_save {
 sub userdata {
     my $self = shift;
     if ($self->{'.userdata'}) { return $self->{'.userdata'}; }
-    return( $self->{'.userdata'} = $self->load_userdata_temp );
+    if ($self->{'.userdata.tempfile'}) {
+        return( $self->{'.userdata'} = $self->load_userdata_temp );
+    }
+    return undef;
 }
 
 sub load_userdata_temp {

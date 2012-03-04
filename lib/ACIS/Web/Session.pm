@@ -243,7 +243,7 @@ sub has_userdata_changed {
 }
 
 
-sub object_set { 
+sub set_userdata {
   my $self   = shift;
   my $object = shift;
   my $file   = shift;
@@ -251,12 +251,15 @@ sub object_set {
   if ( not defined $file and defined $object ) {
     $file = $object -> save_to_file;   ### XX UserData interface
   }
+  
+  my $login = $object->owner->{login};
+  $self->{'.app'}->update_paths_for( $login );
 
   return $self -> SUPER::object_set( $object, $file, @_ );
 }
 
 
-sub set_object_file {
+sub set_userdata_file {
   my $self    = shift;
   my $newfile = shift;
   my $inner = $self ->{_};
@@ -270,14 +273,14 @@ sub userdata {
   return $self -> object( @_ );
 }
 
-sub set_userdata {
+sub object_set {
   my $self   = shift;
-  return $self -> object_set( @_ );
+  return $self -> set_userdata( @_ );
 }
 
-sub set_userdata_file {
+sub set_object_file {
   my $self   = shift;
-  return $self -> set_object_file( @_ );
+  return $self -> set_userdata_file( @_ );
 }
 
 sub userdata_owner { 
