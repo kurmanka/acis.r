@@ -252,8 +252,10 @@ sub set_userdata {
     $file = $object -> save_to_file;   ### XX UserData interface
   }
   
-  my $login = $object->owner->{login};
-  $self->{'.app'}->update_paths_for( $login );
+  my $login = $object->{owner}->{login};
+  if ($login) {
+      $self->{'.app'}->update_paths_for_login( $login );
+  }
 
   return $self -> SUPER::object_set( $object, $file, @_ );
 }
