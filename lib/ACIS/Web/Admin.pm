@@ -1010,9 +1010,9 @@ sub adm_search_for_records {
   $table = 'records';
 
   my $query_text = join( '', 
-                    $q -> {what},
+                    $q -> {what} || '',
                     " from $table ",
-                    $q -> {where},
+                    $q -> {where} || '',
                     $q -> {limit} );
 
 
@@ -1045,9 +1045,9 @@ sub adm_search_for_users {
   $table = 'users';
 
   my $query_text = join( '', 
-                    $q -> {what},
+                    $q -> {what} || '',
                     " from $table ",
-                    $q -> {where},
+                    $q -> {where} || '',
                     $q -> {limit} );
 
 
@@ -1090,9 +1090,9 @@ sub adm_search_person {
 
   my $q = analyse_search_parameters( );
   my $query_text = join( '', 
-                    $q -> {what},
+                    $q -> {what} || '',
                     " from $table ",
-                    $q -> {where},
+                    $q -> {where} || '',
                     $q -> {limit} );
   debug "QUERY: $query_text";
   $result -> {query} = $query_text;

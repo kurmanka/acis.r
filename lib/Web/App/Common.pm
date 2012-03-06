@@ -119,6 +119,7 @@ $dumped_debug = 0;
 
 
 sub debug {
+  clear_undefined \@_;
   my $message = join '', @_;
 
 #  return unless $Web::App::DEBUG;

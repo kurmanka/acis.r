@@ -131,7 +131,7 @@ sub update_suggestion_count {
 
   # suggestions counts: get from simmatrix, put into session
   if ($sid and $mat and $session) {
-    my $old = $session ->{$sid}{'citation-suggestions-new-total'};
+    my $old = $session ->{$sid}{'citation-suggestions-new-total'} || 0;
     my $new = $mat->number_of_new_potential;
     $session ->{$sid}{'citation-suggestions-new-total'} = $new;
     # save updated value to sysprof

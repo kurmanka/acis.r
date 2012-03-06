@@ -693,7 +693,7 @@ sub adjust_shares {
 
     foreach (@$affiliations) {
         my $idorname = $_->{id} || $_->{name};
-        debug "  " . $idorname  . ": " . $_->{share};
+        debug "  " . $idorname  . ": " , $_->{share};
         if (not $_->{share}) {
             $_->{share} = $share_default;
         }
