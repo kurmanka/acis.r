@@ -3,27 +3,29 @@
     xmlns:exsl='http://exslt.org/common'
     xmlns:acis='http://acis.openlib.org'
     xmlns:html='http://www.w3.org/1999/xhtml'
-    
-    exclude-result-prefixes='exsl xml html acis'
+    exclude-result-prefixes='exsl html acis'
     version='1.0'>
+
   <xsl:import href='main.xsl' />
+
   <xsl:variable name='parents'>
     <acis:par id='research/main'/>
   </xsl:variable>
   <xsl:variable name='current-screen-id'>research/identified</xsl:variable>
+
   <!--    v a r i a b l e s    -->
   <xsl:variable name='current'
                 select='$contributions/accepted'/>
   <xsl:variable name='config-object-types' 
                 select='$contributions/config/types'/> 
+
   <xsl:template name='table-resources-for-editing'>
     <xsl:param name='list'/>
     <tr class='here'>
       <th width='6%'>delete</th>
       <th class='desc'> item description </th>
     </tr>    
-    <xsl:for-each select='$list/list-item[id and title]' 
-                  xml:space='preserve'>
+    <xsl:for-each select='$list/list-item[id and title]' xml:space='preserve'>
       <xsl:variable name='sid'
                     select='generate-id(.)'/>
       <xsl:variable name='dsid'
@@ -98,8 +100,7 @@
             </xsl:choose>
         </td>
         <td class='description'>
-          <xsl:call-template name='present-resource'
-                             xml:space='default'>
+          <xsl:call-template name='present-resource' xml:space='default'>
             <xsl:with-param name='resource'
                             select='.'/>
             <xsl:with-param name='for'
@@ -134,6 +135,7 @@
       </tr>      
     </xsl:for-each>
   </xsl:template>
+
   <xsl:template name='research-identified'>
     <h1>
       <xsl:text>Research profile: your identifed works</xsl:text>
@@ -184,6 +186,7 @@
       </xsl:otherwise>  
     </xsl:choose>
   </xsl:template>
+
   <!--   n o w   t h e   p a g e   t e m p l a t e    -->
   <xsl:template match='/data'>
     <xsl:call-template name='research-page'>
@@ -193,4 +196,5 @@
       </xsl:with-param>
     </xsl:call-template>
   </xsl:template>
+
 </xsl:stylesheet>

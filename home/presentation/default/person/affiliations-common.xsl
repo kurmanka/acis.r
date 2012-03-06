@@ -85,7 +85,7 @@
     <xsl:param name='list'/>
     <xsl:param name='full' select='"yes"'/>
 
-    <xsl:for-each select='$list/list-item' xml:space='preserve'>
+    <xsl:for-each select='$list/list-item'>
       <xsl:variable name='alter' xml:space='default'>
         <xsl:if test='(position()) mod 2'>
           <xsl:text> alternate</xsl:text>
@@ -198,7 +198,7 @@ function recalculate_total() {
     <input type='hidden' name='spare' value='' />
 
 
-    <xsl:for-each select='$list/list-item' xml:space='preserve'>
+    <xsl:for-each select='$list/list-item'>
       <xsl:variable name='alter' xml:space='default'>
         <xsl:if test='(position()) mod 2'>
           <xsl:text> alternate</xsl:text>
@@ -242,7 +242,7 @@ function recalculate_total() {
     <xsl:param name='list'/>
     <xsl:param name='mode'/>
     <xsl:param name='full' select='"yes"'/>
-    <xsl:for-each select='$list/list-item' xml:space='preserve'>
+    <xsl:for-each select='$list/list-item'>
       <xsl:variable name='alter' xml:space='default'>
         <xsl:if test='(position()+1) mod 2'>
           <xsl:text> alternate</xsl:text>
