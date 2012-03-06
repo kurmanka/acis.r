@@ -56,6 +56,7 @@ sub welcome {
   my $owner    = $session ->userdata_owner;
 
   if ( $owner->{type}{advanced} 
+       or $owner->{type}{'deceased-list-manager'} 
        or scalar( @$reclist ) > 1 ) {
 
       # the following line is needed to make recent changes to the current
