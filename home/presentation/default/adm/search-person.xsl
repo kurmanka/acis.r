@@ -1,6 +1,7 @@
 <xsl:stylesheet
     xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
     xmlns:exsl="http://exslt.org/common"
+    xmlns:str="http://exslt.org/strings" 
     xmlns:acis="http://acis.openlib.org"
     xmlns:html="http://www.w3.org/1999/xhtml"
     exclude-result-prefixes="exsl html acis"
@@ -85,7 +86,7 @@ co {
                       </a>
                     </xsl:when>
                     <xsl:otherwise>
-                      <a ref='adm/move-record?from={owner}&amp;sid={shortid}'>add to my account</a>
+                      <a ref='adm/move-record?from={str:replace(owner,"+","%2b")}&amp;sid={shortid}'>add to my account</a>
                     </xsl:otherwise>
                   </xsl:choose>
                 </td>
