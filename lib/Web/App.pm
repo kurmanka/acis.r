@@ -694,7 +694,9 @@ sub handle_request {
   $unescaped_url =~ s/%(\w\w)/chr(hex($1))/eg;
 
   my $hostname  = $ENV{HTTP_HOST} || '';
-  my $requested_url = "http://$hostname$unescaped_url";
+  my $protocol  = ($ENV{HTTPS} eq 'on') ? "https" : "http";
+  my $requested_url = $unescaped_url;
+  my $requested_url_full = "$protocol://$hostname$unescaped_url";
 
   my $request = $self -> {request} = {
     CGI     => undef,                    # will be set later
@@ -744,7 +746,7 @@ sub handle_request {
   debug "CGI object: $query";
 
   ### parse the request
-  my ( $screen_name, $session_id ) = $self ->parse_request_url( $requested_url );
+  my ( $screen_name, $session_id ) = $self ->parse_request_url( $requested_url, $requested_url_full );
 
   {
     my $ip  = $request->{ip} || '';
@@ -993,6 +995,7 @@ sub post_process_content {
    </div>
 
 _DEBUG_INCLUDE
+#'; # for emacs Perl mode syntax 
 
     my $mark = '<!-- debuggings go here -->';
     my $index = index( $$out, $mark );
@@ -1133,17 +1136,16 @@ sub prepare_presenter_data {
 
 sub parse_request_url {
   my $self = shift;
-  my $url  = shift;
+  my $url  = shift; # the part after the hostname, e.g. /new-user
+  my $full = shift; # e.g. https://authors.repec.org/new-user/secodnary!a091b4d3
 
-  my $base_url  = $self -> config( 'base-url' );
-
-  my ( $the_request ) = ( $url =~ m[^$base_url/*(.*?)(?:\?|$)] );
+  my ( $the_request ) = ( $url =~ m!^/*(.*?)(?:\?|$)! );
   if ( not defined $the_request ) {
     $the_request = '';
   }
 
 #  warn "handling request: $the_request\n";
-  debug "processing url, full: $url, relative: $the_request";
+  debug "processing url, full: $full, relative: $the_request";
   
   my ( $screen_name, $session_id ) = split '!', $the_request;
 

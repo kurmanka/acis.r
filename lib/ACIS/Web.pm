@@ -184,8 +184,9 @@ sub init_presenter_data {
 sub parse_request_url {
   my $self = shift;
   my $url  = shift;
+  my $full = shift;
 
-  my ( $screen, $session ) = $self -> SUPER::parse_request_url( $url );
+  my ( $screen, $session ) = $self -> SUPER::parse_request_url( $url, $full );
 
   my $req  = $self -> {request};
   if ( $screen and $screen =~ m!^(\w+\d+)/(.+)! ) {  ### (p\w+\d+) XXX
