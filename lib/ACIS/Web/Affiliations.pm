@@ -626,7 +626,7 @@ sub general_handler {
     my $save_shares = 0;
     foreach my $k (keys %$input) {
         my $v = $input->{$k};
-        if( $k =~ m/^(\w+)(\d+)/ ) { $form->[$2]{$1} = $v; debug "affiliations form: param $1 of $2 ='$v'"; next; }
+        if( $k =~ m/^(\w+?)(\d+)/ ) { $form->[$2]{$1} = $v; debug "affiliations form: param $1 of $2 ='$v'"; next; }
         if( $k eq 'saveshare' ) {    $save_shares = 1;  }
     }
 
