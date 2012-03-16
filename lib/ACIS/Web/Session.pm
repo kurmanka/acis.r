@@ -39,26 +39,17 @@ sub new {
   return $self;
 }
 
+sub username {
+    my $self = shift;
+    my $o = $self->userdata_owner || $self->{'.owner'} || {};
+    return $o->{login} || undef;
+}
 
 sub load {
   my $class = shift;
   my @param = @_;
 
   my $self  = $class -> SUPER::load( @param );
-
-  ### respect request parameter "short-id"
-  if ( $self ) {
-    my $app = $self -> {'.app'};
-    if ( my $sid = $app -> {request} {'short-id'} ) {
-      debug "request -> sid:$sid";
-      
-      if ( $self -> choose_record_by_id( $sid ) ) {
-        # good
-      } else {
-        $app  -> error( "bad-short-id-in-request" );
-      } 
-    }
-  }
 
   return $self;
 }
@@ -123,39 +114,61 @@ sub set_current_record_no {
   my $old = $self -> {'.userdata.current_record.no'};
   if ( defined $old and ($old == $no) ) { return $old; }
 
+  debug "->set_current_record_no( $no )";
+
+  if ( defined $old ) {
+      debug "save current record and save userdata (temp)";
+      $self ->save_current_record('closeit');
+      $self ->save_userdata_temp;
+  }
+
   $self -> {'.userdata.current_record.no'} = $no;
 
   my $userdata = $self-> userdata;
+  my $records  = $userdata ->{records};
+  my $reclist  = $self->{'.userdata.record_list'};
+
   if ( defined $userdata
-       and defined $userdata   ->{records}
-       and scalar @{ $userdata ->{records} } 
+       and defined $records
+       and scalar @$records 
      ) {
-    my $records = $userdata ->{records};
 
-    if ( scalar @$records ) {
+      my $app = $self ->{'.app'};
+      my $rec = $records -> [$no]; 
 
-      if ( not defined $old or $old != $no ) {
-
-        my $app = $self ->{'.app'};
-        my $rec = $userdata ->{records} [$no]; 
-        $self->{'.userdata.current_record'} = $rec;
-
-        if ( $rec->{id} ) {
+      if (not $rec) { die "no such record: $no"; }
+      $self->{'.userdata.current_record'} = $rec;
+      
+      if ( $rec->{id} ) {
           $app -> sevent( -class => 'record',
                           -descr => 'identifier',
                           -id    => $rec ->{id},
-          $rec->{sid} ? ( -sid   => $rec ->{sid} ) : ()
-                        );
+                          $rec->{sid} ? ( -sid   => $rec ->{sid} ) : ()
+          );
           debug "set_current_record: id:$rec->{id}, sid:$rec->{sid}";
-        }
-      }
 
+
+          # now do some compatibility checks & upgrades for the record
+          if ($reclist and 
+              not $reclist->[$no]->{upgradechecked}) {
+              $reclist->[$no]->{upgradechecked} = 1;
+              require ACIS::Web::Person;
+              ACIS::Web::Person::bring_up_to_date( $ACIS::Web::ACIS, $rec );
+          }
+
+      }
       return $old;
-    } 
-  } 
-  return undef;
+
+  } else { 
+      # WTF?
+      return undef; 
+  }
+    
 }
 
+
+sub save_userdata_temp {}   # overridden in SOldUser
+sub save_current_record {}  # overridden in SOldUser
 
 
 use RePEc::Index::UpdateClient qw( &send_update_request );

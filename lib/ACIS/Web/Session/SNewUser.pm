@@ -45,15 +45,22 @@ sub new {
   my $class = shift;
   my $acis  = shift;
   my $login = shift;
+
   my $self  = $class -> SUPER::new( $acis, @_ ) or return undef; 
   $acis    -> update_paths_for_login( $login );
   my $udata = $acis -> create_userdata();
   $self    -> object_set( $udata );
   $udata -> {owner} = $self ->{'.owner'};
+  $self ->{'.login'} = $login;
   return $self;
 }
 
 sub current_record { return $_[0]->userdata->{records}->[0]; }
+
+sub username {
+  my $self = shift;
+  return $self->{'.login'};
+}
 
 sub close {
   my $self = shift;

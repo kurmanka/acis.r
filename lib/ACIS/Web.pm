@@ -326,6 +326,12 @@ sub prepare_presenter_data {
   my $self = shift;
   $self -> SUPER::prepare_presenter_data();
   
+  my $session = $self->session;
+  if ($session) {
+      my $rec = $session->current_record;
+      if ($rec) { $self->set_current_record ($rec); }
+  }
+
   if ( defined $self->{request}{'short-id'} ) {
     $self->{'presenter-data'}{request}{'short-id'} = $self->{request}{'short-id'};
   }
@@ -423,7 +429,24 @@ sub update_paths_for_login {
 }
 
 
- 
+sub set_current_record {
+    my $self   = shift;
+    my $record = shift;
+
+    if ( $record ) {
+        my $cur_rec = {
+            id      => $record -> {id},
+            name    => $record -> {name} {full},
+            type    => $record -> {type},
+            shortid => $record -> {sid},             };
+        if ( $record->{'about-owner'} ) {
+            $cur_rec ->{'about-owner'} = $record ->{'about-owner'};
+        }
+        my $preq = $self -> {'presenter-data'} {request};
+        $preq -> {session} {'current-record'} = $cur_rec;
+    }
+}
+
 sub session {
   my $self    = shift;
   my $session = shift;
@@ -431,10 +454,7 @@ sub session {
 
   $self -> SUPER::session( $session );
 
-  if ( not $session -> owner ->{login} ) {
-    return $session;
-  }
-  $self -> set_username( $session -> owner -> {login} );
+  $self -> set_username( $session -> username );
     
   my $id       = $session ->id;
   my $type     = $session ->type;
@@ -444,19 +464,8 @@ sub session {
 #  if ( $realuser ) { $realuser = " for user $realuser";  }
 #  $self -> userlog ( "using session $id ($type)$realuser" );
 
-  my $record = $session -> current_record;
-  if ( $record ) {
-    my $cur_rec = {
-                   id      => $record -> {id},
-                   name    => $record -> {name} {full},
-                   type    => $record -> {type},
-                   shortid => $record -> {sid},             };
-    if ( $record->{'about-owner'} ) {
-      $cur_rec ->{'about-owner'} = $record ->{'about-owner'};
-    }
-    my $preq = $self -> {'presenter-data'} {request};
-    $preq -> {session} {'current-record'} = $cur_rec;
-  }
+#  $
+
   return $session;
 }
 

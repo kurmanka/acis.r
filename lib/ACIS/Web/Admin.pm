@@ -1373,7 +1373,7 @@ sub adm_log_into {
                    -descr => 'admin entering into a user account',
                    -file  => $ud_file,
                    -login => $target_login,
-                 -process => $owner -> {login},
+                -realuser => $owner -> {login},
                -humanname => $user->{name},
                  );
 

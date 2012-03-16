@@ -49,7 +49,6 @@ sub digest {
 }
 
 
-
 sub type { 'user' }
 
 sub close {
@@ -237,7 +236,7 @@ sub set_userdata {
 
     if (scalar @$rl == 1) {
         # if there is just one record, choose the first one as the default
-        $self->set_current_record_no( 0 );
+        #$self->set_current_record_no( 0 );
     }
     
     return 1;
@@ -352,45 +351,6 @@ sub save_userdata_file {
     return $self->save_userdata_final();
 }
 
-
-sub set_current_record_no {
-    my $self = shift || die;
-    my $no   = shift;
-    debug "->set_current_record_no( $no )";
-
-    my $reclist = $self->{'.userdata.record_list'};
-    my $cur_no  = $self->{'.userdata.current_record.no'};
-
-    if (defined $cur_no) {
-        if ($cur_no == $no) {
-            return $cur_no;
-        } else {
-            debug "save current record and save userdata (temp)";
-            $self ->save_current_record('closeit');
-            $self ->save_userdata_temp;
-        }
-    }
-    
-    if (not $reclist->[$no]) {
-        debug "this record is not in the reclist!";
-    }
-    
-    my $rec  = $self->userdata->{records}->[$no];
-    if (not $rec) { die "no such record: $no"; }
-    $self->{'.userdata.current_record'}    = $rec;
-    $self->{'.userdata.current_record.no'} = $no;
-    
-    debug "record $no is now current";
-    
-    # now do some compatibility checks for the record
-    if (not $reclist->[$no]->{upgradechecked}) {
-        $reclist->[$no]->{upgradechecked} = 1;
-        require ACIS::Web::Person;
-        ACIS::Web::Person::bring_up_to_date( $ACIS::Web::ACIS, $rec );
-    }
-    
-    return $cur_no;
-}
 
 sub current_record { 
   my $self = shift;

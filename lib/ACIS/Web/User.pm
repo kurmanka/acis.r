@@ -83,6 +83,9 @@ sub welcome {
 
       $app -> variables -> {records} = \@list; 
       $app -> set_presenter( 'records-menu' );
+
+  } else {
+      $session -> set_current_record_no( 0 );
   }
 }
 

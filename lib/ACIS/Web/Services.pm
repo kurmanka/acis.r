@@ -26,10 +26,6 @@ package ACIS::Web;   ### -*-perl-*-
 #  You should have received a copy of the GNU General Public License
 #  along with this program; if not, write to the Free Software
 #  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
-#
-#  ---
-#  $Id$
-#  ---
 
 # cardiff
 
@@ -51,7 +47,6 @@ use ACIS::Web::SysProfile;
 
 
 ####   SESSION STUFF   ####
-
 
 sub start_session {
   my $self  = shift;
@@ -192,6 +187,17 @@ sub load_session {
   }
 
   $app -> session( $session );
+
+  ### respect request parameter "short-id"
+  if ( my $sid = $request -> {'short-id'} ) {
+      debug "request -> sid:$sid";
+      if ( $session -> choose_record_by_id( $sid ) ) {
+
+      } else {
+          $app  -> error( "bad-short-id-in-request" );
+      } 
+  }
+
   return $session;
 }
 
@@ -558,7 +564,7 @@ sub login_start_session {
   }
   $owner -> {IP} = $ENV{'REMOTE_ADDR'};
 
-  ### XXXXXXXsomething breaks here
+  # XXX
   my $session = $app -> start_session( "user", $owner,
                                        object => $udata, 
                                        file   => $udata_file );

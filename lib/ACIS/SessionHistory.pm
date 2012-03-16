@@ -20,7 +20,7 @@ sub session_stop {
   my ($session)=@_;
   my $sessionid=$session->id;
   my $login; 
-  eval { $login=$session->object->{owner}->{login}; };
+  eval { $login=$session->username; };
   $login ||= $session->owner->{login};
   $login ||= 'unknown';
   my $type = $session->type;
@@ -32,7 +32,7 @@ sub session_start {
   my ($session)=@_;
   my $sessionid=$session->id;
   my $login; 
-  eval { $login=$session->object->{owner}->{login}; };
+  eval { $login=$session->username; };
   $login ||= $session->owner->{login};
   $login ||= 'unknown';
   my $type = $session->type;
@@ -43,7 +43,7 @@ sub session_discard {
   my ($session)=@_;
   my $sessionid=$session->id;
   my $login; 
-  eval { $login=$session->object->{owner}->{login}; };
+  eval { $login=$session->username; };
   $login ||= $session->owner->{login};
   $login ||= 'unknown';
   my $type = $session->type;
