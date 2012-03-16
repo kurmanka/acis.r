@@ -234,11 +234,6 @@ sub set_userdata {
         return undef;
     }
 
-    if (scalar @$rl == 1) {
-        # if there is just one record, choose the first one as the default
-        #$self->set_current_record_no( 0 );
-    }
-    
     return 1;
 }
 

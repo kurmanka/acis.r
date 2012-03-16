@@ -196,6 +196,14 @@ sub load_session {
       } else {
           $app  -> error( "bad-short-id-in-request" );
       } 
+  } else {
+      # SOS for some poor users, for whom contributions fail because
+      # they have no current record
+      my $reclist = $session -> userdata_record_list;
+      if ( not $session->current_record 
+	   and scalar @$reclist == 1 ) {
+	  $session -> set_current_record_no( 0 );
+      }
   }
 
   return $session;
