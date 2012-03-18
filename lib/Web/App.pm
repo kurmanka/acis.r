@@ -578,9 +578,8 @@ sub update_paths {
 sub set_username {
   my $self = shift;
   my $username = shift;
-  assert( $username );
   $self -> {username} = $username;
-  debug "username: $username";
+  debug "set username: ", ($username || '');
 }
 
 sub username {
