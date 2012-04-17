@@ -1086,14 +1086,16 @@ sub adm_search_person {
   } else {
       die "We need a short-id or an email; '$key' does not look like either";
   }
+
   $table = 'records';
+  $input->{show} = 'shortid,id,owner,userdata_file,namefull,profile_url';
 
   my $q = analyse_search_parameters( );
   my $query_text = join( '', 
-                    $q -> {what} || '',
+                    $q -> {what},
                     " from $table ",
                     $q -> {where} || '',
-                    $q -> {limit} );
+                    $q -> {limit} || '');
   debug "QUERY: $query_text";
   $result -> {query} = $query_text;
   $result -> {key}   = $key;
@@ -1136,6 +1138,8 @@ sub build_general_results_list {
         push @$data, $item;
         
         foreach ( keys %$item ) {
+          # exclude emailmd5 column, it is in latin1
+          next if $_ eq 'emailmd5';
           $item -> {$_} = Encode::decode_utf8( $item ->{$_} );
         }
         $rrow = $res -> next;
