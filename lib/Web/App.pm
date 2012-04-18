@@ -908,7 +908,19 @@ sub handle_request {
     ###  prepare presenter-data 
     $self -> prepare_presenter_data;
 
-    my $content = $response->{body} = $self -> run_presenter( $self->{presenter} );
+    my $content;
+    eval {
+        $content = $response->{body} = $self -> run_presenter( $self->{presenter} );
+    };
+    if ($@) {
+        debug "presenter error: $@";
+        if ( not $handler_error ) {
+            $self->critical_handler_error( $@ );
+            $content = $response->{body} = $self -> run_presenter( $self->{presenter} );
+        } else {
+            $content = $response->{body} = "<html><body><h3>critical presenter error (logged)</h3></body></html>";
+        }
+    }
 
     print "</pre>\n"
       if $Web::App::DEBUGIMMEDIATELY;
