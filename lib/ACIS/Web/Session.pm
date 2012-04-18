@@ -167,6 +167,27 @@ sub set_current_record_no {
 }
 
 
+sub set_default_current_record {
+    my $self = shift;
+    my $userdata = $self->userdata;
+    my $records = $userdata->{records};
+
+    if ($self->{'.userdata.current_record'}) {
+        return;
+    }
+
+    debug "->set_default_current_record()";
+    if (scalar @$records == 1) {
+        $self->set_current_record_no(0);
+
+    } elsif ($records->[0]->{'about-owner'} eq 'yes') {
+        $self->set_current_record_no(0);
+    } else {
+        debug "->set_default_current_record(): no luck";
+    }
+}
+
+
 sub save_userdata_temp {}   # overridden in SOldUser
 sub save_current_record {}  # overridden in SOldUser
 
