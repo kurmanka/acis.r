@@ -544,7 +544,9 @@ sub authenticate {
     # this is for single-profile accounts, that are opening
     # direct links, e.g. http://authors.repec.org/research/autosuggest
     # we need to choose some record at that moment
-    $app -> session -> set_default_current_record;
+    if ($app -> session) {
+	$app -> session -> set_default_current_record;
+    }
     return $ret;
   }
   # else ?
