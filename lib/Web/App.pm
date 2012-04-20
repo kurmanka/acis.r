@@ -955,8 +955,17 @@ sub critical_handler_error {
   $self -> set_presenter( 'application-error' );
   $self -> response_status( '500' );
   $self -> variables ->{handlererror} = $message;
-  warn "application error:\n$message\ndebug log:\n$Web::App::Common::LOGCONTENTS------\n";
-  $self -> errlog( "application error: $message" );
+  my $req_url = $self->{request}->{url};
+  my $message_head = substr( $message, 0, 100 ); 
+
+  if ($self->config('debug-log'))      { # abridged:
+      warn "application error at $req_url:\n$message_head...\n(see debug log for details)\n";
+
+  } else { # detailed:
+      warn "application error at $req_url:\n$message\n"
+         . "debug log:\n$Web::App::Common::LOGCONTENTS------\n";
+  }
+  $self -> errlog( "application error at $req_url: $message" );
 }
 
 
