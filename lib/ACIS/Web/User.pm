@@ -288,6 +288,7 @@ sub set_user_login {
   my $oldlc = lc $old;
 
   if ( $newlc ne $oldlc ) {
+    debug "set_user_login: new login $newlc";
 
     my $f = $app -> userdata_file_for_login( $newlc );
 
@@ -302,6 +303,7 @@ sub set_user_login {
 
     } else {
       if ( -e $f or -e "$f.lock" ) {
+        debug "login change cancelled by lock file $f.lock";
         $app -> error( "login-taken" );
         return $old;
       }
@@ -322,6 +324,7 @@ sub set_user_login {
       }
     }
 
+    debug "login change successful";
     $owner   -> {login} = $new;
     $session -> set_userdata_saveto_file( $f );
     $app     -> update_paths_for_login( $newlc );

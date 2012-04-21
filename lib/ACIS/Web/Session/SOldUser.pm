@@ -64,6 +64,7 @@ sub close {
 
     # save any unsaved changes
     $self->save_current_record( 'closeit' );
+    $self->prepare_userdata_for_save;
 
     if ( $self -> has_userdata_changed ) {
       debug "->close: userdata has changed";
@@ -137,6 +138,7 @@ sub has_userdata_changed {
     my $self = shift;
     debug "->has_userdata_changed()?";
     
+    # .userdata.owner.modified key is set in ->prepare_userdata_for_save()
     if ($self->{'.userdata.owner.modified'}) {
         debug "owner modified";
         return 1;
