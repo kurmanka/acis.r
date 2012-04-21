@@ -1334,6 +1334,8 @@ sub set_cookie {
 
   debug "Set-Cookie: $cookie";
   push @$headers, "Set-Cookie: $cookie";
+
+  $response->{cookies}{ $cookie->name } = $cookie->value;
 }
 
 

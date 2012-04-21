@@ -297,9 +297,10 @@ sub get_auto_logon_mode {
     my $owner = $session -> userdata_owner;
     my $login = $owner -> {login};
     my $pass  = $owner -> {password};
+    my $resp_cookies = $self ->{response}{cookies};
 
-    my $cookie_login = $self -> get_cookie( 'login' );
-    my $cookie_pass  = $self -> get_cookie( 'pass'  );
+    my $cookie_login = $resp_cookies->{login} || $self -> get_cookie( 'login' );
+    my $cookie_pass  = $resp_cookies->{pass}  || $self -> get_cookie( 'pass'  );
 
     if ( $cookie_login and $cookie_login eq $login ) {
       if ( $cookie_pass
