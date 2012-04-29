@@ -34,13 +34,19 @@
     <xsl:choose> 
       <xsl:when test='$list/list-item[1]/new'>
         <p>We have found <a ref='@citations/autosug'>
-        <xsl:value-of select='$potent-new-num'/> new potential citation
+        <xsl:value-of select='$potent-new-num'/> 
+	<xsl:text> new potential citation</xsl:text>
         <xsl:if test='$potent-new-num&gt;1'>s</xsl:if>
-        </a> to your works, please check <xsl:choose >
-        <xsl:when test='$potent-new-num &gt;1' >them
-      </xsl:when>
-      <xsl:otherwise >it</xsl:otherwise>
-        </xsl:choose>.</p>
+        </a>
+	<xsl:text> to your works, please check </xsl:text>
+	  <xsl:choose >
+            <xsl:when test='$potent-new-num &gt;1' >
+	      <xsl:text>them</xsl:text>
+	    </xsl:when>
+	    <xsl:otherwise>it</xsl:otherwise>
+          </xsl:choose>
+	  <xsl:text>.</xsl:text>
+	</p>
       </xsl:when>
       <xsl:when test='not($list/list-item)'>
         <p>We haven't found any citations for you yet.</p>
