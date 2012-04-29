@@ -134,9 +134,11 @@ sub update_suggestion_count {
     my $old = $session ->{$sid}{'citation-suggestions-new-total'} || 0;
     my $new = $mat->number_of_new_potential;
     $session ->{$sid}{'citation-suggestions-new-total'} = $new;
+    debug "update_suggestion_count: $new citations";
     # save updated value to sysprof
     if ($old != $new) {
-      put_sysprof_value( $sid, 'citation-suggestions-new-total', $new );
+	debug "update_suggestion_count: reset sysprof value to $new";
+	put_sysprof_value( $sid, 'citation-suggestions-new-total', $new );
     }
   }
 

@@ -599,6 +599,7 @@
     <call function='load_session_or_authenticate' />
     <call function='ACIS::Web::Citations::prepare'/>
     <call function='ACIS::Web::Citations::prepare_overview'/>
+    <call function='ACIS::Web::Citations::update_suggestion_count'/>
     <presentation type='xslt' filename='citations/overview.xsl' />
   </screen>
 
@@ -631,6 +632,7 @@
     <call function='load_session_or_authenticate' />
     <call function='ACIS::Web::Citations::prepare'/>
     <call function='ACIS::Web::Citations::prepare_doclist'/>
+    <call function='ACIS::Web::Citations::update_suggestion_count'/>
     <presentation type='xslt' filename='citations/doclist.xsl' />
   </screen>
 
@@ -640,8 +642,8 @@
     <call function='ACIS::Web::Citations::prepare'/>
     <process>
       <call function='ACIS::Web::Citations::process_autosug'/>
-      <call function='ACIS::Web::Citations::update_suggestion_count'/>
     </process>
+    <call function='ACIS::Web::Citations::update_suggestion_count'/>
     <call function='ACIS::Web::Citations::prepare_autosug'/>
     <presentation type='xslt' filename='citations/potential.xsl' />
   </screen>
