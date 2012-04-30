@@ -137,6 +137,9 @@ sub auto_processing {
   put_sysprof_value( $sid, "last-auto-citations-date", today );
   put_sysprof_value( $sid, "citation-suggestions-new-total", $new_potential );
 
+  debug "citation-suggestions-new-total: $new_potential";
+  logit "citation-suggestions-new-total: $new_potential";
+
 }
 
 
