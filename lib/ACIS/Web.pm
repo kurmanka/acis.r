@@ -477,7 +477,7 @@ sub update_paths {
   if ( defined $self -> {session} ) {
     my $session = $self -> session;
     my $home    = $self -> {home};
-    return undef if not $session ->userdata;
+    return undef if not $session ->userdata_owner;
 
     my $owner   = $session -> userdata_owner;
     
