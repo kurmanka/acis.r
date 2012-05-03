@@ -105,7 +105,7 @@
 
   <!--  I need to have simple-user flag variable -->
   
-  <xsl:variable name='advanced-user' select='$user-type/advanced'/>
+  <xsl:variable name='advanced-user' select='$user-type/advanced or $user-type/deceased-list-manager'/>
   <xsl:variable name='simple-user'   select='not( $user-type/advanced )'/>
   
   
