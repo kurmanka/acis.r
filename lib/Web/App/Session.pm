@@ -187,7 +187,7 @@ sub close {
   } elsif ( -f $lock ) {
     unlink $lock;
   } else {
-    warn "session without lock? $lock";
+    warn "closing a session without lock: $lock, id: " . $self->id;
   }
 
   $self -> { '.closed' } = 1;
