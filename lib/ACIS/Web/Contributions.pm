@@ -203,7 +203,9 @@ sub prepare {
   my $already_refused = {}; 
   foreach my $item ( @$refused ) {
     my $id = $item ->{'id'};
-    if ( $already_refused->{$id} ) {
+    if ( not defined $id ) {
+      undef $item;
+    } elsif ( $already_refused->{$id} ) {
       undef $item;
     } 
     else { 
