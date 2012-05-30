@@ -1052,4 +1052,20 @@
   </screen>
 
 
+  <screen id='openid/yadis'>
+    <use module='ACIS::Web::OpenID'/>
+    <call function='ACIS::Web::OpenID::yadis'/>
+    <presentation type='xslt' filename='openid/yadis.xslt'/>
+  </screen>
+
+  <screen id='openid'>
+    <use module='ACIS::Web::OpenID'/>
+    <call function='ACIS::Web::OpenID::endpoint'/>
+  </screen>
+
+  <screen id='openid/setup'>
+    <use module='ACIS::Web::OpenID'/>
+    <call function='ACIS::Web::OpenID::setup'/>
+  </screen>
+
 </screens>

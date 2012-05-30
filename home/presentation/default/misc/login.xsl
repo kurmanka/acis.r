@@ -36,8 +36,8 @@
                 </acis:input>
                 
                 <xsl:for-each select='$form-input/*[name() != "login" 
-                                      and name() != "pass" 
-                                      and name != "auto-login"]'>
+                                                    and name() != "pass" 
+                                                    and name() != "auto-login"]'>
                   <acis:input type='hidden' name='{name()}' value='{text()}'/>
                 </xsl:for-each>
               </td>

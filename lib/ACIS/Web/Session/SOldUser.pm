@@ -314,6 +314,9 @@ sub load_userdata_temp {
     if (not -f $file) {
         $file = $self->{'.userdata.readfrom'} || confess "no readfrom file defined";
     }
+    # debugging the issue when this method was called on EVERY request.
+    #use Carp;
+    #confess "->load_userdata_temp(): $file";
     debug "->load_userdata_temp(): $file";
     return ACIS::Web::UserData->load( $file );
 }

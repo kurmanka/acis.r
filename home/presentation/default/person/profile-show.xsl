@@ -8,7 +8,7 @@
     version="1.0">
   
   <xsl:import href='research/listings.xsl'/>
-  
+
   <xsl:variable name='logged-mode-flag'>
     <xsl:if test='$current-screen-id = "personal-overview"'>1</xsl:if>
   </xsl:variable>

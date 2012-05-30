@@ -693,12 +693,17 @@ sub handle_request {
   $unescaped_url =~ s/%(\w\w)/chr(hex($1))/eg;
 
   my $hostname  = $ENV{HTTP_HOST} || '';
+  $ENV{HTTPS} ||='';
   my $protocol  = ($ENV{HTTPS} eq 'on') ? "https" : "http";
   my $requested_url = $unescaped_url;
   my $requested_url_full = "$protocol://$hostname$unescaped_url";
-
+  my $original_url_full  = "$protocol://$hostname$ENV{REQUEST_URI}";
+  
   my $request = $self -> {request} = {
     CGI     => undef,                    # will be set later
+    request_uri => $ENV{REQUEST_URI},
+    protocol => $protocol,
+    original_url_full => $original_url_full,
     referer => $ENV{HTTP_REFERER},
     agent   => $ENV{HTTP_USER_AGENT},
     method  => $ENV{REQUEST_METHOD},
@@ -930,19 +935,21 @@ sub handle_request {
   }
 
   if ( $response ->{body} ) {
-    $charset = $self->{response}{charset};
+      my $body = $response->{body};
+      if (ref $body) { $body = $$body; }
+      debug "response body: " . length( $body ) . " chars";
+      $charset = $self->{response}{charset};
 
-    ###  now go, print the resulting page
-    if ( $charset ne 'utf-8' ) {
-      binmode STDOUT, ":encoding($charset)"; 
-    } else {
-      binmode STDOUT, ":utf8"; 
-    }
-    $/=undef;
-    print STDOUT ${$response->{body}} 
-      if ref $response->{body};
-    print STDOUT $response->{body}
-      if not ref $response->{body};
+      ###  now go, print the resulting page
+      if ( $charset ne 'utf-8' ) {
+          binmode STDOUT, ":encoding($charset)"; 
+      } else {
+          binmode STDOUT, ":utf8"; 
+      }
+      $/=undef;
+      print STDOUT $body; 
+  } else {
+      debug "empty response body";
   }
 
   $self -> post_scriptum;
