@@ -1309,6 +1309,19 @@ sub redirect {
   $self -> {response} {'redirect-to'} = $url;
 }
 
+sub clear_redirect {
+  my $self = shift;
+  debug "->clear_redirect()";
+  my $response = $self -> {response};
+  my $headers  = $response -> {headers};
+
+  debug "headers: " . scalar @$headers;
+  @$headers = grep { not m/^Status: / } @$headers;
+  debug "headers: " . scalar @$headers;
+  delete $response->{'redirect-to'};
+}
+
+
 sub print_content_type_header {
   my $self = shift;
   my $type = shift;

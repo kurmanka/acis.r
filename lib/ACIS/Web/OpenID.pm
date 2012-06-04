@@ -9,7 +9,7 @@ OpenID server, at /openid, based on the Net::OpenID::Server module
 use strict;
 use warnings;
 
-#use Data::Dumper;
+use Data::Dumper;
 #use Carp::Assert;
 
 use Web::App::Common qw( debug );
@@ -41,20 +41,23 @@ sub server_secret { "q3w6ugHDzu2lXmPs6LWjIbm9X4luzoeBSjnTIvdWbCGAETbvfFylqMCppSz
 # this function is to receive and process the OpenID requests
 sub endpoint {
     $app = shift;
+    my $recursive = shift;
     debug "OpenID endpoint accessed";
 
     my $args = $app->form_input;
     my $base_url = $app->config( 'base-url' );
 
-
     if (exists $args->{pass} and $args->{login}) {
+        # process login form
         my $auth = $app->authenticate;
+        if ($auth) { $app->clear_redirect; }
     } else {
         $app->load_session_if_possible;
     }
+    my $session = $app->session;
+    
 
     my $nos = Net::OpenID::Server->new(
-#      get_args     => $args,
       args          => $args,
       get_user      => \&get_user,
       get_identity  => \&get_identity,
@@ -66,53 +69,60 @@ sub endpoint {
     );
 
 
+    # let Net::OpenID::Server do it's work, and call the necessary callbacks
     my ($type, $data) = $nos->handle_page;
 
-    use Data::Dumper;
-    my $string = Data::Dumper->Dump( [$data], ['data'] );
 
+    my $string = Data::Dumper->Dump( [$data], ['data'] );
     debug "OpenID NOS: type - $type";
     debug "OpenID NOS: data - $string";
 
     
     if ($type eq "redirect") {
-        #WebApp::redirect_to($data);
         $app->redirect( $data );
 
     } elsif ($type eq "setup") {
         debug "setup request";
 
-        my %setup_opts = %$data;
-        # ... show them setup page(s), with options from setup_map
-        # it's then your job to redirect them at the end to "return_to"
-        # (or whatever you've named it in setup_map)
+        # setup data is in $data
         
-        my $u = $app ->{request}{original_url_full};
-        
-        my $session = $app->session;
         if ( $session
              and $session->current_record ) {
-            # positive assertion
-            #my $id = $session->current_record->
-            #my $u = $nos ->signed_return_url( identity =>  );
-            #$app->redirect_to( $args->{'openid.return_to'} );
-            
+            debug "session and record are present";
 
-            $app->response->{body} = "<html><p>OpenID endpoint</p>" 
-              . "<pre>type: $type</pre>"
-              . "<p><pre>data: $string</p>"
-              ;
-        
-            #$app->print_content_type_header( $type );
-            #$app->response->{body} = $data;
+            if ( $args ->{allow_trust} ) {
+                # process setup screen: [ CONTINUE LOGIN ]
+                debug "process CONTINUE button";
+                my $trust_root = $data->{trust_root};
+                $session->userdata_owner->{openid_trust}->{$trust_root} = 1;
+
+                # sanity check: this should not happen, $recursive should be undef
+                if ($recursive) { die "looks like endless recursion"; }
+
+                # recursive call -- it should work this time
+                return endpoint( $app, 1 );
+
+            } elsif ( $args ->{cancel} ) {
+                # process setup screen: [ CANCEL ]
+                # XXX what should I do?
+                debug "process CANCEL button";
+
+            } else {
+                debug "prepare for the setup screen";
+                # prepare for the setup screen
+                $app->variables->{openid} = $data;
+                $app->variables->{openid_trust_root} = $data->{trust_root};
+                $app->set_presenter( "openid/setup" );
+            }
+
         } else {
+            # show login form
+            debug "show the login form";
             $app->set_presenter( "login" );
-            
         }
         
     } else {
-        #WebApp::set_content_type($type);
-        #WebApp::print($data);
+        debug "output the N:O:S' response of type $type";
         $app->print_content_type_header( $type );
         $app->response->{body} = $data;
     }
@@ -127,25 +137,21 @@ sub endpoint {
 sub setup {
     my $app = shift;
 
-    my $u = $app ->{request}{original_url_full};
-    
+    debug "setup screen";
+
     $app->load_session_if_possible;
     my $session = $app->session;
-    if ( $session
-         and $session->current_record ) {
-        # positive assertion
-        #my $id = $session->current_record->
-        #my $u = $nos ->signed_return_url( identity =>  );
-        #$app->redirect_to( $args->{'openid.return_to'} );
-        
-        $app->response->{body} = "<html><p>OpenID endpoint: should pass control to NOS, i guess</p>";    
-        
+    my $input = $app->form_input;
+
+    # XXX not correct anymore:
+    if ($input->{allow_trust} and $input->{trust}) {
+        $session->userdata_owner->{openid_trust}->{$input->{trust}} = 1;
+        $app->redirect( $session->{openid_goto} );
     } else {
-        
-        $app->response->{body} = "<html><p>OpenID endpoint: please login for setup and then reload this: "
-          .  "<br>$u</p>";
+        # nothing
     }
     
+    return;
 }
 
 
@@ -216,8 +222,11 @@ sub is_trusted  {
     debug "->is_trusted( $u, $trust_root, $is_identity )";
     
     if ($u) {
-        debug "return 1;";
-        return 1;
+        my $s = $app->session;
+        my $owner = $s->userdata_owner;
+        return exists $owner->{openid_trust}->{$trust_root};
+        #debug "return 1;";
+        #return 1;
     } else {
         return 0;
     }

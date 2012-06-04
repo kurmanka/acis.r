@@ -1066,6 +1066,7 @@
   <screen id='openid/setup'>
     <use module='ACIS::Web::OpenID'/>
     <call function='ACIS::Web::OpenID::setup'/>
+    <presentation type='xslt' filename='openid/setup.xslt'/>
   </screen>
 
 </screens>
