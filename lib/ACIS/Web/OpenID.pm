@@ -85,35 +85,24 @@ sub endpoint {
         debug "setup request";
 
         # setup data is in $data
-        
+        my $url_success = $nos ->signed_return_url( %$data );
+        my $url_cancel  = $nos ->cancel_return_url( return_to => $data->{return_to} );
+        debug "openid goto: $url_success";
+        debug "openid cancel: $url_cancel";
+        if ($session) {
+            $session ->{openid_goto}   = $url_success;
+            $session ->{openid_cancel} = $url_cancel;
+        }
+
         if ( $session
              and $session->current_record ) {
             debug "session and record are present";
 
-            if ( $args ->{allow_trust} ) {
-                # process setup screen: [ CONTINUE LOGIN ]
-                debug "process CONTINUE button";
-                my $trust_root = $data->{trust_root};
-                $session->userdata_owner->{openid_trust}->{$trust_root} = 1;
-
-                # sanity check: this should not happen, $recursive should be undef
-                if ($recursive) { die "looks like endless recursion"; }
-
-                # recursive call -- it should work this time
-                return endpoint( $app, 1 );
-
-            } elsif ( $args ->{cancel} ) {
-                # process setup screen: [ CANCEL ]
-                # XXX what should I do?
-                debug "process CANCEL button";
-
-            } else {
-                debug "prepare for the setup screen";
-                # prepare for the setup screen
-                $app->variables->{openid} = $data;
-                $app->variables->{openid_trust_root} = $data->{trust_root};
-                $app->set_presenter( "openid/setup" );
-            }
+            debug "prepare for the setup screen";
+            # prepare for the setup screen
+            $app->variables->{openid} = $data;
+            $app->variables->{openid_trust_root} = $data->{trust_root};
+            $app->set_presenter( "openid/setup" );
 
         } else {
             # show login form
@@ -143,14 +132,36 @@ sub setup {
     my $session = $app->session;
     my $input = $app->form_input;
 
-    # XXX not correct anymore:
-    if ($input->{allow_trust} and $input->{trust}) {
-        $session->userdata_owner->{openid_trust}->{$input->{trust}} = 1;
-        $app->redirect( $session->{openid_goto} );
-    } else {
-        # nothing
-    }
-    
+    return if not $session;
+
+    if ( $input->{allow_trust} and $input->{trust_root} ) {
+        # process setup screen: [ CONTINUE LOGIN ]
+        debug "process CONTINUE button";
+        my $trust_root = $input->{trust_root};
+
+        $session->userdata_owner->{openid_trust}->{$trust_root} = 1;
+        
+        if ( $session->{openid_goto} ) {
+            $app->redirect( delete $session->{openid_goto} );
+            return;
+        } else {
+            die "no openid_goto value in the session!";
+        }
+        
+        
+    } elsif ( $input->{cancel} ) {
+        # process setup screen: [ CANCEL ]
+        # XXX what should I do?
+        debug "process CANCEL button";
+
+        if ( $session->{openid_cancel} ) {
+            $app->redirect( delete $session->{openid_cancel} );
+        } else {
+            die "no openid_cancel value in the session!";
+        }
+
+    } 
+
     return;
 }
 
