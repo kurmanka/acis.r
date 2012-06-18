@@ -59,6 +59,7 @@ sub close {
   ### save last login (logoff) date
   my $userdata = $self ->userdata;
   my $owner    = $self ->userdata_owner;
+  my $save_profile = 1; # always save metadata and profile page
 
   if ( $userdata ) {
 
@@ -99,24 +100,25 @@ sub close {
       }
       delete $owner -> {placeholder_file};
 
-      eval { 
-        ### generate static pages and metadata files
-        if ( not $self -> {'.saved_profile'} ) {
-          require ACIS::Web::SaveProfile;
-          ACIS::Web::SaveProfile::save_profile( $app );
-        }
-      };
-      my $prob = $@;
-
       ### write userdata and request RI update
       $self -> save_userdata( $app );
       
-      if ( $prob ) { die $prob; }
       $self -> notify_user_about_profile_changes( $app );
 
     } else {
       # delete the tempfile, if exists
       unlink $self->{'.userdata.tempfile'};
+    }
+
+    if ($save_profile) {
+	debug "save profile";
+        ### generate static profile page and metadata files
+        if ( not $self -> {'.saved_profile'} ) {
+	    require ACIS::Web::SaveProfile;
+	    ACIS::Web::SaveProfile::save_profile( $app );
+        } else {
+	    debug "... already saved";
+	}
     }
 
   } else {

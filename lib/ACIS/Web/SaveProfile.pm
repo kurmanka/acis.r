@@ -67,18 +67,17 @@ sub save_profile {
   foreach my $record ( @{ $userdata ->{records} } ) {
     my $id = $record ->{'id'};
 
+    my $modified;
     if ($reclist
-        and $reclist->[$number]
-        and not $reclist->[$number]{modified}) {
-        # this record is not modified, so we skip it
-        next;
+        and $reclist->[$number] ) {
+	$modified = $reclist->[$number]{modified};
     }
 
     $session -> set_current_record_no( $number );
 
     die "no cur rec" if not $session ->current_record;
 
-    if ( $app -> config( "learn-via-daemon" ) ) {
+    if ( $modified and $app -> config( "learn-via-daemon" ) ) {
         ## learn all known items
         require ACIS::Resources::Learn::KnownItems;
         my $sql = $app -> sql_object();
@@ -96,22 +95,27 @@ sub save_profile {
     debug( "AMF export: ", (($res) ? "OK" : "FAILED") );
 
     # there are only personal records now, and no plans to introduce
-    # other types. but still we check here, just to be cautious.
+    # other types. but still we check here, just to be extra cautious.
     if ( $record ->{'type'} eq 'person' ) {
+
       my $sid   = $record ->{'sid'};      
       ### update the personal profile
       if ( $sid ) {
         my $link = &write_outside_personal_profile( $app );
         push @profiles, { name => $record->{name} {full}, 
                           link => $link };
+
         ## run the command the system-command-after-profile-change
         ## defined in acis.conf
-        my $command_to_run = $app->config('system-command-after-profile-change');
-        ## run it in the background if it's an excecutable file
-        if (defined($command_to_run) and -X $command_to_run) {
-          system("$command_to_run $sid &");
-        }
+	if ( $modified ) {
+	    my $command_to_run = $app->config('system-command-after-profile-change');
+	    ## run it in the background if it's an excecutable file
+	    if (defined($command_to_run) and -X $command_to_run) {
+		system("$command_to_run $sid &");
+	    }
+	}
       }
+
     } # if type == "person"
 
   } continue {
