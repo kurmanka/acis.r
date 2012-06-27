@@ -12,8 +12,8 @@
   <xsl:variable name='additional-head-stuff'>
     <!-- OpenID -->
     <link rel="openid2.provider"       href="{$base-url}/openid" />
-    <meta http-equiv="X-XRDS-Location" content="{$base-url}/openid/yadis?id={$response-data/record/sid}&amp;url={$response-data/permalink}" />
-    <!-- XXX: add OpenID 1.1 support -->
+    <meta http-equiv="X-XRDS-Location" content="{$base-url}/openid/yadis" />
+    <!-- XXX: add OpenID 1.1 support? -->
     <!-- <link rel="openid.server" href="{$base-url}/openid" /> -->
   </xsl:variable>
 

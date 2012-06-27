@@ -8,10 +8,21 @@
   <xsl:import href='page.xsl'/>
   <xsl:import href='page-universal.xsl'/>
   <xsl:import href='misc/login.xsl'/>
+
   <xsl:variable name='current-screen-id'>homepage</xsl:variable>
+
   <xsl:variable name='full-page-title'>
     <xsl:value-of select='$site-name-long'/>
   </xsl:variable>  
+
+  <xsl:variable name='additional-head-stuff'>
+    <!-- OpenID -->
+    <link rel="openid2.provider"       href="{$base-url}/openid" />
+    <meta http-equiv="X-XRDS-Location" content="{$base-url}/openid/yadis" />
+    <!-- XXX: add OpenID 1.1 support? -->
+    <!-- <link rel="openid.server" href="{$base-url}/openid" /> -->
+  </xsl:variable>
+
   <xsl:template match="/data">
     <xsl:call-template name='page'>
       <xsl:with-param name='into-the-top'>

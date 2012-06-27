@@ -39,20 +39,21 @@
           <URI><xsl:value-of select='$base-url'/>/openid</URI> 
        </Service> 
 
-       <xsl:if test='//sid'>
 <xsl:text>
 </xsl:text>
-         <Service> 
-           <Type>http://specs.openid.net/auth/2.0/signon</Type> 
-           <!-- this is a little risky: the URL might be different -->
-           <URI><xsl:value-of select='$base-url'/>/openid</URI> 
+       <Service> 
+         <Type>http://specs.openid.net/auth/2.0/signon</Type> 
+         <!-- this is a little risky: the URL might be different -->
+         <URI><xsl:value-of select='$base-url'/>/openid</URI> 
 <!--
-           <URI><xsl:value-of select='$base-url'/>/pro/<xsl:value-of select='//sid'/>/</URI> 
- -->
+         <URI><xsl:value-of select='$base-url'/>/pro/<xsl:value-of select='//sid'/>/</URI> 
+-->
+        <!-- i don't know if this is really needed -->
+         <xsl:if test='//sid'>
            <LocalID><xsl:value-of select='$base-url'/>/pro/<xsl:value-of select='//sid'/>/</LocalID> 
+         </xsl:if>
 
-         </Service> 
-       </xsl:if>
+       </Service> 
 
 <xsl:text>
 </xsl:text>
