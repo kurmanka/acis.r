@@ -608,6 +608,32 @@ sub send_mail {
 }
 
 
+
+use RePEc::Index::UpdateClient;
+
+sub send_update_request {
+    my $self = shift;
+    my $collection = shift;
+    my $path = shift;
+
+    # special handling in case of FastCGI
+    my $request = $ACIS::FCGIReq;
+    if ($request) {
+        $request->Detach();
+    }
+
+    ###  request RI update
+    $self -> log( "requesting RI update for $path in $collection" );
+    RePEc::Index::UpdateClient::send_update_request( $collection, $path );
+    
+    if ($request) {
+        $request->Attach();
+    }
+}
+
+
+
+
  
 1;
 

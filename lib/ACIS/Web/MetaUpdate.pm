@@ -137,8 +137,7 @@ sub handle_request {
   my $coll    = $res -> {collection};
 
   if ( $mstatus eq 'ok' ) {
-    require RePEc::Index::UpdateClient;
-    RePEc::Index::UpdateClient::send_update_request( $coll, $file );
+    $self -> send_update_request( $coll, $file );
     produce_result( $self, '200' );
 
   } else {

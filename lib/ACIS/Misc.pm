@@ -28,6 +28,7 @@ package ACIS::Misc;   ### -*-perl-*-
 #  ---
 
 
+
 sub contains_non_ascii {
   my $str = shift;
   if ( $str =~ /^[\0-\x80]*$/ ) {

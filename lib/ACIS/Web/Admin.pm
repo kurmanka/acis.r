@@ -571,11 +571,9 @@ sub remove_account {
   }
 
   ###  send update request to the RI UD (RePEc-Index Update Daemon)
-  require RePEc::Index::UpdateClient;
   my $udatadir = $app -> userdata_dir;
   my $relative = substr( $file, length( "$udatadir/" ) );
-  $app -> log( "requesting RI update for $relative" );
-  RePEc::Index::UpdateClient::send_update_request( 'ACIS', $relative );
+  $app -> send_update_request( 'ACIS', $relative );
 
   if ( $clean ) {
     ### delete the profile pages

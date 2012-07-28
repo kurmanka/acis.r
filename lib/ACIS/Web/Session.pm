@@ -192,9 +192,6 @@ sub save_userdata_temp {}   # overridden in SOldUser
 sub save_current_record {}  # overridden in SOldUser
 
 
-use RePEc::Index::UpdateClient qw( &send_update_request );
-
-
 sub has_userdata_changed {
   my $self = shift;
   my $app  = shift;
@@ -347,8 +344,7 @@ sub save_userdata {
   ###  request RI update
   eval {
     my $relative = substr( $udata_file, length( "$udatadir/" ) );
-    $app -> log( "requesting RI update for $relative" );
-    send_update_request( 'ACIS', $relative );
+    $app->send_update_request( 'ACIS', $relative );
   };
   if ( $@ ) {
     warn "sending update request for $udata_file ($udatadir) failed: $@";
