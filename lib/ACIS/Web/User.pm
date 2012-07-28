@@ -361,6 +361,25 @@ sub remove_account {
   $app -> sevent ( -class  => 'account', 
                    -action => 'delete request' );
   
+
+  ### delete the profile pages
+  my $udata = $session -> userdata || die;
+  foreach ( @{ $udata-> {records} } ) {
+    my $file = $_ -> {profile} {file};
+    if ( $file and -f $file ) {
+      unlink $file;
+      $app-> userlog( "removed profile file at $file" );
+    }
+    my $exp = $_ -> {profile} {export};
+    if ( $exp ) {
+      foreach ( values %$exp ) {
+        unlink $_;
+        $app-> userlog( "removed exported profile data: $_" );
+      }
+    }
+  }
+
+
   my $userdata = $paths -> {'user-data'};
   my $deleted_userdata = $paths -> {'user-data-deleted'};
   
@@ -385,23 +404,6 @@ sub remove_account {
   $app -> send_update_request( 'ACIS', $relative );
   
 
-  ### delete the profile pages
-  my $udata = $session -> userdata || die;
-  foreach ( @{ $udata-> {records} } ) {
-    my $file = $_ -> {profile} {file};
-    if ( $file and -f $file ) {
-      unlink $file;
-      $app-> userlog( "removed profile file at $file" );
-    }
-    my $exp = $_ -> {profile} {export};
-    if ( $exp ) {
-      foreach ( values %$exp ) {
-        unlink $_;
-        $app-> userlog( "removed exported profile data: $_" );
-      }
-    }
-  }
-    
   $session -> set_userdata( undef );
   $app -> send_mail( 'email/account-deleted.xsl' );
 
