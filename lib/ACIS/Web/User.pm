@@ -386,7 +386,7 @@ sub remove_account {
   
 
   ### delete the profile pages
-  my $udata = $session -> object;
+  my $udata = $session -> userdata || die;
   foreach ( @{ $udata-> {records} } ) {
     my $file = $_ -> {profile} {file};
     if ( $file and -f $file ) {
@@ -408,6 +408,7 @@ sub remove_account {
   $app -> sevent ( -class  => 'account', 
                    -action => 'deleted',
                    -file   => $deleted_userdata );
+
   $app -> userlog( "deleted account; backup stored in $deleted_userdata" );
   debug "close the session";
 
