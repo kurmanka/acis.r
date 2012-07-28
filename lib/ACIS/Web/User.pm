@@ -378,6 +378,13 @@ sub remove_account {
     return;
   }
 
+
+  # special handling in case of FASTCGI
+  my $request = $ACIS::FCGIReq;
+  if ($request) {
+      $request->Detach();
+  }
+
   ###  request RI update
   require RePEc::Index::UpdateClient;
   my $udatadir = $app -> userdata_dir;
@@ -385,6 +392,11 @@ sub remove_account {
   $app -> log( "requesting RI update for $relative" );
   RePEc::Index::UpdateClient::send_update_request( 'ACIS', $relative );
   
+  if ($request) {
+      $request->Attach();
+  }
+  
+
   ### delete the profile pages
   my $udata = $session -> object;
   foreach ( @{ $udata-> {records} } ) {
@@ -415,6 +427,7 @@ sub remove_account {
   $app -> message( 'account-deleted' );
   $app -> success( 1 );
   $app -> set_presenter( "account-deleted" );
+
 }
 
 
