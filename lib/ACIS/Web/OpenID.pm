@@ -232,7 +232,7 @@ sub is_trusted  {
     
     debug "->is_trusted( $u, $trust_root, $is_identity )";
     
-    if ($u) {
+    if ($u and $is_identity) {
         my $s = $app->session;
         my $owner = $s->userdata_owner;
         return exists $owner->{openid_trust}->{$trust_root};
