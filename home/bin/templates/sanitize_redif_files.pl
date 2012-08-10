@@ -44,6 +44,7 @@ my $redif_dir = $acis -> config( "metadata-ReDIF-output-dir" );
 if ( open FLIST, "find $redif_dir -type f -name '*.rdf'|" ) {
   while ( <FLIST> ) {
     if ( m!/(p[a-z]+\d+)\.rdf! ) {
+      chomp;
       my $rfile = $_;
       my $sid  = $1;
       my $res  = $sql -> execute( $sid );
