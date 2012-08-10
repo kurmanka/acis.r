@@ -1,4 +1,14 @@
 
+# this script checks every ReDIF file in the ReDIF output directory
+# against the records table: if the ReDIF file exists, but the record
+# is not in the records table, or the userdata file is not present, or
+# the userdata file does not point to that record (by short-id), then
+# the original ReDIF file should be removed. 
+
+# this does not cover removing the AMF files and the profile pages. If
+# a ReDIF file was left lingering, then the AMF and profile page are
+# probably these too.
+
 use Carp::Assert;
 
 use sql_helper;

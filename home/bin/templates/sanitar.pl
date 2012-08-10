@@ -1,4 +1,9 @@
 
+# This script clears old / outdated records from the objects table
+# (ARDB), using the RePEc::Index record's presence as a criteria.
+
+# use --safe switch for check mode/simulation.
+
 use Carp::Assert;
 
 use sql_helper;
