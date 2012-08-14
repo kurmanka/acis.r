@@ -38,6 +38,11 @@ sub yadis {
 sub server_secret { "q3w6ugHDzu2lXmPs6LWjIbm9X4luzoeBSjnTIvdWbCGAETbvfFylqMCppSzdnI6" }
 
 
+# important variables, set in sub is_identity(), checked in sub endpoint()
+my $claimed_id;
+my $is_identity;
+
+
 # this function is to receive and process the OpenID requests
 sub endpoint {
     $app = shift;
@@ -68,6 +73,8 @@ sub endpoint {
       server_secret => \&server_secret,
     );
 
+    $claimed_id  = '';
+    $is_identity = 0;
 
     # let Net::OpenID::Server do it's work, and call the necessary callbacks
     my ($type, $data) = $nos->handle_page;
@@ -84,6 +91,11 @@ sub endpoint {
     } elsif ($type eq "setup") {
         debug "setup request";
 
+        # should we really continue? 
+        if (not $is_identity) {
+            die "You do not own the URL: $claimed_id\n";
+        }
+
         # setup data is in $data
         my $url_success = $nos ->signed_return_url( %$data );
         my $url_cancel  = $nos ->cancel_return_url( return_to => $data->{return_to} );
@@ -97,7 +109,6 @@ sub endpoint {
         if ( $session
              and $session->current_record ) {
             debug "session and record are present";
-
             debug "prepare for the setup screen";
             # prepare for the setup screen
             $app->variables->{openid} = $data;
@@ -148,7 +159,6 @@ sub setup {
             die "no openid_goto value in the session!";
         }
         
-        
     } elsif ( $input->{cancel} ) {
         # process setup screen: [ CANCEL ]
         # XXX what should I do?
@@ -159,7 +169,6 @@ sub setup {
         } else {
             die "no openid_cancel value in the session!";
         }
-
     } 
 
     return;
@@ -236,9 +245,9 @@ sub is_trusted  {
         my $s = $app->session;
         my $owner = $s->userdata_owner;
         return exists $owner->{openid_trust}->{$trust_root};
-        #debug "return 1;";
         #return 1;
     } else {
+        debug "no trust";
         return 0;
     }
     
@@ -250,8 +259,11 @@ sub is_identity {
     
     debug "->is_identity( $u, $url )";
     
-    if (not $u) { return 0; }
+    if (not $u) { 
+        return $is_identity = 0;
+    }
     
+    $claimed_id = $url; # variable defined above, checked in endpoint()
     my $session = $app->session;
     if ($session) {
         my $owner = $session->userdata_owner;
@@ -259,17 +271,16 @@ sub is_identity {
         
         my $ret = 0;
         if (not $owner or not $rec or not $rec->{'about-owner'}) {
-            return 0;
+            return $is_identity = 0;
         } 
         
         debug "profile URL: " . $rec->{profile}{url};
         if ($rec->{profile}{url} eq $url) {
-            $ret = 1;
+            $is_identity = 1;
         }
         
-        debug "->is_identity: $ret";
-        return $ret;
-        
+        debug "->is_identity: $is_identity";
+        return $is_identity;
     }
     
 }
