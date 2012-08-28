@@ -189,6 +189,16 @@ sub setup {
 }
 
 
+# same_url() -- compare the URLs without the protocol part. Otherwise,
+# https://authors.repec.org/pro/pku9/ and http://authors.repec.org are
+# treated as different.
+sub same_url ($$) {
+    my ($a, $b) = @_;
+    $a =~ s/^https?://;
+    $b =~ s/^https?://;
+    return ($a eq $b);
+}
+
 
 # doc quote
 # from http://search.cpan.org/~mart/Net-OpenID-Server-1.02/lib/Net/OpenID/Server.pm
@@ -239,7 +249,7 @@ sub get_identity {
             $ret = $rec->{profile}{url};
         }
         
-        if ($rec->{profile}{url} eq $url) {
+        if (same_url $rec->{profile}{url}, $url) {
             $ret = $url;
         }
         
@@ -289,7 +299,7 @@ sub is_identity {
         } 
         
         debug "profile URL: " . $rec->{profile}{url};
-        if ($rec->{profile}{url} eq $url) {
+        if (same_url $rec->{profile}{url}, $url) {
             $is_identity = 1;
         }
         
