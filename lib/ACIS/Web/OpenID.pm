@@ -43,24 +43,10 @@ my $claimed_id;
 my $is_identity;
 
 
-# this function is to receive and process the OpenID requests
-sub endpoint {
-    $app = shift;
-    my $recursive = shift;
-    debug "OpenID endpoint accessed";
-
-    my $args = $app->form_input;
+sub openid_server {
+    shift; # $app is already here
+    my $args = shift || $app->form_input;
     my $base_url = $app->config( 'base-url' );
-
-    if (exists $args->{pass} and $args->{login}) {
-        # process login form
-        my $auth = $app->authenticate;
-        if ($auth) { $app->clear_redirect; }
-    } else {
-        $app->load_session_if_possible;
-    }
-    my $session = $app->session;
-    
 
     my $nos = Net::OpenID::Server->new(
       args          => $args,
@@ -73,17 +59,39 @@ sub endpoint {
       server_secret => \&server_secret,
     );
 
-    $claimed_id  = '';
-    $is_identity = 0;
+    return $nos;
+}
+
+
+# this function is to receive and process the OpenID requests
+sub endpoint {
+    $app = shift;
+    my $retry = shift;
+    debug "OpenID endpoint accessed";
+
+    my $args     = $app->form_input;
+    my $base_url = $app->config( 'base-url' );
+
+    if (exists $args->{pass} and $args->{login}) {
+        # process login form
+        my $auth = $app->authenticate;
+        if ($auth) { $app->clear_redirect; }
+    } else {
+        $app->load_session_if_possible;
+    }
+    my $session = $app->session;
+
+    if ($retry and $session and $session->{openid_args}) { 
+        $args = $session->{openid_args}; 
+    }
 
     # let Net::OpenID::Server do it's work, and call the necessary callbacks
+    my $nos = openid_server( $app, $args );
     my ($type, $data) = $nos->handle_page;
-
 
     my $string = Data::Dumper->Dump( [$data], ['data'] );
     debug "OpenID NOS: type - $type";
     debug "OpenID NOS: data - $string";
-
     
     if ($type eq "redirect") {
         $app->redirect( $data );
@@ -91,29 +99,40 @@ sub endpoint {
     } elsif ($type eq "setup") {
         debug "setup request";
 
-        # should we really continue? 
-        if (not $is_identity) {
-            die "You do not own the URL: $claimed_id\n";
-        }
-
         # setup data is in $data
-        my $url_success = $nos ->signed_return_url( %$data );
-        my $url_cancel  = $nos ->cancel_return_url( return_to => $data->{return_to} );
-        debug "openid goto: $url_success";
-        debug "openid cancel: $url_cancel";
-        if ($session) {
-            $session ->{openid_goto}   = $url_success;
-            $session ->{openid_cancel} = $url_cancel;
-        }
+#        my $url_success = $nos ->signed_return_url( %$data );
+#        my $url_cancel  = $nos ->cancel_return_url( return_to => $data->{return_to} );
+#        debug "openid goto: $url_success";
+#        debug "openid cancel: $url_cancel";
+#        if ($session) {
+#            $session ->{openid_goto}   = $url_success;
+#            $session ->{openid_cancel} = $url_cancel;
+#        }
 
         if ( $session
              and $session->current_record ) {
+
             debug "session and record are present";
-            debug "prepare for the setup screen";
-            # prepare for the setup screen
-            $app->variables->{openid} = $data;
-            $app->variables->{openid_trust_root} = $data->{trust_root};
-            $app->set_presenter( "openid/setup" );
+
+            if ($is_identity) {
+                # good, can go on
+                debug "prepare for the setup screen";
+                $session ->{openid_args}   = $args;
+                
+                # prepare for the setup screen
+                $app->variables->{openid} = $data;
+                $app->variables->{openid_trust_root} = $data->{trust_root};
+                $app->set_presenter( "openid/setup" );
+
+            } else {
+                # not good, need to stop this
+                debug "The user is trying to authenticate as $claimed_id, but it is not theirs";
+                #die "You are trying to authenticate as $claimed_id, but it is not yours.\n";
+                $app->variables->{openid_trust_root} = $data->{trust_root};
+                $app->variables->{openid_claimed_id} = $claimed_id;
+                $app->variables->{'profile-url'}     = $session->current_record->{profile}{url};
+                $app->set_presenter( "openid/notyours" );
+            }
 
         } else {
             # show login form
@@ -135,7 +154,7 @@ sub endpoint {
 # setup URL in N::O::S config above, but i have not seen N::O::S
 # redirecting to it.
 sub setup {
-    my $app = shift;
+    $app = shift;
 
     debug "setup screen";
 
@@ -151,25 +170,20 @@ sub setup {
         my $trust_root = $input->{trust_root};
 
         $session->userdata_owner->{openid_trust}->{$trust_root} = 1;
-        
-        if ( $session->{openid_goto} ) {
-            $app->redirect( delete $session->{openid_goto} );
-            return;
-        } else {
-            die "no openid_goto value in the session!";
-        }
-        
+
+
     } elsif ( $input->{cancel} ) {
         # process setup screen: [ CANCEL ]
         # XXX what should I do?
         debug "process CANCEL button";
 
-        if ( $session->{openid_cancel} ) {
-            $app->redirect( delete $session->{openid_cancel} );
-        } else {
-            die "no openid_cancel value in the session!";
-        }
     } 
+
+
+    # now let's try again
+    if ( $session->{openid_args} ) {
+        return endpoint( $app, 1 );        
+    }
 
     return;
 }
@@ -267,7 +281,7 @@ sub is_identity {
     my $session = $app->session;
     if ($session) {
         my $owner = $session->userdata_owner;
-        my $rec   = $session->userdata->{records}[0];
+        my $rec   = $session->current_record || $session->userdata->{records}[0];
         
         my $ret = 0;
         if (not $owner or not $rec or not $rec->{'about-owner'}) {

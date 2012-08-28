@@ -1069,4 +1069,8 @@
     <presentation type='xslt' filename='openid/setup.xslt'/>
   </screen>
 
+  <screen id='openid/notyours'>
+    <presentation type='xslt' filename='openid/notyours.xslt'/>
+  </screen>
+
 </screens>
