@@ -628,7 +628,7 @@ sub login_start_session {
 sub load_session_if_possible {
   my $app = shift;  
   if ( $app -> request ->{'session-id'} ) {
-    return $app -> load_session;
+    return $app -> load_session(1); # soft try; do not fail if it can't be loaded
   }
   return undef;
 }
