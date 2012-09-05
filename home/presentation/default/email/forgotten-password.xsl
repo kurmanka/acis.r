@@ -26,7 +26,7 @@
         <xsl:value-of select='$site-name'/>
         <xsl:text>.&#10;&#10;The password is: </xsl:text>
         <xsl:value-of select='$user-pass'/>
-        <xsl:text>.&#10;&#10;</xsl:text>
+        <xsl:text>&#10;&#10;</xsl:text>
       </xsl:with-param>
     </xsl:call-template>
   </xsl:template>  
