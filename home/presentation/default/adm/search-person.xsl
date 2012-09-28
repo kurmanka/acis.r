@@ -14,8 +14,8 @@
   <xsl:variable name='result' select='$response-data/result'/>
   <xsl:variable name='items'  select='$result/data/list-item'/>
 
-  <xsl:variable name='admin-mode'                 select='not(//deceased-list-manager-mode)'/>
-  <xsl:variable name='deceased-list-manager-mode' select='//deceased-list-manager-mode'/>
+  <xsl:variable name='admin-mode'                 select='//user/type/admin'/>
+  <xsl:variable name='deceased-list-manager-mode' select='//user/type/deceased-list-manager'/>
 
   <xsl:template match='/data'>
     <xsl:call-template name='page'>
@@ -41,7 +41,7 @@ co {
 -->
 <label for='key'>Email or short-id: </label>
 <input type='text' id='key' name='key' value='{$form-values/key}' size='60'/>
-
+q
 <xsl:text> </xsl:text>
 <input type='submit' class='important' value='SEARCH'/>
 </p>
@@ -79,16 +79,15 @@ co {
                 </td>
                 <td><xsl:value-of select='id'/></td>
                 <td>
-                  <xsl:choose>
-                    <xsl:when test='$admin-mode'>
-                      <a ref='adm/log_into?login={owner}'>
-                        log into account
-                      </a>
-                    </xsl:when>
-                    <xsl:otherwise>
-                      <a ref='adm/move-record?from={str:replace(owner,"+","%2b")}&amp;sid={shortid}'>add to my account</a>
-                    </xsl:otherwise>
-                  </xsl:choose>
+                  <xsl:if test='$admin-mode'>
+                    <a ref='adm/log_into?login={owner}'>
+                      log into account
+                    </a>
+                  </xsl:if>
+                  <br/>
+                  <xsl:if test='$deceased-list-manager-mode'>
+                    <a ref='adm/move-record?from={str:replace(owner,"+","%2b")}&amp;sid={shortid}'>add to my account</a>
+                  </xsl:if>
                 </td>
               </tr>
             </xsl:for-each>

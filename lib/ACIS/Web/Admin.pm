@@ -658,11 +658,11 @@ sub check_access_allow_deceased_volunteer {
         my $session = $acis -> session;
         if ( $session 
              and $session -> owner -> {type} ) {
-            if ( $session -> owner -> {type} {admin} ) {
-                return 1;
-            }
             if ( exists $session -> owner -> {type} {'deceased-list-manager'} ) {
                 $acis->variables->{'deceased-list-manager-mode'} = 1;
+                return 1;
+            }
+            if ( $session -> owner -> {type} {admin} ) {
                 return 1;
             }
         }
