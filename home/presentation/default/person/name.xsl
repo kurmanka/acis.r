@@ -41,7 +41,7 @@
             <acis:input name='last-name' id='ln' size='50'/>
             <br />
             <label for='ns'>Name suffix, if any (III, Jr., no titles):</label><br />
-            <select name='name-suffix' class="suffix" id='ns' size='1'>
+            <acis:select name='name-suffix' class="suffix" id='ns' size='1'>
               <option selected='' value=''>- none -</option>
               <option>Sr.</option>
               <option>Jr.</option>
@@ -49,7 +49,7 @@
               <option>III</option>
               <option>IV</option>
               <option>V</option>
-            </select>
+            </acis:select>
           </p>
           
           <p>

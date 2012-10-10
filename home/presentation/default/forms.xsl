@@ -99,7 +99,7 @@
     <xsl:variable name='name'   select='$select/@name'/>
     <xsl:variable name='value'  select='@value|text()'/>
     <xsl:element name='option'>
-      <xsl:copy-of select='@*'/>
+      <xsl:copy-of select='@value'/>
       <xsl:if test='$form-values/*[name()=$name][./text()=$value]'>
         <xsl:attribute name='selected'>1</xsl:attribute>
       </xsl:if>
