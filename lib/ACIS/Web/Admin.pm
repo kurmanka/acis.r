@@ -56,6 +56,27 @@ sub check_access_real {
   my $pass = $acis -> config( 'admin-access-pass' );
   debug "pass real = $pass";
 
+  # check for user's access
+  if ( $acis -> load_session_if_possible ) {
+    my $session = $acis -> session;
+    
+    if ( $session 
+         and $session -> owner -> {type}
+         and exists $session -> owner -> {type} {admin} ) {
+      return 1;
+    }
+
+    if ($allow_deceased_list_manager) {
+        if ( $session 
+             and $session -> owner -> {type}
+             and exists $session -> owner -> {type} {'deceased-list-manager'} ) {
+            $acis->variables->{'deceased-list-manager-mode'} = 1;
+            return 1;
+        }
+    }
+  }
+
+  # check for the admin password given on a form, or via cookie
   if ( $pass and length( $pass ) > 5 ) { 
     my $form_input = $acis -> form_input();
     my $cookie  = $acis -> get_cookie( 'admin-pass' ) || '';
@@ -75,25 +96,6 @@ sub check_access_real {
     if ( $given and $given eq $pass ) {  return 1 + $cookie_set;  }
   }
 
-  if ( $acis -> load_session_if_possible ) {
-    my $session = $acis -> session;
-    
-    if ( $session 
-         and $session -> owner -> {type}
-         and exists $session -> owner -> {type} {admin} ) {
-      return 1;
-    }
-
-    if ($allow_deceased_list_manager) {
-        if ( $session 
-             and $session -> owner -> {type}
-             and exists $session -> owner -> {type} {'deceased-list-manager'} ) {
-            $acis->variables->{'deceased-list-manager-mode'} = 1;
-            return 1;
-        }
-    }
-
-  }
 
   $acis -> clear_process_queue;
   $acis -> set_presenter( 'adm/pass' );
