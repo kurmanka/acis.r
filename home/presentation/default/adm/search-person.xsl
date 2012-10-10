@@ -41,7 +41,6 @@ co {
 -->
 <label for='key'>Email or short-id: </label>
 <input type='text' id='key' name='key' value='{$form-values/key}' size='60'/>
-q
 <xsl:text> </xsl:text>
 <input type='submit' class='important' value='SEARCH'/>
 </p>
