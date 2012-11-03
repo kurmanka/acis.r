@@ -98,11 +98,11 @@ sub load_suggestion_counts_for_records {
     
     foreach ( @$list ) {
         my $sid = $_->{sid};
-        my $r = get_sysprof_value( $sid, "research-suggestions-total" );
+        my $r = get_sysprof_value( $sid, "research-suggestions-exact" );
         my $c = get_sysprof_value( $sid, "citation-suggestions-new-total" );
         # an optimization
         if (defined $r or defined $c) {
-            $session->{$sid}{"research-suggestions-total"} = $r;
+            $session->{$sid}{"research-suggestions-exact"} = $r;
             $session->{$sid}{"citation-suggestions-new-total"} = $c;
             $session->make_sticky( $sid );
         }
