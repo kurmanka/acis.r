@@ -140,7 +140,7 @@ sub prepare {
   # suggestions counts: get from sysprof, put into session (but only do that once)
   if ($sid) {
       if ( not $session->{$sid} 
-           or not $session->{$sid}{"research-suggestions-total"} ) {
+           or not defined $session->{$sid}{"research-suggestions-total"} ) {
           my $counts = get_sysprof_values( $sid, 'research-suggestions-' );
           my $count_total = $counts->{'research-suggestions-total'} || 0;
           my $count_exact = $counts->{'research-suggestions-exact'} || 0;
