@@ -1684,7 +1684,7 @@ sub reload_accepted_contributions {
     }
     my $reload = reload_contribution( $app, $id, $metadata_db );
     if ( $reload and $reload->{'sid'} ) {
-      my $item = $reload;
+      $item = $reload;
       $item -> {'role'} = $role;
       delete $item -> {'frozen'};      
     }
