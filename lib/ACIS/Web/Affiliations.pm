@@ -147,6 +147,7 @@ sub prepare {
 
   # reload each affiliation, which has an id from the database
   my $adjust_shares = reload_institutions( $app, $affiliations );
+  clear_undefined( $affiliations );
 
   # to set initial shares for the existing accounts with multiple shares
   if ( scalar @$affiliations > 1
@@ -157,7 +158,6 @@ sub prepare {
   if ($adjust_shares) {
       adjust_shares( $app );
   }
-  clear_undefined( $affiliations );
   
   $session->{$id}{prepared_affiliations} = 1;
 }
