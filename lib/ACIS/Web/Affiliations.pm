@@ -89,8 +89,13 @@ sub reload_institutions {
                     undef $_;
                     $adjust_shares = 1;
                 }
-            }
-            # else: do nothing
+            } elsif ( $_->{name} ) {
+                # do nothing
+            } else {
+                # clear. this may be a broken item that needs to be cleared
+                undef $_;
+                $adjust_shares = 1;
+	    }
             
         } else { 
             # legacy support: just a string, not a hash
