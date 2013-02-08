@@ -48,6 +48,7 @@ if ( open FLIST, "find $redif_dir -type f -name '*.rdf'|" ) {
       my $rfile = $_;
       my $sid  = $1;
       my $res  = $sql -> execute( $sid );
+      my $cleanup;
 
       if ( $res and $res->{row} ) {
         my $id   = $res ->{row}{id};
@@ -74,20 +75,30 @@ if ( open FLIST, "find $redif_dir -type f -name '*.rdf'|" ) {
               #        print ".";
               next;
             } else {
-              p "didn't find right sid: $sid in file $file (id: $id)";
+              p "$sid: didn't find the right record in $file (id: $id)";
+	      $cleanup = 1;
             }
 
           } else {
-            p "can't open $file";
-            next;
+            p "$sid: can't open $file";
+	    $cleanup = 1;
           }
           
         } else {
-          p "no such file: $file";
+          p "$sid: no such file: $file";
+	  $cleanup = 1;
         }
         
       } else {
-        p "$sid: no such record (file $rfile should be deleted)";
+	  $cleanup = 1;
+	  p "$sid: no such record";
+      }
+
+      if ($cleanup) {
+	if (not $safe_mode) {
+	    unlink $rfile;
+	    p "> $rfile removed";
+	}
       }
 
     }
