@@ -94,8 +94,8 @@ sub delete_record {
     # no more records in the account. delete the account too. the following
     # code is copied from ACIS::Web::User, sub remove_account
 
-    $app -> userlog( "removing the account, per admin request" );
-    $app -> sevent ( -class  => 'account', 
+    $acis -> userlog( "removing the account, per admin request" );
+    $acis -> sevent ( -class  => 'account', 
                      -action => 'delete request' );
 
     my $userdata = $paths -> {'user-data'};
@@ -110,22 +110,22 @@ sub delete_record {
     my $check = rename $userdata, $deleted_userdata;  
     
     if ( not $check ) {
-      $app -> errlog ( "Can't move $userdata file to $deleted_userdata" );
-      $app -> error ( "cant-remove-account" );
+      $acis -> errlog ( "Can't move $userdata file to $deleted_userdata" );
+      $acis -> error ( "cant-remove-account" );
     }
 
     ###  request RI update
-    my $udatadir = $app -> userdata_dir;
+    my $udatadir = $acis -> userdata_dir;
     my $relative = substr( $userdata, length( "$udatadir/" ) );
-    $app -> send_update_request( 'ACIS', $relative );
+    $acis -> send_update_request( 'ACIS', $relative );
 
     $session -> set_userdata( undef );
 
-    $app -> sevent ( -class  => 'account', 
+    $acis -> sevent ( -class  => 'account', 
                      -action => 'deleted',
                      -file   => $deleted_userdata );
 
-    $app -> userlog( "deleted account; backup stored in $deleted_userdata" );
+    $acis -> userlog( "deleted account; backup stored in $deleted_userdata" );
 
   }
 
