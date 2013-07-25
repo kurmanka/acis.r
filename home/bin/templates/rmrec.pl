@@ -90,6 +90,45 @@ sub delete_record {
     }
   }
 
+  if ( not scalar @$records ) {
+    # no more records in the account. delete the account too. the following
+    # code is copied from ACIS::Web::User, sub remove_account
+
+    $app -> userlog( "removing the account, per admin request" );
+    $app -> sevent ( -class  => 'account', 
+                     -action => 'delete request' );
+
+    my $userdata = $paths -> {'user-data'};
+    my $deleted_userdata = $paths -> {'user-data-deleted'};
+    
+    while ( -e $deleted_userdata ) {
+      debug "backup file $deleted_userdata already exists";
+      $deleted_userdata =~ s/\.xml(\.(\d+))?$/".xml." . ($2 ? ($2+1) : '1')/eg;
+    }
+
+    debug "move userdata from '$userdata' to '$deleted_userdata'";
+    my $check = rename $userdata, $deleted_userdata;  
+    
+    if ( not $check ) {
+      $app -> errlog ( "Can't move $userdata file to $deleted_userdata" );
+      $app -> error ( "cant-remove-account" );
+    }
+
+    ###  request RI update
+    my $udatadir = $app -> userdata_dir;
+    my $relative = substr( $userdata, length( "$udatadir/" ) );
+    $app -> send_update_request( 'ACIS', $relative );
+
+    $session -> set_userdata( undef );
+
+    $app -> sevent ( -class  => 'account', 
+                     -action => 'deleted',
+                     -file   => $deleted_userdata );
+
+    $app -> userlog( "deleted account; backup stored in $deleted_userdata" );
+
+  }
+
   return 1;
 }
 
