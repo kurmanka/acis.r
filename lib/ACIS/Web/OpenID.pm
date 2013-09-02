@@ -241,7 +241,7 @@ sub get_identity {
         my $rec   = $session->userdata->{records}[0];
         my $ret = 0;
 
-        if (not $owner or not $rec or not $rec->{'about-owner'}) {
+        if (not $owner or not $rec) {
             return 0;
         } 
         
@@ -294,7 +294,7 @@ sub is_identity {
         my $rec   = $session->current_record || $session->userdata->{records}[0];
         
         my $ret = 0;
-        if (not $owner or not $rec or not $rec->{'about-owner'}) {
+        if (not $owner or not $rec) {
             return $is_identity = 0;
         } 
         
