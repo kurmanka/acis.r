@@ -51,8 +51,8 @@ sub generate_random_bytes_base64 {
 }
 
 sub make_hash($$) {
-  my $passw = shift;
-  my $salt  = shift;
+  my $password = shift;
+  my $salt     = shift;
   my $hash_string;
 
   # prepend the salt
@@ -86,7 +86,7 @@ sub generate_salt {
   my ($salt, $salt_b64) = generate_random_bytes_base64();
 
   # we store the base64 encoding of the salt
-  $ud_owner->{password_salt_base64} = $b64;
+  $ud_owner->{password_salt_base64} = $salt_b64;
   return $salt;
 }
 
@@ -100,7 +100,7 @@ sub upgrade_clear_password {
     my $salt = generate_salt( $app ) or die;
     my $pass = delete $ud_owner->{password};
 
-    my $hash = make_hash( $password, $salt ) or die;
+    my $hash = make_hash( $pass, $salt ) or die;
     $ud_owner->{password_hash_base64} = $hash;
     debug "password hash (b64): $hash";
     
