@@ -44,6 +44,7 @@ use ACIS::Data::DumpXML qw( dump_xml );
 use Encode qw/encode decode/;
 
 use ACIS::Web::SysProfile;
+use ACIS::Web::UserPassword;
 
 
 ####   SESSION STUFF   ####
@@ -72,6 +73,11 @@ sub start_session {
 
   $self -> set_session_cookie( $sid );
   $self -> session( $session );
+
+  if ($session->userdata_owner->{password}) {
+    ACIS::Web::UserPassword::upgrade_clear_password( $app );
+  }
+
   return $session;
 }
 
