@@ -74,10 +74,6 @@ sub start_session {
   $self -> set_session_cookie( $sid );
   $self -> session( $session );
 
-  if ($session->userdata_owner->{password}) {
-    ACIS::Web::UserPassword::upgrade_clear_password( $app );
-  }
-
   return $session;
 }
 
@@ -622,6 +618,13 @@ sub login_start_session {
   debug "requesting a redirect to $URI";
   $app -> clear_process_queue;
   $app -> redirect( $URI );
+
+
+  ## need userdata upgrade?
+  if ($session->userdata_owner->{password}) {
+  	debug "call upgrade_clear_password()";
+    ACIS::Web::UserPassword::upgrade_clear_password( $app );
+  }
 
   return $udata;
 }
