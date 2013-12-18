@@ -815,7 +815,7 @@ sub handle_request {
   if ( scalar keys %$form_input ) {
     my $dump = Data::Dumper->Dump( [$form_input], ['form_input'] );
     chomp $dump;
-    debug $dump;
+    debug $self->sanitize_form_input_dump( $dump );
 
   } else { 
     debug "\$form_input = {};"; 
@@ -1468,6 +1468,7 @@ sub time_checkpoint {};
 sub report_timed_checkpoints {''};
 sub log_profiling {};
 
+sub sanitize_form_input_dump { shift; return shift; };
  
 1;
 

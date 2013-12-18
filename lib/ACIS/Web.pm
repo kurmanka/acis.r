@@ -632,6 +632,12 @@ sub send_update_request {
 }
 
 
+sub sanitize_form_input_dump { 
+    shift; 
+    my $dump = shift;
+    $dump =~ s!(\s+'pass' =>) '.+'!$1 ######!; 
+    return $dump; 
+};
 
 
  
