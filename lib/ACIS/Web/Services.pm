@@ -362,7 +362,7 @@ sub check_login_and_pass {
       if ( $login eq lc $owner ->{login} ) {
 
         # XXX-Password
-        if ( not ACIS::Web::UserPassword::check_user_password( $app, $pass, $owner ) ) {
+        if ( not ACIS::Web::UserPassword::check_user_password( $pass, $owner ) ) {
           return "wrong-password";
         }
 
