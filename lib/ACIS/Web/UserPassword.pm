@@ -64,10 +64,15 @@ sub make_hash($$) {
 }
 
 sub check_user_password {
-  my $app      = shift;
   my $password = shift || die;
-  my $session  = $app->session or die;
-  my $ud_owner = $session ->userdata_owner or die;
+  my $ud_owner = shift || die;
+
+  if (not exists $ud_owner->{password_hash_base64} 
+      or not exists $ud_owner->{password_salt_base64}) {
+        # XXX fallback to the clear-text password
+        return ($password eq $ud_owner->{password});
+  }
+
   my $salt_b64 = $ud_owner->{password_salt_base64} or die;
   my $salt     = decode_base64( $salt_b64 ) or die;
 

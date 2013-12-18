@@ -354,15 +354,16 @@ sub check_login_and_pass {
       last;
     }
     
-    debug "and in fact, there is a session, and it belongs to the user";
+    debug "and in fact, there is a session";
     
     my $owner = $session -> owner;
 
     if ( $owner and $owner ->{login} ) {
       if ( $login eq lc $owner ->{login} ) {
 
-        if ( not equal_passwords( $pass, $owner ->{password} ) ) {
-          return "wrong-password:$owner->{password}";
+        # XXX-Password
+        if ( not ACIS::Web::UserPassword::check_user_password( $app, $pass, $owner ) ) {
+          return "wrong-password";
         }
 
         if ( $override ) {
@@ -380,20 +381,18 @@ sub check_login_and_pass {
     debug 'lock file does not exist';
   } 
 
-
   my $udata = load ACIS::Web::UserData( $udata_file );
 
   if ( not defined $udata
        or not defined $udata->{owner}
        or not defined $udata->{owner}{login}
-       or not defined $udata->{owner}{password} 
     ) {
     return 'account-damaged';
   }
 
-
-  if ( not equal_passwords $pass, $udata -> {owner} {password} ) {
-    return "wrong-password:$udata->{owner}{password}";
+  # XXX-Password
+  if ( not ACIS::Web::UserPassword::check_user_password( $pass, $udata->{owner} ) ) {
+    return "wrong-password";
   }
    
   return $udata;
@@ -458,7 +457,7 @@ sub authenticate {
   }
   
   $login = lc $login;
-  debug "we do have both login ($login) and password ($passwd)";
+  debug "we do have both login ($login) and password";
 
   
   ###  now it's time to check, if such a user exists and if her
@@ -492,11 +491,11 @@ sub authenticate {
                     -login => $login,
                   );
 
-  } elsif ( $status =~ m/wrong\-password:(.+)/ ) {
+  } elsif ( $status eq 'wrong-password' ) {
     
     my $expected = $1;
 
-    $app -> errlog( "[$login] login attempt failed, wrong password ($passwd)" );
+    $app -> errlog( "[$login] login attempt failed, wrong password" );
     $app -> set_form_value( 'login', $login );
     $app -> error( 'login-bad-password' );
     $app -> variables -> {'remind-password-button'} = 1;
@@ -505,7 +504,7 @@ sub authenticate {
     $app -> set_presenter( 'login' );
     
     $app -> event ( -class => 'authenticate',
-                    -descr => "login failed, password given/expected: $passwd/$expected",
+                    -descr => "login failed, password mismatch",
                     -login => $login,
                   );
     
@@ -547,7 +546,7 @@ sub authenticate {
     # direct links, e.g. http://authors.repec.org/research/autosuggest
     # we need to choose some record at that moment
     if ($app -> session) {
-	$app -> session -> set_default_current_record;
+      $app -> session -> set_default_current_record;
     }
     return $ret;
   }
