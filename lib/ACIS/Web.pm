@@ -631,12 +631,24 @@ sub send_update_request {
     }
 }
 
+# Do not log the users' passwords to debug.log
 
-sub sanitize_form_input_dump { 
+my $UNSAFE_TO_LOG = {
+    'pass' => 1,
+    'pass-confirm' => 1,
+};
+
+sub safe_to_log_form_input { 
     shift; 
-    my $dump = shift;
-    $dump =~ s!(\s+'pass' =>) '.+'!$1 ######!; 
-    return $dump; 
+    my $input = shift;
+    my $out = {};
+    foreach ( keys %$input ) {
+        my $k = $_;
+        my $v = $input->{$k};
+        if (exists $UNSAFE_TO_LOG->{$k}) { $out->{$k} = '#######'; }
+        else { $out->{$k} = $v; }
+    }
+    return $out; 
 };
 
 
