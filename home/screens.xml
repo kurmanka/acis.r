@@ -729,8 +729,7 @@
            maxlen='10'
            place='session:registration-date/day'  />
 
-    <param name='pass'         required='yes' type='password'  
-           place='owner:password'/>
+    <param name='pass'         required='yes' type='password'  />
     <param name='pass-confirm' required='yes' type='password'  />
     <param name='homepage'                    type='url'       
            place='record:contact/homepage'/>

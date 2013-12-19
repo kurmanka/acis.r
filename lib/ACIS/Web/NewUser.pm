@@ -85,13 +85,14 @@ sub initial_process {
 
 
   ### check password and password confirmation
-  if ( not $app -> get_form_value ('pass') 
-       or ( $app -> get_form_value ('pass') 
-            ne $app -> get_form_value ('pass-confirm') ) ) {
+  my $password = $app -> get_form_value ('pass');
+  if ( not $password
+       or ( $password ne $app -> get_form_value ('pass-confirm') ) ) {
+    
     $app -> form_invalid_value( 'pass' );
     $app -> form_invalid_value( 'pass-confirm' );
     $abort = 1;
-  }
+  } 
 
 
   {
@@ -161,11 +162,15 @@ sub initial_process {
     undef $form_input -> {homepage};
   }
 
-  $app -> process_form_data;
   $app -> userlog ( "initial registration" ); 
-  prepare_user( $app );
-  $app -> redirect_to_screen( 'new-user/additional' );
+  $app -> process_form_data;
 
+  prepare_user( $app );
+  # password is okay, save it
+  $app->set_new_password( $password );
+
+
+  $app -> redirect_to_screen( 'new-user/additional' );
   if ( $form_input -> {'remember-me'} ) {
     $app -> set_authentication_cookie( 'login', $login );
     $app -> set_authentication_cookie( 'pass',  $form_input -> {pass} );
