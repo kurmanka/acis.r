@@ -11,6 +11,9 @@ require Exporter;
 require Storable;
 require XML::Parser;
 require Proc::Daemon;
+require MIME::Base64;
+require Bytes::Random::Secure;
+require Digest::SHA;
 
 # other components
 require ARDB;
