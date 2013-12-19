@@ -86,6 +86,12 @@ sub check_user_password {
   return $result;
 }
 
+sub ACIS::Web::check_user_password {
+    my $self = shift;
+    return check_user_password( @_ );
+}
+
+
 sub generate_salt {
   my $app = shift;
   my $session = $app->session or die;
@@ -117,12 +123,22 @@ sub upgrade_clear_password {
   return 0;
 }
 
-sub set_new_password {
-  my $app = shift;
-  my $pass = shift;
+sub ACIS::Web::set_new_password {
+  my $app  = shift or die;
+  my $pass = shift or die;
   my $session = $app->session or die;
   my $ud_owner = $session ->userdata_owner or die;
-  # ...
+
+  my $salt = generate_salt( $app ) or die;
+  
+  my $hash = make_hash( $pass, $salt ) or die;
+  $ud_owner->{password_hash_base64} = $hash;
+  debug "password hash (b64): $hash";
+
+  if (exists $ud_owner->{password}) {
+    delete $ud_owner->{password};
+  }
+
   return 1;
 }
 

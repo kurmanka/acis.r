@@ -547,13 +547,14 @@ sub settings {
 
   if ( $input ->{pass} ) {{
 
-    my $old_real = $owner -> {password};
     my $old      = $input -> {pass};
-
     my $pass;
 
-    if ( $old_real eq $old ) {
-      $pass = $old;
+    # call check_user_password()
+    
+    if ( $app->check_user_password( $old, $owner ) ) {
+      # password is valid
+      # we can continue
     } else {
       $app -> error( 'bad-old-pass' ); ### 'bad-old-pass' ?
       undef $OK;
@@ -563,33 +564,28 @@ sub settings {
     if ( $input -> {'pass-new'} 
          or $input -> {'pass-confirm'} ) { 
 
-      my $new      = $input -> {'pass-new' };
-      my $conf     = $input -> {'pass-confirm'};
+        my $new      = $input -> {'pass-new' };
+        my $conf     = $input -> {'pass-confirm'};
       
-      if ( $old 
-           and $old_real eq $old ) {
         if ( $new eq $conf ) {
-          $owner ->{password} = $new;
-          $pass  = $new;
+            $app->set_new_password( $new );
           
         } else {
-          $app -> form_invalid_value( 'pass-new' );
-          $app -> form_invalid_value( 'pass-confirm' );
-          undef $OK;
+            $app -> form_invalid_value( 'pass-new' );
+            $app -> form_invalid_value( 'pass-confirm' );
+            undef $OK;
         }
         
-      } else {
+    } else {
         die;
-      }
-
     }
+
     if ( $pass 
          and $input -> {'remember-pass'} 
          and $input -> {'remember-login'} ) {
       $app -> set_auth_cookies( undef, $pass );
     }
   }}
-
 
 
   if ( not $app -> error 

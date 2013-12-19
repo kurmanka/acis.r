@@ -362,7 +362,7 @@ sub check_login_and_pass {
       if ( $login eq lc $owner ->{login} ) {
 
         # XXX-Password
-        if ( not ACIS::Web::UserPassword::check_user_password( $pass, $owner ) ) {
+        if ( not $app->check_user_password( $pass, $owner ) ) {
           return "wrong-password";
         }
 
@@ -391,7 +391,7 @@ sub check_login_and_pass {
   }
 
   # XXX-Password
-  if ( not ACIS::Web::UserPassword::check_user_password( $pass, $udata->{owner} ) ) {
+  if ( not $app->check_user_password( $pass, $udata->{owner} ) ) {
     return "wrong-password";
   }
    
@@ -714,6 +714,9 @@ sub set_form_value {
     {form} {values} {$element} = 
       ( defined $value ) ? $value : undef;
 
+  if (exists $UNSAFE_TO_LOG->{$element} and defined $value) {
+    $value = '######';
+  }
   debug "set form value $element: ", (defined $value)? $value : '*undef*';
 }
 
@@ -869,7 +872,11 @@ sub check_input_parameters {
       ### make sure it is 
       assert( not ref( $orig_val ) );
       
-      debug "parameter '$name' with value '$orig_val'";
+      if (exists $UNSAFE_TO_LOG->{$name}) {
+        debug "parameter '$name' with a value (not logged)";
+      } else {
+        debug "parameter '$name' with value '$orig_val'";
+      }
 
       $orig_val =~ s/(^\s+|\s+$)//g;
 
