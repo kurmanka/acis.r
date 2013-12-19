@@ -69,6 +69,7 @@ sub check_user_password {
 
   if (not exists $ud_owner->{password_hash_base64} 
       or not exists $ud_owner->{password_salt_base64}) {
+        debug "fallback to the clear-text password";
         # XXX fallback to the clear-text password
         return ($password eq $ud_owner->{password});
   }
@@ -80,6 +81,7 @@ sub check_user_password {
   my $existing_hash = $ud_owner->{password_hash_base64} or die;
   # compare
   my $result = ($given_hash eq $existing_hash);
+  debug "result: $result";
   # false or true
   return $result;
 }

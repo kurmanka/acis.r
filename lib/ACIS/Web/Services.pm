@@ -356,7 +356,7 @@ sub check_login_and_pass {
     
     debug "and in fact, there is a session";
     
-    my $owner = $session -> owner;
+    my $owner = $session -> owner; # or $session -> userdata_owner; ? XXX
 
     if ( $owner and $owner ->{login} ) {
       if ( $login eq lc $owner ->{login} ) {
