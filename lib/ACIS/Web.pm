@@ -634,8 +634,9 @@ sub send_update_request {
 # Do not log the users' passwords to debug.log
 
 my $UNSAFE_TO_LOG = {
-    'pass' => 1,
+    'pass'         => 1,
     'pass-confirm' => 1,
+    'pass-new'     => 1,
 };
 
 sub safe_to_log_form_input { 
