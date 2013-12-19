@@ -98,6 +98,8 @@ sub generate_salt {
   my $ud_owner = $session ->userdata_owner or die;
   my ($salt, $salt_b64) = generate_random_bytes_base64();
 
+  # remove trailing whitespace
+  chomp $salt_b64;
   # we store the base64 encoding of the salt
   $ud_owner->{password_salt_base64} = $salt_b64;
   return $salt;
