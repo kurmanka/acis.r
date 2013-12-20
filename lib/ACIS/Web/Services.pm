@@ -586,6 +586,10 @@ sub login_start_session {
                                        object => $udata, 
                                        file   => $udata_file );
 
+  assert( $session );
+  require ACIS::Web::User;
+  $app -> userdata_bring_up_to_date();
+
   my $sid = $session -> id;
   assert( $sid );
   $app -> sevent(  -class => 'auth',
@@ -618,12 +622,6 @@ sub login_start_session {
   $app -> clear_process_queue;
   $app -> redirect( $URI );
 
-
-  ## need userdata upgrade?
-  if ($session->userdata_owner->{password}) {
-  	debug "call upgrade_clear_password()";
-    ACIS::Web::UserPassword::upgrade_clear_password( $app );
-  }
 
   return $udata;
 }

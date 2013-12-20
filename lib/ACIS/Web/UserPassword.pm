@@ -105,13 +105,13 @@ sub generate_salt {
   return $salt;
 }
 
-sub upgrade_clear_password {
+sub ACIS::Web::upgrade_clear_password {
   my $app = shift;
   my $session = $app->session or die;
   my $ud_owner = $session ->userdata_owner or die;
 
   if (exists $ud_owner->{password}) {
-    debug "clear password exsits";
+    debug "clear text password exsits";
     my $salt = generate_salt( $app ) or die;
     my $pass = delete $ud_owner->{password};
 

@@ -607,6 +607,12 @@ sub rebuild_profile_url {
   }
 }
 
+use ACIS::Web::UserPassword;
+sub ACIS::Web::userdata_bring_up_to_date {
+    my $app = shift or die;
+    $app -> upgrade_clear_password();
+}
+
 
 
 ############################################################################
