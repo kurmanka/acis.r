@@ -947,7 +947,7 @@ sub handle_request {
       } else {
           binmode STDOUT, ":utf8"; 
       }
-      $/=undef;
+
       print STDOUT $body; 
   } else {
       debug "empty response body";
