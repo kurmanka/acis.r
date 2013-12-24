@@ -47,8 +47,22 @@ sub generate_random_bytes {
 sub generate_random_bytes_base64 {
   my $bytes = generate_random_bytes();
   my $string = encode_base64( $bytes );
+  # remove trailing whitespace
+  chomp $string;
   return ($bytes, $string);
 }
+
+sub generate_salt {
+  my $app = shift;
+  my $session = $app->session or die;
+  my $ud_owner = $session ->userdata_owner or die;
+  my ($salt, $salt_b64) = generate_random_bytes_base64();
+
+  # we store the base64 encoding of the salt
+  $ud_owner->{password_salt_base64} = $salt_b64;
+  return $salt;
+}
+
 
 sub make_hash($$) {
   my $password = shift;
@@ -92,19 +106,6 @@ sub ACIS::Web::check_user_password {
 }
 
 
-sub generate_salt {
-  my $app = shift;
-  my $session = $app->session or die;
-  my $ud_owner = $session ->userdata_owner or die;
-  my ($salt, $salt_b64) = generate_random_bytes_base64();
-
-  # remove trailing whitespace
-  chomp $salt_b64;
-  # we store the base64 encoding of the salt
-  $ud_owner->{password_salt_base64} = $salt_b64;
-  return $salt;
-}
-
 sub ACIS::Web::upgrade_clear_password {
   my $app = shift;
   my $session = $app->session or die;
@@ -143,6 +144,53 @@ sub ACIS::Web::set_new_password {
 
   return 1;
 }
+
+# cookie name: rememberme
+# cookie expiry time: 1 month
+
+sub create_persistent_login {
+  my $app = shift or die;
+  my $login = shift or die;
+
+  my ($token, $token_b64) = generate_random_bytes_base64();
+
+  my $q = $app->sql->prepare( 'insert into persistent_login (login,token,created) values (?,?,NOW())' );
+  my $r = $q->execute( $login, $token );
+  if ($r) {
+    # good result
+    $app -> set_cookie( -name  => 'rememberme',
+                        -value => $token_b64,
+                        -expires => '+1m'
+    );
+    return 1;
+
+  } else {
+    debug "create_persistent_login: insert failed: " . $sql->error;
+    return 0;
+  }
+}
+
+sub check_persistent_login {
+  my $app = shift or die;
+  my $token_b64 = $app->get_cookie('rememberme');
+  my $login;
+
+  my $sql = $app->sql;
+
+  # - check the token.
+  # - check the expiry time.
+  # - get the login.
+  # - remove the token.
+  # - return the login.
+
+  # - if the token is not there, or it has already expired, return undef.
+
+  # ...
+
+  return $login;
+}
+
+
 
 sub create_password_reset {
   my $app = shift;
