@@ -207,10 +207,9 @@ sub has_userdata_changed {
 
     if ( open USERDATA, "<:utf8", $udata_file ) {  ### XX PERL5.8 dependency
       # load the userdata file
-      my $irs = $/; undef $/;
+      local $/;
       $udata_string = <USERDATA>;
       close USERDATA;
-      $/ = $irs;
 
 #      $udata_real  = ACIS::Data::DumpXML::Parser ->new ->parse( $udata_string );
 # that could be useful if we wanted to check each individual record for change
