@@ -296,6 +296,9 @@ sub equal_passwords($$) {
 }
 
 
+
+# XXX this is an almost complete copy of the 
+# check_login_and_pass() function below.
 sub attempt_userdata_access {
 
 # Returns one of:
