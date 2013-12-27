@@ -234,6 +234,9 @@
 
     <use module='ACIS::Web::User'/>
 
+
+    <param name='pass'    type='password' required='yes'/>
+
     <param name='name'    type='name' if-not-empty='1'
            place='owner:name' 
            maxlen='1000'/>
@@ -246,7 +249,6 @@
 
     <param name='record-email'/>
 
-    <param name='pass'/>
     <param name='pass-new'     type='password'/>
     <param name='pass-confirm' type='password'/>
     <!-- also: remember-email, remember-pass -->
