@@ -294,6 +294,8 @@ sub set_auth_cookies {
 sub clear_auth_cookies { 
   my $self = shift;
   # XXX
+  $self -> set_authentication_cookie( 'login', '', 1 );
+  $self -> set_authentication_cookie( 'pass' , '', 1 );
 }
 
 # XXX

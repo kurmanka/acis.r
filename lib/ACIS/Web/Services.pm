@@ -431,11 +431,19 @@ sub authenticate {
   if ( not $login ) {
     $login = $app -> get_cookie ( 'login' );
   }
-
   if ( not $passwd ) {
     $passwd = $app -> get_cookie( 'pass' );
   }
 
+  # for a smooth transition from old pass & login cookies to the
+  # new persistent login cookie:
+  if ( $app->get_cookie( 'pass' ) and $app->get_cookie('login') ) {
+    debug "both pass and login cookies are present";
+    $app->variables->{'pass-and-login-cookies'} = $app->get_cookie( 'pass' );
+  }
+  if ( $app->get_cookie( 'pass' ) or $app->get_cookie('login') ) {
+    #$app->clear_auth_cookies;
+  }
 
   if ( $login and $form_input -> {'remind-password'} ) {
     $app -> forgotten_password ();
@@ -604,9 +612,10 @@ sub login_start_session {
   put_sysprof_value( $login, 'last-login-date', date_now() );
 
   my $auto_login = $app -> form_input ->{'auto-login'} || '';
-  if ( $auto_login eq "true" )  {
-    my $pass = $app -> form_input ->{pass};
-    $app -> set_auth_cookies( $login, $pass );
+  if ( $auto_login eq "true" 
+       or $app->variables->{'pass-and-login-cookies'})  {
+    debug "time to set persistent login";
+    $app -> set_auth_cookies( $login, $app->form_input->{pass} || $app->variables->{'pass-and-login-cookies'} );
   } 
 
   ### redirect to the same screen, but with session id
