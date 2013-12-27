@@ -146,7 +146,7 @@ sub ACIS::Web::set_new_password {
 }
 
 # cookie name: rememberme
-# cookie expiry time: 1 month
+# cookie expiry time: 3 months
 
 sub create_persistent_login {
   my $app = shift or die;
@@ -160,7 +160,7 @@ sub create_persistent_login {
     # good result
     $app -> set_cookie( -name  => 'rememberme',
                         -value => $token_b64,
-                        -expires => '+1m'
+                        -expires => '+3M'
     );
     return 1;
 
@@ -172,6 +172,7 @@ sub create_persistent_login {
 
 sub check_persistent_login {
   my $app = shift or die;
+  my $readonly = shift;
   my $token_b64 = $app->get_cookie('rememberme');
   my $login;
 
@@ -180,16 +181,17 @@ sub check_persistent_login {
   # - check the token.
   # - check the expiry time.
   # - get the login.
-  # - remove the token.
+  # - if not $readonly, remove the token.
   # - return the login.
 
   # - if the token is not there, or it has already expired, return undef.
 
-  # ...
+  # XXXX ...
 
   return $login;
 }
 
+sub ACIS::Web::check_persistent_login { check_persistent_login( @_ ); }
 
 
 sub create_password_reset {
