@@ -147,6 +147,7 @@ sub ACIS::Web::set_new_password {
 
 # cookie name: rememberme
 # cookie expiry time: 3 months
+my $EXPIRY_MONTHS = 3;
 
 sub create_persistent_login {
   my $app = shift or die;
@@ -160,12 +161,12 @@ sub create_persistent_login {
     # good result
     $app -> set_cookie( -name  => 'rememberme',
                         -value => $token_b64,
-                        -expires => '+3M'
+                        -expires => "+${EXPIRY_MONTHS}M"
     );
     return 1;
 
   } else {
-    debug "create_persistent_login: insert failed: " . $sql->error;
+    debug "create_persistent_login: insert failed: " . $app->sql->error;
     return 0;
   }
 }
@@ -179,14 +180,27 @@ sub check_persistent_login {
   my $sql = $app->sql;
 
   # - check the token.
+  if ($token_b64 eq 'notnow') { return undef; }
+  # - decode the token.
+  my $token = decode_base64( $token_b64 ) or die;
+  my $row;
+
+  # - get the token table row.
   # - check the expiry time.
+  my $q = $sql->prepare_cached( "select * from persistent_login where token=? and timestampadd(MONTH,?,created) > NOW()" );
+  my $r = $q->execute( $token, $EXPIRY_MONTHS );
+  if ($r and $r->{row}) { $row = $r->{row}; }
+
   # - get the login.
+  $login = $row->{login};
+
   # - if not $readonly, remove the token.
+  if (not $readonly) {
+      my $q2 = $sql->prepare( "delete from persistent_login where token=?" );
+      $q2->execute($token);
+  }
   # - return the login.
-
   # - if the token is not there, or it has already expired, return undef.
-
-  # XXXX ...
 
   return $login;
 }
