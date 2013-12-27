@@ -283,7 +283,7 @@ sub set_auth_cookies {
   my $pass  = shift;
   
   if ($login and $pass) {
-    ACIS::Web::UserPassword::create_persistent_login( $self, $login );
+    $self->create_persistent_login( $login );
   }
 
   # clear old auth cookies  

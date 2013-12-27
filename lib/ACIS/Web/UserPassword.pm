@@ -149,7 +149,7 @@ sub ACIS::Web::set_new_password {
 # cookie expiry time: 3 months
 my $EXPIRY_MONTHS = 3;
 
-sub create_persistent_login {
+sub ACIS::Web::create_persistent_login {
   my $app = shift or die;
   my $login = shift or die;
 
@@ -171,10 +171,10 @@ sub create_persistent_login {
   }
 }
 
-sub check_persistent_login {
+
+sub ACIS::Web::check_persistent_login {
   my $app = shift or die;
-  my $readonly = shift;
-  my $token_b64 = $app->get_cookie('rememberme');
+  my $token_b64 = $app->get_cookie('rememberme') || return undef;
   my $login;
 
   my $sql = $app->sql;
@@ -182,30 +182,39 @@ sub check_persistent_login {
   # - check the token.
   if ($token_b64 eq 'notnow') { return undef; }
   # - decode the token.
-  my $token = decode_base64( $token_b64 ) or die;
+  my $token = decode_base64( $token_b64 ) or return undef;
   my $row;
 
   # - get the token table row.
   # - check the expiry time.
   my $q = $sql->prepare_cached( "select * from persistent_login where token=? and timestampadd(MONTH,?,created) > NOW()" );
-  my $r = $q->execute( $token, $EXPIRY_MONTHS );
-  if ($r and $r->{row}) { $row = $r->{row}; }
-
-  # - get the login.
-  $login = $row->{login};
-
-  # - if not $readonly, remove the token.
-  if (not $readonly) {
-      my $q2 = $sql->prepare( "delete from persistent_login where token=?" );
-      $q2->execute($token);
+  my $r = $sql->execute( $token, $EXPIRY_MONTHS );
+  if ($r and $r->{row}) { 
+    $row = $r->{row}; 
+    # - get the login.
+    $login = $row->{login};
   }
+
   # - return the login.
   # - if the token is not there, or it has already expired, return undef.
 
   return $login;
 }
 
-sub ACIS::Web::check_persistent_login { check_persistent_login( @_ ); }
+
+
+sub ACIS::Web::have_used_persistent_login {
+  my $app = shift or die;
+  my $token_b64 = $app->get_cookie('rememberme') || return undef;
+
+  # - decode the token.
+  my $token = decode_base64( $token_b64 ) or return undef;
+
+  my $sql = $app->sql;
+  my $q = $sql->prepare( "delete from persistent_login where token=?" );
+  $q->execute($token);
+  return;    
+}
 
 
 sub create_password_reset {
