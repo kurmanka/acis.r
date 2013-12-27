@@ -298,7 +298,8 @@ sub equal_passwords($$) {
 
 
 # XXX this is an almost complete copy of the 
-# check_login_and_pass() function below.
+# check_login_and_pass() function below. but it does not 
+# check the password.
 sub attempt_userdata_access {
 
 # Returns one of:
@@ -502,22 +503,22 @@ sub authenticate {
   my $login;
   my $passwd;
   my $persistent;
+  my $form_input = $app -> form_input;
 
   $login = $app->check_persistent_login;
   if ( $login ) {
-      $persistent = 1; 
-      $status = $app->attempt_userdata_access( $login );
-  } else {
+    $persistent = 1; 
+    $status = $app->attempt_userdata_access( $login );  
+  } 
+  
+  if( not $status 
+    and $app->request_input('login') or $app->request_input('pass') ) {
 
     debug "check CGI parameters and cookies";
-
-    # now we find out
-
-    my $form_input = $app -> form_input;
-
     $login  = $form_input -> {login};
     $passwd = $form_input -> {pass};
 
+    # legacy cookies
     if ( not $login ) {
       $login = $app -> get_cookie ( 'login' );
     }

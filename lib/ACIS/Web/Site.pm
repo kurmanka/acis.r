@@ -107,32 +107,8 @@ sub homepage {
     }
   }
 
-
-  if (     $app -> get_cookie( 'login' ) 
-       and $app -> get_cookie( 'pass'  )  ) {
-
-    my $login = $app -> get_cookie( 'login' );
-    my $pass  = $app -> get_cookie( 'pass'  );
-
-    my $status = $app -> check_login_and_pass( $login, $pass, 1 );
-    debug "check_login_and_pass: $status";
-
-    if ( $status eq 'existing-session-loaded' ) {
-
-    } elsif ( ref $status ) {
-      $vars -> {'auto-login-possible'} = { name  => $status ->{owner}{name},
-                                           login => $status ->{owner}{login}, };
-    }
-  }
-
-  my $login_cu = $app -> get_cookie( 'login' );
-
-  if ( $login_cu
-       and not $app-> session
-       and not $vars -> {'auto-login-possible'}
-     ) {
-    $app -> set_form_value( "login", $login_cu );
-  }
+  # try authenticating
+  $app -> authenticate;
 
 }
 
