@@ -642,8 +642,7 @@ sub authenticate {
     my $ret = login_start_session( $app, $udata, $login );
     # remove the login
     if ($persistent) {
-      $app -> have_used_persistent_login;
-      $app -> create_persistent_login( $login );
+      $app -> renew_persistent_login;
     }
 
     # this is for single-profile accounts, that are opening

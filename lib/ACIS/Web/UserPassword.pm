@@ -152,11 +152,12 @@ my $EXPIRY_MONTHS = 3;
 sub ACIS::Web::create_persistent_login {
   my $app = shift or die;
   my $login = shift or die;
-
+ 
   my ($token, $token_b64) = generate_random_bytes_base64();
 
-  my $q = $app->sql->prepare( 'insert into persistent_login (login,token,created) values (?,?,NOW())' );
-  my $r = $q->execute( $login, $token );
+  my $sql = $app->sql;
+  my $q = $sql->prepare( 'insert into persistent_login (login,token,created) values (?,?,NOW())' );
+  my $r = $sql->execute( $login, $token );
   if ($r) {
     # good result
     $app -> set_cookie( -name  => 'rememberme',
@@ -166,7 +167,7 @@ sub ACIS::Web::create_persistent_login {
     return 1;
 
   } else {
-    debug "create_persistent_login: insert failed: " . $app->sql->error;
+    debug "create_persistent_login: insert failed: " . $sql->error;
     return 0;
   }
 }
@@ -202,8 +203,7 @@ sub ACIS::Web::check_persistent_login {
 }
 
 
-
-sub ACIS::Web::have_used_persistent_login {
+sub ACIS::Web::renew_persistent_login {
   my $app = shift or die;
   my $token_b64 = $app->get_cookie('rememberme') || return undef;
 
@@ -211,10 +211,41 @@ sub ACIS::Web::have_used_persistent_login {
   my $token = decode_base64( $token_b64 ) or return undef;
 
   my $sql = $app->sql;
-  my $q = $sql->prepare( "delete from persistent_login where token=?" );
-  $q->execute($token);
+  $sql->prepare( "update persistent_login set created=NOW() where token=?" );
+  my $r = $sql->execute($token);
+  
+  if ($r) {
+    # reset the cookie
+    $app -> set_cookie( -name  => 'rememberme',
+                        -value => $token_b64,
+                        -expires => "+${EXPIRY_MONTHS}M" );
+  } else {
+    debug "renew_persistent_login: update failed: " . $sql->error;
+  }
   return;    
 }
+
+
+sub ACIS::Web::remove_persistent_login {
+  my $app = shift or die;
+  my $token_b64 = $app->get_cookie('rememberme') || return undef;
+
+  # - decode the token.
+  my $token = decode_base64( $token_b64 ) or return undef;
+
+  my $sql = $app->sql;
+  $sql->prepare( "delete persistent_login where token=?" );
+  my $r = $sql->execute($token);
+  
+  if ($r) {
+    # clear the cookie
+    $app -> set_cookie( -name  => 'rememberme',
+                        -value => '',
+                        -expires => "+0m" );
+  }
+  return;    
+}
+
 
 
 sub create_password_reset {
