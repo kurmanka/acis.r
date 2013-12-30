@@ -511,8 +511,8 @@ sub authenticate {
     $status = $app->attempt_userdata_access( $login );  
   } 
   
-  if( not $status 
-    and $app->request_input('login') or $app->request_input('pass') ) {
+  if ( not $status 
+       and ($app->request_input('login') or $app->request_input('pass')) ) {
 
     debug "check CGI parameters and cookies";
     $login  = $form_input -> {login};
@@ -538,7 +538,7 @@ sub authenticate {
     }
 
     if ( $login and $form_input -> {'remind-password'} ) {
-      $app -> forgotten_password ();
+      $app -> forgotten_password(); ## XXX
       return 0;
     }
 
@@ -592,8 +592,6 @@ sub authenticate {
 
   } elsif ( $status eq 'wrong-password' ) {
     
-    my $expected = $1;
-
     $app -> errlog( "[$login] login attempt failed, wrong password" );
     $app -> set_form_value( 'login', $login );
     $app -> error( 'login-bad-password' );
