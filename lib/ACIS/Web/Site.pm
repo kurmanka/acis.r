@@ -110,6 +110,10 @@ sub homepage {
   # try authenticating
   $app -> authenticate;
 
+  # prepare the remember-me checkbox value
+  my $remember_me = $app->get_cookie('remember-me');
+  $remember_me = not defined $remember_me or ($remember_me ne 'notnow');
+  $app->set_form_value( 'remember-me', $remember_me );
 }
 
 

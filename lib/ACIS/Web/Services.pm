@@ -704,7 +704,7 @@ sub login_start_session {
    
   put_sysprof_value( $login, 'last-login-date', date_now() );
 
-  my $auto_login = $app -> form_input ->{'auto-login'} || '';
+  my $auto_login = $app -> form_input ->{'remember-me'} || '';
   if ( $auto_login eq "true" 
        or $app->variables->{'pass-and-login-cookies'})  {
     debug "time to set persistent login";
