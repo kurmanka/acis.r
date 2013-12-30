@@ -510,6 +510,8 @@ sub settings {
 
   my $old_login = $owner->{login};
   $login = set_user_login( $app, $login );
+  $app -> set_form_value( "email", $login );
+
   my $login_changed = ($old_login ne $login);
   debug "Login changed: <$login_changed>";
 
@@ -548,26 +550,30 @@ sub settings {
     }
   }
   
-  # like this, or add this additional condition:
-  #   and not $persistent_login_mode
-  my $remember_me_input = $input->{'remember-me'};
+  # handle the remember me checkbox
+  my $remember_me_input = $input->{'remember-me'} || '';
   debug "remember-me: $remember_me_input";
 
   if ( not $remember_me_input ) {
     $app -> remove_persistent_login;
+    $persistent_login_mode = undef;
 
   } else { # $remember_me_input == true
 
     if ( $login_changed ) {
-      # if login address changed, create a new persistent login cookie
+      # if login has changed, remove the old login cookie, 
       $app ->remove_persistent_login;
     }
     if ( not $persistent_login_mode or $login_changed ) {
-      $app ->create_persistent_login( $login );
+      # create a new one.
+      $persistent_login_mode = $app ->create_persistent_login( $login );
     } else {
-      $app ->renew_persistent_login();
+      # renew the existing one
+      $persistent_login_mode = $app ->renew_persistent_login();
     }
   }
+  $app -> set_form_value( "remember-me", $persistent_login_mode );
+
 
   if ( not $app -> error 
        and $OK ) {

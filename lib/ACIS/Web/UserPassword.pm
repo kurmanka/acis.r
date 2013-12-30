@@ -234,22 +234,26 @@ sub ACIS::Web::renew_persistent_login {
     $app -> set_cookie( -name  => 'rememberme',
                         -value => $token_b64,
                         -expires => "+${EXPIRY_MONTHS}M" );
+    return 1;
+
   } else {
     debug "renew_persistent_login: update failed: " . $sql->error;
   }
-  return;    
+  return;
 }
 
 
 sub ACIS::Web::remove_persistent_login {
   my $app = shift or die;
-  my $token_b64 = $app->get_cookie('rememberme') || return undef;
+  debug "remove_persistent_login(): start";
+  debug "remove_persistent_login(): cookie rememberme: " . $app->get_cookie('rememberme');
+  my $token_b64 = $app->get_cookie('rememberme') or return undef;
 
   # - decode the token.
   my $token = decode_base64( $token_b64 ) or return undef;
 
   my $sql = $app->sql;
-  $sql->prepare( "delete persistent_login where token=?" );
+  $sql->prepare( "delete from persistent_login where token=?" );
   my $r = $sql->execute($token);
   
   if ($r) {
@@ -257,7 +261,10 @@ sub ACIS::Web::remove_persistent_login {
     $app -> set_cookie( -name  => 'rememberme',
                         -value => 'notnow',
                         -expires => "+${EXPIRY_MONTHS}M" );
+  } else {
+    debug "remove_persistent_login(): failed: " . $sql->error;
   }
+
   return;    
 }
 

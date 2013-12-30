@@ -261,7 +261,6 @@
       <call function='ACIS::Web::User::settings'     />
       <call function='process_form_data' />
       <call function='prepare_form_data' />
-      <call function='ACIS::Web::User::settings_prepare'     />
     </process>
 
     <presentation type='xslt' filename='user/settings.xsl' />
