@@ -175,7 +175,15 @@ sub ACIS::Web::create_persistent_login {
 
 sub ACIS::Web::check_persistent_login {
   my $app = shift or die;
-  my $token_b64 = $app->get_cookie('rememberme') || return undef;
+  my $token_b64 = $app->get_cookie('rememberme');
+
+  if (not $token_b64 or ($token_b64 eq 'notnow')) { 
+    # also check the cookies to be set
+    $token_b64 = $app->response->{cookies}->{rememberme} || '';
+    debug "token_b64: $token_b64";
+  }
+  if (not $token_b64) { return undef; }
+
   my $login;
 
   my $sql = $app->sql;
@@ -205,7 +213,14 @@ sub ACIS::Web::check_persistent_login {
 
 sub ACIS::Web::renew_persistent_login {
   my $app = shift or die;
-  my $token_b64 = $app->get_cookie('rememberme') || return undef;
+  my $token_b64 = $app->get_cookie('rememberme');
+
+  if (not $token_b64 or ($token_b64 eq 'notnow')) { 
+    # also check the cookies to be set
+    $token_b64 = $app->response->{cookies}->{rememberme} || '';
+    debug "token_b64: $token_b64";
+  }
+  if (not $token_b64) { return undef; }
 
   # - decode the token.
   my $token = decode_base64( $token_b64 ) or return undef;
@@ -240,8 +255,8 @@ sub ACIS::Web::remove_persistent_login {
   if ($r) {
     # clear the cookie
     $app -> set_cookie( -name  => 'rememberme',
-                        -value => '',
-                        -expires => "+0m" );
+                        -value => 'notnow',
+                        -expires => "+${EXPIRY_MONTHS}M" );
   }
   return;    
 }

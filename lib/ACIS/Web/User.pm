@@ -464,29 +464,22 @@ sub check_session_type {
 
 sub settings_prepare {
   my $app    = shift;
-
+  
   my $vars    = $app -> variables;
   my $session = $app -> session;
-  my $mode    = $app -> get_auto_logon_mode;
-
   my $login = $session -> userdata_owner-> {login};
+  my $persistent_login = $app -> check_persistent_login || '';
+  debug "Persistent login: $persistent_login";
+  
+  my $persistent_login_mode = ($persistent_login eq $login);
+
   $app -> set_form_value( "email", $login );
 
-  $vars -> {'auto-log-mode'} = $mode;
+  my $mode = ($persistent_login_mode ? 'true' : undef);
+  debug "Persistent login mode: $mode";
+  $app -> set_form_value( "remember-me", $mode );
+  #$vars -> {'remember-me'} = $mode;
 
-  debug "Auto-logon-mode: $mode";
-
-  if ( $mode eq 'full'
-       or $mode eq 'login' ) {
-    $app -> set_form_value( "remember-login", 1 );
-  }
-  
-  $session -> {'auto-logon-mode'} = $mode;
-
-
-  if ( $mode eq 'full' ) {
-    $app -> set_form_value( "remember-pass", 1 );
-  }
 }
 
 
@@ -497,7 +490,7 @@ sub settings {
   my $session = $app -> session;
   my $record  = $session -> current_record;
   my $owner   = $session -> userdata_owner;
-  my $persistent_login = $app -> check_persistent_login(1);
+  my $persistent_login = $app -> check_persistent_login || '';
   my $persistent_login_mode = ($persistent_login eq $owner->{login});
 
   my $OK  = 1;
@@ -515,8 +508,10 @@ sub settings {
     return;
   }
 
+  my $old_login = $owner->{login};
   $login = set_user_login( $app, $login );
-  my $login_changed = $owner->{login} ne $login;
+  my $login_changed = ($old_login ne $login);
+  debug "Login changed: <$login_changed>";
 
   if ( $login_changed 
        and $record -> {'about-owner'} 
@@ -555,8 +550,23 @@ sub settings {
   
   # like this, or add this additional condition:
   #   and not $persistent_login_mode
-  if ( $input->{'persistent-login'} ) {
-    $app -> set_auth_cookies( $login, $pass );
+  my $remember_me_input = $input->{'remember-me'};
+  debug "remember-me: $remember_me_input";
+
+  if ( not $remember_me_input ) {
+    $app -> remove_persistent_login;
+
+  } else { # $remember_me_input == true
+
+    if ( $login_changed ) {
+      # if login address changed, create a new persistent login cookie
+      $app ->remove_persistent_login;
+    }
+    if ( not $persistent_login_mode or $login_changed ) {
+      $app ->create_persistent_login( $login );
+    } else {
+      $app ->renew_persistent_login();
+    }
   }
 
   if ( not $app -> error 

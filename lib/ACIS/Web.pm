@@ -298,31 +298,6 @@ sub clear_auth_cookies {
   $self -> set_authentication_cookie( 'pass' , '', 1 );
 }
 
-# XXX
-sub get_auto_logon_mode {
-  my $self = shift;
-  my $session = $self -> session;
-
-  if ( $session ) {
-    my $owner = $session -> userdata_owner;
-    my $login = $owner -> {login};
-    my $pass  = $owner -> {password};
-    my $resp_cookies = $self ->{response}{cookies};
-
-    my $cookie_login = $resp_cookies->{login} || $self -> get_cookie( 'login' );
-    my $cookie_pass  = $resp_cookies->{pass}  || $self -> get_cookie( 'pass'  );
-
-    if ( $cookie_login and $cookie_login eq $login ) {
-      if ( $cookie_pass
-#          and $cookie_pass eq $pass
-         ) { return 'full' ; }
-      else { return 'login'; }
-
-    } else { return 'off'  ; }
-
-  }
-  return undef;
-}
 
 # XXX
 sub set_authentication_cookie { 

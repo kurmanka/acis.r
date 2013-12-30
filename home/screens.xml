@@ -234,24 +234,19 @@
 
     <use module='ACIS::Web::User'/>
 
+    <param name='pass'    type='password'    required='yes' />
 
-    <param name='pass'    type='password' required='yes'/>
+    <param name='name'    type='name'        if-not-empty='1'
+                          place='owner:name' maxlen='1000'  />
 
-    <param name='name'    type='name' if-not-empty='1'
-           place='owner:name' 
-           maxlen='1000'/>
-
-    <param name='email'   required='yes' 
-           type='simpleemail'
-           />
+    <param name='email'   type='simpleemail' required='yes' />
     <!-- this parameter is checked and handled carefully in
     ACIS::Web::User::set_user_login() -->
-
     <param name='record-email'/>
 
     <param name='pass-new'     type='password'/>
     <param name='pass-confirm' type='password'/>
-    <!-- also: remember-email, remember-pass -->
+    <!-- also: remember-me -->
 
     <call function='load_session_or_authenticate' />
     <call function='ACIS::Web::User::check_session_type' />
