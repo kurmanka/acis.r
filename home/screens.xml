@@ -267,6 +267,13 @@
   </screen>
  
 
+  <screen id='forget-me'>
+    <use module='ACIS::Web::UserPassword'/>
+    <call function='load_session_if_possible' />
+    <call function='remove_persistent_login' />
+    <presentation type='xslt' filename='user/forget-me.xsl' />
+  </screen>
+
 
   <screen id='off'>
 

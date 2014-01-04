@@ -261,6 +261,7 @@ sub ACIS::Web::remove_persistent_login {
     $app -> set_cookie( -name  => 'rememberme',
                         -value => '',
                         -expires => "+${EXPIRY_MONTHS}M" );
+    $app -> variables -> {persistent_login_cookie_removed} = 1;
   } else {
     debug "remove_persistent_login(): failed: " . $sql->error;
   }

@@ -143,14 +143,12 @@
                 <acis:input type='checkbox' name='remember-me' id='rem-p'/>
                 <label for='rem-p'
                        title=''>
-                  <xsl:text> Persistent login on this computer (via a browser cookie).</xsl:text>
+                  <xsl:text> Persistent login on this computer via a browser cookie.</xsl:text>
+                  <xsl:if test='$form-values/remember-me/text()'>
+                      (<a ref='forget-me'>Remove it.</a>)
+                  </xsl:if>
                 </label>
             </p>
-<!-- XXX
-<acis:script-onload>control_remember_password_switch();</acis:script-onload>
--->
-
-
 
           
           <h2>Owner</h2>
