@@ -224,6 +224,7 @@ sub logoff_session {
   $session -> close( $self );
 
   $self -> clear_session_cookie;  
+  $self -> remove_persistent_login;  
   if ( $self->request ) { 
     undef $self -> request -> {'session-id'}; 
   }

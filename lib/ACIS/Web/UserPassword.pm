@@ -259,7 +259,7 @@ sub ACIS::Web::remove_persistent_login {
   if ($r) {
     # clear the cookie
     $app -> set_cookie( -name  => 'rememberme',
-                        -value => 'notnow',
+                        -value => '',
                         -expires => "+${EXPIRY_MONTHS}M" );
   } else {
     debug "remove_persistent_login(): failed: " . $sql->error;
