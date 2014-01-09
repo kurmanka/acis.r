@@ -296,6 +296,7 @@ sub create_password_reset {
 sub check_password_reset_token {
   my $app = shift or die;
   my $token_b64 = shift or die;
+  my $remove = 1;
   my $login;
 
   my $sql = $app->sql;
@@ -313,10 +314,15 @@ sub check_password_reset_token {
     $row = $r->{row}; 
     # - get the login.
     $login = $row->{login};
+    
+    # - remove the token
+    if ($remove) {
+      $sql->prepare( "delete from reset_token where token=?" );
+      $sql->execute($token);
+    }
   }
 
-  # - return the login.
-  # - if the token is not there, or it has already expired, return undef.
+  # - return the login (if found; undef otherwise)
   return $login;
 }
 
