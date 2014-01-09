@@ -72,6 +72,7 @@ sub make_hash($$) {
   # prepend the salt
   my $data = $salt . encode_utf8( $password );
   # take sha256, in the base64 encoding
+  # should be 44 characters long, if the data is 32 bytes long
   $hash_string = sha256_base64( $data );
   # ...
   return $hash_string; 
@@ -271,20 +272,52 @@ sub ACIS::Web::remove_persistent_login {
 
 
 
+# password reset token;
+# expiry time: 12 hours
+my $RESET_EXPIRY_HOURS = 12;
+
+
 sub create_password_reset {
   my $app = shift;
-  my $session = $app->session or die;
-  my $ud_owner = $session ->userdata_owner or die;
-  my $token;
-  # ...
-  return $token;
+  my $login = shift;
+  my ($token, $token_b64) = generate_random_bytes_base64();
+
+  my $sql = $app->sql;
+  my $q = $sql->prepare( 'insert into reset_token (login,token,created) values (?,?,NOW())' );
+  my $r = $sql->execute( $login, $token );
+  if ($r) {
+    return $token_b64;
+
+  } else {
+    return undef;
+  }
 }
 
-sub check_reset_token {
-  my $app = shift;
-  my $result;
-  # ...
-  return $result;
+sub check_password_reset_token {
+  my $app = shift or die;
+  my $token_b64 = shift or die;
+  my $login;
+
+  my $sql = $app->sql;
+
+  # - check the token.
+  # - decode the token.
+  my $token = decode_base64( $token_b64 ) or return undef;
+  my $row;
+
+  # - get the token table row.
+  # - check the expiry time.
+  my $q = $sql->prepare_cached( "select * from reset_token where token=? and timestampadd(HOUR,?,created) > NOW()" );
+  my $r = $sql->execute( $token, $RESET_EXPIRY_HOURS );
+  if ($r and $r->{row}) { 
+    $row = $r->{row}; 
+    # - get the login.
+    $login = $row->{login};
+  }
+
+  # - return the login.
+  # - if the token is not there, or it has already expired, return undef.
+  return $login;
 }
 
 1;
