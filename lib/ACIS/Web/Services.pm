@@ -141,51 +141,6 @@ sub load_session {
     # IPs don't match -- should not continue
     debug "the user IP addresses don't match";
 
-    ###  may be it is better to check the session validity by checking
-    ###  the user-agent string?  Probably it will be more comfortable
-    ###  for the users, although -- less secure.  In some big
-    ###  organizations both IP addresses and the user agent strings
-    ###  may in fact be the same with high probability.
-
-    my $pass = $app -> request_input( "pass" );
-    if ( $pass ) {
-      if ( equal_passwords( $pass, $session -> owner ->{password} ) ) {
-        ###  Override ip address
-        debug "but a valid password were given";
-        $session -> owner ->{IP} = $IP;
-      
-      } else {
-        my $login = $session ->owner ->{login};
-
-        if ( $just_try ) {
-          return "no-good-password";
-          
-        } else { 
-          ###  serious
-          $app -> log ( "session override attempt failed [$login] from $IP" );
-
-          $app -> error( "login-bad-password" );
-          $app -> set_presenter ( 'relogin-password' );
-          $app -> clear_process_queue;
-          
-          return undef;
-        }
-      }
-      
-    } else {
-      
-      if ( $just_try ) {
-        return "no-good-password";
-
-      } else { # serious
-  
-        $app -> message( "must-relogin" );
-        $app -> set_presenter ( 'relogin-password' );
-        $app -> clear_process_queue;
-        return undef;
-      }
-    }
-
   }
 
   $app -> session( $session );

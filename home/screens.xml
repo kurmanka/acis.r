@@ -823,10 +823,6 @@
     <presentation type='xslt' filename='misc/login.xsl'/>
   </screen>
 
-  <screen id='relogin-password'>
-    <presentation type='xslt' filename='misc/login-pass.xsl'/>
-  </screen>
-
   <screen id='sorry'>
     <presentation type='xslt' filename='misc/sorry.xsl'/>
   </screen>
