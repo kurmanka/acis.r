@@ -505,7 +505,7 @@ sub authenticate {
       $app -> clear_process_queue;
       if ( defined $login ) {
         $app -> set_form_value( 'login', $login );
-        $app -> variables -> {'remind-password-button'} = 1;
+        $app -> variables -> {'suggest-reset-password'} = 1;
       }
       $app -> set_presenter ( 'login' );
 
@@ -551,7 +551,8 @@ sub authenticate {
     $app -> errlog( "[$login] login attempt failed, wrong password" );
     $app -> set_form_value( 'login', $login );
     $app -> error( 'login-bad-password' );
-    $app -> variables -> {'remind-password-button'} = 1;
+    # suggest reset password? XXX
+    $app -> variables -> {'suggest-reset-password'} = 1;
     $app -> clear_process_queue;
     
     $app -> set_presenter( 'login' );

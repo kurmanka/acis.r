@@ -25,7 +25,7 @@
         <xsl:text>&#10;&#10;&#10;Hello </xsl:text>
         <xsl:value-of select='$user-name'/><xsl:text>,&#10;&#10;Someone (may be you) requested a password reset at </xsl:text>
         <xsl:value-of select='$site-name'/>
-        <xsl:text>.&#10;&#10;Please follow this link to set a new password:&#10;&#10;</xsl:text>
+        <xsl:text>.&#10;&#10;Please follow this link to set a new password for your account:&#10;&#10;</xsl:text>
         <xsl:value-of select='$base-url'/>
         <xsl:text>/reset/</xsl:text>
         <!-- http://www.exslt.org/str/functions/encode-uri/str.encode-uri.html -->
