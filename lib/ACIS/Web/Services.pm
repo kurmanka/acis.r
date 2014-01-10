@@ -1082,13 +1082,12 @@ sub forgotten_password {
 
   debug "going to load userdata to find the password";
 
-  my $udata = load ACIS::Web::UserData ( $udata_file );
+  my $udata = load ACIS::Web::UserData( $udata_file );
   
   my $owner = $udata -> {owner};
 
   if ( not $owner 
-       or not $owner ->{login}
-       or not $owner ->{password} ) {
+       or not $owner ->{login} ) {
     $app -> error ( 'login-account-damaged' );
     $app -> clear_process_queue;
     return undef;
@@ -1099,8 +1098,10 @@ sub forgotten_password {
     name  => $owner -> {name},
     login => $owner -> {login},
     type  => $owner -> {type},
-    pass  => $owner -> {password},
   };
+
+  my $token_string = ACIS::Web::UserPassword::create_password_reset( $app, $owner->{login} );
+  $vars->{token_string} = $token_string;
   
   $app -> send_mail ( 'email/forgotten-password.xsl' );
   $app -> success( 1 );  ### XXX email/forgotten-password.xsl should check this
