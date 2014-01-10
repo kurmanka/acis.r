@@ -1116,6 +1116,20 @@ sub forgotten_password {
   $app -> set_presenter ( 'login' );
 }
 
+sub forgotten_password_reset {
+  my $app = shift;
+  my $request  = $app -> request;
+  my $home     = $app -> {home};
+  my $vars     = $app -> variables;
+
+  debug "reset request";
+  #use Data::Dumper;
+  #debug Data::Dumper::Dumper($request);
+ 
+  my $token = $request-> {subscreen};
+  debug "token: $token";
+
+}
 
 
 

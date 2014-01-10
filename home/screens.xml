@@ -54,6 +54,12 @@
     </process>
     <presentation type='xslt' filename='misc/forgotten-password.xsl' />
   </screen>
+
+  <screen id='reset'>
+    <call function='ACIS::Web::forgotten_password_reset' />
+    <presentation type='xslt' filename='misc/forgotten-password.xsl' />
+  </screen>
+  
   
 
   <screen id='name' process-on-POST='1'>
