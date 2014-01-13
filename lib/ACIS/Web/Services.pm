@@ -1175,8 +1175,11 @@ sub password_reset_process {
   }
   if (not $pass1) { return; }
 
+  # different page template
+  $app->set_presenter('reset-done');
+  
+  # grab the userdata
   my $status = $app->attempt_userdata_access( $login );
-
   if (not ref $status) {
     debug "status: $status";
   }
@@ -1202,15 +1205,17 @@ sub password_reset_process {
                                           object => $udata, 
                                           file   => $udata_file );
     debug "created a new session";
-    
     $ok = 1;
-
   }
 
   if ($ok) {
     $app->success(1);
     $app->set_new_password( $pass1 );
     $app->logoff_session();
+    
+    # mark the token as used
+    my $token = $app->request->{subscreen};
+    ACIS::Web::UserPassword::password_reset_token_used( $app, $token );
   }
 }
 

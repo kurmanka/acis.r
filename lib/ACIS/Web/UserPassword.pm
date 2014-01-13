@@ -338,4 +338,14 @@ sub check_password_reset_token {
   return undef;
 }
 
+sub password_reset_token_used {
+  my $app          = shift or die;
+  my $token_b64    = shift or die;
+  my $sql = $app->sql;
+  my $token = decode_base64( $token_b64 ) or return undef;
+  $sql->prepare( "update reset_token set used=NOW() where token=?" );
+  $sql->execute($token);
+} 
+
+
 1;

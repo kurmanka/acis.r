@@ -4,10 +4,11 @@
     xmlns:exsl="http://exslt.org/common"
     xmlns:acis="http://acis.openlib.org"
     xmlns:html="http://www.w3.org/1999/xhtml"
-    
     exclude-result-prefixes="exsl xml html acis"
     version="1.0">
+  
   <xsl:import href='../page.xsl'/>
+  
   <xsl:template match='/'>
     <xsl:call-template name='page'>
       <xsl:with-param name='title'>
@@ -21,11 +22,7 @@
         <xsl:call-template name='show-status'/>
 
         <xsl:if test='$success'>
-          <p>
-          <xsl:text>We have sent you a secure, one-time password reset link by email.
-          Please set a new password for your account.
-          If you no longer have access to your email, contact the administrator.</xsl:text>
-          </p>
+          <p>Please set a new password for your account.</p>
 
           <acis:form xsl:use-attribute-sets='form' 
                    name='theform' 

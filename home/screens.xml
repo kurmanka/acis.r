@@ -63,6 +63,9 @@
     <presentation type='xslt' filename='misc/reset-password.xsl' />
   </screen>
   
+  <screen id='reset-done'>
+    <presentation type='xslt' filename='misc/reset-password-done.xsl' />
+  </screen>
   
 
   <screen id='name' process-on-POST='1'>
