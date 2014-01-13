@@ -92,5 +92,16 @@
     need all possible ways your name may appear in bibliographies and
     citations.
   </acis:error>
+  
+  <acis:error id='reset-token-expired'
+  >Sorry, the reset link has already expired. You need to use the reset 
+  link within 3 hours of requesting it.</acis:error>
+
+  <acis:error id='reset-token-reused'
+  >Sorry, the reset link has already been used. You need to request 
+  another one.</acis:error>
+
+  <acis:error id='reset-token-bad'
+  >Sorry, the reset link is incorrect.</acis:error>
 
 </acis:errors>

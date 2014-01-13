@@ -283,7 +283,7 @@ sub create_password_reset {
   my ($token, $token_b64) = generate_random_bytes_base64();
 
   my $sql = $app->sql;
-  my $q = $sql->prepare( 'insert into reset_token (login,token,created) values (?,?,NOW())' );
+  my $q = $sql->prepare( 'insert into reset_token (login,token,created,used) values (?,?,NOW(),NULL)' );
   my $r = $sql->execute( $login, $token );
   if ($r) {
     return $token_b64;
@@ -308,22 +308,36 @@ sub check_password_reset_token {
 
   # - get the token table row.
   # - check the expiry time.
-  my $q = $sql->prepare_cached( "select * from reset_token where token=? and timestampadd(HOUR,?,created) > NOW()" );
+  $sql->prepare_cached( "select * from reset_token where token=? and timestampadd(HOUR,?,created) > NOW()" );
   my $r = $sql->execute( $token, $RESET_EXPIRY_HOURS );
   if ($r and $r->{row}) { 
     $row = $r->{row}; 
     # - get the login.
     $login = $row->{login};
     
+    # - check if the token was already used in the past
+    if ($row->{used}) {
+      return -2;
+    }
+    
     # - remove the token
     if ($remove) {
-      $sql->prepare( "delete from reset_token where token=?" );
+      $sql->prepare( "update reset_token set used=NOW() where token=?" );
       $sql->execute($token);
     }
+    # - return the login
+    return $login;
   }
-
-  # - return the login (if found; undef otherwise)
-  return $login;
+  
+  # else (not found)
+  # - check if there's an expired token with this value
+  $sql->prepare_cached( "select * from reset_token where token=?" );
+  $r = $sql->execute( $token );
+  if ($r->{row} and $r->{row}{login}) {
+    return -1;
+  }
+  # not found at all
+  return undef;
 }
 
 1;

@@ -1081,7 +1081,7 @@ sub forgotten_password {
     return undef;
   }
 
-  debug "going to load userdata to find the password";
+  debug "going to load userdata to check the account";
 
   my $udata = load ACIS::Web::UserData( $udata_file );
   
@@ -1128,6 +1128,31 @@ sub forgotten_password_reset {
  
   my $token = $request-> {subscreen};
   debug "token: $token";
+
+  my $login = ACIS::Web::UserPassword::check_password_reset_token( $app, $token );
+  if ($login == -1) {
+    debug "expired token";
+    $app->error('reset-token-expired');
+    return;
+
+  } elsif ($login == -2) {
+    debug "already used token";
+    $app->error('reset-token-reused');
+    return;
+  
+  } elsif (not defined $login) {
+    debug "bad token";
+    $app->error('reset-token-bad');
+    return;   
+  }
+
+  # valid token:  
+  debug "login: $login";
+  # attempt login
+  
+  
+  
+  $app->success(1);
 
 }
 
