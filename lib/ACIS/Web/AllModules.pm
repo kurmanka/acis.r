@@ -45,6 +45,7 @@ require ACIS::Web::Site;
 require ACIS::Web::SysProfile;
 require ACIS::Web::User;
 require ACIS::Web::UserPassword;
+require ACIS::Web::PasswordReset;
 
 # Web::App core
 require Web::App::XSLT;
