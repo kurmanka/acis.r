@@ -22,37 +22,56 @@
         <xsl:call-template name='show-status'/>
 
         <xsl:if test='$success'>
-          <p>Please set a new password for your account.</p>
 
-          <acis:form xsl:use-attribute-sets='form' 
-                   name='theform' 
-                   id='theform'>
-            <p>
-            <label for='pass1'>
-              <xsl:text>new password:</xsl:text>
-            </label>
-            <br/>
-            <input name='pass' id='pass1'
-                   size='50' type='password'/>
-            </p>
+          <acis:form xsl:use-attribute-sets='form' name='f' class='important'>
+          
+          <xsl:call-template name='fieldset'>
+            <xsl:with-param name='content'>
+              <h2>New password</h2>
+              
+              <table>
+                <tr>
+                  <td>
+                    <label for='pass-in'>Password, required:</label>
+                  </td>
+                  <td>
+                   <acis:input name='pass' id='pass-in' type='password'>
+                    <acis:hint side=''>Minimum 6 digits or english letters.</acis:hint>
+                    <acis:check nonempty=''/>
+                    <acis:name>password</acis:name>
+                   </acis:input>
+                  </td>
+                </tr>
+                <tr>
+                  <td>
+                    <label for='pass-conf-in'>Password confirmation, required:</label>
+                  </td>
+                  <td>
+                    <acis:input class='edit' name='pass-confirm' id='pass-conf-in'
+                            type='password'>
+                      <acis:hint side=''>Repeat the password.</acis:hint>
+                      <acis:check nonempty=''/>
+                      <acis:name>password confirmation</acis:name>
+                    </acis:input>
+                  </td>
+                </tr>
+                
+                <tr>
+                  <td></td>
+                  <td>
+                    <input type='submit' class='important' 
+                      value='Done' />
+                    <acis:script-onload>
+                      document.f.pass.focus();
+                    </acis:script-onload>
+                  </td>
+                </tr>
+                
+              </table>
 
-            <p>
-            <label for='pass2'>
-              <xsl:text>password confirmation:</xsl:text>
-            </label>
-            <br/>
-            <input name='pass-confirm' id='pass2'
-                   size='50' type='password'/>
-            </p>
+            </xsl:with-param>
+          </xsl:call-template>
 
-            <p>
-            <xsl:text> </xsl:text>            
-            <input type='submit' class='important' 
-                   value='Set my new password' />
-            <acis:script-onload>
-              document.theform.pass.focus();
-            </acis:script-onload>                       
-            </p>        
           </acis:form>
 
         </xsl:if>

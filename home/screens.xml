@@ -61,7 +61,12 @@
   <screen id='reset'>
     <use module='ACIS::Web::PasswordReset'/>
     <call function='ACIS::Web::PasswordReset::password_reset' />
+
+    <param name='pass'         required='yes' type='password'  />
+    <param name='pass-confirm' required='yes' type='password'  />
+
     <process>
+      <call function='check_input_parameters' />
       <call function='ACIS::Web::PasswordReset::password_reset_process' />    
     </process>
     <presentation type='xslt' filename='misc/reset-password.xsl' />
