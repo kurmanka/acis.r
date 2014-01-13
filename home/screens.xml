@@ -56,7 +56,10 @@
   </screen>
 
   <screen id='reset'>
-    <call function='ACIS::Web::forgotten_password_reset' />
+    <call function='ACIS::Web::password_reset' />
+    <process>
+      <call function='ACIS::Web::password_reset_process' />    
+    </process>
     <presentation type='xslt' filename='misc/reset-password.xsl' />
   </screen>
   

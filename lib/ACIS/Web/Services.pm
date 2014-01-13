@@ -464,7 +464,7 @@ sub authenticate {
   $login = $app->check_persistent_login;
   if ( $login ) {
     $persistent = 1; 
-    $status = $app->attempt_userdata_access( $login );  
+    $status = $app->attempt_userdata_access( $login );
   } 
   
   if ( not $status 
@@ -1116,7 +1116,7 @@ sub forgotten_password {
   $app -> set_presenter ( 'login' );
 }
 
-sub forgotten_password_reset {
+sub password_reset {
   my $app = shift;
   my $request  = $app -> request;
   my $home     = $app -> {home};
@@ -1148,13 +1148,73 @@ sub forgotten_password_reset {
 
   # valid token:  
   debug "login: $login";
-  # attempt login
-  
-  
-  
+  $vars->{login} = $login;
   $app->success(1);
-
+  
+  # see the next function below 
+  # to see what happens next.
 }
+
+
+sub password_reset_process {
+  my $app = shift;
+  my $input = $app -> form_input;
+  my $home  = $app -> {home};
+  my $vars  = $app -> variables;
+
+  debug "reset password";
+
+  my $login = $vars->{login} || die;
+
+  my $pass1 = $input->{'pass'};
+  my $pass2 = $input->{'pass-confirm'};
+
+  if ($pass1 and $pass2 and $pass1 ne $pass2) {
+    $app->error( 'password-confirmation-mismatch' );
+    return;
+  }
+  if (not $pass1) { return; }
+
+  my $status = $app->attempt_userdata_access( $login );
+
+  if (not ref $status) {
+    debug "status: $status";
+  }
+  
+  my $ok;
+  # login
+  if ( $status eq 'no-account' ) {
+    #$app -> error ( 'no-account' );
+  } elsif ( $status eq 'account-damaged' )  {
+    # XXX
+  } elsif ( $status eq 'existing-session-loaded' ) {
+    # very strange, but could work
+    $ok = 1;
+  } elsif ( $status =~ /^account-locked:([^:]+):(.+)/ ) {
+    # may happen; need to try again later
+  } elsif ( ref $status ) {
+
+    my $udata = $status;
+    $app->update_paths_for_login( $login );
+    my $udata_file = $app -> paths -> {'user-data'};
+    my $session = $app -> start_session( "user", 
+                                          {login => $login}, # session owner
+                                          object => $udata, 
+                                          file   => $udata_file );
+    debug "created a new session";
+    
+    $ok = 1;
+
+  }
+
+  if ($ok) {
+    $app->success(1);
+    $app->set_new_password( $pass1 );
+    $app->logoff_session();
+  }
+}
+
+
 
 
 

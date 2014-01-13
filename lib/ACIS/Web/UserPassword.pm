@@ -294,24 +294,22 @@ sub create_password_reset {
 }
 
 sub check_password_reset_token {
-  my $app = shift or die;
-  my $token_b64 = shift or die;
-  my $remove = 1;
+  my $app          = shift or die;
+  my $token_b64    = shift or die;
+  my $mark_as_used = shift;
   my $login;
-
   my $sql = $app->sql;
 
   # - check the token.
   # - decode the token.
   my $token = decode_base64( $token_b64 ) or return undef;
-  my $row;
 
   # - get the token table row.
   # - check the expiry time.
   $sql->prepare_cached( "select * from reset_token where token=? and timestampadd(HOUR,?,created) > NOW()" );
   my $r = $sql->execute( $token, $RESET_EXPIRY_HOURS );
   if ($r and $r->{row}) { 
-    $row = $r->{row}; 
+    my $row = $r->{row}; 
     # - get the login.
     $login = $row->{login};
     
@@ -320,8 +318,8 @@ sub check_password_reset_token {
       return -2;
     }
     
-    # - remove the token
-    if ($remove) {
+    # - set the used time for the token
+    if ($mark_as_used) {
       $sql->prepare( "update reset_token set used=NOW() where token=?" );
       $sql->execute($token);
     }

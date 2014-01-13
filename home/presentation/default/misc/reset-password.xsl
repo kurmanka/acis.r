@@ -31,23 +31,29 @@
                    name='theform' 
                    id='theform'>
             <p>
-            <label for='password'>
+            <label for='pass1'>
               <xsl:text>new password:</xsl:text>
             </label>
             <br/>
-            <input name='password'
-                   id='password'
-                   size='50'/>
+            <input name='pass' id='pass1'
+                   size='50' type='password'/>
+            </p>
+
+            <p>
+            <label for='pass2'>
+              <xsl:text>password confirmation:</xsl:text>
+            </label>
+            <br/>
+            <input name='pass-confirm' id='pass2'
+                   size='50' type='password'/>
             </p>
 
             <p>
             <xsl:text> </xsl:text>            
-            <input type='submit' 
-                   class='important' 
-                   value='Let me reset my password'
-                   title='via email'/>
+            <input type='submit' class='important' 
+                   value='Set my new password' />
             <acis:script-onload>
-              document.theform.login.focus();
+              document.theform.pass.focus();
             </acis:script-onload>                       
             </p>        
           </acis:form>
