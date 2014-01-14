@@ -45,7 +45,6 @@ sub forgotten_password {
     $app -> clear_process_queue;
     return undef;
   }
-  assert( $owner );
   
   $app -> {'presenter-data'} {request} {user} = {
     name  => $owner -> {name},
@@ -59,11 +58,12 @@ sub forgotten_password {
   $app -> send_mail ( 'email/forgotten-password.xsl' );
   $app -> success( 1 );  ### XXX email/forgotten-password.xsl should check this
 
-  $app -> message( 'forgotten-password-email-sent' );
+  $app -> set_username($login);
+  $app -> userlog( "requested a password reset link" );
 
+  $app -> message( 'forgotten-password-email-sent' );
   $app -> set_form_value ( 'login', $login );
   $app -> set_form_action( $app -> config( 'base-url' ) );
-
   $app -> clear_process_queue;
   $app -> set_presenter ( 'login' );
 }
@@ -164,6 +164,9 @@ sub password_reset_process {
     $app->success(1);
     $app->set_new_password( $pass1 );
     $app->logoff_session();
+
+    $app->set_username($login);
+    $app->userlog( "has set new password via reset link" );
     
     # mark the token as used
     my $token = $app->request->{subscreen};
