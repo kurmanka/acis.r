@@ -246,9 +246,9 @@ sub ACIS::Web::renew_persistent_login {
 
 sub ACIS::Web::remove_persistent_login {
   my $app = shift or die;
-  debug "remove_persistent_login(): start";
-  debug "remove_persistent_login(): cookie rememberme: " . $app->get_cookie('rememberme');
   my $token_b64 = $app->get_cookie('rememberme') or return undef;
+  debug "remove_persistent_login(): start";
+  debug "remove_persistent_login(): cookie rememberme: " . $token_b64;
 
   # - decode the token.
   my $token = decode_base64( $token_b64 ) or return undef;
