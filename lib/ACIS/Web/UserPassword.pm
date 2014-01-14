@@ -4,7 +4,7 @@ package ACIS::Web::UserPassword; ### -*-perl-*-
 #
 #  Description:
 #
-#    Tools to generate password hashes, password salt, etc.
+#    Tools to generate password hashes, password salt, tokens, etc.
 #
 #  This program is free software; you can redistribute it and/or modify
 #  it under the terms of the GNU General Public License, version 2, as
@@ -23,8 +23,18 @@ package ACIS::Web::UserPassword; ### -*-perl-*-
 use strict;
 use warnings;
 
-# http://search.cpan.org/~mkanat/Math-Random-Secure-0.06/lib/Math/Random/Secure.pm
-#use Math::Random::Secure; 
+# Constants
+
+# persistent login
+# - cookie name: rememberme
+# - cookie expiry time: 3 months
+my $EXPIRY_MONTHS = 3;
+
+# password reset token (link)
+# - expiry time: 12 hours
+my $RESET_EXPIRY_HOURS = 12;
+
+
 # http://search.cpan.org/~davido/Bytes-Random-Secure-0.28/lib/Bytes/Random/Secure.pm
 use Bytes::Random::Secure qw(random_bytes); 
 use MIME::Base64;
@@ -146,9 +156,6 @@ sub ACIS::Web::set_new_password {
   return 1;
 }
 
-# cookie name: rememberme
-# cookie expiry time: 3 months
-my $EXPIRY_MONTHS = 3;
 
 sub ACIS::Web::create_persistent_login {
   my $app = shift or die;
@@ -271,11 +278,7 @@ sub ACIS::Web::remove_persistent_login {
 }
 
 
-
-# password reset token;
-# expiry time: 12 hours
-my $RESET_EXPIRY_HOURS = 12;
-
+### Password reset
 
 sub create_password_reset {
   my $app = shift;
