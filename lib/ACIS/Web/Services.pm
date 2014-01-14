@@ -494,7 +494,8 @@ sub authenticate {
     }
 
     if ( $login and $form_input -> {'remind-password'} ) {
-      $app -> forgotten_password(); ## XXX
+      use ACIS::Web::PasswordReset;
+      ACIS::Web::PasswordReset::forgotten_password($app);
       return 0;
     }
 

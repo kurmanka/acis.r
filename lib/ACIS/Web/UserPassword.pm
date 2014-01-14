@@ -351,4 +351,19 @@ sub password_reset_token_used {
 } 
 
 
+sub cleanup_tokens {
+  my $app = shift;
+  my $sql = $app->sql or die;
+
+  # remove old persistent logins
+  my $old = $EXPIRY_MONTHS + 1;
+  $sql->prepare( "delete from persistent_login where timestampadd(MONTH,$old,created) < NOW()" );
+  $sql->execute();
+  
+  # remove reset tokens, that are older than 1 week
+  $sql->prepare( "delete from reset_token where timestampadd(WEEK,1,created) < NOW()" );
+  $sql->execute();
+}
+
+
 1;
