@@ -104,7 +104,7 @@ sub critical_message {
 use Bytes::Random::Secure qw(random_bytes_hex); 
 
 sub generate_id {
-  return random_bytes_hex( 8 );
+  return random_bytes_hex( 16 );
 }
 
 

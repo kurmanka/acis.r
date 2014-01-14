@@ -382,12 +382,7 @@
     <field name='action' sql-type='varchar(30)'/>         
     <field name='descr' sql-type='text CHARACTER SET utf8'/>
     <field name='data'  sql-type='text CHARACTER SET utf8'/>
-<!--
-    <field name='login' sql-type='varchar(100)' />
-    <field name='url'   sql-type='varchar(200)' />
-    <field name='file'  sql-type='varchar(200)' />
--->
-    <field name='chain'    sql-type='char(16)'/><!-- session id -->
+    <field name='chain'    sql-type='char(32) character set ascii'/><!-- session id -->
     <field name='startend' sql-type='tinyint'/><!-- 1 is session start, -1 is session end -->
     <field name='packed'   sql-type='mediumblob'/>
     <create-table-sql line='index( date, chain )'/>
@@ -395,7 +390,7 @@
 
   <table name='acis:session_history'>
     <field name='date'  sql-type='datetime not null' />
-    <field name='sessionid' sql-type='char(16) not null' />
+    <field name='sessionid' sql-type='char(32) character set ascii not null' />
     <field name='login' sql-type='varchar(100) not null' />
     <field name='type'  sql-type='varchar(10) not null' />
     <field name='act'   sql-type='enum("start","stop","discard") not null' />
