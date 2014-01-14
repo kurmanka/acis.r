@@ -164,6 +164,7 @@ sub password_reset_process {
     $app->success(1);
     $app->set_new_password( $pass1 );
     $app->logoff_session();
+    undef $app->{'presenter-data'}{request}{session}{id};
 
     $app->set_username($login);
     $app->userlog( "has set new password via reset link" );
