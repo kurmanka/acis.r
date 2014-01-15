@@ -24,11 +24,6 @@ package ACIS::Web::Admin;   ### -*-perl-*-
 #  along with this program; if not, write to the Free Software
 #  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 #
-#  ---
-#  $Id$
-#  ---
-
-
 
 use strict;
 
@@ -41,20 +36,10 @@ use Web::App::Common;
 
 use ACIS::Data::DumpXML qw(dump_xml);
 
+
 sub check_access {
   my $acis = shift;
-  my $check = check_access_real( $acis );
-  if ( $check == 2 ) {
-    $acis ->redirect( 'http://' . $ENV{HTTP_HOST} . $ENV{REQUEST_URI} );
-    $acis ->clear_process_queue;
-  }
-}
-
-sub check_access_real {
-  my $acis = shift;
   my $allow_deceased_list_manager = shift || 0;
-  my $pass = $acis -> config( 'admin-access-pass' );
-  debug "pass real = $pass";
 
   # check for user's access
   if ( $acis -> load_session_if_possible ) {
@@ -76,32 +61,15 @@ sub check_access_real {
     }
   }
 
-  # check for the admin password given on a form, or via cookie
-  if ( $pass and length( $pass ) > 5 ) { 
-    my $form_input = $acis -> form_input();
-    my $cookie  = $acis -> get_cookie( 'admin-pass' ) || '';
-    debug "pass cook = $cookie";
-
-    my $given   = $form_input -> {pass} || $cookie;
-
-    my $cookie_set = 0;
-    if ( $given and $form_input -> {'remember-me'} ) {
-      # set cookie
-      $acis -> set_cookie( -name  => 'admin-pass', 
-                           -value => $given,
-                           -expires => '+1M' );
-      $cookie_set = 1;
-    }
-    # compare
-    if ( $given and $given eq $pass ) {  return 1 + $cookie_set;  }
-  }
-
-
   $acis -> clear_process_queue;
   $acis -> set_presenter( 'adm/pass' );
   return 0;
 }
 
+sub check_access_allow_deceased_volunteer {
+  my $acis = shift;
+  my $check = check_access( $acis, 'allow deceased manager' );
+}
 
 
 
@@ -655,35 +623,6 @@ sub move_record_handler {
     }
 
 }
-
-
-# this is for the deceased list manager volunteer
-sub check_access_allow_deceased_volunteer {
-    my $acis = shift;
-    if ( $acis -> load_session_if_possible ) {
-        my $session = $acis -> session;
-        if ( $session 
-             and $session -> owner -> {type} ) {
-            if ( exists $session -> owner -> {type} {'deceased-list-manager'} ) {
-                $acis->variables->{'deceased-list-manager-mode'} = 1;
-                return 1;
-            }
-            if ( $session -> owner -> {type} {admin} ) {
-                return 1;
-            }
-        }
-    }
-    
-    $acis -> clear_process_queue;
-    $acis -> set_presenter( 'adm/pass' ); # XXX this is of no use for the deceased-list-manager
-    return 0;
-}
-
-sub check_access_allow_deceased_volunteer_and_admin {
-  my $acis = shift;
-  my $check = check_access_real( $acis, 'allow deceased manager' );
-}
-
 
 
 
