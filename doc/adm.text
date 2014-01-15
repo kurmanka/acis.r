@@ -712,36 +712,16 @@ for these functions.
 Administrator screens are potentially a huge security risk.
 Be sure that only trusted individuals have access to it.
 
-There are two ways a user can get access to an administrator
-screen.  First, she can enter a special password,
-<c>admin-access-pass</c>.  If: 
+Only logged-in administrator users can get access
+to the /adm/... screens.
 
-- configuration defines this password and
-- it is at least 6 characters long and
-- one of the following:
-  <ul><li>the user entered the same password or</li>
-  <li>the password is present in the user's browser
-  cookies,</li></ul>
-
-then system lets her in.
-
-When system asks the user for admin's password, there is an
-option to save the password in a cookie.  Browser will store
-the cookie for a month since its creation.  After that
-browser will drop the cookie and you'll have to enter the
-password again.
-
-Second, a currently logged-in user might have an
-administrator privilege.  A user has administrator privilege
-if there is <co>admin</co> element in her userdata's owner
+A user has administrator privilege if there is 
+<co>admin</co> element in her userdata's owner
 <co>type</co> element (XPath:
 <co>/data/owner/type/admin</co>).  There is no way a user
 can get administrator privilege other than by a manual edit
 of her userdata file.
 
-The second way to access the administrator screens is
-preferable.  Especially, when you access it from a shared
-computer, beause it doesn't leave the pass cookie.
 
 
 ### <C>/adm/sql</C>

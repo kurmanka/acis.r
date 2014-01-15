@@ -609,15 +609,6 @@ log of the website.</dd>
 ### Other 
 
 <dl>
-<dt><C>admin-access-pass</C></dt>
-
-<dd>Special administrator's password to access the <a
-href='adm.html#adm-slash'>administrator's screens</a>.  Must
-be at least 6 characters long.  Optional.  When not
-specified only users which have admin privileges can access
-the screens and only while they are logged in.  <a
-href='adm.html#amd-slash-access'>Read more about it.</a></dd>
-
 
 
 <dt><C>template-set</C></dt>
