@@ -7,13 +7,13 @@
 <body>
       
 
-   <h1 id="id2528194">ACIS Source Code Guide</h1>
+   <h1 id="idp211872">ACIS Source Code Guide</h1>
 
 <h3><i>Table of contents</i></h3>
-<p class="toc">   <a href="#id2528202">Separate components</a><br>   <a href="#id2528260">Darcs</a><br>   <a href="#id2529638">Working on a local working copy of a project</a><br>   <a href="#id2529677">Syncing your local changes with the central repository</a><br>   <a href="#id2529759">Manifest file</a><br>   <a href="#id2529787">Basic code editing procedure with Darcs</a><br>   <a href="#id2529842">Releasing a packaged version</a><br>   <a href="#id2529916">Building an ACIS package</a><br></p>
+<p class="toc">   <a href="#idp212288">Separate components</a><br>   <a href="#idp215808">Darcs</a><br>   <a href="#idp217696">Working on a local working copy of a project</a><br>   <a href="#idp220048">Syncing your local changes with the central repository</a><br>   <a href="#idp224920">Manifest file</a><br>   <a href="#idp226608">Basic code editing procedure with Darcs</a><br>   <a href="#idp229864">Releasing a packaged version</a><br>   <a href="#idp234304">Building an ACIS package</a><br></p>
 
 
-   <h2 id="id2528202">Separate components</h2>
+   <h2 id="idp212288">Separate components</h2>
 
 <p>ACIS is not a monolithic program.  It is a large collection of modules,
 scripts, configuration files and templates.  And there are several
@@ -36,7 +36,7 @@ which correspond to four projects:</p>
 <p>Each project contains a separate source tree, managed with <a href="http://darcs.net">Darcs</a> revision control system.</p>
 
 
-   <h2 id="id2528260">Darcs</h2>
+   <h2 id="idp215808">Darcs</h2>
 
 <p>Darcs is an easy-to-use system.  It currently lacks some nice-to-have
 features, if compared to SVN or CVS.  It's core advantage is that it
@@ -54,7 +54,7 @@ at the host <code>acis.openlib.org</code>.</p>
 you don't have to do it now.</p>
 
 
-   <h2 id="id2529638">Working on a local working copy of a project</h2>
+   <h2 id="idp217696">Working on a local working copy of a project</h2>
 
 <p>First install Darcs on your machine.  Set up your local environment
 DARCS_EMAIL to your email address. Set the environment
@@ -69,7 +69,7 @@ on. Your local copy of a project's source code is called a working
 copy.</p>
 
 
-   <h2 id="id2529677">Syncing your local changes with the central repository</h2>
+   <h2 id="idp220048">Syncing your local changes with the central repository</h2>
 
 
 
@@ -96,7 +96,7 @@ to the <code>MANIFEST</code> file.</p>
 
 
 
-   <h2 id="id2529759">Manifest file</h2>
+   <h2 id="idp224920">Manifest file</h2>
 
 <p>There is a MANIFEST file in each of the project directories.  It lists
 all files to be packaged in a release of the project. A useful command
@@ -110,7 +110,7 @@ is</p>
 in the Perl camel book.</p>
 
 
-   <h2 id="id2529787">Basic code editing procedure with Darcs</h2>
+   <h2 id="idp226608">Basic code editing procedure with Darcs</h2>
 
 <p>For example, let's imagine I had to make a change to the ReDIF-perl
 project.  Here are the first steps of the procedure:</p>
@@ -138,7 +138,7 @@ your change:</p>
 explain the substance of the change, or at least it's character.</p>
 
 
-   <h2 id="id2529842">Releasing a packaged version</h2>
+   <h2 id="idp229864">Releasing a packaged version</h2>
 
 <p>If <code>darcs record</code> worked fine and didn't complain, you may now
 want to release a new version package to the public. You have to do
@@ -172,7 +172,7 @@ separate package building script.</p>
 
 
 
-   <h2 id="id2529916">Building an ACIS package</h2>
+   <h2 id="idp234304">Building an ACIS package</h2>
 
 <p>There are two ways the build an ACIS package. If you just want to
 package acis as such, you can do</p>
@@ -191,7 +191,7 @@ using</p>
 
   
 <address class="footer">
-<p>Generated: Fri Jun 11 07:15:03 2010</p>
+<p>Generated: Wed Jan 15 13:37:33 2014</p>
 <p><a href="http://acis.openlib.org/">ACIS project</a>,
           acis<i>@</i>openlib<span>.org</span></p>
 </address>
