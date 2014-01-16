@@ -15,11 +15,18 @@ my @q = (
     alter table users 
     drop column password
   !,
-#  qq!!,
+  qq!
+   update events 
+    set 
+       descr = 'login failed, password mismatch' 
+    where 
+       class='authenticate' 
+       and descr like 'login failed, password given%'
+  !,
 #  qq!!,
 );
 
-print "please wait while we upgrade the database...\n";
+print "please wait while we upgrade the database... its going to take a while.\n";
 
 use Data::Dumper;
 foreach ( @q ) {
