@@ -595,12 +595,14 @@ form .important {
  height: 2.6em;
  padding-left : 10px;
  padding-right: 10px;
+ background: #FFF; /* white */
 }
 
 form .significant {
  height: 2em;
  padding-left : 10px;
  padding-right: 10px;
+ background: #F4F4F4; /* white */
 }
 
 form .important:hover,

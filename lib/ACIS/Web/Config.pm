@@ -59,7 +59,6 @@ sub configuration_parameters {
     ## cookies
     #    'auth-cookie-domain',    'not-defined',
     #    'auth-cookie-age-days',  '365',
-    'admin-access-pass',     'not-defined',
    
     ## email-related
     'institutions-maintainer-email', 'required',

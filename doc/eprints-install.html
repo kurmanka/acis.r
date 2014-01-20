@@ -12,14 +12,14 @@ extensions to EPrints / ACIS documentation</title>
 extensions to EPrints</h1>
 
 <h3><i>Table of contents</i></h3>
-<p class="toc">   <a href="#id2540129">Automatic installation</a><br>   <a href="#id2540153">Manual installation</a><br>      <a href="#copy-files">1. Copy perl code and other files</a><br>      <a href="#page-template-pidaid">2. Modify page template to
+<p class="toc">   <a href="#idp1249512">Automatic installation</a><br>   <a href="#idp1250952">Manual installation</a><br>      <a href="#copy-files">1. Copy perl code and other files</a><br>      <a href="#page-template-pidaid">2. Modify page template to
 include pidaid.js and pidaid.css</a><br>      <a href="#id-field-enabled">3. Make sure id field for authors and
 editors is enabled</a><br>      <a href="#id-field-label">4. Set appropriate label for the id
 field</a><br>      <a href="#enable-amf">5. Patch EPrints::EPrint: enable AMF export</a><br>      <a href="#arc-cfg-amf">6. Archive configuration: AMF export</a><br>      <a href="#arc-cfg-pidaid">7. Archive configuration: ACIS::PIDAID</a><br>      <a href="#arc-cfg-metaupd">8. Archive configuration: ACIS metadata
 update</a><br>      <a href="#install-lwp">9. Install libwww-perl library</a><br></p>
 
 
-   <h2 id="id2540129">Automatic installation</h2>
+   <h2 id="idp1249512">Automatic installation</h2>
 
 <p>The primary way to install these extensions onto an EPrints
 service is to use the <code class="f BROKEN">install.pl</code> script in the
@@ -32,7 +32,7 @@ $ perl install.pl /opt/eprints2/archive/Archive
 </code></pre>
 
 
-   <h2 id="id2540153">Manual installation</h2>
+   <h2 id="idp1250952">Manual installation</h2>
 
 <p>In case the automatic installation script fails at some step
 of the process, you may have to do part of it by yourself.</p>
@@ -105,7 +105,7 @@ and <a href="eprints.html#level3">level 3: person identification aid</a>.</stron
 <li>
 <p>near below it find the line, which starts with</p>
 
-<pre><code>    { name =&gt; "creators", type =&gt; "name", 
+<pre><code>    { name =&gt; "creators", type =&gt; "name",
 </code></pre>
 
 <p>and make sure <code>hasid</code> parameter in this
@@ -120,7 +120,7 @@ block is set to 1.  The block will look like this:</p>
 <p>Do the same for the "editors" field.  Here the block
 starts with</p>
 
-<pre><code>    { name =&gt; "editors", type =&gt; "name" 
+<pre><code>    { name =&gt; "editors", type =&gt; "name"
 </code></pre>
 
 <p>Again, the <code>hasid</code> parameter should have value
@@ -307,7 +307,7 @@ $Id$
 
   
 <address class="footer">
-<p>Generated: Fri Jun 11 07:15:03 2010</p>
+<p>Generated: Wed Jan 15 13:37:33 2014</p>
 <p><a href="http://acis.openlib.org/">ACIS project</a>,
           acis<i>@</i>openlib<span>.org</span></p>
 </address>

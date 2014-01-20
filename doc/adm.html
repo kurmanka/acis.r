@@ -7,10 +7,10 @@
 <body>
       
 
-   <h1 id="id2542006">ACIS administrator's guide</h1>
+   <h1 id="idp317376">ACIS administrator's guide</h1>
 
 <h3><i>Table of contents</i></h3>
-<p class="toc">   <a href="#utils">Utilities in <code class="f BROKEN">{HOME}/bin/</code></a><br>      <a href="#bincreate_tables"><code class="C">bin/create_tables</code> script</a><br>      <a href="#binbackup_tables"><code class="C">bin/backup_tables</code> script</a><br>      <a href="#binrestore_table_backup"><code class="C">bin/restore_table_backup</code> script</a><br>      <a href="#binrid"><code class="C">bin/rid</code> script</a><br>      <a href="#binupdareq"><code class="C">bin/updareq</code> script</a><br>      <a href="#binsid_base"><code class="C">bin/sid_base</code> script</a><br>      <a href="#binclean-up"><code class="C">bin/clean-up</code> script</a><br>      <a href="#id2542384"><code>bin/apu</code> script</a><br>      <a href="#binevents_archiving"><code class="C">bin/events_archiving</code> script</a><br>   <a href="#short-ids">The short-ids</a><br>   <a href="#id2542450">Logging.  Tracking and debugging problems</a><br>      <a href="#id2542469">Web interface and users' interactions</a><br>      <a href="#id2542538">Automatic profile update (APU)</a><br>      <a href="#id2542553">Background searches for documents and other resources</a><br>      <a href="#id2542572">Sessions</a><br>      <a href="#id2542602">Metadata processing</a><br>      <a href="#id2542665">The log of short-ids</a><br>      <a href="#id2542690">MySQL log</a><br>      <a href="#id2542704">Archiving and rotating the logs</a><br>      <a href="#events-database">The events database</a><br>   <a href="#id2542796">What to back up and how to restore</a><br>      <a href="#id2542800">Critical data</a><br>      <a href="#id2542896">Other data</a><br>         <a href="#id2542932">MySQL tables</a><br>         <a href="#id2542966">Update daemon database</a><br>      <a href="#id2542993">Restoring a service after a crash</a><br>   <a href="#userdata">Managing user accounts</a><br>      <a href="#userdata-owner">Userdata structure: owner branch</a><br>      <a href="#userdata-records-personal">Userdata structure: records branch. Personal record</a><br>   <a href="#adm-slash">Administrator's screens</a><br>      <a href="#adm-slash-access">Access</a><br>      <a href="#admsql"><code class="C">/adm/sql</code></a><br>      <a href="#admevents"><code class="C">/adm/events</code></a><br>         <a href="#id2543619">Checking a particular date</a><br>         <a href="#id2543656">Filters</a><br>         <a href="#admeventsrecent"><code class="C">/adm/events/recent</code></a><br>         <a href="#admeventspref"><code class="C">/adm/events/pref</code></a><br>      <a href="#admsearch"><code class="C">/adm/search</code></a><br>      <a href="#admsessions"><code class="C">/adm/sessions</code></a><br>   <a href="#id2543812">Customizing an ACIS installation</a><br>      <a href="#phrases">Phrases</a><br>      <a href="#site">Building a site around an ACIS installation</a><br>   <a href="#installation-files">Files in an ACIS installation</a><br></p>
+<p class="toc">   <a href="#utils">Utilities in <code class="f BROKEN">{HOME}/bin/</code></a><br>      <a href="#bincreate_tables"><code class="C">bin/create_tables</code> script</a><br>      <a href="#binbackup_tables"><code class="C">bin/backup_tables</code> script</a><br>      <a href="#binrestore_table_backup"><code class="C">bin/restore_table_backup</code> script</a><br>      <a href="#binrid"><code class="C">bin/rid</code> script</a><br>      <a href="#binupdareq"><code class="C">bin/updareq</code> script</a><br>      <a href="#binsid_base"><code class="C">bin/sid_base</code> script</a><br>      <a href="#binclean-up"><code class="C">bin/clean-up</code> script</a><br>      <a href="#idp340088"><code>bin/apu</code> script</a><br>      <a href="#binevents_archiving"><code class="C">bin/events_archiving</code> script</a><br>   <a href="#short-ids">The short-ids</a><br>   <a href="#idp344016">Logging.  Tracking and debugging problems</a><br>      <a href="#idp345192">Web interface and users' interactions</a><br>      <a href="#idp349288">Automatic profile update (APU)</a><br>      <a href="#idp350224">Background searches for documents and other resources</a><br>      <a href="#idp351328">Sessions</a><br>      <a href="#idp353152">Metadata processing</a><br>      <a href="#idp356912">The log of short-ids</a><br>      <a href="#idp358448">MySQL log</a><br>      <a href="#idp359280">Archiving and rotating the logs</a><br>      <a href="#events-database">The events database</a><br>   <a href="#idp364784">What to back up and how to restore</a><br>      <a href="#idp365016">Critical data</a><br>      <a href="#idp370784">Other data</a><br>         <a href="#idp372960">MySQL tables</a><br>         <a href="#idp375016">Update daemon database</a><br>      <a href="#idp376624">Restoring a service after a crash</a><br>   <a href="#userdata">Managing user accounts</a><br>      <a href="#userdata-owner">Userdata structure: owner branch</a><br>      <a href="#userdata-records-personal">Userdata structure: records branch. Personal record</a><br>   <a href="#adm-slash">Administrator's screens</a><br>      <a href="#adm-slash-access">Access</a><br>      <a href="#admsql"><code class="C">/adm/sql</code></a><br>      <a href="#admevents"><code class="C">/adm/events</code></a><br>         <a href="#idp411360">Checking a particular date</a><br>         <a href="#idp413568">Filters</a><br>         <a href="#admeventsrecent"><code class="C">/adm/events/recent</code></a><br>         <a href="#admeventspref"><code class="C">/adm/events/pref</code></a><br>      <a href="#admsearch"><code class="C">/adm/search</code></a><br>      <a href="#admsessions"><code class="C">/adm/sessions</code></a><br>   <a href="#idp422896">Customizing an ACIS installation</a><br>      <a href="#phrases">Phrases</a><br>      <a href="#site">Building a site around an ACIS installation</a><br>   <a href="#installation-files">Files in an ACIS installation</a><br></p>
 
 <p>Other related files:</p>
 
@@ -167,7 +167,7 @@ capture its output into a log file.  For example</p>
 </code></pre>
 
 
-   <h3 id="id2542384">
+   <h3 id="idp340088">
 <code>bin/apu</code> script</h3>
 
 <p>See <a class="c" href="apu.html#binapu">bin/apu</a>.</p>
@@ -200,7 +200,7 @@ and its longer counter-part.</p>
 logged into <code class="f BROKEN">SID/short-id.log</code>.</p>
 
 
-   <h2 id="id2542450">Logging.  Tracking and debugging problems</h2>
+   <h2 id="idp344016">Logging.  Tracking and debugging problems</h2>
 
 <p>ACIS is a complicated software and keeps a number of
 different logs.  Each subsystem maintains its own log, and
@@ -211,7 +211,7 @@ logs.  Here is a description of what is logged and into
 which files.</p>
 
 
-   <h3 id="id2542469">Web interface and users' interactions</h3>
+   <h3 id="idp345192">Web interface and users' interactions</h3>
 
 <p>The users' interactions with the system are logged into the
 <code class="f BROKEN">acis.log</code> file.  This is the main log, which shows
@@ -247,13 +247,13 @@ it will slow things down considerably and will eat your
 diskspace quickly.</p>
 
 
-   <h3 id="id2542538">Automatic profile update (APU)</h3>
+   <h3 id="idp349288">Automatic profile update (APU)</h3>
 
 <p>APU-related activity (see <a class="c" href="apu.html#binapu">bin/apu</a>) is logged into the
 <code class="f BROKEN">autoprofileupdate.log</code> file.</p>
 
 
-   <h3 id="id2542553">Background searches for documents and other resources</h3>
+   <h3 id="idp350224">Background searches for documents and other resources</h3>
 
 <p>When a user enters hers research profile after a while or
 after she changes her name variations, ACIS runs an
@@ -265,7 +265,7 @@ requests are.  So it is logged into a separate log--the
 searched and how many matching items were found.</p>
 
 
-   <h3 id="id2542572">Sessions</h3>
+   <h3 id="idp351328">Sessions</h3>
 
 <p>Sessions are created by the web interface of ACIS, and so it
 is usually logged together with other events of the web
@@ -281,7 +281,7 @@ possibly, to peek into one of them, use the
 <a class="c" href="adm.html#admsessions">/adm/sessions</a> administrator's screen.</p>
 
 
-   <h3 id="id2542602">Metadata processing</h3>
+   <h3 id="idp353152">Metadata processing</h3>
 
 <p>Metadata is processed by the <a href="daemon.html">update
 daemon</a> and the update daemon writes several logs.  One
@@ -311,7 +311,7 @@ log.</p>
 work is logged into the <code class="f BROKEN">ardb.log</code> file.</p>
 
 
-   <h3 id="id2542665">The log of short-ids</h3>
+   <h3 id="idp356912">The log of short-ids</h3>
 
 <p>All created and assigned <a href="adm.html#short-ids">short-ids</a>
 are logged into the <code class="f BROKEN">SID/short-id.log</code>.</p>
@@ -320,7 +320,7 @@ are logged into the <code class="f BROKEN">SID/short-id.log</code>.</p>
 <a class="c" href="adm.html#binsid_base">bin/sid_base</a> script.</p>
 
 
-   <h3 id="id2542690">MySQL log</h3>
+   <h3 id="idp358448">MySQL log</h3>
 
 <p>If an SQL query or a statement fails, it is logged into the
 <code class="f BROKEN">sql.log</code> file, with all the details.  Normally this
@@ -328,7 +328,7 @@ log will only contain messages about database connections
 having been established or re-established.</p>
 
 
-   <h3 id="id2542704">Archiving and rotating the logs</h3>
+   <h3 id="idp359280">Archiving and rotating the logs</h3>
 
 <p>For an actively used service the amounts of logs generated
 is great and no matter how big your harddrive is, one day
@@ -385,10 +385,10 @@ occasionally).  It will pack parts of the database and make
 loading things from it quicker.</p>
 
 
-   <h2 id="id2542796">What to back up and how to restore</h2>
+   <h2 id="idp364784">What to back up and how to restore</h2>
 
 
-   <h3 id="id2542800">Critical data</h3>
+   <h3 id="idp365016">Critical data</h3>
 
 <p>There are two most critical things you should backup
 regularly in a service: the userdata files and the short-id
@@ -427,7 +427,7 @@ added to your ACIS installation or modified in it.</li>
 service with moderate effort in moderate time.</p>
 
 
-   <h3 id="id2542896">Other data</h3>
+   <h3 id="idp370784">Other data</h3>
 
 <p>To allow even faster and smoother recovery after a severe
 system failure with a data loss you may also keep backups of
@@ -447,7 +447,7 @@ enough space.  In that case additionally create copies of:</p>
 </ul>
 
 
-   <h4 id="id2542932">MySQL tables</h4>
+   <h4 id="idp372960">MySQL tables</h4>
 
 <p>See <a class="c" href="adm.html#binbackup_tables">bin/backup_tables</a> and <a class="c" href="adm.html#binrestore_table_backup">bin/restore_table_backup</a> scripts.</p>
 
@@ -456,7 +456,7 @@ and all the section <a href="http://dev.mysql.com/doc/refman/4.1/en/disaster-pre
 and Recovery</a>. (These links are for MySQL version 4.1.)</p>
 
 
-   <h4 id="id2542966">Update daemon database</h4>
+   <h4 id="idp375016">Update daemon database</h4>
 
 <p>The update daemon uses Berkeley DB for storing its data.  Consult its
 documentation for backup instructions: <a href="http://www.sleepycat.com/docs/ref/transapp/archival.html">Database and
@@ -466,7 +466,7 @@ log file archival</a>.</p>
 much easier then.</p>
 
 
-   <h3 id="id2542993">Restoring a service after a crash</h3>
+   <h3 id="idp376624">Restoring a service after a crash</h3>
 
 <p>Of course, how you are going to restore a service depends
 greatly on what damage happened.
@@ -677,41 +677,15 @@ for these functions.</p>
 <p>Administrator screens are potentially a huge security risk.
 Be sure that only trusted individuals have access to it.</p>
 
-<p>There are two ways a user can get access to an administrator
-screen.  First, she can enter a special password,
-<a class="c" href="conf.html#admin-access-pass">admin-access-pass</a>.  If: </p>
+<p>Only logged-in administrator users can get access
+to the /adm/... screens.</p>
 
-<ul>
-<li>configuration defines this password and</li>
-<li>it is at least 6 characters long and</li>
-<li>one of the following:</li>
-</ul>
-
-<ul>
-<li>the user entered the same password or</li>
-  <li>the password is present in the user's browser
-  cookies,</li>
-</ul>
-
-<p>then system lets her in.</p>
-
-<p>When system asks the user for admin's password, there is an
-option to save the password in a cookie.  Browser will store
-the cookie for a month since its creation.  After that
-browser will drop the cookie and you'll have to enter the
-password again.</p>
-
-<p>Second, a currently logged-in user might have an
-administrator privilege.  A user has administrator privilege
-if there is <code>admin</code> element in her userdata's owner
+<p>A user has administrator privilege if there is 
+<code>admin</code> element in her userdata's owner
 <code>type</code> element (XPath:
 <code>/data/owner/type/admin</code>).  There is no way a user
 can get administrator privilege other than by a manual edit
 of her userdata file.</p>
-
-<p>The second way to access the administrator screens is
-preferable.  Especially, when you access it from a shared
-computer, beause it doesn't leave the pass cookie.</p>
 
 <h3 id="admsql" C="/adm/sql"><code class="C">/adm/sql</code></h3>
 
@@ -740,7 +714,7 @@ provide navigational cues, which make it straightforward to
 use; we hope so.</p>
 
 
-   <h4 id="id2543619">Checking a particular date</h4>
+   <h4 id="idp411360">Checking a particular date</h4>
 
 <p>The overview mode offers a form (at the bottom of the
 screen), which you can use to browse events for a particular
@@ -763,7 +737,7 @@ already:</p>
 </code></pre>
 
 
-   <h4 id="id2543656">Filters</h4>
+   <h4 id="idp413568">Filters</h4>
 
 <p>There are several filters which you can enable via the <a href="adm.html#admeventspref">preferences</a> screen, or explicitly by
 adding "?filter" or "?filter1+filter2" to the URL.</p>
@@ -850,7 +824,7 @@ deleted.</p>
 
 
 
-   <h2 id="id2543812">Customizing an ACIS installation</h2>
+   <h2 id="idp422896">Customizing an ACIS installation</h2>
 
 <p>An ideal web application is so flexible that you can build
 it into an existing website seamlessly and you can customize
@@ -1314,7 +1288,7 @@ socket; the daemon listens to it.</td>
   
 <address class="footer">
 <p>$Id$</p>
-<p>Generated: Fri Jun 11 07:15:03 2010</p>
+<p>Generated: Wed Jan 15 13:37:33 2014</p>
 <p><a href="http://acis.openlib.org/">ACIS project</a>,
           acis<i>@</i>openlib<span>.org</span></p>
 </address>

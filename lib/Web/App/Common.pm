@@ -101,10 +101,10 @@ sub critical_message {
   }
 }
 
+use Bytes::Random::Secure qw(random_bytes_hex); 
 
 sub generate_id {
-  my $limit = 0xffffffff;  # each char - 4 bit, 0-f
-  return sprintf "%08x", $limit ^ rand ($limit);
+  return random_bytes_hex( 16 );
 }
 
 

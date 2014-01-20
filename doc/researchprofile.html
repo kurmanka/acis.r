@@ -7,13 +7,13 @@
 <body>
       
 
-   <h1 id="id2530686">Research Profile</h1>
+   <h1 id="idp237928">Research Profile</h1>
 
 <h3><i>Table of contents</i></h3>
-<p class="toc">   <a href="#id2530693">Introduction &amp; overview</a><br>   <a href="#id2530735">Research Profile screens</a><br>      <a href="#id2530739">Identified Items</a><br>      <a href="#id2530749">Automatic Suggestions</a><br>      <a href="#id2530764">Refused Items</a><br>      <a href="#id2530778">Manual Search</a><br>      <a href="#id2530802">Auto Update Preferences</a><br>      <a href="#doclinks">Document-to-Document Links</a><br>      <a href="#fturls">Full-text URLs</a><br>         <a href="#binexport_fturls_choices"><code class="C">bin/export_fturls_choices</code> script</a><br>      <a href="#id2531007">Main Research Profile screen</a><br>   <a href="#rp-autosearch">Automatic research search</a><br>      <a href="#id2531023">Exact searches</a><br>      <a href="#id2531033">Additional searches</a><br>      <a href="#research-fuzzy">Fuzzy name search</a><br>         <a href="#binfuzzy_search_table"><code class="C">bin/fuzzy_search_table</code> script</a><br>   <a href="#rp-conf">Configuration of the Research Profile and its screens</a><br>      <a href="#id2531110">Automatic search</a><br>      <a href="#research-doclinks">Document-to-document links configuration</a><br>      <a href="#fturls-conf">Full-text URLs configuration</a><br>      <a href="#id2531213">Fuzzy search</a><br>   <a href="#rp-tech">Selected technical details</a><br>      <a href="#id2531255">Technical: database tables</a><br>         <a href="#id2531259"><code>resources</code></a><br>         <a href="#id2531280"><code>rp_suggestions</code></a><br>         <a href="#id2529473"><code>ft_urls</code></a><br>         <a href="#id2529506"><code>ft_urls_choices</code></a><br>      <a href="#id2529539">Technical: code structure</a><br></p>
+<p class="toc">   <a href="#idp238336">Introduction &amp; overview</a><br>   <a href="#idp240832">Research Profile screens</a><br>      <a href="#idp241056">Identified Items</a><br>      <a href="#idp241648">Automatic Suggestions</a><br>      <a href="#idp242576">Refused Items</a><br>      <a href="#idp243424">Manual Search</a><br>      <a href="#idp244832">Auto Update Preferences</a><br>      <a href="#doclinks">Document-to-Document Links</a><br>      <a href="#fturls">Full-text URLs</a><br>         <a href="#binexport_fturls_choices"><code class="C">bin/export_fturls_choices</code> script</a><br>      <a href="#idp265328">Main Research Profile screen</a><br>   <a href="#rp-autosearch">Automatic research search</a><br>      <a href="#idp266328">Exact searches</a><br>      <a href="#idp266896">Additional searches</a><br>      <a href="#research-fuzzy">Fuzzy name search</a><br>         <a href="#binfuzzy_search_table"><code class="C">bin/fuzzy_search_table</code> script</a><br>   <a href="#rp-conf">Configuration of the Research Profile and its screens</a><br>      <a href="#idp271552">Automatic search</a><br>      <a href="#research-doclinks">Document-to-document links configuration</a><br>      <a href="#fturls-conf">Full-text URLs configuration</a><br>      <a href="#idp277656">Fuzzy search</a><br>   <a href="#rp-tech">Selected technical details</a><br>      <a href="#idp280224">Technical: database tables</a><br>         <a href="#idp280448"><code>resources</code></a><br>         <a href="#idp281696"><code>rp_suggestions</code></a><br>         <a href="#idp283408"><code>ft_urls</code></a><br>         <a href="#idp285376"><code>ft_urls_choices</code></a><br>      <a href="#idp287400">Technical: code structure</a><br></p>
 
 
-   <h2 id="id2530693">Introduction &amp; overview</h2>
+   <h2 id="idp238336">Introduction &amp; overview</h2>
 
 <p>Research profile is one of the main parts of a personal record in ACIS.
 It lists the research works that the person has authored or otherwise
@@ -34,17 +34,17 @@ document database.  The personal RPs can only include items that are
 already present in the resource database.</p>
 
 
-   <h2 id="id2530735">Research Profile screens</h2>
+   <h2 id="idp240832">Research Profile screens</h2>
 
 
-   <h3 id="id2530739">Identified Items</h3>
+   <h3 id="idp241056">Identified Items</h3>
 
 <p>The identified items screen lists all the currently-claimed works of a
 person.  And it allows to remove items from the list, for example, to
 fix a mistake of adding a wrong item.</p>
 
 
-   <h3 id="id2530749">Automatic Suggestions</h3>
+   <h3 id="idp241648">Automatic Suggestions</h3>
 
 <p><a href="researchprofile.html#rp-autosearch">Automatic search</a> is the main procedure that
 we execute to find works for a person's RP.  Automatic Suggestions
@@ -52,7 +52,7 @@ screen is where we show the results of the automatic search and let
 user either accept them or not, individually.</p>
 
 
-   <h3 id="id2530764">Refused Items</h3>
+   <h3 id="idp242576">Refused Items</h3>
 
 <p>The refused items is a list of research items which should not be
 suggested for inclusion into the person's RP.  It is a blacklist of
@@ -62,7 +62,7 @@ sorts.</p>
 it, if desired.  </p>
 
 
-   <h3 id="id2530778">Manual Search</h3>
+   <h3 id="idp243424">Manual Search</h3>
 
 <p>While <a href="researchprofile.html#rp-autosearch">automatic search</a> should find every
 resource an ACIS service has for a person, sometimes the metadata is
@@ -75,7 +75,7 @@ author/editor name, by record identifier.</p>
 results.</p>
 
 
-   <h3 id="id2530802">Auto Update Preferences</h3>
+   <h3 id="idp244832">Auto Update Preferences</h3>
 
 <p>ACIS provides <a href="apu.html">APU</a> -- automatic profile update
 service, which executes automatic research searches for a person even
@@ -169,7 +169,7 @@ outputs all data from that day on.  The dates are expected in the
 YYYY-MM-DD format.</p>
 
 
-   <h3 id="id2531007">Main Research Profile screen</h3>
+   <h3 id="idp265328">Main Research Profile screen</h3>
 
 <p>Displays a menu of all the screens with a brief introduction into each
 and some general status information.  Provides a button to force
@@ -179,14 +179,14 @@ automatic search for the person with her current name variations.</p>
    <h2 id="rp-autosearch">Automatic research search</h2>
 
 
-   <h3 id="id2531023">Exact searches</h3>
+   <h3 id="idp266328">Exact searches</h3>
 
 <p>This is search by the person's name variations in the names of the
 document authors (and editors).  As its name states, it finds exact
 matches only.</p>
 
 
-   <h3 id="id2531033">Additional searches</h3>
+   <h3 id="idp266896">Additional searches</h3>
 
 
    <h3 id="research-fuzzy">Fuzzy name search</h3>
@@ -216,7 +216,7 @@ statements) to standard output.</p>
 <p>See all <a href="conf.html#conf-research">research profile parameters</a>.</p>
 
 
-   <h3 id="id2531110">Automatic search</h3>
+   <h3 id="idp271552">Automatic search</h3>
 
 <ul>
 <li><a class="c" href="conf.html#research-additional-searches">research-additional-searches</a></li>
@@ -279,7 +279,7 @@ with the update daemon.  You have to explicitly request an update (see
 <a class="c" href="adm.html#binupdareq">bin/updareq</a>).</p>
 
 
-   <h3 id="id2531213">Fuzzy search</h3>
+   <h3 id="idp277656">Fuzzy search</h3>
 
 <ul>
 <li><a class="c" href="conf.html#fuzzy-name-search">fuzzy-name-search</a></li>
@@ -294,10 +294,10 @@ with the update daemon.  You have to explicitly request an update (see
    <h2 id="rp-tech">Selected technical details</h2>
 
 
-   <h3 id="id2531255">Technical: database tables</h3>
+   <h3 id="idp280224">Technical: database tables</h3>
 
 
-   <h4 id="id2531259"><code>resources</code></h4>
+   <h4 id="idp280448"><code>resources</code></h4>
 
 <pre><code>+----------+--------------+------+-----+---------+-------+
 | Field    | Type         | Null | Key | Default | Extra |
@@ -314,7 +314,7 @@ with the update daemon.  You have to explicitly request an update (see
 </code></pre>
 
 
-   <h4 id="id2531280"><code>rp_suggestions</code></h4>
+   <h4 id="idp281696"><code>rp_suggestions</code></h4>
 
 <pre><code>+--------+----------+------+-----+---------------------+-------+
 | Field  | Type     | Null | Key | Default             | Extra |
@@ -328,7 +328,7 @@ with the update daemon.  You have to explicitly request an update (see
 </code></pre>
 
 
-   <h4 id="id2529473"><code>ft_urls</code></h4>
+   <h4 id="idp283408"><code>ft_urls</code></h4>
 
 <ul>
 <li>dsid char(15) not null</li>
@@ -342,7 +342,7 @@ with the update daemon.  You have to explicitly request an update (see
 source_i(source(50))</code></p>
 
 
-   <h4 id="id2529506"><code>ft_urls_choices</code></h4>
+   <h4 id="idp285376"><code>ft_urls_choices</code></h4>
 
 <ul>
 <li>dsid char(15) not null</li>
@@ -356,7 +356,7 @@ source_i(source(50))</code></p>
 <p><code>primary key prim(dsid, checksum, psid), index t_i(time), index psid_i(psid)</code></p>
 
 
-   <h3 id="id2529539">Technical: code structure</h3>
+   <h3 id="idp287400">Technical: code structure</h3>
 
 <p>Core modules:</p>
 
@@ -396,7 +396,7 @@ source_i(source(50))</code></p>
   
 <address class="footer">
 <p>$Id$</p>
-<p>Generated: Fri Jun 11 07:15:03 2010</p>
+<p>Generated: Wed Jan 15 13:37:33 2014</p>
 <p><a href="http://acis.openlib.org/">ACIS project</a>,
           acis<i>@</i>openlib<span>.org</span></p>
 </address>

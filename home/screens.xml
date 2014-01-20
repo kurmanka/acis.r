@@ -937,7 +937,7 @@
   <screen id='adm/search/person'>
    <param name='key' required='yes' />
    <use module='ACIS::Web::Admin'/>
-   <call function='ACIS::Web::Admin::check_access_allow_deceased_volunteer_and_admin'/>
+   <call function='ACIS::Web::Admin::check_access_allow_deceased_volunteer'/>
    <init>
      <call function='prepare_form_data' />
    </init>
