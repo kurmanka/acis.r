@@ -85,7 +85,8 @@
                             class='checkbox'
                             value='true' />
                 <label for='cook-cb'>
-                  <span title='Check this box if you now work from your own computer and want quick access to your account'>Remember email and password for automatic login from this my computer (in a cookie).</span>
+                  <span title='Check this box if you are working from your own computer and want quick access to your account'
+                  >Remember me in this browser. Don't ask my password next time. (Persistent login via a browser cookie.)</span>
                 </label>
                 
               </p>

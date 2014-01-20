@@ -252,15 +252,7 @@ sub contact_screen_process {
       $owner -> {name} = $full_name;
     }
     
-    my $mode = $app -> get_auto_logon_mode;
     $login = set_user_login( $app, $login );
-
-    if ( defined $login
-         and ( $mode eq 'login' 
-               or $mode eq 'full' ) ) {
-      $app -> set_auth_cookies( $login );
-    }
-
   }
 
   if ( not $app->error ) {
@@ -331,6 +323,10 @@ sub set_user_login {
 
     require ACIS::Web::SysProfile;
     ACIS::Web::SysProfile::rename_sysprof_id( $oldlc, $newlc );
+    
+    # XXXXX if there is a persistent login cookie, we may need to
+    # update the login in the table. 
+    
   } 
 
   $owner -> {login} = $new;
@@ -468,29 +464,22 @@ sub check_session_type {
 
 sub settings_prepare {
   my $app    = shift;
-
+  
   my $vars    = $app -> variables;
   my $session = $app -> session;
-  my $mode    = $app -> get_auto_logon_mode;
-
   my $login = $session -> userdata_owner-> {login};
+  my $persistent_login = $app -> check_persistent_login || '';
+  debug "Persistent login: $persistent_login";
+  
+  my $persistent_login_mode = ($persistent_login eq $login);
+
   $app -> set_form_value( "email", $login );
 
-  $vars -> {'auto-log-mode'} = $mode;
+  my $mode = ($persistent_login_mode ? 'true' : undef);
+  debug "Persistent login mode: $mode";
+  $app -> set_form_value( "remember-me", $mode );
+  #$vars -> {'remember-me'} = $mode;
 
-  debug "Auto-logon-mode: $mode";
-
-  if ( $mode eq 'full'
-       or $mode eq 'login' ) {
-    $app -> set_form_value( "remember-login", 1 );
-  }
-  
-  $session -> {'auto-logon-mode'} = $mode;
-
-
-  if ( $mode eq 'full' ) {
-    $app -> set_form_value( "remember-pass", 1 );
-  }
 }
 
 
@@ -501,31 +490,33 @@ sub settings {
   my $session = $app -> session;
   my $record  = $session -> current_record;
   my $owner   = $session -> userdata_owner;
+  my $persistent_login = $app -> check_persistent_login || '';
+  my $persistent_login_mode = ($persistent_login eq $owner->{login});
 
   my $OK  = 1;
 
-  my $auto_logon_mode = $app -> get_auto_logon_mode;
-
+  my $oldp  = $input -> {pass};
   my $login = $input -> {email};
+  my $pass;
 
-  $login = set_user_login( $app, $login );
-
-  if ( defined $login ) {
-    if ( $input -> {'remember-login'} ) {
-      $app -> set_auth_cookies( $login );
-
-    } else {
-
-      my $mode = $session -> {'auto-logon-mode'} || '';
-      if ( $mode eq 'full' 
-           or $mode eq 'login' ) {
-        $app -> clear_auth_cookies;
-        $app -> set_form_value( "remember-login", 0 );
-      }
-    }
+  if ( $app->check_user_password( $oldp, $owner ) ) {
+      # password is valid
+      # we can continue
+  } else {
+    $app -> error( 'bad-old-pass' ); ### 'bad-old-pass' ?
+    undef $OK;
+    return;
   }
 
-  if (     $record -> {'about-owner'} 
+  my $old_login = $owner->{login};
+  $login = set_user_login( $app, $login );
+  $app -> set_form_value( "email", $login );
+
+  my $login_changed = ($old_login ne $login);
+  debug "Login changed: <$login_changed>";
+
+  if ( $login_changed 
+       and $record -> {'about-owner'} 
        and $record -> {'about-owner'} eq 'yes'
        and $input -> {'record-email'} 
       ) {
@@ -543,49 +534,45 @@ sub settings {
     }
   }
 
-  ### password 
-
-  if ( $input ->{pass} ) {{
-
-    my $old      = $input -> {pass};
-    my $pass;
-
-    # call check_user_password()
-    
-    if ( $app->check_user_password( $old, $owner ) ) {
-      # password is valid
-      # we can continue
-    } else {
-      $app -> error( 'bad-old-pass' ); ### 'bad-old-pass' ?
-      undef $OK;
-      last;
-    }
-    
-    if ( $input -> {'pass-new'} 
-         or $input -> {'pass-confirm'} ) { 
-
-        my $new      = $input -> {'pass-new' };
-        my $conf     = $input -> {'pass-confirm'};
+  ### setting the password 
+  if ( $input -> {'pass-new'} 
+       or $input -> {'pass-confirm'} ) { 
+           
+    my $new  = $input -> {'pass-new' };
+    my $conf = $input -> {'pass-confirm'};
       
-        if ( $new eq $conf ) {
-            $app->set_new_password( $new );
-          
-        } else {
-            $app -> form_invalid_value( 'pass-new' );
-            $app -> form_invalid_value( 'pass-confirm' );
-            undef $OK;
-        }
-        
+    if ( $new eq $conf ) {
+        $app->set_new_password( $new );
     } else {
-        die;
+        $app -> form_invalid_value( 'pass-new' );
+        $app -> form_invalid_value( 'pass-confirm' );
+        undef $OK;
     }
+  }
+  
+  # handle the remember me checkbox
+  my $remember_me_input = $input->{'remember-me'} || '';
+  debug "remember-me: $remember_me_input";
 
-    if ( $pass 
-         and $input -> {'remember-pass'} 
-         and $input -> {'remember-login'} ) {
-      $app -> set_auth_cookies( undef, $pass );
+  if ( not $remember_me_input ) {
+    $app -> remove_persistent_login;
+    $persistent_login_mode = undef;
+
+  } else { # $remember_me_input == true
+
+    if ( $login_changed ) {
+      # if login has changed, remove the old login cookie, 
+      $app ->remove_persistent_login;
     }
-  }}
+    if ( not $persistent_login_mode or $login_changed ) {
+      # create a new one.
+      $persistent_login_mode = $app ->create_persistent_login( $login );
+    } else {
+      # renew the existing one
+      $persistent_login_mode = $app ->renew_persistent_login();
+    }
+  }
+  $app -> set_form_value( "remember-me", $persistent_login_mode );
 
 
   if ( not $app -> error 

@@ -59,11 +59,11 @@
             <tr>
               <td align='right'>
                 <label for='auto-login'>
-                  <small>Save login and password in a cookie on this machine?</small>
+                  <small>Persistent login on this computer (via a browser cookie)</small>
                 </label>
               </td>
               <td>
-                <acis:input type='checkbox' name='auto-login' id='auto-login' checked='checked' tabindex='3' value='true'/>
+                <acis:input type='checkbox' name='remember-me' id='auto-login' tabindex='3' value='true'/>
                 <label for='auto-login'>Yes, remember me.</label>
               </td>
             </tr>            

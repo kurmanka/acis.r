@@ -172,8 +172,7 @@ sub initial_process {
 
   $app -> redirect_to_screen( 'new-user/additional' );
   if ( $form_input -> {'remember-me'} ) {
-    $app -> set_authentication_cookie( 'login', $login );
-    $app -> set_authentication_cookie( 'pass',  $form_input -> {pass} );
+     $app -> create_persistent_login( $login );
   }
 
 }

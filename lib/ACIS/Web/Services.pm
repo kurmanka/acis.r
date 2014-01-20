@@ -179,6 +179,7 @@ sub logoff_session {
   $session -> close( $self );
 
   $self -> clear_session_cookie;  
+  $self -> remove_persistent_login;  
   if ( $self->request ) { 
     undef $self -> request -> {'session-id'}; 
   }
@@ -251,6 +252,90 @@ sub equal_passwords($$) {
 }
 
 
+
+# XXX this is an almost complete copy of the 
+# check_login_and_pass() function below. but it does not 
+# check the password.
+sub attempt_userdata_access {
+
+# Returns one of:
+#   $udata - userdata loaded & checked fine
+#   'no-account' - no such account
+#   'account-damaged' 
+#   'wrong-password' 
+#   'account-locked:$sid' - account locked by a session
+#   'existing-session-loaded' - 
+
+  my $app   = shift;
+  my $login = lc shift; # lower case
+  
+ #  now it's time to check, if such a user exists
+  my $udata_file    = $app -> userdata_file_for_login( $login );
+  if ( not -f $udata_file ) {
+    return 'no-account';
+  }
+  
+  my $lock = "$udata_file.lock";
+  if ( -f $lock ) {{
+
+    debug "found lock file at '$lock'";
+    my $sid; 
+    if ( open LOCK, $lock ) {
+      $sid = <LOCK>;
+      close LOCK;
+      debug "locked by session $sid";
+    }    
+
+    ### go get the session, if it exists
+    ### ignore the lock if it doesn't
+    ### if it exists, see if user wants to steal it...
+    
+    my $file = $app -> paths -> {sessions} . "/$sid";
+
+    if ( not -f $file ) {
+      debug "but session doesn't exist anymore ($file)";
+      unlink $lock;
+      last;
+    }
+    
+    my $session = $SESSION_CLASS_MAIN -> load( $app, $file );
+      
+    if ( not defined $session or not $session ) {
+      unlink $lock;
+      debug "but session can't be loaded ($file)";
+      last;
+    }
+    
+    debug "and in fact, there is a session";
+    
+    my $owner = $session -> owner; # or $session -> userdata_owner; ? XXX
+
+    if ( $owner and $owner ->{login} ) {
+      if ( $login eq lc $owner ->{login} ) {
+        ####  steal the session.  override.
+        $app -> update_paths_for_login( $login );
+        $app -> session( $session );
+        return 'existing-session-loaded';        
+      }
+    }
+
+    return "account-locked:$sid:$owner->{login}";
+
+  }} else {
+    debug 'lock file does not exist';
+  }
+
+  my $udata = load ACIS::Web::UserData( $udata_file );
+
+  if ( not defined $udata
+       or not defined $udata->{owner}
+       or not defined $udata->{owner}{login}
+    ) {
+    return 'account-damaged';
+  }
+
+  return $udata;
+}
 
 sub check_login_and_pass {
 
@@ -369,57 +454,72 @@ sub authenticate {
 #  my $paths    = $app -> {paths};
 #  my $vars     = $app -> variables;
 
-  my $login;  
+  my $status;
+  
+  my $login;
   my $passwd;
-
-  debug "check CGI parameters and cookies";
-
-  # now we find out
-
+  my $persistent;
   my $form_input = $app -> form_input;
 
-  $login  = $form_input -> {login};
-  $passwd = $form_input -> {pass};
+  $login = $app->check_persistent_login;
+  if ( $login ) {
+    $persistent = 1; 
+    $status = $app->attempt_userdata_access( $login );  
+  } 
+  
+  if ( not $status 
+       and ($app->request_input('login') or $app->request_input('pass')) ) {
 
-#  my $cookies = $app -> request -> {cookies};
+    debug "check CGI parameters and cookies";
+    $login  = $form_input -> {login};
+    $passwd = $form_input -> {pass};
 
-  if ( not $login ) {
-    $login = $app -> get_cookie ( 'login' );
-  }
-
-  if ( not $passwd ) {
-    $passwd = $app -> get_cookie( 'pass' );
-  }
-
-
-  if ( $login and $form_input -> {'remind-password'} ) {
-    $app -> forgotten_password ();
-    return 0;
-  }
-
-
-  ### final check
-  if ( not $login or not $passwd ) {
-
-    $app -> clear_process_queue;
-    if ( defined $login ) {
-      $app -> set_form_value( 'login', $login );
-      $app -> variables -> {'remind-password-button'} = 1;
+    # legacy cookies
+    if ( not $login ) {
+      $login = $app -> get_cookie ( 'login' );
     }
-    $app -> set_presenter ( 'login' );
+    if ( not $passwd ) {
+      $passwd = $app -> get_cookie( 'pass' );
+    }
 
-    return undef;
+    # for a smooth transition from old pass & login cookies to the
+    # new persistent login cookie:
+    if ( $app->get_cookie( 'pass' ) and $app->get_cookie('login') ) {
+      debug "both pass and login cookies are present";
+      # this is checked for later, in the login_start_session() func
+      $app->variables->{'pass-and-login-cookies'} = $app->get_cookie( 'pass' );
+    }
+    if ( $app->get_cookie( 'pass' ) or $app->get_cookie('login') ) {
+      $app->clear_auth_cookies;
+    }
+
+    if ( $login and $form_input -> {'remind-password'} ) {
+      $app -> forgotten_password(); ## XXX
+      return 0;
+    }
+
+
+    ### final check
+    if ( not $login or not $passwd ) {
+
+      $app -> clear_process_queue;
+      if ( defined $login ) {
+        $app -> set_form_value( 'login', $login );
+        $app -> variables -> {'remind-password-button'} = 1;
+      }
+      $app -> set_presenter ( 'login' );
+
+      return undef;
+    }
+  
+    $login = lc $login;
+    debug "we do have both login ($login) and password";
+    ###  now it's time to check, if such a user exists and if her
+    ###  password matches to the one entered.
+
+    $status = $app -> check_login_and_pass( $login, $passwd, 1 );
   }
   
-  $login = lc $login;
-  debug "we do have both login ($login) and password";
-
-  
-  ###  now it's time to check, if such a user exists and if her
-  ###  password matches to the one entered.
-
-  my $status = $app -> check_login_and_pass( $login, $passwd, 1 );
-
   if ( $status eq 'no-account' ) {
 
     # no such user 
@@ -448,8 +548,6 @@ sub authenticate {
 
   } elsif ( $status eq 'wrong-password' ) {
     
-    my $expected = $1;
-
     $app -> errlog( "[$login] login attempt failed, wrong password" );
     $app -> set_form_value( 'login', $login );
     $app -> error( 'login-bad-password' );
@@ -496,6 +594,10 @@ sub authenticate {
     my $udata = $status;
     $app -> update_paths_for_login( $login );
     my $ret = login_start_session( $app, $udata, $login );
+    # remove the login
+    if ($persistent) {
+      $app -> renew_persistent_login;
+    }
 
     # this is for single-profile accounts, that are opening
     # direct links, e.g. http://authors.repec.org/research/autosuggest
@@ -558,10 +660,11 @@ sub login_start_session {
    
   put_sysprof_value( $login, 'last-login-date', date_now() );
 
-  my $auto_login = $app -> form_input ->{'auto-login'} || '';
-  if ( $auto_login eq "true" )  {
-    my $pass = $app -> form_input ->{pass};
-    $app -> set_auth_cookies( $login, $pass );
+  my $auto_login = $app -> form_input ->{'remember-me'} || '';
+  if ( $auto_login eq "true" 
+       or $app->variables->{'pass-and-login-cookies'})  {
+    debug "time to set persistent login";
+    $app -> set_auth_cookies( $login, $app->form_input->{pass} || $app->variables->{'pass-and-login-cookies'} );
   } 
 
   ### redirect to the same screen, but with session id
