@@ -115,6 +115,7 @@ sub homepage {
     my $pass  = $app -> get_cookie( 'pass'  );
 
     my $status = $app -> check_login_and_pass( $login, $pass, 1 );
+    debug "check_login_and_pass: $status";
 
     if ( $status eq 'existing-session-loaded' ) {
 

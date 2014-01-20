@@ -44,6 +44,7 @@ use ACIS::Data::DumpXML qw( dump_xml );
 use Encode qw/encode decode/;
 
 use ACIS::Web::SysProfile;
+use ACIS::Web::UserPassword;
 
 
 ####   SESSION STUFF   ####
@@ -72,6 +73,7 @@ sub start_session {
 
   $self -> set_session_cookie( $sid );
   $self -> session( $session );
+
   return $session;
 }
 
@@ -138,51 +140,6 @@ sub load_session {
   } else {
     # IPs don't match -- should not continue
     debug "the user IP addresses don't match";
-
-    ###  may be it is better to check the session validity by checking
-    ###  the user-agent string?  Probably it will be more comfortable
-    ###  for the users, although -- less secure.  In some big
-    ###  organizations both IP addresses and the user agent strings
-    ###  may in fact be the same with high probability.
-
-    my $pass = $app -> request_input( "pass" );
-    if ( $pass ) {
-      if ( equal_passwords( $pass, $session -> owner ->{password} ) ) {
-        ###  Override ip address
-        debug "but a valid password were given";
-        $session -> owner ->{IP} = $IP;
-      
-      } else {
-        my $login = $session ->owner ->{login};
-
-        if ( $just_try ) {
-          return "no-good-password";
-          
-        } else { 
-          ###  serious
-          $app -> log ( "session override attempt failed [$login] from $IP" );
-
-          $app -> error( "login-bad-password" );
-          $app -> set_presenter ( 'relogin-password' );
-          $app -> clear_process_queue;
-          
-          return undef;
-        }
-      }
-      
-    } else {
-      
-      if ( $just_try ) {
-        return "no-good-password";
-
-      } else { # serious
-  
-        $app -> message( "must-relogin" );
-        $app -> set_presenter ( 'relogin-password' );
-        $app -> clear_process_queue;
-        return undef;
-      }
-    }
 
   }
 
@@ -352,15 +309,16 @@ sub check_login_and_pass {
       last;
     }
     
-    debug "and in fact, there is a session, and it belongs to the user";
+    debug "and in fact, there is a session";
     
-    my $owner = $session -> owner;
+    my $owner = $session -> owner; # or $session -> userdata_owner; ? XXX
 
     if ( $owner and $owner ->{login} ) {
       if ( $login eq lc $owner ->{login} ) {
 
-        if ( not equal_passwords( $pass, $owner ->{password} ) ) {
-          return "wrong-password:$owner->{password}";
+        # XXX-Password
+        if ( not $app->check_user_password( $pass, $owner ) ) {
+          return "wrong-password";
         }
 
         if ( $override ) {
@@ -378,20 +336,18 @@ sub check_login_and_pass {
     debug 'lock file does not exist';
   } 
 
-
   my $udata = load ACIS::Web::UserData( $udata_file );
 
   if ( not defined $udata
        or not defined $udata->{owner}
        or not defined $udata->{owner}{login}
-       or not defined $udata->{owner}{password} 
     ) {
     return 'account-damaged';
   }
 
-
-  if ( not equal_passwords $pass, $udata -> {owner} {password} ) {
-    return "wrong-password:$udata->{owner}{password}";
+  # XXX-Password
+  if ( not $app->check_user_password( $pass, $udata->{owner} ) ) {
+    return "wrong-password";
   }
    
   return $udata;
@@ -456,7 +412,7 @@ sub authenticate {
   }
   
   $login = lc $login;
-  debug "we do have both login ($login) and password ($passwd)";
+  debug "we do have both login ($login) and password";
 
   
   ###  now it's time to check, if such a user exists and if her
@@ -490,11 +446,11 @@ sub authenticate {
                     -login => $login,
                   );
 
-  } elsif ( $status =~ m/wrong\-password:(.+)/ ) {
+  } elsif ( $status eq 'wrong-password' ) {
     
     my $expected = $1;
 
-    $app -> errlog( "[$login] login attempt failed, wrong password ($passwd)" );
+    $app -> errlog( "[$login] login attempt failed, wrong password" );
     $app -> set_form_value( 'login', $login );
     $app -> error( 'login-bad-password' );
     $app -> variables -> {'remind-password-button'} = 1;
@@ -503,7 +459,7 @@ sub authenticate {
     $app -> set_presenter( 'login' );
     
     $app -> event ( -class => 'authenticate',
-                    -descr => "login failed, password given/expected: $passwd/$expected",
+                    -descr => "login failed, password mismatch",
                     -login => $login,
                   );
     
@@ -545,7 +501,7 @@ sub authenticate {
     # direct links, e.g. http://authors.repec.org/research/autosuggest
     # we need to choose some record at that moment
     if ($app -> session) {
-	$app -> session -> set_default_current_record;
+      $app -> session -> set_default_current_record;
     }
     return $ret;
   }
@@ -585,6 +541,10 @@ sub login_start_session {
                                        object => $udata, 
                                        file   => $udata_file );
 
+  assert( $session );
+  require ACIS::Web::User;
+  $app -> userdata_bring_up_to_date();
+
   my $sid = $session -> id;
   assert( $sid );
   $app -> sevent(  -class => 'auth',
@@ -616,6 +576,7 @@ sub login_start_session {
   debug "requesting a redirect to $URI";
   $app -> clear_process_queue;
   $app -> redirect( $URI );
+
 
   return $udata;
 }
@@ -706,6 +667,9 @@ sub set_form_value {
     {form} {values} {$element} = 
       ( defined $value ) ? $value : undef;
 
+  if (exists $UNSAFE_TO_LOG->{$element} and defined $value) {
+    $value = '######';
+  }
   debug "set form value $element: ", (defined $value)? $value : '*undef*';
 }
 
@@ -861,7 +825,11 @@ sub check_input_parameters {
       ### make sure it is 
       assert( not ref( $orig_val ) );
       
-      debug "parameter '$name' with value '$orig_val'";
+      if (exists $UNSAFE_TO_LOG->{$name}) {
+        debug "parameter '$name' with a value (not logged)";
+      } else {
+        debug "parameter '$name' with value '$orig_val'";
+      }
 
       $orig_val =~ s/(^\s+|\s+$)//g;
 

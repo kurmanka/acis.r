@@ -813,7 +813,8 @@ sub handle_request {
   }
 
   if ( scalar keys %$form_input ) {
-    my $dump = Data::Dumper->Dump( [$form_input], ['form_input'] );
+    my $safe_input = $self->safe_to_log_form_input($form_input); 
+    my $dump = Data::Dumper->Dump( [$safe_input], ['form_input'] );
     chomp $dump;
     debug $dump;
 
@@ -1468,6 +1469,8 @@ sub time_checkpoint {};
 sub report_timed_checkpoints {''};
 sub log_profiling {};
 
+# a stub to be redefined in ACIS::Web
+sub safe_to_log_form_input { shift; return shift; };
  
 1;
 

@@ -526,5 +526,11 @@
     <create-table-sql> primary key prim(dsid, checksum, psid), index t_i(time), index psid_i(psid) </create-table-sql>
   </table>
 
-</configuration>
+  <table name='acis:persistent_login'>
+    <field name='login' sql-type='varchar(255) not null' />
+    <field name='token' sql-type='binary(32) not null PRIMARY KEY' />
+    <field name='created' sql-type='timestamp not null'/>
+  </table>
 
+
+</configuration>

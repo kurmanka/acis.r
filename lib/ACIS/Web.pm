@@ -49,7 +49,7 @@ require ACIS::Web::Session::SOldUser;
 require ACIS::Web::Session::SMagic;
 require ACIS::Web::Session::SAdminUser;
 
-use vars qw ( $ACIS %SESSION_CLASS $SESSION_CLASS_MAIN );
+use vars qw ( $ACIS %SESSION_CLASS $SESSION_CLASS_MAIN $UNSAFE_TO_LOG );
 *ACIS = *Web::App::APP;
 $SESSION_CLASS_MAIN = "ACIS::Web::Session";
 %SESSION_CLASS = (
@@ -58,6 +58,15 @@ $SESSION_CLASS_MAIN = "ACIS::Web::Session";
  "magic"    => "ACIS::Web::Session::SMagic",
  "admin-user" => "ACIS::Web::Session::SAdminUser",
 );
+
+# Do not log the users' passwords to debug.log
+
+$UNSAFE_TO_LOG = {
+    'pass'         => 1,
+    'pass-confirm' => 1,
+    'pass-new'     => 1,
+};
+
 
 require ACIS::Web::UserData;
 require ACIS::Web::Services;
@@ -632,6 +641,20 @@ sub send_update_request {
 }
 
 
+# Do not log the users' passwords to debug.log
+
+sub safe_to_log_form_input { 
+    shift; 
+    my $input = shift;
+    my $out = {};
+    foreach ( keys %$input ) {
+        my $k = $_;
+        my $v = $input->{$k};
+        if (exists $UNSAFE_TO_LOG->{$k}) { $out->{$k} = '#######'; }
+        else { $out->{$k} = $v; }
+    }
+    return $out; 
+};
 
 
  

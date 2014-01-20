@@ -234,22 +234,19 @@
 
     <use module='ACIS::Web::User'/>
 
-    <param name='name'    type='name' if-not-empty='1'
-           place='owner:name' 
-           maxlen='1000'/>
+    <param name='pass'    type='password'    required='yes' />
 
-    <param name='email'   required='yes' 
-           type='simpleemail'
-           />
+    <param name='name'    type='name'        if-not-empty='1'
+                          place='owner:name' maxlen='1000'  />
+
+    <param name='email'   type='simpleemail' required='yes' />
     <!-- this parameter is checked and handled carefully in
     ACIS::Web::User::set_user_login() -->
-
     <param name='record-email'/>
 
-    <param name='pass'/>
     <param name='pass-new'     type='password'/>
     <param name='pass-confirm' type='password'/>
-    <!-- also: remember-email, remember-pass -->
+    <!-- also: remember-me -->
 
     <call function='load_session_or_authenticate' />
     <call function='ACIS::Web::User::check_session_type' />
@@ -264,12 +261,18 @@
       <call function='ACIS::Web::User::settings'     />
       <call function='process_form_data' />
       <call function='prepare_form_data' />
-      <call function='ACIS::Web::User::settings_prepare'     />
     </process>
 
     <presentation type='xslt' filename='user/settings.xsl' />
   </screen>
  
+
+  <screen id='forget-me'>
+    <use module='ACIS::Web::UserPassword'/>
+    <call function='load_session_if_possible' />
+    <call function='remove_persistent_login' />
+    <presentation type='xslt' filename='user/forget-me.xsl' />
+  </screen>
 
 
   <screen id='off'>
@@ -729,8 +732,7 @@
            maxlen='10'
            place='session:registration-date/day'  />
 
-    <param name='pass'         required='yes' type='password'  
-           place='owner:password'/>
+    <param name='pass'         required='yes' type='password'  />
     <param name='pass-confirm' required='yes' type='password'  />
     <param name='homepage'                    type='url'       
            place='record:contact/homepage'/>
@@ -819,10 +821,6 @@
     <call function='authenticate' />
 
     <presentation type='xslt' filename='misc/login.xsl'/>
-  </screen>
-
-  <screen id='relogin-password'>
-    <presentation type='xslt' filename='misc/login-pass.xsl'/>
   </screen>
 
   <screen id='sorry'>

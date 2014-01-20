@@ -11,6 +11,9 @@ require Exporter;
 require Storable;
 require XML::Parser;
 require Proc::Daemon;
+require MIME::Base64;
+require Bytes::Random::Secure;
+require Digest::SHA;
 
 # other components
 require ARDB;
@@ -41,6 +44,7 @@ require ACIS::Web::Session;
 require ACIS::Web::Site;
 require ACIS::Web::SysProfile;
 require ACIS::Web::User;
+require ACIS::Web::UserPassword;
 
 # Web::App core
 require Web::App::XSLT;

@@ -262,6 +262,10 @@ sub offline_userdata_service {
   #$session -> set_userdata( $userdata, $userdata_file );
   #die Dumper( $session );
 
+  # upgrade userdata, if necessary (esp. the owner part)
+  require ACIS::Web::User;
+  $acis -> userdata_bring_up_to_date();
+
   my $user = $session->userdata_owner;
   my $ulogin= $user   ->{login};
 
@@ -276,7 +280,7 @@ sub offline_userdata_service {
                  );
 
   $acis -> {'presenter-data'} {request} {user} {name}  = $user->{name};
-  $acis -> {'presenter-data'} {request} {user} {pass}  = $user->{password};
+  $acis -> {'presenter-data'} {request} {user} {pass}  = '######'; # XXX-Password
   $acis -> {'presenter-data'} {request} {user} {login} = $ulogin;
   
   if ( $rec ) {
@@ -413,11 +417,11 @@ sub get_hands_on_userdata {
 
   ###  load the userdata
   $userdata = load ACIS::Web::UserData( $userdata_file );
+  my $owner = $userdata->{owner};
 
   if ( not defined $userdata
-       or not defined $userdata->{owner}
-       or not defined $userdata->{owner}{login}
-       or not defined $userdata->{owner}{password} 
+       or not defined $owner
+       or not defined $owner->{login}
      ) {
     # a problem
 
