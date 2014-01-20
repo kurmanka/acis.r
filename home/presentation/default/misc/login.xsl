@@ -48,10 +48,10 @@
               </td>
               <td>
                 <acis:input name='pass' type='password' id='password' tabindex='3'/>
-                <xsl:if test='not( //remind-password-button )'>
+                <xsl:if test='not( //suggest-reset-password )'>
                   <xsl:text> </xsl:text>
                   <a ref='forgotten-password!' tabindex='10'>
-                    <small>Remind you of the password?</small>
+                    <small>Forgot your password?</small>
                   </a>
                 </xsl:if>
               </td>
@@ -77,16 +77,15 @@
             <input type='submit' value='Login' name='do' class='important' tabindex='4'/>            
             <xsl:text> </xsl:text>
 
-            <xsl:if test='//remind-password-button'>
+            <xsl:if test='//suggest-reset-password'>
               <input type='submit' 
                      name='remind-password'
-                     value='Send me my password'
-                     title='via email'
+                     value='Let me reset my password'
                      class='important'/>
             </xsl:if>
             
             <xsl:choose xml:space='default'>
-              <xsl:when test='//remind-password-button'>
+              <xsl:when test='//suggest-reset-password'>
                 
                 <acis:script-onload>
                   var loginform=document.getElementById('loginform');

@@ -464,7 +464,7 @@ sub authenticate {
   $login = $app->check_persistent_login;
   if ( $login ) {
     $persistent = 1; 
-    $status = $app->attempt_userdata_access( $login );  
+    $status = $app->attempt_userdata_access( $login );
   } 
   
   if ( not $status 
@@ -494,7 +494,8 @@ sub authenticate {
     }
 
     if ( $login and $form_input -> {'remind-password'} ) {
-      $app -> forgotten_password(); ## XXX
+      use ACIS::Web::PasswordReset;
+      ACIS::Web::PasswordReset::forgotten_password($app);
       return 0;
     }
 
@@ -505,7 +506,7 @@ sub authenticate {
       $app -> clear_process_queue;
       if ( defined $login ) {
         $app -> set_form_value( 'login', $login );
-        $app -> variables -> {'remind-password-button'} = 1;
+        $app -> variables -> {'suggest-reset-password'} = 1;
       }
       $app -> set_presenter ( 'login' );
 
@@ -551,7 +552,8 @@ sub authenticate {
     $app -> errlog( "[$login] login attempt failed, wrong password" );
     $app -> set_form_value( 'login', $login );
     $app -> error( 'login-bad-password' );
-    $app -> variables -> {'remind-password-button'} = 1;
+    # suggest reset password? XXX
+    $app -> variables -> {'suggest-reset-password'} = 1;
     $app -> clear_process_queue;
     
     $app -> set_presenter( 'login' );
@@ -1050,69 +1052,6 @@ sub process_form_data {
 #############  end of main form processing subs  ###
 
 
-
-
-sub forgotten_password {
-
-  my $app = shift;
-
-  my $request  = $app -> request;
-  my $home     = $app -> {home};
-  my $vars     = $app -> variables;
-
-  debug 'get login';
-  
-  my $login  = lc $app -> get_form_value( 'login' ); 
- 
-  if ( not defined $login or not $login ) {
-    $app -> form_required_absent ( 'login' );
-    $app -> clear_process_queue;
-    return undef;
-  }
-
-  
-  my $udata_file  = $app -> userdata_file_for_login( $login );
-
-  if ( not -f $udata_file ) {
-    # no such user 
-    $app -> error ( 'login-unknown-user' );
-    $app -> clear_process_queue;
-    return undef;
-  }
-
-  debug "going to load userdata to find the password";
-
-  my $udata = load ACIS::Web::UserData ( $udata_file );
-  
-  my $owner = $udata -> {owner};
-
-  if ( not $owner 
-       or not $owner ->{login}
-       or not $owner ->{password} ) {
-    $app -> error ( 'login-account-damaged' );
-    $app -> clear_process_queue;
-    return undef;
-  }
-  assert( $owner );
-  
-  $app -> {'presenter-data'} {request} {user} = {
-    name  => $owner -> {name},
-    login => $owner -> {login},
-    type  => $owner -> {type},
-    pass  => $owner -> {password},
-  };
-  
-  $app -> send_mail ( 'email/forgotten-password.xsl' );
-  $app -> success( 1 );  ### XXX email/forgotten-password.xsl should check this
-
-  $app -> message( 'forgotten-password-email-sent' );
-
-  $app -> set_form_value ( 'login', $login );
-  $app -> set_form_action( $app -> config( 'base-url' ) );
-
-  $app -> clear_process_queue;
-  $app -> set_presenter ( 'login' );
-}
 
 
 

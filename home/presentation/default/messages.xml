@@ -1,10 +1,9 @@
-<acis:messages xmlns:acis="http://acis.openlib.org" 
-               >
+<acis:messages xmlns:acis="http://acis.openlib.org">
 
   <acis:message id='personal-data-saved'>We saved your personal and contact information.</acis:message>
 
   <acis:message id='forgotten-password-email-sent'>We have sent you an email
-  message, containing your password.</acis:message>
+  message for your password reset.</acis:message>
 
   <acis:message id='must-relogin'>You must re-enter your password before you can
   continue.  This is because you now come from a different network

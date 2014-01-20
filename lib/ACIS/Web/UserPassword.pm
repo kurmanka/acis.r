@@ -4,7 +4,7 @@ package ACIS::Web::UserPassword; ### -*-perl-*-
 #
 #  Description:
 #
-#    Tools to generate password hashes, password salt, etc.
+#    Tools to generate password hashes, password salt, tokens, etc.
 #
 #  This program is free software; you can redistribute it and/or modify
 #  it under the terms of the GNU General Public License, version 2, as
@@ -23,8 +23,18 @@ package ACIS::Web::UserPassword; ### -*-perl-*-
 use strict;
 use warnings;
 
-# http://search.cpan.org/~mkanat/Math-Random-Secure-0.06/lib/Math/Random/Secure.pm
-#use Math::Random::Secure; 
+# Constants
+
+# persistent login
+# - cookie name: rememberme
+# - cookie expiry time: 3 months
+my $EXPIRY_MONTHS = 3;
+
+# password reset token (link)
+# - expiry time: 12 hours
+my $RESET_EXPIRY_HOURS = 12;
+
+
 # http://search.cpan.org/~davido/Bytes-Random-Secure-0.28/lib/Bytes/Random/Secure.pm
 use Bytes::Random::Secure qw(random_bytes); 
 use MIME::Base64;
@@ -72,6 +82,7 @@ sub make_hash($$) {
   # prepend the salt
   my $data = $salt . encode_utf8( $password );
   # take sha256, in the base64 encoding
+  # should be 44 characters long, if the data is 32 bytes long
   $hash_string = sha256_base64( $data );
   # ...
   return $hash_string; 
@@ -145,9 +156,6 @@ sub ACIS::Web::set_new_password {
   return 1;
 }
 
-# cookie name: rememberme
-# cookie expiry time: 3 months
-my $EXPIRY_MONTHS = 3;
 
 sub ACIS::Web::create_persistent_login {
   my $app = shift or die;
@@ -245,9 +253,9 @@ sub ACIS::Web::renew_persistent_login {
 
 sub ACIS::Web::remove_persistent_login {
   my $app = shift or die;
-  debug "remove_persistent_login(): start";
-  debug "remove_persistent_login(): cookie rememberme: " . $app->get_cookie('rememberme');
   my $token_b64 = $app->get_cookie('rememberme') or return undef;
+  debug "remove_persistent_login(): start";
+  debug "remove_persistent_login(): cookie rememberme: " . $token_b64;
 
   # - decode the token.
   my $token = decode_base64( $token_b64 ) or return undef;
@@ -270,21 +278,92 @@ sub ACIS::Web::remove_persistent_login {
 }
 
 
+### Password reset
 
 sub create_password_reset {
   my $app = shift;
-  my $session = $app->session or die;
-  my $ud_owner = $session ->userdata_owner or die;
-  my $token;
-  # ...
-  return $token;
+  my $login = shift;
+  my ($token, $token_b64) = generate_random_bytes_base64();
+
+  my $sql = $app->sql;
+  my $q = $sql->prepare( 'insert into reset_token (login,token,created,used) values (?,?,NOW(),NULL)' );
+  my $r = $sql->execute( $login, $token );
+  if ($r) {
+    return $token_b64;
+
+  } else {
+    return undef;
+  }
 }
 
-sub check_reset_token {
-  my $app = shift;
-  my $result;
-  # ...
-  return $result;
+sub check_password_reset_token {
+  my $app          = shift or die;
+  my $token_b64    = shift or die;
+  my $mark_as_used = shift;
+  my $login;
+  my $sql = $app->sql;
+
+  # - check the token.
+  # - decode the token.
+  my $token = decode_base64( $token_b64 ) or return undef;
+
+  # - get the token table row.
+  # - check the expiry time.
+  $sql->prepare_cached( "select * from reset_token where token=? and timestampadd(HOUR,?,created) > NOW()" );
+  my $r = $sql->execute( $token, $RESET_EXPIRY_HOURS );
+  if ($r and $r->{row}) { 
+    my $row = $r->{row}; 
+    # - get the login.
+    $login = $row->{login};
+    
+    # - check if the token was already used in the past
+    if ($row->{used}) {
+      return -2;
+    }
+    
+    # - set the used time for the token
+    if ($mark_as_used) {
+      $sql->prepare( "update reset_token set used=NOW() where token=?" );
+      $sql->execute($token);
+    }
+    # - return the login
+    return $login;
+  }
+  
+  # else (not found)
+  # - check if there's an expired token with this value
+  $sql->prepare_cached( "select * from reset_token where token=?" );
+  $r = $sql->execute( $token );
+  if ($r->{row} and $r->{row}{login}) {
+    return -1;
+  }
+  # not found at all
+  return undef;
 }
+
+sub password_reset_token_used {
+  my $app          = shift or die;
+  my $token_b64    = shift or die;
+  my $sql = $app->sql;
+  my $token = decode_base64( $token_b64 ) or return undef;
+  $sql->prepare( "update reset_token set used=NOW() where token=?" );
+  $sql->execute($token);
+} 
+
+
+sub cleanup_tokens {
+  my $app = shift;
+  my $sql = $app->sql or die;
+
+  # remove old persistent logins
+  my $old = $EXPIRY_MONTHS + 1;
+  $sql->prepare( "delete from persistent_login where timestampadd(MONTH,$old,created) < NOW()" );
+  $sql->execute();
+  
+  # remove reset tokens, that are older than 1 week
+  $sql->prepare( "delete from reset_token where timestampadd(WEEK,1,created) < NOW()" );
+  $sql->execute();
+}
+
 
 1;

@@ -532,5 +532,12 @@
     <field name='created' sql-type='timestamp not null'/>
   </table>
 
+  <table name='acis:reset_token'>
+    <field name='login'   sql-type='varchar(255) not null' />
+    <field name='token'   sql-type='binary(32) not null PRIMARY KEY' />
+    <field name='created' sql-type='timestamp not null'/>
+    <field name='used'    sql-type='timestamp null default null'/>
+  </table>
+
 
 </configuration>

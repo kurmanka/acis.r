@@ -48,11 +48,32 @@
     <presentation type='xslt'
                   filename='user/records-menu.xsl'/>
   </screen>
+
+  <!-- password reset feature -->
   <screen id='forgotten-password'>
+    <use module='ACIS::Web::PasswordReset'/>
     <process>
-      <call function='ACIS::Web::forgotten_password' />
+      <call function='ACIS::Web::PasswordReset::forgotten_password' />
     </process>
     <presentation type='xslt' filename='misc/forgotten-password.xsl' />
+  </screen>
+
+  <screen id='reset'>
+    <use module='ACIS::Web::PasswordReset'/>
+    <call function='ACIS::Web::PasswordReset::password_reset' />
+
+    <param name='pass'         required='yes' type='password'  />
+    <param name='pass-confirm' required='yes' type='password'  />
+
+    <process>
+      <call function='check_input_parameters' />
+      <call function='ACIS::Web::PasswordReset::password_reset_process' />    
+    </process>
+    <presentation type='xslt' filename='misc/reset-password.xsl' />
+  </screen>
+  
+  <screen id='reset-done'>
+    <presentation type='xslt' filename='misc/reset-password-done.xsl' />
   </screen>
   
 
