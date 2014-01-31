@@ -2,11 +2,10 @@ use strict;
 use warnings;
 
 #####  MAIN PART
-require ARDB;
-require ARDB::Local;
+use ACIS::Web;
 
-my $ARDB = ARDB -> new() or die;
-my $sql = $ARDB -> sql_object;
+my $ACIS = ACIS::Web -> new();
+my $sql = $ACIS -> sql_object;
 
 # Add the timestamp column to the resources, objects and institutions
 # tables. 
