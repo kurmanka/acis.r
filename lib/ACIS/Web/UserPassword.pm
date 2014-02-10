@@ -36,7 +36,9 @@ my $RESET_EXPIRY_HOURS = 12;
 
 
 # http://search.cpan.org/~davido/Bytes-Random-Secure-0.28/lib/Bytes/Random/Secure.pm
-use Bytes::Random::Secure qw(random_bytes); 
+# Math::Random::ISAAC::XS is recommended for performance
+
+use Bytes::Random::Secure; 
 use MIME::Base64;
 use Encode;
 
@@ -50,8 +52,10 @@ use Web::App::Common qw( debug );
 use ACIS::Data::DumpXML qw(dump_xml);
 
 
+my $random;
 sub generate_random_bytes {
-  return random_bytes( 32 );
+  $random ||= Bytes::Random::Secure->new();
+  return $random ->bytes( 32 );
 }
 
 sub generate_random_bytes_base64 {
