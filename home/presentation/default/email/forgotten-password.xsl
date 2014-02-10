@@ -29,7 +29,7 @@
         <xsl:value-of select='$base-url'/>
         <xsl:text>/reset/</xsl:text>
         <!-- http://www.exslt.org/str/functions/encode-uri/str.encode-uri.html -->
-        <xsl:value-of select='str:encode-uri(//token_string/text(),true())'/>
+        <xsl:value-of select='str:encode-uri(//token_string/text(),false())'/>
         <xsl:text>&#10;&#10;</xsl:text>
         <!-- 12 is a magic number constant from ACIS::Web::UserPassword -->
         <xsl:text>(The link is valid for 12 hours.)</xsl:text>
