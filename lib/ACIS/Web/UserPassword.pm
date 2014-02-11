@@ -54,7 +54,7 @@ use ACIS::Data::DumpXML qw(dump_xml);
 
 my $random;
 sub generate_random_bytes {
-  $random ||= Bytes::Random::Secure->new();
+  $random ||= Bytes::Random::Secure->new(NonBlocking => 1, Bits => 64);
   return $random ->bytes( 32 );
 }
 
