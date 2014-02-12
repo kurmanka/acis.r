@@ -95,7 +95,7 @@
   
   <acis:error id='reset-token-expired'
   >Sorry, the reset link has already expired. You need to use the reset 
-  link within 3 hours of requesting it.</acis:error>
+  link within 12 hours of requesting it.</acis:error>
 
   <acis:error id='reset-token-reused'
   >Sorry, the reset link has already been used. You need to request 
