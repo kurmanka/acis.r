@@ -42,34 +42,16 @@ use Data::Dumper;
 use Encode;
 use Storable;
 
-# use CGI::Carp qw( fatalsToBrowser set_message carpout );
-
-
-#BEGIN { set_message( \&Web::App::Common::critical_message ); }
-
-#use Web::App::Config;
-
 BEGIN { 
   use Web::App::Common qw( debug debug_as_is );
   if ( $ENV{HTTP_HOST} ) {
-#    eval " use CGI::Carp qw( fatalsToBrowser set_message ); ";
-#  set_message( sub { print '<h1>fuck!</h1><p>', \$_[0], '</p>'; } ); ";
-#  set_message( \&Web::App::Common::critical_message ); ";
-    if ( $@ ) { 
-      warn "Problem when I tried to use CGI::Carp: $@";
-    }
-
   } else {
     require Carp;
     import  Carp 'verbose';
-#    eval "use Carp qw( verbose );";
   }
 }
 
-
-require Web::App::Common;
-import  Web::App::Common 'date_now';
-
+use  Web::App::Common 'date_now';
 
 
 use vars qw( $APP );
