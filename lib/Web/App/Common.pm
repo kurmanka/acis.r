@@ -56,6 +56,8 @@ sub clear_undefined ($);
 $Web::App::DEBUG            ||= $ENV{WEBAPPDEBUG};
 $Web::App::DEBUGLOGFILE     ||= $ENV{WEBAPPDEBUGLOGFILE};
 $Web::App::DEBUGIMMEDIATELY ||= $ENV{WEBAPPDEBUGIMM};
+# may be set to 1 in Web::App, depending on config: 
+$Web::App::DEBUGWITHTIME    ||= $ENV{WEBAPPDEBUGWITHTIME};
 
 foreach ( @::ARGV ) {
   if ( m/^--debug$/ ) {
@@ -127,7 +129,13 @@ sub debug {
   my $subroutine = (caller(1))[3];
   my $line       = (caller)[2];
 
-  $message = "[$subroutine($line)] $message\n";
+  my $timestamp = '';
+  if ($Web::App::DEBUGWITHTIME) {
+    $timestamp = scalar localtime;
+    $timestamp .= ' ';
+  }
+
+  $message = "$timestamp[$subroutine($line)] $message\n";
 
   if ( $Web::App::DEBUGLOGFILE
        and open (DEBUGLOG, ">>:utf8", $Web::App::DEBUGLOGFILE)

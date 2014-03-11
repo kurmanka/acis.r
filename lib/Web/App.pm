@@ -126,6 +126,10 @@ sub new {
   if ( $config -> {umask} ) {
     umask( $config -> {umask} );
   }
+  
+  if ( $config -> {'debug-log-with-time'} ) {
+    $Web::App::DEBUGWITHTIME = 1;
+  }
 
   if ( $config -> {'require-modules'} ) {
     my @list = split /\s+/, $config -> {'require-modules'};
@@ -196,6 +200,8 @@ sub configuration_parameters {
     'template-set',     'default',
     'debug-info-visible', '',
     'debug-log',          '',
+    'debug-log-with-time', '',          # enables timestamps in debug log
+    
     'home-url', "not-defined",
     'debug-transformations', '',
     'umask',   'not-defined',           # '0022'
