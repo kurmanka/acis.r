@@ -124,18 +124,14 @@ sub debug {
   clear_undefined \@_;
   my $message = join '', @_;
 
-#  return unless $Web::App::DEBUG;
-
   my $subroutine = (caller(1))[3];
   my $line       = (caller)[2];
 
-  my $timestamp = '';
-  if ($Web::App::DEBUGWITHTIME) {
-    $timestamp = scalar localtime;
-    $timestamp .= ' ';
-  }
+  $message = "[$subroutine($line)] $message\n";
 
-  $message = "$timestamp[$subroutine($line)] $message\n";
+  if ($Web::App::DEBUGWITHTIME) {
+    $message = localtime() . ' ' . $message;
+  }
 
   if ( $Web::App::DEBUGLOGFILE
        and open (DEBUGLOG, ">>:utf8", $Web::App::DEBUGLOGFILE)

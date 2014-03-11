@@ -196,38 +196,35 @@ sub configuration_parameters {
     'require-modules',  'not-defined',
     
     # web interface
-    'base-url',         'required',
-    'template-set',     'default',
-    'debug-info-visible', '',
-    'debug-log',          '',
-    'debug-log-with-time', '',          # enables timestamps in debug log
-    
-    'home-url', "not-defined",
-    'debug-transformations', '',
-    'umask',   'not-defined',           # '0022'
-    'requests-log',     '*stderr*',
+    'base-url',            'required',
+    'home-url',            'not-defined',
+
+    'template-set',        'default',
+    'presenters-dir',      'not-defined',
 
     'default-screen-name', "index",
     'screen-not-found',    "sorry",
 
-    'character-encoding',  'utf-8',
+    'character-encoding',    'utf-8',
     'input-space-normalize', 'true',
 
-    'presenters-dir',    'not-defined',
-    
-
+    # logging and debugging
+    'requests-log',          '*stderr*',
+    'debug-info-visible',    '',
+    'debug-log',             '',
+    'debug-log-with-time',   'not-defined',     # enables timestamps in debug log
+    'debug-transformations', '',
+    'debug-email-data-log',  'not-defined',
 
     # email-related
     'system-email',     'required',
     'sendmail',         'required',
+    'umask',            'not-defined',    # '0022'
 
     # database parameters
     'db-name',          'required',
     'db-user',          'required',
     'db-pass',          'required',
-
-    # debug 
-    'debug-email-data-log',  'not-defined',
 
 
    };

@@ -119,11 +119,19 @@ system-command-after-profile-change = /home/awho/perl/call_test
 
   
 ###  Debugging
-# +debug-info-visible
- +debug-transformations
+
+# debug log
 debug-log=/home/awho/opt/acis.debug.log
+# ... with timestamps?
+#+debug-log-with-time
+
+# inject the debug log into the pages?
+#+debug-info-visible
+
+# debug XSLT transformations?
+#+debug-transformations
+
 # +log-profiling-data
 # +show-profiling-data
 # +extreme-debug
-
 
