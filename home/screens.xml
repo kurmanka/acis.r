@@ -858,10 +858,13 @@
 
     <use module='ACIS::Web::User'/>
 
+    <param name='pass'    type='password'    required='yes' />
+
     <call function='load_session_or_authenticate' />
     <call function='ACIS::Web::User::check_session_type' />
 
     <process>
+      <call function='check_input_parameters' />
       <call function='ACIS::Web::User::remove_account' />
     </process>
     

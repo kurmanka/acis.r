@@ -341,23 +341,26 @@ sub remove_account {
   my $paths   = $app -> paths;
   my $session = $app -> session;
   my $input   = $app -> form_input;
+  my $owner   = $session -> userdata_owner;
   
+  my $pass = $input ->{'pass'};
+  if ( $app->check_user_password( $pass, $owner ) ) {
+    # password is valid
+    # we can continue
+  } else {
+    $app -> error( 'bad-old-pass' ); ### 'bad-old-pass' ?
+    return;
+  }
+
   if ( not $input ->{'confirm-it'} ) {
     ### request the confirmation 
     return ;
-  }
-
-  if ( not $session -> owner -> {type} {advanced} ) {
-    ###  SHALL NOT BE HERE, THEN.  XXX
-    ###  But, at the same time, this function very well can be used for
-    ###  advanced users as well.
   }
 
   $app -> userlog( "removing the account, per user request" );
   $app -> sevent ( -class  => 'account', 
                    -action => 'delete request' );
   
-
   ### delete the profile pages
   my $udata = $session -> userdata || die;
   foreach ( @{ $udata-> {records} } ) {

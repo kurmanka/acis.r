@@ -22,19 +22,33 @@
         </h1>
         <xsl:call-template name='show-status' />
         <acis:form>
-          <p>
-            <input type='submit'
-                   name='action'
-                   value='Proceed'
-                   class='important' />
-            <xsl:text>, if you really want to delete the account and the profile.</xsl:text>
-            <input type='hidden'
-                   name='confirm-it'
-                   value='yes'/>
-          </p>          
-          <p>
-            <xsl:text>Press Back button of your browser otherwise.</xsl:text>
-          </p>
+
+          <xsl:call-template name='fieldset'> 
+            <xsl:with-param name='content'>
+
+              <p>
+                <label for='old'>You must enter your current password to confirm:</label><br/>
+                <acis:input name='pass' type='password' id='old'>
+                  <acis:name>current password</acis:name>
+                </acis:input>
+              </p>
+              <p>
+                <input type='submit'
+                       name='action'
+                       value='Proceed'
+                       class='important' />
+                <xsl:text>, if you really want to delete the account and the profile.</xsl:text>
+                <input type='hidden'
+                       name='confirm-it'
+                       value='yes'/>
+              </p>          
+              <p>
+                <xsl:text>Press Back button of your browser otherwise.</xsl:text>
+              </p>
+              
+            </xsl:with-param>
+          </xsl:call-template>
+          
         </acis:form>
       </xsl:with-param>
     </xsl:call-template>
