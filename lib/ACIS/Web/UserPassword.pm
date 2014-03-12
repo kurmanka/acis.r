@@ -160,6 +160,16 @@ sub ACIS::Web::set_new_password {
   return 1;
 }
 
+# when deleting an account:
+sub remove_password {
+  my $app = shift or die;
+  my $owner = shift or die;
+  
+  delete $owner->{password};
+  delete $owner->{password_hash_base64};
+  delete $owner->{password_salt_base64};
+}
+
 
 sub ACIS::Web::create_persistent_login {
   my $app = shift or die;

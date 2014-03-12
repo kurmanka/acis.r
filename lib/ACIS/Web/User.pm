@@ -388,10 +388,17 @@ sub remove_account {
   }
 
   debug "move userdata from '$userdata' to '$deleted_userdata'";
-  my $check = rename $userdata, $deleted_userdata;  
+
+  ACIS::Web::UserPassword::remove_password( $app, $owner );
+  $session -> set_userdata_saveto_file( $deleted_userdata );
   
+  debug "close the session";
+  $app -> logoff_session;
+  $session -> set_userdata( undef );
+
+  my $check = unlink $userdata;
   if ( not $check ) {
-    $app -> errlog ( "Can't move $userdata file to $deleted_userdata" );
+    $app -> errlog ( "Can't remove $userdata" );
     $app -> error ( "cant-remove-account" );
     return;
   }
@@ -403,7 +410,6 @@ sub remove_account {
   $app -> send_update_request( 'ACIS', $relative );
   
 
-  $session -> set_userdata( undef );
   $app -> send_mail( 'email/account-deleted.xsl' );
 
   $app -> sevent ( -class  => 'account', 
@@ -411,9 +417,7 @@ sub remove_account {
                    -file   => $deleted_userdata );
 
   $app -> userlog( "deleted account; backup stored in $deleted_userdata" );
-  debug "close the session";
 
-  $app -> logoff_session;
   $app -> message( 'account-deleted' );
   $app -> success( 1 );
   $app -> set_presenter( "account-deleted" );
