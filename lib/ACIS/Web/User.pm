@@ -335,7 +335,9 @@ sub set_user_login {
 }
 
 
-sub remove_account {   
+use ACIS::User;
+
+sub remove_account {
   my $app = shift;
 
   my $paths   = $app -> paths;
@@ -357,70 +359,13 @@ sub remove_account {
     return ;
   }
 
-  $app -> userlog( "removing the account, per user request" );
-  $app -> sevent ( -class  => 'account', 
-                   -action => 'delete request' );
-  
-  ### delete the profile pages
-  my $udata = $session -> userdata || die;
-  foreach ( @{ $udata-> {records} } ) {
-    my $file = $_ -> {profile} {file};
-    if ( $file and -f $file ) {
-      unlink $file;
-      $app-> userlog( "removed profile file at $file" );
-    }
-    my $exp = $_ -> {profile} {export};
-    if ( $exp ) {
-      foreach ( values %$exp ) {
-        unlink $_;
-        $app-> userlog( "removed exported profile data: $_" );
-      }
-    }
+  my $ret = ACIS::User::remove_current_account( $app, 'user' );
+
+  if ($ret) {
+    $app -> message( 'account-deleted' );
+    $app -> success( 1 );
+    $app -> set_presenter( "account-deleted" );
   }
-
-
-  my $userdata = $paths -> {'user-data'};
-  my $deleted_userdata = $paths -> {'user-data-deleted'};
-  
-  while ( -e $deleted_userdata ) {
-    debug "backup file $deleted_userdata already exists";
-    $deleted_userdata =~ s/\.xml(\.(\d+))?$/".xml." . ($2 ? ($2+1) : '1')/eg;
-  }
-
-  debug "move userdata from '$userdata' to '$deleted_userdata'";
-
-  ACIS::Web::UserPassword::remove_password( $app, $owner );
-  $session -> set_userdata_saveto_file( $deleted_userdata );
-  
-  debug "close the session";
-  $app -> logoff_session;
-  $session -> set_userdata( undef );
-
-  my $check = unlink $userdata;
-  if ( not $check ) {
-    $app -> errlog ( "Can't remove $userdata" );
-    $app -> error ( "cant-remove-account" );
-    return;
-  }
-
-
-  ###  request RI update
-  my $udatadir = $app -> userdata_dir;
-  my $relative = substr( $userdata, length( "$udatadir/" ) );
-  $app -> send_update_request( 'ACIS', $relative );
-  
-
-  $app -> send_mail( 'email/account-deleted.xsl' );
-
-  $app -> sevent ( -class  => 'account', 
-                   -action => 'deleted',
-                   -file   => $deleted_userdata );
-
-  $app -> userlog( "deleted account; backup stored in $deleted_userdata" );
-
-  $app -> message( 'account-deleted' );
-  $app -> success( 1 );
-  $app -> set_presenter( "account-deleted" );
 
 }
 

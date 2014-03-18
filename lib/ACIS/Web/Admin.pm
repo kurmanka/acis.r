@@ -489,7 +489,7 @@ sub move_records {
     ### XXX this could be deferred until the session end.
     ### XXX run it via ->run_at_close()?
     if ( $should_remove ) {
-        remove_account( $acis, -login => $src_login );
+        ACIS::User::remove_account( $acis, -login => $src_login );
     }
     if ( scalar @$dest > 1 ) {
       $ud ->{owner} {type} {advanced} = 1;
@@ -500,92 +500,6 @@ sub move_records {
   return $moved;
 }
 
-
-sub remove_account {   
-  my $app    = shift;
-  my $par    = { @_ };
-
-  my $login  = $par -> {-login};
-  my $notify = $par -> {-notify};
-  my $clean  = $par -> {-clean};
-
-  assert( $login );
-
-  my $paths   = $app -> make_paths_for_login( $login );
-  
-  my $file    = $paths -> {'user-data'};
-  my $bakfile = $paths -> {'user-data-deleted'};
-
-  $app -> sevent ( -class  => 'account', 
-                   -action => 'delete',
-                   -login  => $login,
-                   -backup => $bakfile,
-                 );
-  
-  while ( -e $bakfile ) {
-    debug "backup file $bakfile already exists";
-    $bakfile =~ s/\.xml(\.(\d+))?$/".xml." . ($2+1)/eg;
-  }
-
-  debug "move '$file' to '$bakfile'";
-  my $check = rename $file, $bakfile;  
-  
-  if ( not $check ) {
-    debug "failed";
-    $app -> errlog ( "Can't move $file file to $bakfile" );
-    $app -> error ( "cant-remove-account" );
-    return 0;
-  }
-
-  ## find if there is a user. if there is no user, 
-  ## don't write anything to the userlog
-  my $user = $app->{'username'};
-  if($user) {
-    $app -> userlog( "removed $login account" );
-  }
-
-  ###  send update request to the RI UD (RePEc-Index Update Daemon)
-  my $udatadir = $app -> userdata_dir;
-  my $relative = substr( $file, length( "$udatadir/" ) );
-  $app -> send_update_request( 'ACIS', $relative );
-
-  if ( $clean ) {
-    ### delete the profile pages
-    debug "clean-up after deletion";
-    
-    require ACIS::Web::UserData;
-    my $udata = ACIS::Web::UserData -> load( $bakfile );
-    
-    foreach ( @{ $udata-> {records} } ) {
-      my $f = $_ -> {profile} {file};
-      
-      if ( $f and -f $f ) {
-        unlink $f;
-        if($user) {
-          $app-> userlog( "removed profile file $file" );
-        }
-      }      
-      my $exp = $_ -> {profile} {export};
-      if ( $exp ) {
-        foreach ( values %$exp ) {
-          unlink $_;
-          if($user) {          
-            $app-> userlog( "removed exported profile data: $_" );
-          }
-        }
-      }      
-    }    
-  }
-
-  ### XXX Further clean-up is probably needed
-
-  if ( $notify ) {
-    # $app -> send_mail( 'email/account-deleted.xsl' );
-    debug "clean-up after deletion";
-  }
-  
-  return 1; # success
-}
 
 
 
