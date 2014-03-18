@@ -1424,8 +1424,7 @@ sub userlog {
   my $self    = shift;
   my $message = join '', @_;
 
-  my $user = $self->{username} || 'unknown';
-  assert( $user, "user name is not yet known to the Web::App object" );
+  my $user = $self->{username} || $0;
   $self-> log( "[$user] ", $message );
 }
 
