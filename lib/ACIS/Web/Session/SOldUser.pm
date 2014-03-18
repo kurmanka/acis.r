@@ -111,14 +111,14 @@ sub close {
     }
 
     if ($save_profile) {
-	debug "save profile";
-        ### generate static profile page and metadata files
-        if ( not $self -> {'.saved_profile'} ) {
-	    require ACIS::Web::SaveProfile;
-	    ACIS::Web::SaveProfile::save_profile( $app );
-        } else {
-	    debug "... already saved";
-	}
+      debug "save profile";
+      ### generate static profile page and metadata files
+      if ( not $self -> {'.saved_profile'} ) {
+        require ACIS::Web::SaveProfile;
+        ACIS::Web::SaveProfile::save_profile( $app );
+      } else {
+        debug "... already saved";
+      }
     }
 
   } else {
@@ -129,6 +129,20 @@ sub close {
 
   $self -> SUPER::close( $app );
 }
+
+# this is used if the user has requested to remove his account.
+# we still save the userdata file (to a backup location), 
+# then close the session.
+sub close_no_save {
+  my $self = shift;
+  my $app  = shift || die;
+  debug "->close_no_save() session";
+
+  ### write userdata and request RI update
+  $self -> save_userdata( $app );
+  $self -> SUPER::close( $app );
+}
+
 
 sub set_userdata_saveto_file {
     my $self = shift;

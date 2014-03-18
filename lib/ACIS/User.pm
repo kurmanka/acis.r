@@ -6,26 +6,30 @@ use Web::App::Common;
 use ACIS::Web::UserPassword;
 
 sub cleanup_removed_profile {
-  my $acis = shift ;
+  my $acis   = shift;
   my $record = shift;
+  my $sql    = $acis->sql;
   
-  ## find if there is a user. if there is no user, 
-  ## don't write anything to the userlog
-  my $user = $acis->username();
-  if (not $user) { $acis->set_username("ACIS::User/$0"); }
-
   for ($record) {
     my $file = $_ -> {profile} {file};
     if ( $file and -f $file ) {
-      unlink( $file ) or warn "can't delete $file";
-      $acis-> userlog( "removed profile file at $file" );
+      if (unlink( $file )) {
+        $acis-> userlog( "removed profile file at $file" );
+        debug "removed $file";
+      } else {
+        warn "can't delete $file: $!";
+      }
     }
     
     my $exp = $_ -> {profile} {export};
     if ( $exp and ref $exp ) {
       foreach ( values %$exp ) {
-        unlink( $_ ) or warn "can't delete $_";
-        $acis-> userlog( "removed exported profile data: $_" );
+        if (unlink( $_ )) {
+          $acis-> userlog( "removed exported profile data: $_" );
+          debug "removed $_";
+        } else {
+          warn "can't delete $_: $!";
+        }
       }
     }
 
@@ -55,7 +59,7 @@ sub delete_current_account {
   my $udata = $session->object;
   my $owner = $session->userdata_owner;
   my $records = $udata->{records};
-  my $sql = $acis->sql_object();
+  my $sql   = $acis->sql;
 
 
   # log removal in userlog 
@@ -63,10 +67,10 @@ sub delete_current_account {
 
   # create event: account delete request
   $acis -> sevent( -class  => 'account', 
-                   -action => 'delete request'
+                   -action => 'delete request',
                    -mode   => $mode );
 
-  # create userdata backup in deleted-userdata/ folder
+  # create a filename for the userdata backup in deleted-userdata/ folder
   my $userdata = $paths -> {'user-data'};
   my $deleted_userdata = $paths -> {'user-data-deleted'};
   
@@ -75,7 +79,9 @@ sub delete_current_account {
     $deleted_userdata =~ s/\.xml(\.(\d+))?$/".xml." . ($2 ? ($2+1) : '1')/eg;
   }
 
+  # clean the password
   ACIS::Web::UserPassword::remove_password( $acis, $owner );
+  
   $session -> set_userdata_saveto_file( $deleted_userdata );
 
   # delete the userdata
@@ -91,7 +97,17 @@ sub delete_current_account {
                     -action => 'deleted',
                     -file   => $deleted_userdata );
 
+  # close the session; save the backup
+  debug "close the session";
+  $acis -> logoff_session_removed_account;
+  $acis -> userlog( "deleted account; backup in $deleted_userdata" );
 
+  # notification email
+  if ($mode eq 'user') {
+    $acis -> send_mail( 'email/account-deleted.xsl' );    
+  }
+  
+  
   ### for each record, delete:
   ###  - the profile pages,
   ###  - exported metadata files, and
@@ -103,15 +119,6 @@ sub delete_current_account {
   # anything else to clean-up? XXX
   #  - sysprof by login?
 
-
-  # close the session
-  debug "close the session";
-  $acis -> logoff_session;
-  $acis -> userlog( "deleted account; backup in $deleted_userdata" );
-
-  if ($mode eq 'user') {
-    $acis -> send_mail( 'email/account-deleted.xsl' );    
-  }
 
   # send update request to the Update Daemon
   my $udatadir = $acis -> userdata_dir;
@@ -170,16 +177,19 @@ sub remove_account {
     cleanup_removed_profile($acis, $_);
   }
 
+  # clean the password
+  ACIS::Web::UserPassword::remove_password( $acis, $udata->{owner} );
+
+  $udata->save( $bakfile );
 
   # send update request to the Update Daemon
   my $udatadir = $acis -> userdata_dir;
   my $relative = substr( $file, length( "$udatadir/" ) );
   $acis -> send_update_request( 'ACIS', $relative );
 
-
+  # send user a note, if enabled
   if ( $notify ) {
-    # XXX
-    # $acis -> send_mail( 'email/account-deleted.xsl' );
+    $acis -> send_mail( 'email/account-deleted.xsl' );
     debug "clean-up after deletion";
   }
   

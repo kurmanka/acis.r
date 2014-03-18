@@ -200,6 +200,22 @@ sub logoff_session {
   undef $self -> {session};
 }
 
+# special version of the logoff_session method; used when user has 
+# removed his account (or admin did so for him):
+sub logoff_session_removed_account {
+  my $self = shift;
+  my $session = $self -> session;
+
+  $session -> close_no_save( $self );
+
+  $self -> clear_session_cookie;  
+  $self -> remove_persistent_login;  
+  if ( $self->request ) { 
+    undef $self -> request -> {'session-id'}; 
+  }
+  undef $self -> {session};
+}
+
 
 sub set_session_cookie {
   my $self = shift;

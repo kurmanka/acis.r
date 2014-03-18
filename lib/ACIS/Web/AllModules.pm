@@ -30,13 +30,11 @@ require ACIS::Web::Admin;
 require ACIS::Web::Admin::Events;
 require ACIS::Web::Admin::EventsArchiving;
 require ACIS::Web::Affiliations;
-#require ACIS::Web::ARPM;
 require ACIS::Web::Background; # ?
 require ACIS::Web::Citations;
 require ACIS::Web::Contributions;
 require ACIS::Web::Export;
 require ACIS::Web::NewUser;
-#require ACIS::Web::MetaUpdate;
 require ACIS::Web::Person;
 require ACIS::Web::SaveProfile;
 require ACIS::Web::Services;
@@ -46,6 +44,7 @@ require ACIS::Web::SysProfile;
 require ACIS::Web::User;
 require ACIS::Web::UserPassword;
 require ACIS::Web::PasswordReset;
+require ACIS::User;
 
 # Web::App core
 require Web::App::XSLT;

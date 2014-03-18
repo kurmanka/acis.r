@@ -359,7 +359,7 @@ sub remove_account {
     return ;
   }
 
-  my $ret = ACIS::User::remove_current_account( $app, 'user' );
+  my $ret = ACIS::User::delete_current_account( $app, 'user' );
 
   if ($ret) {
     $app -> message( 'account-deleted' );
