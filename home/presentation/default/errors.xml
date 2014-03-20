@@ -72,7 +72,7 @@
     <xsl:text>and report it to administrator.</xsl:text>
   </acis:error>
   <acis:error id='bad-old-pass'>
-    <xsl:text>Please give your actual current password. If you want to change it, there's no other way.</xsl:text>
+    <xsl:text>Please give your valid current password.</xsl:text>
   </acis:error>
   <acis:error id='session-failure'>
     <xsl:text>This session has already been closed.  If you had any changes in your account, they have been saved.  Please, login again.</xsl:text>

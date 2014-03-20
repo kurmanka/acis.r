@@ -428,7 +428,7 @@ sub settings_prepare {
   $app -> set_form_value( "email", $login );
 
   my $mode = ($persistent_login_mode ? 'true' : undef);
-  debug "Persistent login mode: $mode";
+  debug "Persistent login mode: ", $mode ? 'on' : 'off';
   $app -> set_form_value( "remember-me", $mode );
   #$vars -> {'remember-me'} = $mode;
 
@@ -451,15 +451,7 @@ sub settings {
   my $login = $input -> {email};
   my $pass;
 
-  if ( $app->check_user_password( $oldp, $owner ) ) {
-      # password is valid
-      # we can continue
-  } else {
-    $app -> error( 'bad-old-pass' ); ### 'bad-old-pass' ?
-    undef $OK;
-    return;
-  }
-
+  # this can be done without the password, by CZ's decision
   my $old_login = $owner->{login};
   $login = set_user_login( $app, $login );
   $app -> set_form_value( "email", $login );
@@ -472,7 +464,6 @@ sub settings {
        and $record -> {'about-owner'} eq 'yes'
        and $input -> {'record-email'} 
       ) {
-
     ### simple user mode
     $record -> {contact} {email} = $login;
     
@@ -484,6 +475,20 @@ sub settings {
          and not $input -> {'record-email'} ) {
       delete $record -> {'about-owner'}; ### XXX this is arguable      
     }
+  }
+
+  # check the password
+  # any further changes require the password
+  debug "check password";
+  if ( $oldp and $app->check_user_password( $oldp, $owner ) ) {
+      # password is valid
+      # we can continue
+  } else {
+    debug "no way";
+    $app -> error( 'bad-old-pass' ); ### 'bad-old-pass' ?
+    $app -> clear_process_queue;
+    undef $OK;
+    return;
   }
 
   ### setting the password 

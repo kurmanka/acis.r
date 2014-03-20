@@ -255,7 +255,7 @@
 
     <use module='ACIS::Web::User'/>
 
-    <param name='pass'    type='password'    required='yes' />
+    <param name='pass'    type='password'    required='no' />
 
     <param name='name'    type='name'        if-not-empty='1'
                           place='owner:name' maxlen='1000'  />

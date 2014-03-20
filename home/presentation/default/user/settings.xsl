@@ -60,11 +60,13 @@
             var pass_new  = pass_new_e.value;
             var pass_conf = pass_conf_e.value;
 
+/*
             if ( pass_old == '' ) {
                 alert( "Enter your current password to make any changes on this screen." );
                 pass_old_e.focus();
                 return false;
             }
+*/
 
             if ( pass_new || pass_conf ) {
               if ( !pass_new || !pass_conf || pass_new != pass_conf ) {
@@ -75,16 +77,6 @@
             }
           </acis:onsubmit>
           
-          <h2>Current password</h2>
-        
-          <p><label for='old'>You must enter valid current password to make any changes to 
-            your settings.</label><br/>
-            <acis:input name='pass' type='password' id='old'>
-              <acis:name>current password</acis:name>
-            </acis:input>
-          </p>
-
-  
           <h2>Login</h2>
           
           <p>
@@ -103,6 +95,16 @@
             </xsl:if>
           </p>
           
+          <h2>Current password</h2>
+        
+          <p><label for='old'>You must enter your current password to make any changes 
+            below this point.</label><br/>
+            <acis:input name='pass' type='password' id='old'>
+              <acis:name>current password</acis:name>
+            </acis:input>
+          </p>
+
+  
           
           <h2>Set new password</h2>
           
