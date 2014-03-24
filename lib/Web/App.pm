@@ -320,7 +320,7 @@ sub success {
   my $self = shift;
   my $success = shift;
 
-  if ( $success ) {
+  if ( defined $success ) {
     $self -> {'presenter-data'} {response} {success} = $success;
   } else { 
     return $self -> {'presenter-data'} {response} {success};

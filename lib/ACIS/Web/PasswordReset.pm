@@ -113,6 +113,7 @@ sub password_reset_process {
   my $input = $app -> form_input;
   my $home  = $app -> {home};
   my $vars  = $app -> variables;
+  $app->success('');
 
   debug "reset password";
 
@@ -142,11 +143,14 @@ sub password_reset_process {
     #$app -> error ( 'no-account' );
   } elsif ( $status eq 'account-damaged' )  {
     # XXX
+    $app->error('login-account-locked');
   } elsif ( $status eq 'existing-session-loaded' ) {
     # very strange, but could work
     $ok = 1;
   } elsif ( $status =~ /^account-locked:([^:]+):(.+)/ ) {
     # may happen; need to try again later
+    $app->error('login-account-locked');
+    
   } elsif ( ref $status ) {
 
     my $udata = $status;
@@ -173,6 +177,7 @@ sub password_reset_process {
     my $token = $app->request->{subscreen};
     ACIS::Web::UserPassword::password_reset_token_used( $app, $token );
   }
+
 }
 
 
