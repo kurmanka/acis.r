@@ -81,27 +81,33 @@ sub password_reset {
   my $token = $request-> {subscreen};
   debug "token: $token";
 
+  my $OK = 1;
   my $login = ACIS::Web::UserPassword::check_password_reset_token( $app, $token );
   if ($login == -1) {
     debug "expired token";
     $app->error('reset-token-expired');
-    return;
+    $OK = 0;
 
   } elsif ($login == -2) {
     debug "already used token";
     $app->error('reset-token-reused');
-    return;
+    $OK = 0;
   
   } elsif (not defined $login) {
     debug "bad token";
     $app->error('reset-token-bad');
-    return;   
+    $OK = 0;
   }
 
-  # valid token:  
-  debug "login: $login";
-  $vars->{login} = $login;
-  $app->success(1);
+  if ($OK) {
+    # valid token:  
+    debug "login: $login";
+    $vars->{login} = $login;
+    $app->success(1);
+
+  } else {
+    $app->clear_process_queue;
+  }
   
   # see the next function below 
   # to see what happens next.
