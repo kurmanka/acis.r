@@ -528,7 +528,12 @@
   <table name='acis:reset_token'>
     <field name='login'   sql-type='varchar(255) not null' />
     <field name='token'   sql-type='binary(32) not null PRIMARY KEY' />
-    <field name='created' sql-type='timestamp not null'/>
+    <field name='created' sql-type='timestamp NULL DEFAULT CURRENT_TIMESTAMP'/>
+      <!-- created is an obligatory field, but mysql makes it auto-update if I make it not null. 
+           And we don't want or need it to be auto-updated. Therefore, I set it to null here, but 
+           with DEFAULT CURRENT_TIMESTAMP.
+           http://dev.mysql.com/doc/refman/5.6/en/timestamp-initialization.html
+      -->           
     <field name='used'    sql-type='timestamp null default null'/>
   </table>
 
