@@ -183,11 +183,13 @@ fi
 # chmod +x $cleanupscript
 
 
-test $log_browsing_cgi_filename && {
+# cgi script for log browsing; deprecated
+test $log_browsing_cgi_filename && test -f $log_browsing_cgi_filename && {
     dest=$log_browsing_cgi_filename
-    echo installing log browsing script to $dest
-    . bin/setup.logs-browsing > $dest
-    chmod +x $dest
+    echo removing unsafe log browsing script at $dest
+    echo > $dest
+    chmod -x $dest
+    rm $dest
 }
 
 
