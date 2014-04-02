@@ -62,7 +62,7 @@ sub check_access {
   }
 
   $acis -> clear_process_queue;
-  $acis -> set_presenter( 'adm/pass' );
+  $acis -> respond_403;
   return 0;
 }
 

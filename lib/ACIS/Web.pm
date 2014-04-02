@@ -639,7 +639,15 @@ sub prepare_for_work () {
   my $a = ACIS::Web::UserPassword::generate_random_bytes();
 }
 
- 
+
+sub respond_403 () {
+  my $self = shift;
+  $self -> clear_process_queue;
+  $self -> response_status( '403' ); # 403 Forbidden
+  $self -> {presenter} = undef;
+  $self -> {response}{body} = '403 Forbidden';
+}
+
 1;
 
 __END__

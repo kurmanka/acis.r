@@ -1,4 +1,4 @@
-<screens>
+  <screens>
 <!-- <use-perl-module>ACIS::Web::NewUser</use-perl-module> -->
 <!-- <use-perl-module>ACIS::Web::User</use-perl-module> -->
 <!-- <use-perl-module>ACIS::Web::Affiliations</use-perl-module> -->
@@ -898,9 +898,6 @@
 
 
   <!-- Admin screens -->
-  <screen id='adm/pass'>
-    <presentation type='xslt' filename='adm/pass.xsl'/>
-  </screen>
 
   <screen id='adm'>
     <use module='ACIS::Web::Admin'/>
