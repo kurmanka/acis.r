@@ -540,6 +540,50 @@ sub move_record_handler {
 
 
 
+sub adm_logs {
+  my $acis = shift;
+  my $input = $acis->form_input;
+  
+  # input
+  my $log  = quotemeta $input->{log}  || 'main';
+  my $tail = quotemeta $input->{tail} || 40;
+  my $key  = quotemeta $input->{key};
+  
+  # output
+  my $logdata;
+
+  # log paths
+  my $homedir = $acis->{paths}{home};
+  my $logs = {
+     main => "$homedir/acis.log",
+     err  => "$homedir/acis-err.log",
+     sql  => "$homedir/sql.log",
+     rid  => "$homedir/RI/daemon.log",
+     sid  => "$homedir/SID/daemon.log",
+  };
+  
+  my $logfile = $logs->{$log};
+  my $command = '';
+
+  if ( $logfile and -f $logfile ) {
+    if ( $key ) {
+      $command = " grep \"$key\" $logfile | tail -n $tail";
+    } else {
+      $command = "tail -n $tail $logfile";
+    }
+  }
+
+  if ( $command ) {  
+    # http://perldoc.perl.org/perlop.html#%60STRING%60
+    $logdata = qx($command);
+    $acis->variables->{logdata} = $logdata;
+  }
+
+
+}
+
+
+
 
 ######################################################################
 ###   DATABASE ACCESS

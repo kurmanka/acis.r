@@ -1065,6 +1065,12 @@
     <presentation type='xslt' filename='adm/move_record.xsl'/>    
   </screen>
 
+  <screen id='adm/logs'>
+    <use module='ACIS::Web::Admin'/>
+    <call function='ACIS::Web::Admin::check_access'/>
+    <call function='ACIS::Web::Admin::adm_logs'/>
+    <presentation type='xslt' filename='adm/logs.xsl'/>
+  </screen>
 
   <screen id='application-error'>
     <presentation type='xslt' filename='misc/application-error.xsl'/>
