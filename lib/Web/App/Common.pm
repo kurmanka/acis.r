@@ -145,14 +145,9 @@ sub debug {
 
   $LOGCONTENTS .= $message;
 
-  if ( $PPERL::DEBUG 
-       and $PPerlServer::LOG_ERROR ) {
-    PPerlServer::log_error( $message );
-  }
 }
 
 sub dump_debug {
-  PPerlServer::log_error( "Web::App::Common::dump_debug() to $Web::App::DEBUGLOGFILE\n" );
   if ( $Web::App::DEBUGLOGFILE
        and open DEBUGLOG, ">>$Web::App::DEBUGLOGFILE" ) {
     print DEBUGLOG "\n * ", scalar( localtime ), " debug log dump\n";
@@ -184,16 +179,6 @@ if (0) {
 
 #$::SIG{USR1} = \&dump_debug;
 
-#   if ( $PPerlServer::LOG_ERROR
-#        and not $dumped_debug ) {
-#     if ( $Web::App::DEBUGLOGFILE
-#          and open DEBUGLOG, ">>$Web::App::DEBUGLOGFILE" ) {
-#       print DEBUGLOG "\n * ", scalar( localtime ), " debug log dump\n";
-#       print DEBUGLOG $LOGCONTENTS, "\n";
-#       close DEBUGLOG;
-#     }
-#     $dumped_debug=1;
-#   }
 
 
 sub debug_as_is {

@@ -101,11 +101,6 @@ chunk-size = 100
 ## the location of the learing socket, a cardiff addition                       
 learning-socket = /home/acis/learning_socket
 
-# persistent perl
-#cgi-pperl-binary=/usr/bin/pperl
-# don't use under normal run
-#cgi-pperl-reinit=/usr/bin/pperl -- -k /var/www/acis/cgi/a.cgi  ; 
-
 ## learning, pitman project 
 above-me-propose-accept = 0.6
 below-me-propose-refuse = 0.4

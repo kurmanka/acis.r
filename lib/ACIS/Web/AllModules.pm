@@ -1,5 +1,5 @@
 # this is a special module to load all specific modules
-# to be used for persistent environments, like PPerl
+# to be used for persistent environments, like pre-fork servers
 
 # external
 require Carp::Assert;
