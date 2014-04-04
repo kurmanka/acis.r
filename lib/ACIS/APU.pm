@@ -31,7 +31,7 @@ my $error_count = 0;
 
 sub logit (@) {
   if ( not $logfile and $ACIS ) {
-    $logfile = $ACIS -> home . "/opt/log/autoprofileupdate.log";
+    $logfile = $ACIS -> home . "/log/autoprofileupdate.log";
   }
   if ( $logfile ) {
     open LOG, ">>:utf8", $logfile;

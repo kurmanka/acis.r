@@ -557,7 +557,7 @@ sub adm_logs {
   my $logs = {
      main => "$homedir/acis.log",
      err  => "$homedir/acis-err.log",
-     sql  => "$homedir/sql.log",
+     sql  => "$homedir/log/sql.log",
      rid  => "$homedir/RI/daemon.log",
      sid  => "$homedir/SID/daemon.log",
   };

@@ -128,7 +128,7 @@ sub sql_object {
   ### sql helper / driver module name
   my $class = 'sql_helper';
 
-  $class -> set_log_filename ( $self ->{home} . '/opt/log/sql.log' );
+  $class -> set_log_filename ( $self ->{home} . '/log/sql.log' );
 
   my $config = $self -> config;
 

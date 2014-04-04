@@ -63,10 +63,10 @@ admin-email    = admin@sahure.authorclaim.org
 
 ###  Web interface
 base-url = http://sahure.authorclaim.org
-base-cgi-script-filename=/var/www/awho/cgi/a.cgi
-base-fcgi-script-filename=/var/www/awho/cgi/acis.fcgi
+base-cgi-script-filename=/var/www/acis/cgi/a.cgi
+base-fcgi-script-filename=/var/www/acis/cgi/acis.fcgi
 
-static-base-dir = /home/awho/public_html/acis
+static-base-dir = /home/acis/public_html
 static-base-url = http://sahure.authorclaim.org
 
 # home url, missing in the mail.conf.eg
@@ -80,17 +80,16 @@ session-lifetime = 20
 echo-apu-mails = 1
 
 ### prepend local directory of perl modules
-perllibprepend = /home/awho/usr/lib/perl
-perllibadd = /home/awho/usr/share/perl 
+perllibprepend = /home/acis/usr/lib/perl
+perllibadd = /home/acis/usr/share/perl 
 
 ###  Email-related:
 system-email = "AuthorClaim" <admin@sahure.authorclaim.org>
 sendmail = /usr/sbin/sendmail -t
-#sendmail = /bin/false -t
 
 ###  The data that ACIS produces
 #metadata-redif-output-dir = ${homedir}/metadata.output.ReDIF
-metadata-amf-output-dir = /home/awho/public_html/amf/
+metadata-amf-output-dir = /home/acis/public_html/amf/
 
 person-id-prefix = info:lib/am:
 institutions-maintainer-email = "whoarewe-run" <whoarewe-run@lists.openlib.org>
@@ -100,12 +99,12 @@ template-set = authorclaim
 ## size of chunk, a cardiff addition                                            
 chunk-size = 100
 ## the location of the learing socket, a cardiff addition                       
-learning-socket = /home/awho/acis/learning_socket
+learning-socket = /home/acis/learning_socket
 
 # persistent perl
 #cgi-pperl-binary=/usr/bin/pperl
 # don't use under normal run
-#cgi-pperl-reinit=/usr/bin/pperl -- -k /var/www/awho/cgi/a.cgi  ; 
+#cgi-pperl-reinit=/usr/bin/pperl -- -k /var/www/acis/cgi/a.cgi  ; 
 
 ## learning, pitman project 
 above-me-propose-accept = 0.6
@@ -115,13 +114,13 @@ below-me-propose-refuse = 0.4
 #learn-via-daemon=1
 
 ## system command to run after profile update, with the psid as argument
-system-command-after-profile-change = /home/awho/perl/call_test
+system-command-after-profile-change = /home/acis/perl/call_test
 
   
 ###  Debugging
 
 # debug log
-debug-log=/home/awho/opt/acis.debug.log
+debug-log=/home/acis/log/debug.log
 # ... with timestamps?
 #+debug-log-with-time
 
