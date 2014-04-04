@@ -33,7 +33,6 @@ echo '$acis = new ACIS::Web( );'
 echo 
 #   echo '$acis -> handle_request;'
 #   echo '$acis -> clear_after_request;'
-fi
 echo
 echo 'eval { $acis -> handle_request; };'
 echo 'my $err = $@;'
