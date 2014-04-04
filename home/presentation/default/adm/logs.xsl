@@ -45,7 +45,7 @@
             <input type='text' id='key' name='key' value='{$form-input/key}'/>
             <br/>
 
-            <input type='submit' value='Go get it' />
+            <input type='submit' value='Go get it' class='important' />
           </p>          
         </acis:form>
 
