@@ -1,5 +1,0 @@
-MANIFEST
-MANIFEST.SKIP
-Makefile.PL
-sql_helper.pm
-sql_result.pm
