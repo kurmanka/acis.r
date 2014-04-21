@@ -15,25 +15,36 @@ exposed to a large number of risks and dangers.</p>
 
 <p>I'll briefly describe how we go about them.</p>
 
-<p>First, some facts:</p>
+
+   <h2 id="idp1956304">Basic facts</h2>
 
 <ol>
-<li><p>The user passwords are never stored or written or sent out in 
-their clear-text form. (Hacker break-in, if happens, would not 
-reveal the user passwords.)</p></li>
+<li>
+<p>The user passwords are never stored or written or sent out in 
+their clear-text form. Instead, they are salted and cryptographically 
+hashed before storing. The salt is random and long (32 bytes) and 
+is never re-used. Hash function used is SHA-256.</p>
+
+<p>(Hacker break-in, if happens, would not reveal and 
+compromize the user passwords.)</p>
+</li>
 <li><p>The persistent login is cookie-based, and implemented with secure 
 random tokens, that are independent of passwords, unique and hard 
-to guess.</p></li>
-<li><p>If you forget your password, you can reset it, by requesting a 
-reset link. The reset link is also independent of the password,
+to guess (32 random bytes).</p></li>
+<li>
+<p>If a user forgets his password, he or she can reset it by requesting a 
+reset link email. The reset link is also independent of the password,
 unique and hard to guess. Reset links expire after 12 hours and 
-a used reset link cannot be reused. (Reset feature makes account 
-stealing possible, but mass account stealling is unlikely.)</p></li>
+a once-used reset link cannot be re-used again. </p>
+
+<p>(Reset feature makes account theft possible, if an attacker has access to 
+the victim's incomming email, but mass account theft is unlikely.)</p>
+</li>
 <li><p>There is no way a normal-privilege user may gain high-privilege 
 admin access rights without first having write-access to the 
-filesystem (specifically, the userdata files).</p></li>
-<li><p>The session identifiers are long and random. (Session hi-jacking 
-is not likely.) </p></li>
+filesystem (specifically, to the userdata files).</p></li>
+<li><p>The session identifiers are long and random — 32 bytes. (Session 
+hi-jacking is not likely.) </p></li>
 <li><p>System is protected from SQL-injection by using 
 parameterized SQL queries (bind variables).</p></li>
 <li><p>All HTML pages are generated via XSLT. No cross-site scripting is 
@@ -41,9 +52,23 @@ likely to happen, since all of the user-supplied data goes through
 the strict XML escaping during XSLT processing.</p></li>
 </ol>
 
+
+   <h2 id="idp1963088">Brief source code guide</h2>
+
+<p>The password hashing- and password checking-related code is in 
+<code class="c BROKEN">lib/ACIS/Web/UserPassword.pm</code>.</p>
+
+<p>The password reset feature-related code is in 
+<code class="c BROKEN">lib/ACIS/Web/PasswordReset.pm</code>.</p>
+
+<p>Random data is generated using the <a href="http://search.cpan.org/search?query=Bytes%3A%3ARandom%3A%3ASecure&amp;mode=module">Bytes::Random::Secure</a> module.</p>
+
+<p>SHA-256 is done by the 
+<a href="http://search.cpan.org/search?query=Digest%3A%3ASHA&amp;mode=module">Digest::SHA</a> module.</p>
+
   
 <address class="footer">
-<p>Generated: Mon Apr 21 16:13:43 2014</p>
+<p>Generated: Mon Apr 21 17:07:44 2014</p>
 <p><a href="http://acis.openlib.org/">ACIS project</a>,
           acis<i>@</i>openlib<span>.org</span></p>
 </address>
