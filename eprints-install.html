@@ -1,0 +1,315 @@
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<title>Installing the ACIS'
+extensions to EPrints / ACIS documentation</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+      
+
+   <h1 id="eprints-installation">Installing the ACIS'
+extensions to EPrints</h1>
+
+<h3><i>Table of contents</i></h3>
+<p class="toc">   <a href="#idp1249512">Automatic installation</a><br>   <a href="#idp1250952">Manual installation</a><br>      <a href="#copy-files">1. Copy perl code and other files</a><br>      <a href="#page-template-pidaid">2. Modify page template to
+include pidaid.js and pidaid.css</a><br>      <a href="#id-field-enabled">3. Make sure id field for authors and
+editors is enabled</a><br>      <a href="#id-field-label">4. Set appropriate label for the id
+field</a><br>      <a href="#enable-amf">5. Patch EPrints::EPrint: enable AMF export</a><br>      <a href="#arc-cfg-amf">6. Archive configuration: AMF export</a><br>      <a href="#arc-cfg-pidaid">7. Archive configuration: ACIS::PIDAID</a><br>      <a href="#arc-cfg-metaupd">8. Archive configuration: ACIS metadata
+update</a><br>      <a href="#install-lwp">9. Install libwww-perl library</a><br></p>
+
+
+   <h2 id="idp1249512">Automatic installation</h2>
+
+<p>The primary way to install these extensions onto an EPrints
+service is to use the <code class="f BROKEN">install.pl</code> script in the
+<code class="f BROKEN">EPrints</code> directory of ACIS.  Give the path to your
+EPrints archive directory as a parameter to that script and
+follow the instructions.  For example:</p>
+
+<pre><code>$ cd ACIS-1.2.3-20051010d/EPrints
+$ perl install.pl /opt/eprints2/archive/Archive
+</code></pre>
+
+
+   <h2 id="idp1250952">Manual installation</h2>
+
+<p>In case the automatic installation script fails at some step
+of the process, you may have to do part of it by yourself.</p>
+
+
+   <h3 id="copy-files">1. Copy perl code and other files</h3>
+
+<p><strong>For all the levels.</strong></p>
+
+<p>This includes copying sql_helper, EPrints/{perl_lib,cgi},
+AMF-perl, EPrints/{pidaid.*,images} to appropriate
+directories of your EPrints.</p>
+
+<p>It is unlikely that any problem appears during automatic
+installation at this step.  What may happen is that the
+release does not contain AMF-perl package, and, therefore,
+it cannot be installed.</p>
+
+
+   <h3 id="page-template-pidaid">2. Modify page template to
+include pidaid.js and pidaid.css</h3>
+
+<p><strong>For <a href="eprints.html#level3">person identification aid (level 3)</a>.</strong></p>
+
+<p>Open your archive's <code class="f BROKEN">cfg/template-en.xml</code> file in a
+text editor.  Add references to pidaid.js and to pidaid.css
+into the template.</p>
+
+<p>It may now look like this:</p>
+
+<pre><code>...
+&lt;html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:ep="http://eprints.org/ep2/template"&gt;
+  &lt;head&gt;
+    &lt;title&gt;&amp;archivename; - &lt;ep:pin ref="title" textonly="yes" /&gt;&lt;/title&gt;
+    &lt;style style="text/css" media="screen"&gt;
+@import  url(&amp;base_url;/eprints.css);
+@import  url(&amp;base_url;/pidaid.css);     /* PIDAID */
+    &lt;/style&gt;
+    &lt;style style="text/css" media="print"&gt;
+@import  url(&amp;base_url;/eprints.css);
+@import  url(&amp;base_url;/pidaid.css);     /* PIDAID */
+@import  url(&amp;base_url;/print.css);
+    &lt;/style&gt;
+    &lt;!-- and PIDAID JavaScript: --&gt;
+    &lt;script type='text/javascript' src='&amp;base_url;/pidaid.js' /&gt;  
+    &lt;link rel="Top" href="&amp;frontpage;" /&gt;
+    ...
+</code></pre>
+
+<p>Save the file.</p>
+
+
+   <h3 id="id-field-enabled">3. Make sure id field for authors and
+editors is enabled</h3>
+
+<p><strong>For <a href="eprints.html#level2">level 2: person id metadata field</a>
+and <a href="eprints.html#level3">level 3: person identification aid</a>.</strong></p>
+
+<p>Open your archive's
+<code class="f BROKEN">cfg/ArchiveMetadataFieldsConfig.pm</code> file.</p>
+
+<ol>
+<li>
+<p>find the line which says</p>
+
+<pre><code>$fields-&gt;{eprint} = [
+</code></pre>
+</li>
+<li>
+<p>near below it find the line, which starts with</p>
+
+<pre><code>    { name =&gt; "creators", type =&gt; "name",
+</code></pre>
+
+<p>and make sure <code>hasid</code> parameter in this
+block is set to 1.  The block will look like this:</p>
+
+<pre><code>    { name =&gt; "creators", type =&gt; "name", multiple =&gt; 1, input_boxes =&gt; 4,
+            hasid =&gt; 1, input_id_cols=&gt;20,
+            family_first=&gt;1, hide_honourific=&gt;1, hide_lineage=&gt;1 },
+</code></pre>
+</li>
+<li>
+<p>Do the same for the "editors" field.  Here the block
+starts with</p>
+
+<pre><code>    { name =&gt; "editors", type =&gt; "name"
+</code></pre>
+
+<p>Again, the <code>hasid</code> parameter should have value
+1.</p>
+</li>
+</ol>
+
+
+   <h3 id="id-field-label">4. Set appropriate label for the id
+field</h3>
+
+<p><strong>For <a href="eprints.html#level2">level 2: person id metadata field</a>
+and <a href="eprints.html#level3">level 3: person identification aid</a>.</strong></p>
+
+<p>By default, the personal id field in EPrints has label
+"Creators email (if known)".  We will use this field for
+personal identifiers and email addresses alternatively.  So
+we suggest to change this field's label to "Id or email".</p>
+
+<p>To do that edit the <code class="f BROKEN">phrases-en.xml</code> file in your
+archive's configuration directory.  Find and modify the
+&lt;ep:phrase&gt; items identified
+<code>eprint_fieldname_creators_id</code> and
+<code>eprint_fieldname_editors_id</code>.  The first one
+looks like this:</p>
+
+<pre><code>  &lt;ep:phrase ref="eprint_fieldname_creators_id"&gt;Creators email (if known)&lt;/ep:phrase&gt;
+</code></pre>
+
+<p>Replace the text in both phrase elements with "Id or email".
+The first of the two will now look like this:</p>
+
+<pre><code>  &lt;ep:phrase ref="eprint_fieldname_creators_id"&gt;Id or email&lt;/ep:phrase&gt;
+</code></pre>
+
+<p>Save the file.</p>
+
+
+   <h3 id="enable-amf">5. Patch EPrints::EPrint: enable AMF export</h3>
+
+<p><strong>For <a href="eprints.html#level1">exporting eprints metadata</a> (level
+1) and to <a href="eprints.html#level4">notify an ACIS service</a> about
+new/modified document data in your EPrints (level 4).</strong></p>
+
+<p>Open file <code class="f BROKEN">perl_lib/EPrints/EPrint.pm</code> in your EPrints
+installation directory.  Find subroutine
+<code>_move_from_archive()</code> and add this after the
+initial "my( $self ) = @_;":</p>
+
+<pre><code>require ACIS::EPrints::MetadataExport::AMF;
+ACIS::EPrints::MetadataExport::AMF::clear_metadata( $self );
+</code></pre>
+
+<p>Then find subroutine <code>generate_static()</code> and find
+this line in it:</p>
+
+<pre><code>my $ds_id = $self-&gt;{dataset}-&gt;id();
+</code></pre>
+
+<p>After this line add:</p>
+
+<pre><code>require ACIS::EPrints::MetadataExport::AMF;
+if ( $ds_id eq 'archive' ) {
+   ACIS::EPrints::MetadataExport::AMF::export_metadata( $self );
+}
+</code></pre>
+
+<p>Save the file.</p>
+
+
+   <h3 id="arc-cfg-amf">6. Archive configuration: AMF export</h3>
+
+<p><strong>For <a href="eprints.html#level1">exporting eprints metadata</a> (level
+1) and to <a href="eprints.html#level4">notify an ACIS service</a> about
+new/modified document data in your EPrints (level 4).</strong></p>
+
+<p>Add these two configuration parameters to the archive
+configuration in the <code>get_conf()</code> subroutine of your
+<code class="f BROKEN">cfg/ArchiveConfig.pm</code>:</p>
+
+<dl>
+
+<dt id="eprint_metadata_export_AMF_dir" C="eprint_metadata_export_AMF_dir"><code class="C">eprint_metadata_export_AMF_dir</code></dt>
+
+<dd>Pathname of the directory in which to create the AMF files.</dd>
+
+<dt id="eprint_metadata_export_AMF_idprefix" C="eprint_metadata_export_AMF_idprefix"><code class="C">eprint_metadata_export_AMF_idprefix</code></dt>
+
+<dd>A string; will be used as a prefix for AMF text
+identifiers.  Default value: empty string.</dd>
+
+</dl>
+
+<p>Example: </p>
+
+<pre><code>$c-&gt;{eprint_metadata_export_AMF_dir} = "/opt/eprints2/archives/Musasi/amf";
+$c-&gt;{eprint_metadata_export_AMF_idprefix} = "Musasi:";
+</code></pre>
+
+
+   <h3 id="arc-cfg-pidaid">7. Archive configuration: ACIS::PIDAID</h3>
+
+<p><strong>To <a href="eprints.html#level3">suggest personal names and
+identifiers from an ACIS personal database to your EPrints
+users</a>, while they submit works (level 3).</strong></p>
+
+<p>Obtain database access parameters from administrator of the
+ACIS service, which you want to use as the source of
+personal data.</p>
+
+<p>Open your archive configuration file
+<code class="f BROKEN">cfg/ArchiveConfig.pm</code> in a text editor and add
+$ACIS::PIDAID::CONF variable to the get_conf() subroutine,
+and put the access parameters into it in this form:</p>
+
+<pre><code>$ACIS::PIDAID::CONF = {
+  host =&gt; 'acis.super.edu', # hostname of the ACIS machine
+  port =&gt; '9099',           # MySQL port on the ACIS machine
+  db   =&gt; 'ACIS',           # name of the database in MySQL
+  user =&gt; 'peter',          # username in MySQL terms
+  pass =&gt; 'jolly',          # password
+#  max_results =&gt; '25',     # max number of results to show, optional (def. 15)
+};
+</code></pre>
+
+<p>Save the changes.</p>
+
+
+   <h3 id="arc-cfg-metaupd">8. Archive configuration: ACIS metadata
+update</h3>
+
+<p><strong>To automatically <a href="eprints.html#level4">notify an ACIS service</a>
+about new/modified data in your EPrints (level 4).</strong></p>
+
+<p>To configure ACIS metadata update you must already have a
+data-exchange agreement with an ACIS service.  An
+arrangement must exists to regularly transfer the AMF
+metadata files from your EPrints to that ACIS.  Then you
+need to get permission and an archive name to use for the
+metadata update requests; ACIS administrator will need to
+know your archive's host machine IP address.  </p>
+
+<p>Open <code class="f BROKEN">cfg/ArchiveConfig.pm</code> in a text editor, and add
+<code>eprints_metadata_export_AMF_metaupdate</code> parameter to
+the get_conf() subroutine.  Its value must be a hash, and it
+may look like this:</p>
+
+<pre><code> $c-&gt;{eprint_metadata_export_AMF_metaupdate} = {
+
+      # Full URL to send requests to (ACIS)
+      'request-target-url' =&gt; 'http://acis.super.org/meta/update',
+
+      # Your archive's id for ACIS
+      'archive-id'         =&gt; 'michigan',
+
+      'log-filename'       =&gt; 
+                   '/opt/eprints/archives/History/super-org-metaupdate.log',
+
+      # The directory level of the data files, as it is
+  # seen by the ACIS service
+      'object-dir-levels'  =&gt; 1,
+ };
+</code></pre>
+
+<p><a href="cooperate.html#metaupdate-request-conf">Explanataion of the first 3
+parameters</a> in a different document.  <a href="eprints.html#object-dir-levels">Explanation of the last one</a>
+parameter.</p>
+
+<p>Save the file.</p>
+
+
+   <h3 id="install-lwp">9. Install libwww-perl library</h3>
+
+<p><strong>To automatically <a href="eprints.html#level4">notify an ACIS service</a>
+about new/modified data in your EPrints (level 4).</strong></p>
+
+<p>Get the distribution from CPAN: <a href="http://search.cpan.org/dist/libwww-perl/">libwww-perl</a>
+and install on your system.  Follow installation
+instructions in the package.</p>
+
+<p><Id>
+$Id$
+</Id></p>
+
+  
+<address class="footer">
+<p>Generated: Wed Jan 15 13:37:33 2014</p>
+<p><a href="http://acis.openlib.org/">ACIS project</a>,
+          acis<i>@</i>openlib<span>.org</span></p>
+</address>
+</body>
+</html>

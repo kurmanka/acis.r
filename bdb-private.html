@@ -1,0 +1,179 @@
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<title>Berkeley DB library: private
+installation / ACIS documentation</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+      
+
+   <h1 id="bdb-private">Berkeley DB library: private
+installation</h1>
+
+<h3><i>Table of contents</i></h3>
+<p class="toc">   <a href="#idp146504">Intro</a><br>   <a href="#idp148024">The problem</a><br>   <a href="#idp149872">Installing the library</a><br>   <a href="#idp157056">Installing the BerkeleyDB perl module</a><br></p>
+
+
+   <h2 id="idp146504">Intro</h2>
+
+<p><a href="http://www.sleepycat.com/products/db.shtml">Berkeley
+DB</a> is a very common industrial-strength open source
+embedded database library.  It is used in a huge number of
+applications and appliances.  ACIS uses Berkeley DB for its
+<a href="daemon.html#ri-daemon">update daemon</a>.</p>
+
+<p>The library is common and most Unix/Linux computers already
+have it installed.</p>
+
+
+   <h2 id="idp148024">The problem</h2>
+
+<p>There is one problem with this library.  It requires special
+attention in case you are really doing a production-level
+installation of ACIS, not just playing with it.  The problem
+is that later versions of the Berkeley library usually do
+not support previous version's database formats or at least
+do not support it out of the box.  So if you had some data
+in a database and then you update your system, and with this
+update comes an upgrade for the library -- you've got a
+problem.</p>
+
+<p>In case of such problem you either have to manually convert
+database files to a newer format or erase your database and
+recreate it.  Anyway, you'll have to shutdown your update
+daemon for a while and do manual work.  This is no big deal,
+but for a good service you'd prefer not to do this.</p>
+
+<p>That's why I suggest that you build a private copy of the
+library.  Then build and install a copy of the BerkeleyDB
+perl module, linked to that particular copy of the library.
+This way you'll be independent of the system-wide upgrades
+and save yourself from some headache.</p>
+
+
+   <h2 id="idp149872">Installing the library</h2>
+
+<p>Here is a little description of how I did this.  Your
+configuration will be different, but the general algorithm
+will be the same.  </p>
+
+<p>At the time the latest published Berkeley DB library was
+version 4.3.27 and it had three patches coming with it...</p>
+
+<pre><code>$ cd install
+$ tar xzvf ~/software/BerkeleyDB/db-4.3.27.NC.tar.gz
+$ cd db-4.3.27.NC
+$ patch -p0 &lt; ~/software/BerkeleyDB/patch.4.3.27.1
+$ patch -p0 &lt; ~/software/BerkeleyDB/patch.4.3.27.2
+$ patch -p0 &lt; ~/software/BerkeleyDB/patch.4.3.27.3
+$ cd ../
+$ mv db-4.3.27.NC db-4.3.27.NC.patched-1-2-3
+$ cd db-4.3.27.NC.patched-1-2-3
+</code></pre>
+
+<p>(The latest version at the time of writing, on July 13, 2005
+is 4.3.28 and has no patches with it, so it is a little bit
+simplier.)</p>
+
+<p>When the package was unpacked and patched appropriately, I
+started the installation process per Berkeley DB
+<a href="http://www.sleepycat.com/docs/ref/build_unix/intro.html">instructions</a>.</p>
+
+<pre><code>$ cd build_unix
+$ ../dist/configure <b>--prefix=/home/ivan/lib/bdb-4.3.27</b>
+$ make
+$ make install</code></pre>
+
+<p>The special thing here is the <code>--prefix</code>
+parameter that I gave to the configure script.</p>
+
+<p>After that I had a private copy of the library installed in
+<code>/home/ivan/lib/bdb-4.3.27</code> directory.  Thinking
+about the future, I decided to create a link to use a
+simplier pathname.</p>
+
+<pre><code>$ cd /home/ivan/lib
+$ ln -s bdb-4.3.27 bdb
+</code></pre>
+
+<p>So after that I could refer to the library directory as
+<code>/home/ivan/lib/bdb</code>.  And I had:</p>
+
+<table class="files">
+<tr>
+<td>library utilities</td>
+<td>in /home/ivan/lib/bdb/bin</td>
+</tr>
+
+<tr>
+<td>C header files</td>
+<td>in /home/ivan/lib/bdb/include</td>
+</tr>
+
+<tr>
+<td>library files</td>
+<td>in /home/ivan/lib/bdb/lib</td>
+</tr>
+</table>
+
+
+   <h2 id="idp157056">Installing the BerkeleyDB perl module</h2>
+
+<p>Next step was to install the perl module <a href="http://search.cpan.org/dist/BerkeleyDB/">BerkeleyDB</a>.</p>
+
+<p>First I ensured that I do not have a system-wide installed
+version of this module.  This is to avoid confusion and
+nasty potential problems of differently compiled &amp; linked
+versions of it.</p>
+
+<p>Then, I got source package from CPAN (see link above) and
+went on:</p>
+
+<pre><code>$ cd ~/install
+$ tar xzvf ~/software/BerkeleyDB/BerkeleyDB-0.26.tar.gz
+$ cd BerkeleyDB-0.26
+</code></pre>
+
+<p>This module is configured via <code>config.in</code> file.
+Before you start changing it, you may want to save its
+original version (although its not critical).  When I was
+doing it, I simply renamed the provided file to a backup and
+created a new file in its place.</p>
+
+<pre><code>$ mv config.in config.in.orig
+$ vi config.in
+</code></pre>
+
+<p>I've put the following lines in it:</p>
+
+<pre><code>INCLUDE = /home/ivan/lib/bdb/include
+LIB     = /home/ivan/lib/bdb/lib
+DBNAME = -ldb
+</code></pre>
+
+<p>After that I went on with the standard installation
+procedure:</p>
+
+<pre><code>$ make 
+$ make test
+$ su
+</code></pre>
+
+<p>Entered root password and, finally...</p>
+
+<pre><code># make install
+</code></pre>
+
+<p>That's it.  The library and the module at this stage is
+installed.  Unless something went wrong on one of the
+previous stages, you are now ready to fire up the <a href="daemon.html">update daemon</a>.</p>
+
+  
+<address class="footer">
+<p>Generated: Wed Jan 15 13:37:33 2014</p>
+<p><a href="http://acis.openlib.org/">ACIS project</a>,
+          acis<i>@</i>openlib<span>.org</span></p>
+</address>
+</body>
+</html>

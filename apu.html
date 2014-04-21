@@ -1,0 +1,239 @@
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<title>Automatic Profile Update / ACIS documentation</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+      
+
+   <h1 id="idp1284656">Automatic Profile Update</h1>
+
+<h3><i>Table of contents</i></h3>
+<p class="toc">   <a href="#idp1285072">Introduction &amp; overview</a><br>   <a href="#idp1289728">Some older terms</a><br>   <a href="#binapu">The <code class="C">bin/apu</code> script</a><br>   <a href="#idp1297848">How to run bin/apu?</a><br>   <a href="#idp1300032">Configuration parameters</a><br>   <a href="#idp1302792">Technical: Queue management</a><br>   <a href="#idp1308000">Technical: Responsible perl code</a><br></p>
+
+
+   <h2 id="idp1285072">Introduction &amp; overview</h2>
+
+<p>Automatic Profile Update is a subsystem of ACIS, which performs a
+number of operations on user profiles automatically.  It serves several
+purposes, but the primary one is to make maintaining a profile in ACIS
+less of a chore for the user.</p>
+
+<p>The metadata dataset of a running ACIS service is expected to be
+dynamic, with new items appearing and some old items going out (for a
+number of possible reasons, even if undesired).  So one specific thing
+APU does is finding new documents in the documents database, which a
+registered person might have written.  If there is a highly probable
+match (e.g. exact name match), APU would automatically add the document
+to the person's research profile.</p>
+
+<p>On the other hand, if a document was claimed by the user, but has gone
+out of the document database, APU would clean it out of the person's
+profile.  (A special grace period would be observed to allow short-term
+database fluctuations, when items disappear for a while and then appear
+back.)</p>
+
+<p>When APU does a search for a personal profile, and either adds
+something to the profile, or finds some items for consideration, it
+would send an email to the user, notifying her about the stuff found or
+changes done.</p>
+
+<p>And yet another thing APU does is related to the <a href="citations.html">citation profile</a>.  After looking at the
+person's research profile, and doing a research items search, APU also
+looks for new citations for the research profile items.  And if there
+are any, it would either automatically identify them to RP items or
+store them in a database for the user's consideration.  Similarly, if
+something interesting was found, it would email the user in charge of
+the profile about it.</p>
+
+<p>So at this time APU performs three functions for personal profiles:</p>
+
+<ul>
+<li><p>maintains them in sync with the primary metadata (cleans gone and updates
+changed document records and citations).</p></li>
+<li><p>runs automatic research searches</p></li>
+<li><p>runs automatic citations searches</p></li>
+</ul>
+
+
+   <h2 id="idp1289728">Some older terms</h2>
+
+<dl>
+<dt id="ARPU" C="ARPU"><code class="C">ARPU</code></dt>
+<dd>Automatic Research Profile Update.  It used
+to be a separate feature, but now -- a part of APU.</dd>
+</dl>
+
+<h2 id="binapu" C="bin/apu">The <code class="C">bin/apu</code> script</h2>
+
+<p>APU is done for users while they are not logged in and not interacting
+with the service.  So it is run separately from the main web
+application interface.  All the APU-related functions are available via
+the <a class="a" href="apu.html#binapu">bin/apu</a> script.  </p>
+
+<p>Usage:</p>
+
+<pre><code>$ bin/apu [options] [&lt;number&gt;]
+</code></pre>
+
+<p>Run <abbr title="Automatic Profile Update">APU</abbr> processing for
+the next personal record on the queue.  </p>
+
+<p>If a number &lt;number&gt; is given, the APU is done for that many
+items in the APU queue.  By default it is done for just one record.</p>
+
+<p>The command won't produce any output on successful execution, but would
+write its main steps to a log file <code class="f BROKEN">autoprofileupdate.log</code>.</p>
+
+<pre><code>$ bin/apu [options] queue &lt;identifier&gt;
+</code></pre>
+
+<p>Put the record &lt;identifier&gt; onto the APU queue.
+&lt;identifier&gt; may be a short-id, an id, or a user account email
+address.</p>
+
+<p>The command won't produce any output on success.</p>
+
+<p>The possible options are:</p>
+
+<dl>
+<dt>-\-debug</dt>
+
+<dd>Enable printing debugging output to stdout, of all the process.
+The debuggings are pretty verbose, for a large profile it may print
+hundreds of screenfuls.</dd>
+
+<dt>-\-interactive</dt>
+<dt>-\-inter</dt>
+
+<dd>Duplicate the <code class="f BROKEN">autoprofileupdate.log</code> log messages on the
+standard output.  Would give you a general idea of what is going
+on while APU is running.</dd>
+
+<dt>-\-failed</dt>
+
+<dd>Try again to execute APU for the previously failed items in the APU
+queue, if there are any.</dd>
+
+<dt>-\-noauto</dt>
+
+<dd>Do not automatically clear and re-populate the queue table, if the
+end of the queue is reached.</dd>
+
+</dl>
+
+
+   <h2 id="idp1297848">How to run bin/apu?</h2>
+
+<p>Run it at low-load periods or regularly as a cron-job.</p>
+
+<p>Frequency of the APU runs and the <code>number</code> argument you use is
+important.  Make it high enough to cover all the users.  </p>
+
+<p>For example, if you have roughly 300 personal records, it will be more
+than enough to run "<code>bin/apu 4</code>" three times a day.  It will go
+through 12 records a day, about 360 per month.</p>
+
+<p>In case you run it too often, it will start skipping queued items.  The
+script will skip a record, if APU was already done for it recently.
+See <a class="c" href="conf.html#minimum-apu-period-days">minimum-apu-period-days</a> configuration parameter.</p>
+
+
+   <h2 id="idp1300032">Configuration parameters</h2>
+
+<p>These are the APU-related ACIS configuration parameters (to be used in
+the the <a class="a" href="conf.html#mainconf">main.conf</a> configuration file):</p>
+
+<ul>
+<li>
+<a class="c" href="conf.html#minimum-apu-period-days">minimum-apu-period-days</a> </li>
+<li><a class="c" href="conf.html#echo-apu-mails">echo-apu-mails</a></li>
+<li><a class="c" href="conf.html#apu-research-mail-include-approx-hits">apu-research-mail-include-approx-hits</a></li>
+<li><a class="c" href="conf.html#apu-research-max-suggestions-in-a-mail">apu-research-max-suggestions-in-a-mail</a></li>
+<li><a class="c" href="conf.html#apu-citations-auto-add-limit">apu-citations-auto-add-limit</a></li>
+<li><a class="c" href="conf.html#disable-citation-mails">disable-citation-mails</a></li>
+</ul>
+
+
+   <h2 id="idp1302792">Technical: Queue management</h2>
+
+<p>APU stores it's queue in the apu_queue table.</p>
+
+<table border="1" cellpadding="3" cellspacing="0">
+<summary>The apu_queue table:</summary>
+<tr>
+<th>field</th>
+<th>description</th>
+</tr>
+<tr>
+<td>what</td>
+<td>record id</td>
+</tr>
+<tr>
+<td>position</td>
+<td>queue item number</td>
+</tr>
+<tr>
+<td>filed</td>
+<td>date &amp; time when it was put onto the
+queue</td>
+</tr>
+<tr>
+<td>class</td>
+<td>should this item be treated with a
+priority?</td>
+</tr>
+<tr>
+<td>notes</td>
+<td>any messages during APU execution</td>
+</tr>
+<tr>
+<td>worked</td>
+<td>date &amp; time when it was executed</td>
+</tr>
+</table>
+
+<p>It initially puts every known personal record onto the queue.  As APU
+processing is executed for a record, the queue item status is changed
+from empty string to "OK" or "FAIL" in the queue table.  Normally APU
+runs on empty-status queue items.</p>
+
+<p>Then when it reaches the end of the queue, it
+deletes the table content and starts over again.  This usually happens
+automatically.</p>
+
+
+   <h2 id="idp1308000">Technical: Responsible perl code</h2>
+
+<p>These modules in ACIS are responsible for APU:</p>
+
+<dl>
+<dt>ACIS::APU</dt> <dd>General APU logic.  Used directly by the apu
+script.</dd>
+
+<dt>ACIS::APU::Queue</dt> <dd>Provides APU queue management.</dd>
+
+<dt>ACIS::APU::RP</dt> <dd>Does research-profile processing.</dd>
+
+<dt>ACIS::Citations::AutoUpdate</dt> <dd>Does citations-profile
+automatic processing.</dd>
+
+</dl>
+
+<p>Scripts:</p>
+
+<dl>
+<dt>home/bin/template/apu.pl</dt> <dd>Provides command-line
+interface ACIS::APU module.  Is basis for the <a class="a" href="apu.html#binapu">bin/apu</a> script.</dd>
+</dl>
+
+
+  
+<address class="footer">
+<p>Generated: Wed Jan 15 13:37:33 2014</p>
+<p><a href="http://acis.openlib.org/">ACIS project</a>,
+          acis<i>@</i>openlib<span>.org</span></p>
+</address>
+</body>
+</html>

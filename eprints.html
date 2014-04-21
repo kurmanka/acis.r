@@ -1,0 +1,1293 @@
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<title>EPrints-related stuff in ACIS / ACIS documentation</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+      
+
+   <h1 id="idp750064">EPrints-related stuff in ACIS</h1>
+
+<h3><i>Table of contents</i></h3>
+<p class="toc">   <a href="#idp750488">Intro</a><br>   <a href="#terminology">Terminology</a><br>   <a href="#eprints-installation-brief">Installation</a><br>      <a href="#eprints-install-script">Automatic installation</a><br>   <a href="#level1">Level 1.  Export eprints metadata in
+AMF</a><br>      <a href="#metadata-export-amf">AMF metadata export module</a><br>         <a href="#idp767240">Installation and configuration</a><br>         <a href="#idp772192">What it does.  Techinical details</a><br>      <a href="#idp777848">The AMF generation</a><br>         <a href="#idp784504">From eprint's personal data to AMF <em>person</em> noun</a><br>         <a href="#idp788424">Additional: from eprint type to AMF text type</a><br>      <a href="#amf-plugin">AMF output plugin</a><br>   <a href="#level2">Level 2.  Personal id metadata
+field</a><br>   <a href="#level3">Level 3.  Author identification aid</a><br>      <a href="#level3-ui">User interface</a><br>         <a href="#idp824448">Search by name</a><br>         <a href="#idp828776">Search by email address and by short-id</a><br>         <a href="#idp839240">Problems and weaknesses</a><br>         <a href="#idp844976">Undo feature (additional)</a><br>      <a href="#level3-tech">Implementation technical specification</a><br>         <a href="#idp846536">Components and technology</a><br>         <a href="#pidaid-install">Installation</a><br>         <a href="#idp860088"><code class="f BROKEN">cgi/pidaid</code> script</a><br>         <a href="#idp871576"><code class="f BROKEN">pidaid.js</code> add-on JavaScript</a><br>   <a href="#level4">Level 4.  The metadata update request</a><br>      <a href="#idp909240">Configuration</a><br>         <a href="#object-dir-levels"><code>object-dir-levels</code>
+parameter</a><br>      <a href="#idp917096">Other considerations</a><br></p>
+
+
+   <h2 id="idp750488">Intro</h2>
+
+<p><a href="http://software.eprints.org">GNU EPrints</a> is an
+open-source online repository software for preprints and
+other scholarly materials.  It's primary usage scenario is
+self-archiving.  It is being maintained and developed
+actively.</p>
+
+<p>In ACIS we have specified and developed some <a href="cooperate.html">features for cooperation</a> with
+document submission services.  We chose EPrints as the basis
+for a reference implementation of these features.  This
+document explains in detail what features do we introduce
+into EPrints and how to use them.</p>
+
+
+   <h2 id="terminology">Terminology</h2>
+
+<p>EPrints uses some terms specificly.  We will try with all
+care to avoid confusion.  For this, we will use the EPrints'
+terms in their EPrints-specific sense.</p>
+
+<p>For instance, let's take term <em>document</em>.  In EPrints it
+means <em>a rendering of a document in a file of a particular
+type</em>.  To mean a document as a piece of content, like a
+working paper or an article, which gets submitted to
+EPrints, they use word <em>eprint</em> (note lower case and
+singular number) and we will use that.</p>
+
+<p>When EPrints talks about an installation of EPrints it would
+usually say "an archive".  <em>An archive</em>, therefore is <em>a service,
+powered by EPrints</em>.  </p>
+
+<p>One EPrints installation can power several archives.  Each
+EPrints archive has an id-name and an accordingly-named
+subdirectory in <code class="f BROKEN">{EPrints-dir}/archives/</code>.  That is
+called <em>an archive's directory</em>.</p>
+
+<p>Each archive is configured via several configuration files.
+Most basic and vital things are set in an XML file, named
+<code class="f BROKEN">{EPrints-dir}/archives/{archive-id}.xml</code>.  Several
+other configuration files lie in a directory called
+<code class="f BROKEN">{EPrints-dir}/archives/{archive-id}/cfg</code>.</p>
+
+<p>This configuration directory contains the file
+<code class="f BROKEN">ArchiveConfig.pm</code>, that holds the main configuration
+parameters for an archive.  When further below we refer to
+the <em>archive configuration</em>, we mean the <code>get_conf()</code>
+function in this file.  This Perl function returns a hash
+reference with the configuration parameters as the keys of
+the hash.</p>
+
+<p>A typical parameter setting looks like this:</p>
+
+<pre><code># If 1, users can request the removal of their submissions from the archive
+$c-&gt;{allow_user_removal_request} = 1;
+</code></pre>
+
+<p>If you need to add a configuration parameter, you'd want to
+add a line like this, with your parameter name instead of
+the <code>allow_user_removal_request</code>.  You can do it
+right before the return statement of the <code>get_conf()</code>
+function, or, maybe, right after the initial lines:
+</p>
+
+<pre><code>sub get_conf
+{
+    my( $archiveinfo ) = @_;
+    my $c = {};
+</code></pre>
+
+<p>Choose your topping.</p>
+
+<p>A link on the topic:</p>
+
+<ul>
+<li>
+<a href="http://software.eprints.org/docs/php/configarchive.php">The
+Archive Configuration Files</a> from the EPrints online
+documentation</li>
+</ul>
+
+
+   <h2 id="eprints-installation-brief">Installation</h2>
+
+
+   <h3 id="eprints-install-script">Automatic installation</h3>
+
+<p>The primary way to install these extensions onto an EPrints
+service is to use the <code class="f BROKEN">install.pl</code> script in the
+<code class="f BROKEN">EPrints</code> directory of ACIS.  Give the path to your
+EPrints archive directory as a parameter to that script and
+follow the instructions.  For example:</p>
+
+<pre><code>$ cd ACIS-1.2.3-20051010d/EPrints
+$ perl install.pl /opt/eprints2/archive/Archive
+</code></pre>
+
+<p>If this does not work for you, there are more details on
+installation in the <a href="eprints-install.html">Installation of ACIS'
+extentsions to EPrints</a> document.</p>
+
+<p>The further sections of this document contain installation
+and configuration instructions which are specific to that
+particular level of ACIS-EPrints cooperation.  But all that
+is covered by the automatic installation and is present here
+for historical reasons.  You may also use it to change an
+existing configuration.</p>
+
+
+   <h2 id="level1">Level 1.  Export eprints metadata in
+AMF</h2>
+
+<p>EPrints can export its metadata in a simple XML format.  It
+includes a utility <code>export_xml</code> for that.  EPrints
+has an <a href="http://openarchives.org">OAI-PMH</a>
+interface in it, and so, includes a Dublin Core conversion.
+But we need:</p>
+
+<ol>
+<li><p>each document's data in a separate datafile;</p></li>
+<li><p>datafiles created, updated and deleted immediately as
+ EPrints editors accept or remove individual eprints.</p></li>
+</ol>
+
+<p>And that's what our AMF metadata export does.</p>
+
+
+   <h3 id="metadata-export-amf">AMF metadata export module</h3>
+
+<p>The module's name is ACIS::EPrints::MetadataExport::AMF and
+it is located in the
+<code class="f BROKEN">EPrints/perl_lib/ACIS/EPrints/MetadataExport/AMF.pm</code>
+file.</p>
+
+
+   <h4 id="idp767240">Installation and configuration</h4>
+
+<p>The <a href="eprints.html#eprints-install-script">installation script</a>
+will patch the <code class="f BROKEN">perl_lib/EPrints/EPrint.pm</code> module.
+This will make EPrints call our AMF export module exactly
+when it is needed: on occasions when a new eprints has been
+created (accepted into the repository), when an eprint data
+has been modified and when an eprint is being deleted.  It
+will add several lines into the generate_static() method of
+the EPrints::EPrints class:</p>
+
+<pre><code>require ACIS::EPrints::MetadataExport::AMF;
+if ( $ds_id eq 'archive' ) {
+   ACIS::EPrints::MetadataExport::AMF::export_metadata( $self );
+}
+</code></pre>
+
+<p>and these two lines into the _move_from_archive() method:</p>
+
+<pre><code>require ACIS::EPrints::MetadataExport::AMF;
+ACIS::EPrints::MetadataExport::AMF::clear_metadata( $self );
+</code></pre>
+
+<p>To configure the AMF export module itself, add two
+configuration parameters to the get_conf() subroutine of
+your archive's configuration <code class="f BROKEN">cfg/ArchiveConfig.pm</code>:</p>
+
+<dl>
+
+<dt id="eprint_metadata_export_AMF_dir" C="eprint_metadata_export_AMF_dir"><code class="C">eprint_metadata_export_AMF_dir</code></dt>
+
+<dd>Pathname of the directory to create AMF files in.</dd>
+
+<dt id="eprint_metadata_export_AMF_idprefix" C="eprint_metadata_export_AMF_idprefix"><code class="C">eprint_metadata_export_AMF_idprefix</code></dt>
+
+<dd>A string; will be used as a prefix for AMF text
+identifiers.  Default value: empty string.</dd>
+
+</dl>
+
+<p>Example: </p>
+
+<pre><code>$c-&gt;{eprint_metadata_export_AMF_dir} = "/opt/eprints2/archives/Musasi/amf";
+$c-&gt;{eprint_metadata_export_AMF_idprefix} = "Musasi:";
+</code></pre>
+
+
+   <h4 id="idp772192">What it does.  Techinical details</h4>
+
+<p>Upon a call to <code>export_metadata()</code> function in this
+module, it will:</p>
+
+<ol>
+<li>
+<p>get and check the configuration parameters specified
+above.  </p>
+
+<p>If the directory parameter points to an inexistant
+directory, try to create it.  Fail silently if this
+fails.</p>
+</li>
+<li><p>extract internal numeric eprint identifier from the
+passed EPRINT object;</p></li>
+<li>
+<p>construct datafile pathname from the
+configuration-specified directory and the numeric id as
+follows:</p>
+
+<pre><code>my $filename = $dir . "/" . $id . ".amf.xml";
+</code></pre>
+</li>
+<li><p>create empty AMF <em>text</em> object with ID
+<code>"$prefix$id"</code>.  Populate it with other data
+of the eprint (see next section).</p></li>
+<li><p>get XML rendering of it;</p></li>
+<li><p>write it to the file, adding standard AMF prolog and
+epilog (the &lt;amf&gt; element) along the way.</p></li>
+</ol>
+
+<p>The <code>clear_metadata()</code> function in this
+module will:</p>
+
+<ol>
+<li><p>get and check the directory configuration parameter
+specified above;</p></li>
+<li><p>build the datafile pathname exactly as in previous
+function;</p></li>
+<li><p>delete the file if it exists.</p></li>
+</ol>
+
+
+   <h3 id="idp777848">The AMF generation</h3>
+
+<p><a href="http://acis.openlib.org/documents/saskatoon/">Saskatoon</a> 
+doc <a href="http://acis.openlib.org/documents/saskatoon/#sec3-3-1">says
+that</a> AMF from EPrints must reflect:</p>
+
+<ol>
+<li><p>the work's title</p></li>
+<li><p>the authors' full names</p></li>
+<li><p>EPrints' internal id of the eprint</p></li>
+<li><p>the URL of the work's page in EPrints</p></li>
+</ol>
+
+
+
+<p>Given an eprint object, we first build an empty AMF <em>text</em>
+noun with ID <code>"$prefix$id"</code>, where
+<code>$prefix</code> comes from configuration
+(<a class="c" href="eprints.html#eprint_metadata_export_AMF_idprefix">eprint_metadata_export_AMF_idprefix</a>) and
+<code>$id</code> is the eprint's internal id (the
+<code>eprintid</code> field).  That covers point no. 3.</p>
+
+<p>Then we add <code>title</code> and <code>displaypage</code>
+adjectives, these are points 1 and 4.  </p>
+
+<p>Then we go through all the work's authors (the
+<code>creators</code> field) and editors (the
+<code>editors</code> field).  For each of them we create a
+<em>person</em> noun, see next section.  And then we save each
+author data via the <code>hasauthor</code> verb and each editor
+data via the <code>haseditor</code> verb.  That gives us point
+number 2.</p>
+
+
+   <h4 id="idp784504">From eprint's personal data to AMF <em>person</em> noun</h4>
+
+<p>That is made in a separate function <code>decode_person()</code>.
+First, we create an empty AMF <em>person</em> noun.</p>
+
+<p>We populate the person noun with the <code>givenname</code> and
+<code>familyname</code> adjectives, if corresponding fields are
+defined.  We use the EPrints utility function
+<code>EPrints::Utils::make_name_string()</code> to get full
+name of the person.  Save result as adjective <code>name</code>.</p>
+
+<p>We check the personal data for presence of the <code>id</code>
+field.  If defined, we check it for what kind of value it
+contains.  It may contain a short-id or an email.  If it
+contains an email address, we save it into an <code>email</code>
+adjective.  If it is a short-id, we save it into
+<code>identifier</code> adjective.  It is part of <a href="#level2">level 2</a>, actually.</p>
+
+
+   <h4 id="idp788424">Additional: from eprint type to AMF text type</h4>
+
+<p>Each eprint object has a <code>type</code> field.  EPrints is
+flexible in the types of document that one can store in it.
+Administrators can change the available types, can define
+new types.  It means the range of values that this field can
+take is not fully defined.  We will rely on default types
+configuration.  Given that this is not a required feature,
+we will not try too hard to find a matching AMF type.</p>
+
+<p>Here are the basic eprints types, defined in
+<code class="f BROKEN">defaultcfg/metadata-types.xml</code> (from EPrints dir) and
+their AMF counterpart, if defined.</p>
+
+<table class="files">
+<tr>
+<th align="left">eprint <i>type</i> field   </th>
+<th> AMF text type adjective</th>
+</tr>
+<tr>
+<td><code>article</code></td>         <td><code>article</code></td>
+</tr>
+<tr>
+<td><code>book</code></td>            <td><code>book</code></td>
+</tr>
+<tr>
+<td>
+<code>book_section</code> </td>   <td><code>bookitem</code></td>
+</tr>
+<tr>
+<td>
+<code>conference_item</code>   </td> <td><code>conferencepaper</code></td>
+</tr>
+<tr>
+<td>
+<code>monograph</code>       </td>
+<td>see below</td>
+</tr>
+<tr>
+<td>
+<code>thesis</code>          </td>
+<td>-</td>
+</tr>
+<tr>
+<td>
+<code>patent</code>          </td>
+<td>-</td>
+</tr>
+<tr>
+<td>
+<code>other</code>           </td>
+<td>-</td>
+</tr>
+</table>
+
+<p>Eprints of type <em>monograph</em> also have a
+<code>monograph_type</code> field.  This field takes 
+following values (again with their AMF text type equivalents):</p>
+
+<table class="files">
+<tr>
+<th align="left">eprint <i>monograph_type</i> field   </th>
+                                 <th> AMF text type adjective</th>
+</tr>
+<tr>
+<td>
+<code>technical_report</code>   </td>
+                                 <td><code>preprint</code></td>
+</tr>
+<tr>
+<td><code>project_report</code></td>
+                                 <td>-</td>
+</tr>
+<tr>
+<td>
+<code>documentation</code> </td>
+                                 <td>-</td>
+</tr>
+<tr>
+<td>
+<code>manual</code> </td>    <td>-</td>
+</tr>
+<tr>
+<td><code>working_paper</code></td>
+                                 <td><code>preprint</code></td>
+</tr>
+<tr>
+<td>
+<code>discussion_paper</code>   </td>
+                                 <td><code>preprint</code></td>
+</tr>
+<tr>
+<td>
+<code>other</code>           </td>
+<td>-</td>
+</tr>
+</table>
+
+
+   <h3 id="amf-plugin">AMF output plugin</h3>
+
+<p>EPrints, since version 2.3.14, supports plugins for metadata
+conversion and output.  Plugins are special modules, made as
+drop-in files.  You simply put the plugins you want to use
+into the <code class="f BROKEN">plugins/output/</code> directory of your EPrints
+installation (or to that of your EPrints archive), restart
+EPrints (i.e. Apache) and they work.  Default EPrints
+installation already has a number of plugins pre-installed:
+for BibTeX and for a simple XML format metadata output.</p>
+
+<p>One of the ways to see them working is to look at such URL:</p>
+
+<pre><code>http://your.eprints.url/perl/export/#id#
+</code></pre>
+
+<p>where <code>http://your.eprints.url</code> is the base URL
+of your EPrints service, and <code>#id#</code> is an actual
+id of an eprint (a submission) in your service.</p>
+
+<p>You should then see a page offering you metadata of this
+item in different formats, each format representing an
+installed plugin.</p>
+
+<p>Now the AMF plugin is in ACIS file
+<code class="f BROKEN">EPrints/plugins/output/amf</code>.  But if you followed the
+<a href="eprints.html#eprints-installation-brief">general installation</a>
+instruction above, it is already installed and should be
+working.</p>
+
+<p>Note that the AMF plugin depends on the
+ACIS::EPrints::MetadataExport::AMF module, <a href="eprints.html#metadata-export-amf">described above</a>.</p>
+
+
+   <h2 id="level2">Level 2.  Personal id metadata
+field</h2>
+
+<p>For each person, author or editor of a work, EPrints asks
+and stores a number of fields.  Main are the name fields,
+like given name and family name.  In default installations
+there is also a field called "Creators email (if known)".
+Internally and by design it is named "id".  We will use it
+for the personal identifiers in author/editor metadata.</p>
+
+<p>Typical traditional usage of this field is for email
+addresses.  We will assume it is used for both email
+addresses and personal id.</p>
+
+<p>EPrints allows administrator to configure the field labels.
+We suggest to change this field's label to "Id or
+email".</p>
+
+<p>To change the field's label edit the <code class="f BROKEN">phrases-en.xml</code>
+file in your archive's configuration directory.  Find and
+modify the &lt;ep:phrase&gt; items identified
+<code>eprint_fieldname_creators_id</code> and
+<code>eprint_fieldname_editors_id</code>.  The first one
+looks like this:</p>
+
+<pre><code>&lt;ep:phrase ref="eprint_fieldname_creators_id"&gt;Creators email (if known)&lt;/ep:phrase&gt;
+</code></pre>
+
+<p>If your installation of EPrints does not have this field,
+you need to enable it in your archive's
+<code class="f BROKEN">cfg/ArchiveMetadataFieldsConfig.pm</code> file.</p>
+
+<p>For that: </p>
+
+<ol>
+<li>
+<p>find line which says</p>
+
+<pre><code>$fields-&gt;{eprint} = [
+</code></pre>
+</li>
+<li>
+<p>near below it find the line, which starts with</p>
+
+<pre><code>    { name =&gt; "creators", type =&gt; "name",
+</code></pre>
+
+<p>and make sure <code>hasid</code> parameter in this
+block is set to 1.  The block will look like this:</p>
+
+<pre><code>    { name =&gt; "creators", type =&gt; "name", multiple =&gt; 1, input_boxes =&gt; 4,
+            hasid =&gt; 1, input_id_cols=&gt;20,
+            family_first=&gt;1, hide_honourific=&gt;1, hide_lineage=&gt;1 },
+</code></pre>
+</li>
+<li>
+<p>Do the same for the "editors" field.  Here the block
+starts with</p>
+
+<pre><code>    { name =&gt; "editors", type =&gt; "name"
+</code></pre>
+
+<p>Again, set parameter <code>hasid</code> to 1.</p>
+</li>
+</ol>
+
+<p>This is what you get on the "Core Bibliographic Information"
+page of EPrints if you follow the above instructions:</p>
+
+<p>
+<img class="snap" src="img/eprints/core-bibliographic-info-author-area-with-shortid-or-email-field-with-empty-fields.png">
+</p>
+
+<p>If you had any problems with above instructions, you may
+want to look at <a href="http://software.eprints.org/docs/php/metadata.php">Configuring
+the Archive Metadata</a> section of the EPrints
+documentation.</p>
+
+
+   <h2 id="level3">Level 3.  Author identification aid</h2>
+
+<p>An eprint submission in EPrints takes a number of screens to
+go through.  We will modify just one of the screens, the one
+called "Core Bibliographic Information" in the default
+English-language installation.</p>
+
+<p>On this screen a user enters title of the work being
+submited and data about its authors.  As she enters author
+information, we will search the records database in ACIS to
+see if we have any matching records.  And we offer found
+personal records for the user to choose.  If the user
+accepts an offered record, we automatically fill in the name
+and id fields for this author.  Having correct short-id in
+the document metadata is what we want after all.</p>
+
+<p>It is important that we minimize user errors at this stage.
+If many EPrints users start assigning documents to wrong
+persons, it would cause bad metadata.</p>
+
+<p>We do not change the normal user workflow.  We avoid
+intervening in it.  Instead we try to gently offer our help,
+where we can.  </p>
+
+<p>The next section starts a functional specification of the
+interface changes that we introduce.  Later on there is a
+description of the technical side of things: how to install
+and configure it, what components does it consist of and
+they work.</p>
+
+
+   <h3 id="level3-ui">User interface</h3>
+
+<p>This is a functional specification of the user interface
+enhancements to EPrints at level 3.  The basic general logic
+of the enhancements is right below.  In further sections
+you'll see it detailed.</p>
+
+<p>For data of the authors the "Core Bibliographic Information"
+screen has a table with input fields in it.  After <a href="#level2">level 2</a>, the columns are titled: "Family
+name", "Given name / Initials", "Id or email".  (As an
+aside, the order of the columns on the screen may be
+different.  You can configure EPrints to display "Given name
+/ Initials" before the "Family name".)</p>
+
+<p>The user types her information about the authors into these
+fields.  We look at what she types, do search queries of our
+database.  If we have something to say, we insert a row into
+the author data input table and put our message into this
+row.  This shifts further rows of the table further below.
+So our message appears just below the relevant input fields.</p>
+
+<p>There should be no problem if the user does not notice our
+message, does not understands it or prefers to ignore it.
+She can ignore it and go on.  When the user starts working
+with another row in the personal data table, we will make
+the message that was relevant to the previous author
+disappear.  If the user returns back to the row (the field),
+which caused the message, we display it again.</p>
+
+<p>Our message is usually a menu of personal records that our
+search yielded.  We do not display the menu if we have too
+many search results.  (That would probably mean the search
+conditions are too vague to be useful.)  <i>Too many</i> is
+more than a magical number <code>max_results</code>, with 15 as
+the default value.  It is configurable via the <a href="cooperate.html#acis-pidaid">ACIS::PIDAID module</a>.</p>
+
+<p>
+<img class="snap" src="img/eprints/core-bibliographic-info-author-area-with-shortid-or-email-field-with-walsh-and-menu.png">
+</p>
+
+<p>The menu is shown as a little table.  Each row of the table
+represents one person.  Next to the person's name is a
+mini-icon link to further information about the person -- to
+his or her profile page.  Then comes a link to his or her
+homepage.  Next is an inviting mini-icon to choose the
+person.</p>
+
+<p>A click on the name or on the choose icon would mean user
+has made a choice.  It would mean she was entering data
+about that particular person.  At this point we remove the
+menu and fill in the personal data fields with the data that
+we have: the family name, the given name and the id.  </p>
+
+<p>If search yielded any results, we always build a menu of
+these results and display it.  If search yielded no results
+or too many results and there is a previously-generated menu,
+then we remove the menu.</p>
+
+
+   <h4 id="idp824448">Search by name</h4>
+
+
+   <h5 id="idp824664">Sample scenario</h5>
+
+<p>A user has typed in the title of the work, and then switched
+to the next input field, i.e. the family name input box for
+the first author.  She types the first few letters of the
+author's surname.  The page makes a search and brings up a
+little list of personal names, right below the input box.
+User finds a matching person in this list, clicks on that
+person's name.  Immediately the family, the given name and
+the id/email input boxes are filled in with data from
+ACIS.  Then the menu disappears.  The user is happy because
+she doesn't have to type that info manually.  We get an
+exactly identified author in the eprint's metadata.</p>
+
+<p>The user clicks on the second author's family name input box
+and continues the process.</p>
+
+
+   <h5 id="idp826000">Principles</h5>
+
+<p>Name search is case-insensitive.</p>
+
+<p>We attempt to search for the matching personal records each
+time user acts in a name input box, be it family name box or
+given name box.  Pressing a key, entering or leaving an
+input box are the acts to react upon.</p>
+
+<p>If search yielded any results, we build a menu of these
+results.  If the search yielded no results or too many
+results and there is a previously-generated menu, then we
+remove the menu.</p>
+
+<p>When user is in an input box, we assume she is editing it
+and probably has not finished it yet.  When focus belongs to
+the family input box, we search for lastnames <strong>starting
+with</strong> what user has typed so far.  So if user typed "Mendel",
+it would match both "Mendel" and "Mendelssohn".</p>
+
+<p>As soon as user leaves a family box, we assume the surname
+typed in it is complete and cut off the items, which do not
+produce a whole-string match.  So if user left the family
+name box with "Mendel" in it, only this family name will
+match.</p>
+
+<p>Search requests are asynchronous, which means the page does
+not stop reacting to user actions while a search is taking
+place.  Search results are processed only when a response
+from server has arrived.</p>
+
+
+   <h4 id="idp828776">Search by email address and by short-id</h4>
+
+
+   <h5 id="idp829016">Sample email-search scenario</h5>
+
+<p>A user types in the title of a work and then enters the
+family name and the given name of an author.  ACIS doesn't
+recognize the name for some reason.  It may be a consequence
+of a different (not known to ACIS) variation of the name
+spelling.  It may be that ACIS did find some matching
+records, but user didn't notice or prefers not to use the
+menu of the offered records.</p>
+
+<p>Then the user switches to the next field, the "Id or email"
+box.  She enters the author's email address and presses
+"TAB" key.  TAB key switches focus to the next row of the
+table.  The page sends a request to check if that email
+address is known to ACIS.  ACIS finds a personal record with
+a matching email address and offers that personal record to
+the user.  User clicks on the offered personal name.  The
+family, the given name input boxes are filled in with data
+from ACIS.  The value of the email address that she entered
+is replaced with the person's short-id.</p>
+
+
+   <h5 id="idp830592">Short-id scenario #1, basic</h5>
+
+<p>A user enters personal name of an author.  For some reason
+ACIS doesn't recognize the person or user doesn't use the
+menu offered.  Then she TABs to the id / email field and
+types in the identifier for the person that she knows.
+After she types in the first 4 characters
+(e.g. "<code>pme4</code>") a message appears below the input
+box: "Id 'pme4' belongs to:" with a single-item menu below
+it.  The item is the record, which corresponds to this
+short-id.</p>
+
+<p>Soon after she types another char, the page rechecks and
+offers her a new record -- the one that corresponds to the
+current value in the short-id input box.</p>
+
+<p>Once she typed the identifier completely (it may be 4, 5, 6
+characters long), she sees the name of the person she meant.
+She is now sure that she did no mistake.</p>
+
+
+   <h5 id="idp832392">Short-id scenario #2: Advanced user</h5>
+
+<p>An advanced experienced user comes to the page with the
+short-id of the author at hand.  Instead of entering the
+author's name, she enters the short-id and waits to see the
+page has recognized it.</p>
+
+<p>A second later she sees the expected name (i.e. name of the
+author), clicks on it and name fields are automatically
+filled in.  Everybody is happy.</p>
+
+
+   <h5 id="idp833368">Short-id scenario #3: User makes a mistake</h5>
+
+<p>A user enters the name details for a person and then enters
+an identifier for him.  She doesn't look at the messages
+appearing or they were not appearing because of slow
+connection or because the server was pretty loaded at the
+moment.</p>
+
+<p>She goes on to complete details of the next author/creator.
+A few moments away the identifier that she entered becomes
+red-colored.  She notices that, hoovers mouse cursor over
+the field, and sees a little floating hint: "No such record:
+id unknown".</p>
+
+<p>She clicks on the field.  Immediately she sees this same
+message below the field.  She rechecks her notes and finds
+out she made a mistake.  She corrects the value of the
+field, waits a second or two to see if the page complains
+about it.  Soon she sees that all is fine this time: the
+page offers the record she meant.  She continues to enter
+next person's details.  The menu is hidden as she starts to
+type another person's family name.</p>
+
+
+   <h5 id="idp835568">Principles</h5>
+
+<p>Email search and short-id search happen in the same input
+field.  The page looks at the format of the value string to
+understand, whether it is an email or an id.</p>
+
+<p>The email search and the short-id search are
+case-insensitive.</p>
+
+<p>The id and email searches do exact full-string matching.</p>
+
+<p>We attempt to search for the matching personal records each
+time user acts in the input box.  Pressing a key, entering
+or leaving an input box are the actions to react upon.</p>
+
+<p>If search yielded any results, we build a menu of these
+results.  If search yielded no results or too many results
+and there is a previously-generated menu, then we remove the
+menu.</p>
+
+<p>Search requests are asynchronous, which means the page does
+not stop reacting to user actions while a search is taking
+place.  Search results are processed only when a response
+from server has arrived.</p>
+
+<p>If user has left the field with a non-empty value, which
+does not look like an email address and is not a valid
+short-id (there was a successful search by short-id attempt,
+which returned an empty result list), the value is shown in
+red color and a hint "No such record: id unknown" is
+attached to the field (via <code>title</code> attribute).</p>
+
+<p>If user enters the field while it is value is known to be
+invalid, we display message "No such record: id '...'
+unknown." below the input field; red color and the floating
+hint is removed.</p>
+
+<p>When such message is shown and user starts to edit the
+value, the message is removed.</p>
+
+
+   <h4 id="idp839240">Problems and weaknesses</h4>
+
+<p>The user interface enhancements, that are described above,
+have a number of potential problems and weak sides.</p>
+
+<p>First, most users (until they learn) will not expect the
+search results menu and other messages to appear.  We hope
+it will be a nice surprise.  But novice users may feel
+irritated by unexpected, unrequested things appearing on a
+page.</p>
+
+<p>Second, latency and server load problem.  If the user has a
+slow network connection or the server, handling search
+queries, is overloaded, the features may distort the
+experience.  At the same time, with growing usage of an
+EPrints installation, the number of db search queries may
+grow dramatically, thus increasing the load on the EPrints
+service server and the ACIS database server.</p>
+
+<div class="note"> 
+<p>Situation is as follows: the page
+sends a CGI query back to EPrints, to the <code class="f BROKEN">cgi/pidaid</code>
+script.  The <code class="f BROKEN">cgi/pidaid</code> script sends a database query
+to the ACIS' MySQL server.  MySQL returns some result.  The
+<code class="f BROKEN">cgi/pidaid</code> XML-encodes it and returns to the
+page.</p>
+
+<p>Each component of the structure may become a bottleneck.
+But I guess that MySQL is under biggest strain here, because
+<code class="f BROKEN">cgi/pidaid</code> will run under mod_perl, so it won't eat too much
+resources -- no new processes to start for each request, at
+least.  MySQL also doesn't have to start a process for each
+request, but it must search the database.  Of course, it
+becomes even more strained if several EPrints installations
+would query the same ACIS database at the same time.
+</p>
+
+<p>
+On the other hand, how many document submissions are we
+going to handle?  I doubt any of the existing EPrints
+installations has 10 submissions per day on average.
+But of course, this will grow.  Or at least we have to
+account for that.
+</p>
+</div>
+
+<p>Third, such implementation may create accessibility problems
+for people with disabilities, for users with
+speach-browsers, with memory and orientation difficulties.</p>
+
+<p>Fourth, there is no way for the user to enter both an email
+address and a short-id for a person.</p>
+
+<p>Fifth, with the current setup, having chosen an item from a
+menu, user has no way to undo this choice and to return to
+the previous state.</p>
+
+<p>Sixth, the for technical reasons, it won't work for users
+with older versions of the browsers and some modern, but
+incompatible browsers (e.g.  Opera 7 and earlier).  For
+those users it will work as a usual EPrints service, only
+with a differently-named email field.</p>
+
+
+   <h4 id="idp844976">Undo feature (additional)</h4>
+
+<p>Whenever user gets names from a personal records menu
+inserted into the name and id fields, right under the id
+box appears a small "undo choice" button.  If user clicks on
+the button, the previous values are restored and the button
+disappears.  The previous values are the ones that were in
+those fields at the moment when the user clicked on a menu
+item.</p>
+
+<p>If after making a choice the user starts editing any of the
+name field values or the id field value, the button
+disappears also.  (Otherwise it may confusingly suggest that
+it is capable of undoing his editing.)</p>
+
+
+   <h3 id="level3-tech">Implementation technical specification</h3>
+
+
+   <h4 id="idp846536">Components and technology</h4>
+
+<p>Our enhancement of EPrints for author/person identification
+aid consists of:</p>
+
+<ul>
+<li><p>a CGI script added to EPrints, file <code class="f BROKEN">cgi/pidaid</code>;</p></li>
+<li><p>JavaScript code, file <code class="f BROKEN">pidaid.js</code>;</p></li>
+<li><p>little additional <abbr title="Cascading Style Sheets">CSS</abbr> styling, file <code class="f BROKEN">pidaid.css</code>.</p></li>
+</ul>
+
+<p>The JavaScript part defines certain reactions to certain
+user actions (events).  These reactions include background
+queries back to server and modification of the page without
+full page reload.  JavaScript communicates with the CGI
+script on the EPrints server via XMLHttpRequest technology
+(see <a href="#xmlhttprequest">below</a>).</p>
+
+<p>The <a href="cooperate.html#acis-pidaid">ACIS::PIDAID module</a> executes
+the database queries for the CGI script.  </p>
+
+
+   <h4 id="pidaid-install">Installation</h4>
+
+<ol>
+<li><p>Copy <a class="f" href="internal.html#sql_helpersql_helperpm">sql_helper/sql_helper.pm</a> and
+<a class="f" href="internal.html#sql_helpersql_resultpm">sql_helper/sql_result.pm</a> files from ACIS
+distribution into the <code class="f BROKEN">perl_lib</code> directory of the
+EPrints installation directory.</p></li>
+<li><p>Change to the <code class="f BROKEN">EPrints/</code> directory of ACIS
+distribution.</p></li>
+<li><p>Copy <code class="f BROKEN">cgi/pidaid</code> into <code class="f BROKEN">cgi/</code> dir of the
+EPrints installation.</p></li>
+<li><p>Copy recursively <code class="f BROKEN">perl_lib</code> directory to the EPrints
+installation directory.</p></li>
+<li><p>Copy <code class="f BROKEN">pidaid.js</code> and <code class="f BROKEN">pidaid.css</code> and
+<code class="f BROKEN">images/</code> directory (recursively) to the <code class="f BROKEN">html/en/</code>
+dir of the EPrints archive.</p></li>
+<li>
+<p>Edit <code class="f BROKEN">cfg/template-en.xml</code> in the archive directory to
+add <code class="f BROKEN">pidaid.js</code> and <code class="f BROKEN">pidaid.css</code> to every HTML
+page built.  It may now look like this:</p>
+
+<pre><code>...
+&lt;html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:ep="http://eprints.org/ep2/template"&gt;
+  &lt;head&gt;
+    &lt;title&gt;&amp;archivename; - &lt;ep:pin ref="title" textonly="yes" /&gt;&lt;/title&gt;
+    &lt;style style="text/css" media="screen"&gt;
+@import  url(&amp;base_url;/eprints.css);
+@import  url(&amp;base_url;/pidaid.css);     /* PIDAID */
+    &lt;/style&gt;
+    &lt;style style="text/css" media="print"&gt;
+@import  url(&amp;base_url;/eprints.css);
+@import  url(&amp;base_url;/pidaid.css);     /* PIDAID */
+@import  url(&amp;base_url;/print.css);
+    &lt;/style&gt;
+    &lt;!-- and PIDAID JavaScript: --&gt;
+    &lt;script type='text/javascript' src='&amp;base_url;/pidaid.js' /&gt;  
+    &lt;link rel="Top" href="&amp;frontpage;" /&gt;
+...
+</code></pre>
+</li>
+<li>
+<p>Obtain mysql access parameters from the ACIS service
+administrator.  Then configure the <a href="cooperate.html#acis-pidaid">ACIS::PIDAID</a> module by defining the
+<code>$ACIS::PIDAID::CONF</code> variable in the archive
+configuration file (<code class="f BROKEN">cfg/ArchiveConfig.pm</code>).  It may
+look like this:</p>
+
+<pre><code>$ACIS::PIDAID::CONF = {
+   host =&gt; 'acis.super.edu',
+   port =&gt; '9099',
+   db   =&gt; 'ACIS',
+   user =&gt; 'peter',
+   pass =&gt; 'jolly',
+   max_results =&gt; '25', # optional, default: 15
+};
+</code></pre>
+</li>
+<li><p>Stop and then start again EPrints, i.e. the web server it
+runs on.  The usual <code>apachectl restart</code> may
+not be enough -- you need to separately stop and then
+start it.</p></li>
+</ol>
+
+
+   <h4 id="idp860088">
+<code class="f BROKEN">cgi/pidaid</code> script</h4>
+
+<p>This CGI script searches for personal records.  The script
+is installed into EPrints' <code class="f BROKEN">cgi/</code> directory.  It
+accepts HTTP GET and POST requests and the usual CGI-style
+parameters.  Returns an XML document.</p>
+
+<p>Usage: </p>
+
+<pre><code>http://eprints.super.edu/perl/pidaid?l=mendel*
+http://eprints.super.edu/perl/pidaid?s=pme4
+</code></pre>
+
+<p>Response's <code>Content-type</code> is "<code>text/xml; charset=utf-8</code>".</p>
+
+<p>The script uses the <a href="cooperate.html#acis-pidaid">ACIS::PIDAID</a>
+module to make the actual searches and the <a href="cooperate.html#acis-pidaid-xml">ACIS::PIDAID::XML</a> module to
+produce an XML string of search results.</p>
+
+<p>The CGI parameters this script accepts:</p>
+
+<ul>
+<li><p><code>f</code>: given name to search by;</p></li>
+<li><p><code>l</code>: family name to search by;</p></li>
+<li><p><code>s</code>: short-id to search by;</p></li>
+<li><p><code>e</code>: email address to search by.</p></li>
+</ul>
+
+<p>There are three search modes:</p>
+
+<ul>
+<li><p>by name -- <code>l</code> and <code>f</code> parameters are used;</p></li>
+<li><p>by short-id -- <code>s</code> parameter is used;</p></li>
+<li><p>by email address -- <code>e</code> parameter is used.</p></li>
+</ul>
+
+<p>Specifying together <code>l</code> and <code>s</code> or <code>l</code>
+and <code>e</code> or <code>s</code> and <code>e</code> makes no sense
+and return from such requests is not defined.</p>
+
+<p>The script need not to be configured in any way; it is
+assumed that admin has configured the <a href="cooperate.html#acis-pidaid">ACIS::PIDAID</a> module.</p>
+
+<p>If a search request returns too many matching records, the
+script will return XML string
+"<code>&lt;toomany/&gt;</code>".</p>
+
+<p>In case of an internal problem the script may return XML
+string "<code>&lt;problem/&gt;</code>".</p>
+
+
+   <h5 id="idp870760">Technical details</h5>
+
+<p>The <code class="f BROKEN">cgi/pidaid</code> script employs the normal EPrints'
+infrastructure for accepting and processing requests.  It
+creates an EPrints::Session object and uses it to get the
+input parameters parsed.</p>
+
+
+   <h4 id="idp871576">
+<code class="f BROKEN">pidaid.js</code> add-on JavaScript</h4>
+
+
+   <h5 id="idp871936">XMLHttpRequest technology</h5>
+
+<p>XMLHttpRequest is a piece of browser technology that bacame
+widely known just recently, although existed for a long
+while now.  It allows to create "responsive" web pages.
+With it a web page can communicate to a server and then
+modify itself based on what server returned.  To modify
+itself, the page can use the HTML <abbr title="Document Object Model">DOM</abbr> interface.  XMLHttpRequest is a
+client-side technology and requires in-browser scripting;
+normally JavaScript is used.</p>
+
+<p>XMLHttpRequest has asynchronous mode, when communication
+with the server happens in the background.  While a request
+is sent and a response is recieved, the page is still
+usable, it can react to user input in a usual way.  This
+contrasts with what happens at the page reload phase of a
+usual user-to-a-website interaction.</p>
+
+<p>The XMLHttpRequest requests can contain parameters, as if
+sent by a submitted web form.  The only important limitation
+is that most browsers restrict to which servers it can send
+requests; the server must be on the same domain name as the
+server from which the current page was loaded.  This is a
+security measure.</p>
+
+<p>Response to a XMLHttpRequest request can be of any
+type, e.g. HTML or plain text; just as usual HTTP responses
+can be.  But if a response contains some data in XML,
+XMLHttpRequest provides an interface to parse and traverse
+it.  Again it is <abbr title="Document Object Model">DOM</abbr> interface.</p>
+
+<p>Not all browsers support XMLHttpRequest.  It works in
+Internet Explorer 5.0 and higher, in Mozilla 1.0+ and
+FireFox; Safari 1.2+.  It does not work in Opera 7 and
+earlier, but Opera 8 beta already has an early
+implementation of it.  So, we can hope that soon there will
+be very little number of web users who don't have it.  Of
+course, some users have JavaScript disabled.  Nothing we can
+do about it.</p>
+
+<p>Here are some examples of using the technology:</p>
+
+<ol>
+<li><p><a href="http://www.google.com/webhp?complete=1">Google Suggest</a></p></li>
+<li><p>Meetup.com <a href="http://www.meetup.com/register/">registration form</a>.
+Choose a country and see how the page reacts -- it loads the
+list of cities from the server.</p></li>
+</ol>
+
+<p>Some external resources:</p>
+
+<ol>
+<li><p><a href="http://jibbering.com/2002/4/httprequest.html">Using the XML HTTP Request object</a></p></li>
+<li><p><a href="http://developer.apple.com/internet/webcontent/xmlhttpreq.html">Dynamic HTML and XML: The XMLHttpRequest Object</a></p></li>
+<li><p><a href="http://www.mozilla.org/xmlextras/">Mozilla.com: XML Extras</a></p></li>
+<li><p><a href="http://en.wikipedia.org/wiki/AJAX">AJAX -- Asynchronous JavaScript And XML</a></p></li>
+<li><p><a href="http://en.wikipedia.org/wiki/Single_Page_Application">SPA -- Single Page Application</a></p></li>
+</ol>
+
+
+   <h5 id="idp880416">Overview</h5>
+
+<p>This section offers a brief, simplified overview of how the
+<code class="f BROKEN">pidaid.js</code> script works.  </p>
+
+<p>The script is executed in a user's browser in context of
+an EPrints webpage.  </p>
+
+<p>It starts by calling the <code>install_check_handlers()</code>
+function (via the page's body "onload" event).  The function
+goes through all the &lt;input&gt; elements of the page.
+Along the way, it checks each of them to see if it looks
+like a personal data entry element.  If there are no such
+elements, this is not a page that is interesting to us.</p>
+
+<p>For each group of personal data entry input boxes on the
+page the function creates an object and puts it into the
+global <var>name_groups</var> array.  We use it to store
+certain parameters of each group of controls.  (Each group
+of controls corresponds to one person, whose name data can
+possibly be entered on the page.)</p>
+
+<p>Also, as <code>install_check_handlers()</code> cycles through
+the &lt;input&gt; elements and finds groups of controls, it
+assigns handlers for "onfocus", "onblur" and "onkeyup" events
+to some of them.  To be precise, it assigns handlers for
+these events to the family name, given name and id/email
+input boxes.  Depending on the EPrints configuration, name
+controls may also include honourific name and lineage name
+boxes.  They are disabled by default and we ignore them even
+if they are present.</p>
+
+<p>The handler functions that are assigned to the
+above-mentioned events are different; they depend on the
+event type and the input box type to correctly implement all
+details of the <a href="#level3-ui">user interface</a>.</p>
+
+<p>What all handler functions share in common is that they
+attempt to launch a search request.  For instance, all
+family name and given name box handlers call
+<code>check_name()</code> function, which starts a search by
+name.</p>
+
+<p>A search is done by creating an XMLHttpRequest object, and
+using it to send a request to the <code class="f BROKEN">cgi/pidaid</code> script.
+The <code>send_request()</code> function does that.  Each
+request includes search parameters, e.g. a family name user
+has typed so far.  Before a request is sent, a call-back
+function is set for processing the response.  If the request
+was sent successfully and a response arrives, the
+<code>process_search_results()</code> function analyses the
+response and takes further action.</p>
+
+<p>It uses the data from the search response to build a
+personal records menu (<code>create_menu()</code> function) or
+produce some other message or hide a previously shown
+message.</p>
+
+<p>Here it becomes important to know that personal data entry
+input boxes in EPrints are arranged in a HTML table.  One
+table row -- one person.  To show a message we create a new
+row in the table and a cell in that row and put our message
+into that cell.  (The cell's <code>TD</code> element has
+<code>colspan</code> attribute set to <code>4</code> value--it spans
+4 table columns.)</p>
+
+<p>When we build a menu, we create a new table (inside the
+message cell), and put each personal record item in a
+separate row.  Each menu table row presents a clickable
+personal name and has links to homepage &amp; profile page and
+an "inviting" choice mini-icon.  The personal name and the
+choice mini-icon have "onclick" event handled by a choice
+function.  The choice function sets the name and id input
+boxes to the values of the corresponding personal record and
+hides the menu.</p>
+
+<p>That's how it works, basically.  You are welcome to look
+into the script source if you need more details; it has some
+comments for help.</p>
+
+
+   <h5 id="idp890968">Optimizations</h5>
+
+<p>These are the rules the script follows for minimal
+efficiency and to avoid server overload problems.</p>
+
+<p>At any given time there is only one search request going on.
+If necessary, the new one is sent immediately after the
+first one has finished.</p>
+
+<p><strong>Explanation.</strong> It may happen that user continued entering
+data while a search request was being sent and a response
+was recieved.  This may mean circumstances have changed and
+a new request has to be sent.  But if there is a previous
+request going on, we do not send a new one.  We set a flag
+instead, which instructs the response-processing function to
+restart the search when it is executed.  And the
+response-processing function will run and check this flag
+only when the previous request resulted in a response.</p>
+
+<p>We maintain a simple global cache for search requests to the
+server (the <var>cache</var> variable).  It ensures we never
+have to repeat the same query twice.</p>
+
+<p>We never actually search when the search expression doesn't
+look useful, for example, when the search field's value is
+empty.</p>
+
+<p>We always whitespace-normalize key expression before
+searching: we strip leading and trailing whitespace and we
+compact inner whitespace sequences.  In perl we would do
+that by:</p>
+
+<pre><code>$var =~ s/^\s+//g;
+$var =~ s/\s+$//g;
+$var =~ s/\s+/ /g;
+</code></pre>
+
+
+   <h6 id="idp894272">Short-id / email search optimizations</h6>
+
+<p>There's no point to search for a short-id or email
+address until it looks like an ACIS short-id or an email
+address.</p>
+
+<p>We use a JavaScript equivalent of the following Perl-style
+regular expression for matching email addresses:</p>
+
+<pre><code>/^\s*([\&amp;\+a-z\d\-\.\=\_]+\@(?:[a-z\d\-\_]+\.)+[a-z]{2,})\s*$/i
+</code></pre>
+
+<p>For matching ACIS personal short-ids we use this regular
+expression:</p>
+
+<pre><code>/p[a-z]+\d+/i
+</code></pre>
+
+
+   <h2 id="level4">Level 4.  The metadata update request</h2>
+
+<p>This level's goal is to notify an ACIS service about an
+updated eprint record.  An updated eprint record here means
+a metadata file, to which a new or edited eprint record has
+been just exported.</p>
+
+<p>So, it is as an extension to the <a href="eprints.html#metadata-export-amf">ACIS::EPrints::MetadataExport::AMF
+module</a>, introduced at level 1.  The MetadataExport::AMF
+module writes a metadata file and then immediately notifies
+an ACIS service about it.  We use the <a href="cooperate.html#metaupdate-request">ACIS::MetaUpdate::Request</a>
+module to actually send the request.</p>
+
+
+   <h3 id="idp909240">Configuration</h3>
+
+<p>Via the <code>$c</code> variable in get_conf() function in the
+<code class="f BROKEN">cfg/ArchiveConfig.pm</code> file of the EPrints archive:</p>
+
+<pre><code> $c-&gt;{eprint_metadata_export_AMF_metaupdate} = {
+            'request-target-url' =&gt; 'http://acis.super.org/meta/update',
+            'archive-id'         =&gt; 'michigan',
+            'log-filename'       =&gt; '/opt/eprints/archives/History/super-org-metaupdate.log',
+            'object-dir-levels'  =&gt; 1,
+ };
+</code></pre>
+
+<p>Here three first items: <code>request-target-url</code>,
+<code>archive-id</code> and <code>log-filename</code> are
+configuration for the ACIS::MetaUpdate::Request module.  </p>
+
+<p>You can also configure the ACIS::MetaUpdate::Request module
+via the <code>$ACIS::MetaUpdate::Request::CONF</code> variable
+(<a href="cooperate.html#metaupdate-request-conf">details</a>).</p>
+
+
+   <h4 id="object-dir-levels">
+<code>object-dir-levels</code>
+parameter</h4>
+
+<p>The <code>object-dir-levels</code> parameter helps us to
+calculate the update request OBJECT value from the absolute
+path of a just written AMF file.  It specifies how many
+levels of directory structure will be included into the
+OBJECT.  If <code>object-dir-levels</code> is 0, the OBJECT will
+just include the name of the AMF file (something like
+<code>"100.amf.xml"</code>).</p>
+
+<p>But if, for example,
+<code>$c-&gt;{<a class="c" href="eprints.html#eprint_metadata_export_AMF_dir">eprint_metadata_export_AMF_dir</a>}</code> is
+<code>"/opt/eprints/metadata/amf/History/"</code> and
+<code>object-dir-levels</code> is 1, and the AMF file 
+written was
+<code>"/opt/eprints/metadata/amf/History/100.amf.xml"</code>,
+then OBJECT will be <code>"History/100.amf.xml"</code>.</p>
+
+<p>It means the ACIS service, to which the update request is
+sent, will try to retrieve
+<code>"History/100.amf.xml"</code> from us, the document
+service archive.</p>
+
+<p>Default value for <code>object-dir-levels</code> is 0.</p>
+
+
+   <h3 id="idp917096">Other considerations</h3>
+
+<p>It is up to the EPrints service administrator and the ACIS
+service administrator to agree on a transport technology for
+the data files between the services.  We assume the
+simpliest case here: an exported file becomes immediately
+available for retrieval by ACIS, probably via a public web
+server.  All what is left is to notify ACIS about it.</p>
+
+<p></p>
+
+  
+<address class="footer">
+<p>
+$Id$
+</p>
+<p>Generated: Wed Jan 15 13:37:33 2014</p>
+<p><a href="http://acis.openlib.org/">ACIS project</a>,
+          acis<i>@</i>openlib<span>.org</span></p>
+</address>
+</body>
+</html>
