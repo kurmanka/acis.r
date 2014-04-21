@@ -7,13 +7,13 @@
 <body>
       
 
-   <h1 id="idp1284656">Automatic Profile Update</h1>
+   <h1 id="idp347856">Automatic Profile Update</h1>
 
 <h3><i>Table of contents</i></h3>
-<p class="toc">   <a href="#idp1285072">Introduction &amp; overview</a><br>   <a href="#idp1289728">Some older terms</a><br>   <a href="#binapu">The <code class="C">bin/apu</code> script</a><br>   <a href="#idp1297848">How to run bin/apu?</a><br>   <a href="#idp1300032">Configuration parameters</a><br>   <a href="#idp1302792">Technical: Queue management</a><br>   <a href="#idp1308000">Technical: Responsible perl code</a><br></p>
+<p class="toc">   <a href="#idp348656">Introduction &amp; overview</a><br>   <a href="#idp356400">Some older terms</a><br>   <a href="#binapu">The <code class="C">bin/apu</code> script</a><br>   <a href="#idp370416">How to run bin/apu?</a><br>   <a href="#idp374144">Configuration parameters</a><br>   <a href="#idp379248">Technical: Queue management</a><br>   <a href="#idp388592">Technical: Responsible perl code</a><br></p>
 
 
-   <h2 id="idp1285072">Introduction &amp; overview</h2>
+   <h2 id="idp348656">Introduction &amp; overview</h2>
 
 <p>Automatic Profile Update is a subsystem of ACIS, which performs a
 number of operations on user profiles automatically.  It serves several
@@ -57,7 +57,7 @@ changed document records and citations).</p></li>
 </ul>
 
 
-   <h2 id="idp1289728">Some older terms</h2>
+   <h2 id="idp356400">Some older terms</h2>
 
 <dl>
 <dt id="ARPU" C="ARPU"><code class="C">ARPU</code></dt>
@@ -124,7 +124,7 @@ end of the queue is reached.</dd>
 </dl>
 
 
-   <h2 id="idp1297848">How to run bin/apu?</h2>
+   <h2 id="idp370416">How to run bin/apu?</h2>
 
 <p>Run it at low-load periods or regularly as a cron-job.</p>
 
@@ -137,26 +137,26 @@ through 12 records a day, about 360 per month.</p>
 
 <p>In case you run it too often, it will start skipping queued items.  The
 script will skip a record, if APU was already done for it recently.
-See <a class="c" href="conf.html#minimum-apu-period-days">minimum-apu-period-days</a> configuration parameter.</p>
+See <a class="c" href="citations.html#minimum-apu-period-days">minimum-apu-period-days</a> configuration parameter.</p>
 
 
-   <h2 id="idp1300032">Configuration parameters</h2>
+   <h2 id="idp374144">Configuration parameters</h2>
 
 <p>These are the APU-related ACIS configuration parameters (to be used in
 the the <a class="a" href="conf.html#mainconf">main.conf</a> configuration file):</p>
 
 <ul>
 <li>
-<a class="c" href="conf.html#minimum-apu-period-days">minimum-apu-period-days</a> </li>
-<li><a class="c" href="conf.html#echo-apu-mails">echo-apu-mails</a></li>
+<a class="c" href="citations.html#minimum-apu-period-days">minimum-apu-period-days</a> </li>
+<li><a class="c" href="citations.html#echo-apu-mails">echo-apu-mails</a></li>
 <li><a class="c" href="conf.html#apu-research-mail-include-approx-hits">apu-research-mail-include-approx-hits</a></li>
 <li><a class="c" href="conf.html#apu-research-max-suggestions-in-a-mail">apu-research-max-suggestions-in-a-mail</a></li>
 <li><a class="c" href="conf.html#apu-citations-auto-add-limit">apu-citations-auto-add-limit</a></li>
-<li><a class="c" href="conf.html#disable-citation-mails">disable-citation-mails</a></li>
+<li><a class="c" href="citations.html#disable-citation-mails">disable-citation-mails</a></li>
 </ul>
 
 
-   <h2 id="idp1302792">Technical: Queue management</h2>
+   <h2 id="idp379248">Technical: Queue management</h2>
 
 <p>APU stores it's queue in the apu_queue table.</p>
 
@@ -204,7 +204,7 @@ deletes the table content and starts over again.  This usually happens
 automatically.</p>
 
 
-   <h2 id="idp1308000">Technical: Responsible perl code</h2>
+   <h2 id="idp388592">Technical: Responsible perl code</h2>
 
 <p>These modules in ACIS are responsible for APU:</p>
 
@@ -231,7 +231,7 @@ interface ACIS::APU module.  Is basis for the <a class="a" href="apu.html#binapu
 
   
 <address class="footer">
-<p>Generated: Wed Jan 15 13:37:33 2014</p>
+<p>Generated: Mon Apr 21 16:13:43 2014</p>
 <p><a href="http://acis.openlib.org/">ACIS project</a>,
           acis<i>@</i>openlib<span>.org</span></p>
 </address>

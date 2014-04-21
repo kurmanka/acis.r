@@ -7,21 +7,21 @@
 <body>
       
 
-   <h1 id="idp958656">Citations in ACIS</h1>
+   <h1 id="idp426944">Citations in ACIS</h1>
 
 <p><a href="http://acis.openlib.org/software/doc/citations.text">document
 source</a> in Markdown format
 </p>
 
 <h3><i>Table of contents</i></h3>
-<p class="toc">   <a href="#idp959616">Introduction</a><br>      <a href="#idp959832">Why? What for?</a><br>      <a href="#idp964152">Workflow overview</a><br>   <a href="#user-interface">Citation profile: user interface</a><br>      <a href="#most-interesting-doc">The most interesting document</a><br>      <a href="#idp974048">Per-document screens: identified and potential tabs</a><br>      <a href="#auto-suggestions">"Auto suggestions" screen</a><br>      <a href="#idp986976">Document list screen</a><br>      <a href="#idp988400">Refused citations screen</a><br>      <a href="#idp989152">Citation profile overview screen</a><br>   <a href="#auto-update">Automatic citation profile update</a><br>      <a href="#idp994440">Automatic Update Preferences screen</a><br>      <a href="#idp997232">Notification emails</a><br>   <a href="#data-input">Citations data input</a><br>   <a href="#data-output">Citations data output</a><br>   <a href="#idp1012872">Administration and configuration</a><br>      <a href="#input-configuration">Input data</a><br>      <a href="#idp1016576">Citations screens parameters</a><br>   <a href="#idp1018096">Technical implementation details / developer's guide</a><br>      <a href="#idp1018352">Processing the citations data</a><br>         <a href="#idp1021960">Citations table</a><br>         <a href="#idp1025000">Citation string normalization:</a><br>         <a href="#idp1026608">Cutting out the editors part</a><br>      <a href="#idp1027936">Search for citations and ACPU</a><br>         <a href="#idp1028448">Automatic citation profile update</a><br>         <a href="#idp1032008">Search workflow</a><br>      <a href="#idp1042040">Citation to document similarity</a><br>         <a href="#cit-doc-similarity-pi">Similarity assessment function interface</a><br>         <a href="#similarity-default-func">The default citation-document
-similarity assessment algorithm</a><br>      <a href="#idp1052872">Citation suggestions</a><br>         <a href="#idp1053096">Citation to document similarity table: cit_doc_similarity</a><br>         <a href="#idp1055592">other citation suggestions table: cit_sug</a><br>         <a href="#idp1058048">Old suggestions table: cit_old_sug</a><br>      <a href="#idp1060224">Similarity matrix</a><br>         <a href="#idp1060440">Data structure</a><br>         <a href="#idp1067368">main matrix operations</a><br>      <a href="#idp1069512">Userdata structure</a><br>      <a href="#idp1077880">Storing and passing citations around</a><br>      <a href="#idp1080408">Modules</a><br>         <a href="#idp1080616">ACIS::Citations</a><br>         <a href="#idp1080832">ACIS::Citations::Utils</a><br>         <a href="#idp1083048">ACIS::Citations::Input</a><br>         <a href="#idp1084672">ACIS::Citations::Suggestions</a><br>         <a href="#idp1084904">ACIS::Citations::SimMatrix</a><br>         <a href="#idp1087992">ACIS::Citations::Search</a><br>         <a href="#idp1089688">ACIS::Web::Citations::Profile</a><br>         <a href="#idp1090176">ACIS::Web::Citations</a><br>         <a href="#idp1094344">ACIS::Citations::AutoUpdate</a><br>      <a href="#idp1094568">Other notes</a><br>         <a href="#idp1094776">SysProf table profile parameters</a><br>         <a href="#idp1096200">Consistency maintentance</a><br>         <a href="#idp1097704">Database maintenance</a><br></p>
+<p class="toc">   <a href="#idp428720">Introduction</a><br>      <a href="#idp429120">Why? What for?</a><br>      <a href="#idp436224">Workflow overview</a><br>   <a href="#user-interface">Citation profile: user interface</a><br>      <a href="#most-interesting-doc">The most interesting document</a><br>      <a href="#idp452480">Per-document screens: identified and potential tabs</a><br>      <a href="#auto-suggestions">"Auto suggestions" screen</a><br>      <a href="#idp473008">Document list screen</a><br>      <a href="#idp475200">Refused citations screen</a><br>      <a href="#idp476336">Citation profile overview screen</a><br>   <a href="#auto-update">Automatic citation profile update</a><br>      <a href="#idp484096">Automatic Update Preferences screen</a><br>      <a href="#idp488112">Notification emails</a><br>   <a href="#data-input">Citations data input</a><br>   <a href="#data-output">Citations data output</a><br>   <a href="#idp507600">Administration and configuration</a><br>      <a href="#input-configuration">Input data</a><br>      <a href="#idp513872">Citations screens parameters</a><br>   <a href="#idp516560">Technical implementation details / developer's guide</a><br>      <a href="#idp517008">Processing the citations data</a><br>         <a href="#idp523488">Citations table</a><br>         <a href="#idp529008">Citation string normalization:</a><br>         <a href="#idp531936">Cutting out the editors part</a><br>      <a href="#idp534272">Search for citations and ACPU</a><br>         <a href="#idp535152">Automatic citation profile update</a><br>         <a href="#idp541376">Search workflow</a><br>      <a href="#idp559456">Citation to document similarity</a><br>         <a href="#cit-doc-similarity-pi">Similarity assessment function interface</a><br>         <a href="#similarity-default-func">The default citation-document
+similarity assessment algorithm</a><br>      <a href="#idp577456">Citation suggestions</a><br>         <a href="#idp577872">Citation to document similarity table: cit_doc_similarity</a><br>         <a href="#idp582464">other citation suggestions table: cit_sug</a><br>         <a href="#idp587024">Old suggestions table: cit_old_sug</a><br>      <a href="#idp591056">Similarity matrix</a><br>         <a href="#idp591472">Data structure</a><br>         <a href="#idp603712">main matrix operations</a><br>      <a href="#idp607776">Userdata structure</a><br>      <a href="#idp623360">Storing and passing citations around</a><br>      <a href="#idp627904">Modules</a><br>         <a href="#idp628304">ACIS::Citations</a><br>         <a href="#idp628704">ACIS::Citations::Utils</a><br>         <a href="#idp632752">ACIS::Citations::Input</a><br>         <a href="#idp635712">ACIS::Citations::Suggestions</a><br>         <a href="#idp636128">ACIS::Citations::SimMatrix</a><br>         <a href="#idp641968">ACIS::Citations::Search</a><br>         <a href="#idp645136">ACIS::Web::Citations::Profile</a><br>         <a href="#idp646000">ACIS::Web::Citations</a><br>         <a href="#idp653696">ACIS::Citations::AutoUpdate</a><br>      <a href="#idp654112">Other notes</a><br>         <a href="#idp654512">SysProf table profile parameters</a><br>         <a href="#idp657168">Consistency maintentance</a><br>         <a href="#idp659616">Database maintenance</a><br></p>
 
 
-   <h2 id="idp959616">Introduction</h2>
+   <h2 id="idp428720">Introduction</h2>
 
 
-   <h3 id="idp959832">Why? What for?</h3>
+   <h3 id="idp429120">Why? What for?</h3>
 
 <p>Authors have a strong desire to find out</p>
 
@@ -65,7 +65,7 @@ systems like CiteSeer.</p>
 and filter the data.</p>
 
 
-   <h3 id="idp964152">Workflow overview</h3>
+   <h3 id="idp436224">Workflow overview</h3>
 
 <p>Here is what happens and what we do with citations.</p>
 
@@ -150,7 +150,7 @@ level, some of the citations will be pre-selected for
 identification by default.</p>
 
 
-   <h3 id="idp974048">Per-document screens: identified and potential tabs</h3>
+   <h3 id="idp452480">Per-document screens: identified and potential tabs</h3>
 
 <p>Main work on citations happens on per-document screens,
 which means the user operates on citations for one
@@ -272,7 +272,7 @@ profile, because your research profile is empty.
 </code></pre>
 
 
-   <h3 id="idp986976">Document list screen</h3>
+   <h3 id="idp473008">Document list screen</h3>
 
 <p>A table of all documents (research profile items) is shown
 on the "Document list" screen. It also provides numbers of
@@ -290,7 +290,7 @@ further details.</p>
 citations.</p>
 
 
-   <h3 id="idp988400">Refused citations screen</h3>
+   <h3 id="idp475200">Refused citations screen</h3>
 
 <p>On the Refused Citations screen users will deal with
 citations, for which user has pressed the "Not my work" button
@@ -300,7 +300,7 @@ which then may be suggested to the same or other documents,
 depending on similarity found.</p>
 
 
-   <h3 id="idp989152">Citation profile overview screen</h3>
+   <h3 id="idp476336">Citation profile overview screen</h3>
 
 <p>The main page of the citation profile gives a brief
 introduction and overview of the profile, with links to
@@ -341,7 +341,7 @@ is sent to the user (the owner of the profile) to notify her
 about the changes.  </p>
 
 
-   <h3 id="idp994440">Automatic Update Preferences screen</h3>
+   <h3 id="idp484096">Automatic Update Preferences screen</h3>
 
 <p>Some users most certainly won't trust automatic changes or
 experience problems with it.  Therefore, even though these
@@ -392,7 +392,7 @@ citation profile menu (right-hand top corner navigation
 menu).</p>
 
 
-   <h3 id="idp997232">Notification emails</h3>
+   <h3 id="idp488112">Notification emails</h3>
 
 <p>Automatic citation profile update and research profile
 update are separate functions of ACIS.  Notification
@@ -584,7 +584,7 @@ documents data:</p>
 personal profile pages, generated for each profile in ACIS.</p>
 
 
-   <h2 id="idp1012872">Administration and configuration</h2>
+   <h2 id="idp507600">Administration and configuration</h2>
 
 
    <h3 id="input-configuration">Input data</h3>
@@ -611,7 +611,7 @@ metadata-CitEc-type=CitationsAMF
 extension to be processed by ACIS.</p>
 
 
-   <h3 id="idp1016576">Citations screens parameters</h3>
+   <h3 id="idp513872">Citations screens parameters</h3>
 
 <p>The citation profile is enabled and configured via the the <a href="conf.html">main.conf</a> configuration file.  (Just as every
 other part of the ACIS web interface.)</p>
@@ -620,10 +620,10 @@ other part of the ACIS web interface.)</p>
 another document.</p>
 
 
-   <h2 id="idp1018096">Technical implementation details / developer's guide</h2>
+   <h2 id="idp516560">Technical implementation details / developer's guide</h2>
 
 
-   <h3 id="idp1018352">Processing the citations data</h3>
+   <h3 id="idp517008">Processing the citations data</h3>
 
 <p><em>The data processing flow.</em>  RePEc::Index and
 RePEc::Index::Collections::CitationsAMF to
@@ -647,7 +647,7 @@ document</p></li>
 </ul>
 
 
-   <h4 id="idp1021960">Citations table</h4>
+   <h4 id="idp523488">Citations table</h4>
 
 <p>The fields:</p>
 
@@ -668,7 +668,7 @@ string in base64 encoding - 22 chars)</li>
 <p><code>FULLTEXT INDEX (nstring), INDEX (trgdocid)</code></p>
 
 
-   <h4 id="idp1025000">Citation string normalization:</h4>
+   <h4 id="idp529008">Citation string normalization:</h4>
 
 <ul>
 <li>Unicode decomposition, </li>
@@ -679,7 +679,7 @@ string in base64 encoding - 22 chars)</li>
 </ul>
 
 
-   <h4 id="idp1026608">Cutting out the editors part</h4>
+   <h4 id="idp531936">Cutting out the editors part</h4>
 
 <p>The original citation string may contain editor names, which
 we don't want, because they will cause the citation to be
@@ -693,12 +693,12 @@ found mistakenly for authors.</p>
 <p>should do the trick.</p>
 
 
-   <h3 id="idp1027936">Search for citations and ACPU</h3>
+   <h3 id="idp534272">Search for citations and ACPU</h3>
 
 <p>Via APU. ACIS::APU -&gt; ACIS::Citations::AutoUpdate -&gt; ACIS::Citations::Search</p>
 
 
-   <h4 id="idp1028448">Automatic citation profile update</h4>
+   <h4 id="idp535152">Automatic citation profile update</h4>
 
 <p>Former ARPU has been extended to cover citations and they now
 jointly known as APU: automatic profile update.</p>
@@ -729,7 +729,7 @@ their ACPU or ARPU timestamps oldest, just as it is now done
 for ARPU only.  </p>
 
 
-   <h4 id="idp1032008">Search workflow</h4>
+   <h4 id="idp541376">Search workflow</h4>
 
 <p>For each research profile item of the user, we do something like:</p>
 
@@ -808,7 +808,7 @@ there's several of them)</p></li>
 </ul>
 
 
-   <h3 id="idp1042040">Citation to document similarity</h3>
+   <h3 id="idp559456">Citation to document similarity</h3>
 
 
    <h4 id="cit-doc-similarity-pi">Similarity assessment function interface</h4>
@@ -921,10 +921,10 @@ what CiteSeer team tried.</li>
 </ul>
 
 
-   <h3 id="idp1052872">Citation suggestions</h3>
+   <h3 id="idp577456">Citation suggestions</h3>
 
 
-   <h4 id="idp1053096">Citation to document similarity table: cit_doc_similarity</h4>
+   <h4 id="idp577872">Citation to document similarity table: cit_doc_similarity</h4>
 
 <p>Table cit_doc_similarity fields:</p>
 
@@ -942,7 +942,7 @@ what CiteSeer team tried.</li>
 <p><code>PRIMARY KEY (cnid,dsid)</code></p>
 
 
-   <h4 id="idp1055592">other citation suggestions table: cit_sug</h4>
+   <h4 id="idp582464">other citation suggestions table: cit_sug</h4>
 
 <p>Table cit_sug fields:</p>
 
@@ -960,7 +960,7 @@ what CiteSeer team tried.</li>
 <p><code>PRIMARY KEY (cnid,dsid,reason)</code></p>
 
 
-   <h4 id="idp1058048">Old suggestions table: cit_old_sug</h4>
+   <h4 id="idp587024">Old suggestions table: cit_old_sug</h4>
 
 <p>Table cit_old_sug fields:</p>
 
@@ -975,10 +975,10 @@ what CiteSeer team tried.</li>
 <p><code>PRIMARY KEY (psid,dsid,cnid)</code></p>
 
 
-   <h3 id="idp1060224">Similarity matrix</h3>
+   <h3 id="idp591056">Similarity matrix</h3>
 
 
-   <h4 id="idp1060440">Data structure</h4>
+   <h4 id="idp591472">Data structure</h4>
 
 <p>matrix:</p>
 
@@ -1046,7 +1046,7 @@ multiplying the similarity values (calculated by the
 cit-to-document comparison function) by 100.</p>
 
 
-   <h4 id="idp1067368">main matrix operations</h4>
+   <h4 id="idp603712">main matrix operations</h4>
 
 <ul>
 <li><p>load the matrix</p></li>
@@ -1058,7 +1058,7 @@ cit-to-document comparison function) by 100.</p>
 </ul>
 
 
-   <h3 id="idp1069512">Userdata structure</h3>
+   <h3 id="idp607776">Userdata structure</h3>
 
 <p>The <strong><code>citations</code></strong> branch of the userdata structure:</p>
 
@@ -1107,7 +1107,7 @@ with these items:</p>
 </ul>
 
 
-   <h3 id="idp1077880">Storing and passing citations around</h3>
+   <h3 id="idp623360">Storing and passing citations around</h3>
 
 <p>Citations will be stored as:</p>
 
@@ -1124,13 +1124,13 @@ step, some hash keys may be added to a citation or may be removed.  </p>
 re-considered as a suggestion (3-&gt;2). </p>
 
 
-   <h3 id="idp1080408">Modules</h3>
+   <h3 id="idp627904">Modules</h3>
 
 
-   <h4 id="idp1080616">ACIS::Citations</h4>
+   <h4 id="idp628304">ACIS::Citations</h4>
 
 
-   <h4 id="idp1080832">ACIS::Citations::Utils</h4>
+   <h4 id="idp628704">ACIS::Citations::Utils</h4>
 
 <ul>
 <li><p>normalize_string( string )</p></li>
@@ -1143,7 +1143,7 @@ of [ cnid: citation ] pairs ???</p></li>
 <p>and other useful stuff</p>
 
 
-   <h4 id="idp1083048">ACIS::Citations::Input</h4>
+   <h4 id="idp632752">ACIS::Citations::Input</h4>
 
 <p>use ACIS::Citations::Utils;</p>
 
@@ -1155,10 +1155,10 @@ undef otherwise</p></li>
 </ul>
 
 
-   <h4 id="idp1084672">ACIS::Citations::Suggestions</h4>
+   <h4 id="idp635712">ACIS::Citations::Suggestions</h4>
 
 
-   <h4 id="idp1084904">ACIS::Citations::SimMatrix</h4>
+   <h4 id="idp636128">ACIS::Citations::SimMatrix</h4>
 
 <p>use ACIS::Citations::Suggestions;</p>
 
@@ -1186,7 +1186,7 @@ specified above</li>
 </ul>
 
 
-   <h4 id="idp1087992">ACIS::Citations::Search</h4>
+   <h4 id="idp641968">ACIS::Citations::Search</h4>
 
 <p>use ACIS::Citations::Utils;
 use ACIS::Citations::Suggestions;</p>
@@ -1201,13 +1201,13 @@ use ACIS::Citations::Suggestions;</p>
 <p>...</p>
 
 
-   <h4 id="idp1089688">ACIS::Web::Citations::Profile</h4>
+   <h4 id="idp645136">ACIS::Web::Citations::Profile</h4>
 
 <p>use ACIS::Citations::Input;
 use ACIS::Web::SysProfile;</p>
 
 
-   <h4 id="idp1090176">ACIS::Web::Citations</h4>
+   <h4 id="idp646000">ACIS::Web::Citations</h4>
 
 <ul>
 <li><p>acis_citations_enabled() - check that <a class="c" href="conf.html#citations-profile">citations-profile</a> parameter has
@@ -1225,13 +1225,13 @@ a true value in <a class="f" href="conf.html#mainconf">main.conf</a>; returns tr
 </ul>
 
 
-   <h4 id="idp1094344">ACIS::Citations::AutoUpdate</h4>
+   <h4 id="idp653696">ACIS::Citations::AutoUpdate</h4>
 
 
-   <h3 id="idp1094568">Other notes</h3>
+   <h3 id="idp654112">Other notes</h3>
 
 
-   <h4 id="idp1094776">SysProf table profile parameters</h4>
+   <h4 id="idp654512">SysProf table profile parameters</h4>
 
 <ul>
 <li><p>last profile check time (seconds since the epoch):
@@ -1241,7 +1241,7 @@ a true value in <a class="f" href="conf.html#mainconf">main.conf</a>; returns tr
 </ul>
 
 
-   <h4 id="idp1096200">Consistency maintentance</h4>
+   <h4 id="idp657168">Consistency maintentance</h4>
 
 <p>Every once in a while we check that every citation that is mentioned in
 the personal profile is still present in the citations table, and clear
@@ -1255,7 +1255,7 @@ it, if it isn't there.</p>
 identified citations is still present in the database.</p>
 
 
-   <h4 id="idp1097704">Database maintenance</h4>
+   <h4 id="idp659616">Database maintenance</h4>
 
 <p>It would be highly desirable to backup the citations, citations_deleted
 and other related tables regularly.  It is important for consistency of
@@ -1268,7 +1268,7 @@ the data and stability of the user profiles.</p>
 <p>
 $Id$
 </p>
-<p>Generated: Wed Jan 15 13:37:33 2014</p>
+<p>Generated: Mon Apr 21 16:13:43 2014</p>
 <p><a href="http://acis.openlib.org/">ACIS project</a>,
           acis<i>@</i>openlib<span>.org</span></p>
 </address>

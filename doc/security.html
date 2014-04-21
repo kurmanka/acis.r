@@ -1,0 +1,51 @@
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<title>ACIS: Security / ACIS documentation</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+      
+
+   <h1 id="idp1954912">ACIS: Security</h1>
+
+<p>ACIS is a web-application. It is designed to be run on a public 
+network, accessible by folks around the world. As such, it is 
+exposed to a large number of risks and dangers.</p>
+
+<p>I'll briefly describe how we go about them.</p>
+
+<p>First, some facts:</p>
+
+<ol>
+<li><p>The user passwords are never stored or written or sent out in 
+their clear-text form. (Hacker break-in, if happens, would not 
+reveal the user passwords.)</p></li>
+<li><p>The persistent login is cookie-based, and implemented with secure 
+random tokens, that are independent of passwords, unique and hard 
+to guess.</p></li>
+<li><p>If you forget your password, you can reset it, by requesting a 
+reset link. The reset link is also independent of the password,
+unique and hard to guess. Reset links expire after 12 hours and 
+a used reset link cannot be reused. (Reset feature makes account 
+stealing possible, but mass account stealling is unlikely.)</p></li>
+<li><p>There is no way a normal-privilege user may gain high-privilege 
+admin access rights without first having write-access to the 
+filesystem (specifically, the userdata files).</p></li>
+<li><p>The session identifiers are long and random. (Session hi-jacking 
+is not likely.) </p></li>
+<li><p>System is protected from SQL-injection by using 
+parameterized SQL queries (bind variables).</p></li>
+<li><p>All HTML pages are generated via XSLT. No cross-site scripting is 
+likely to happen, since all of the user-supplied data goes through
+the strict XML escaping during XSLT processing.</p></li>
+</ol>
+
+  
+<address class="footer">
+<p>Generated: Mon Apr 21 16:13:43 2014</p>
+<p><a href="http://acis.openlib.org/">ACIS project</a>,
+          acis<i>@</i>openlib<span>.org</span></p>
+</address>
+</body>
+</html>
