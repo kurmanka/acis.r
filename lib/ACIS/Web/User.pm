@@ -484,13 +484,11 @@ sub settings {
   # if no old password given and no new password given,
   # we assume it was just about the email address.
   if ( not $oldp and not $input->{'pass-new'} ) {
-    if ( not $app -> error ) {
-      $app -> clear_process_queue;
-      if ($login_changed) {
-        $app -> message( "saved" );
-      }
-      return;
+    $app -> clear_process_queue;
+    if ($login_changed) {
+      $app -> message( "saved" );
     }
+    return;
   }
 
   # check the password
