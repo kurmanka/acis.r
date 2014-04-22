@@ -7,13 +7,13 @@
 <body>
       
 
-   <h1 id="idp1546144">Programmer's guide (Internals)</h1>
+   <h1 id="idp1547056">Programmer's guide (Internals)</h1>
 
 <h3><i>Table of contents</i></h3>
-<p class="toc">   <a href="#idp1546944">Overview</a><br>   <a href="#idp1548960">Data processing</a><br>      <a href="#idp1564192">Summary</a><br>   <a href="#webinterface">Web interface</a><br>      <a href="#idp1583392">Summary</a><br>   <a href="#idp1587952">A brief guide to the ACIS source files</a><br>   <a href="#idp1608144">A detailed guide to the ACIS source files</a><br>      <a href="#idp1609040">Traditional meta files</a><br>      <a href="#idp1615552">Documentation</a><br>      <a href="#idp1636656">Installation and configuration</a><br>      <a href="#idp1661632">Presenters and other presentation-related files</a><br>         <a href="#idp1662064">General</a><br>         <a href="#idp1689104">Users' screens</a><br>         <a href="#idp1697024">Person-profile editing screens</a><br>         <a href="#idp1712464">New user (initial registration) screens</a><br>         <a href="#idp1716912">Administrative screens</a><br>         <a href="#idp1730976">Email generation</a><br>         <a href="#idp1733792">Other</a><br>      <a href="#idp1743424">ACIS:: hierarchy</a><br>         <a href="#ACIS::Web">ACIS::Web -- Web interface of ACIS</a><br>         <a href="#idp1774336">Research Profile underlying modules</a><br>         <a href="#idp1780048">APU</a><br>         <a href="#idp1784208">Citations</a><br>         <a href="#idp1795600">Other ACIS:: modules</a><br>      <a href="#idp1801776">Web::App -- the web application framework</a><br>         <a href="#idp1815920">ACIS::Data::DumpXML</a><br>      <a href="#idp1820816">ARDB -- the data-processing</a><br>      <a href="#idp1847776">SQL helper</a><br>      <a href="#idp1852224">Other</a><br></p>
+<p class="toc">   <a href="#idp1547856">Overview</a><br>   <a href="#idp1549872">Data processing</a><br>      <a href="#idp1565104">Summary</a><br>   <a href="#webinterface">Web interface</a><br>      <a href="#idp1584304">Summary</a><br>   <a href="#idp1588864">A brief guide to the ACIS source files</a><br>   <a href="#idp1609056">A detailed guide to the ACIS source files</a><br>      <a href="#idp1609952">Traditional meta files</a><br>      <a href="#idp1616464">Documentation</a><br>      <a href="#idp1637568">Installation and configuration</a><br>      <a href="#idp1662544">Presenters and other presentation-related files</a><br>         <a href="#idp1662976">General</a><br>         <a href="#idp1690016">Users' screens</a><br>         <a href="#idp1697936">Person-profile editing screens</a><br>         <a href="#idp1713376">New user (initial registration) screens</a><br>         <a href="#idp1717824">Administrative screens</a><br>         <a href="#idp1731888">Email generation</a><br>         <a href="#idp1734704">Other</a><br>      <a href="#idp1744336">ACIS:: hierarchy</a><br>         <a href="#ACIS::Web">ACIS::Web -- Web interface of ACIS</a><br>         <a href="#idp1775248">Research Profile underlying modules</a><br>         <a href="#idp1780960">APU</a><br>         <a href="#idp1785120">Citations</a><br>         <a href="#idp1796512">Other ACIS:: modules</a><br>      <a href="#idp1802688">Web::App -- the web application framework</a><br>         <a href="#idp1816832">ACIS::Data::DumpXML</a><br>      <a href="#idp1821728">ARDB -- the data-processing</a><br>      <a href="#idp1848688">SQL helper</a><br>      <a href="#idp1853136">Other</a><br></p>
 
 
-   <h2 id="idp1546944">Overview</h2>
+   <h2 id="idp1547856">Overview</h2>
 
 <p>Internally, ACIS consists of two main subsystems and a
 number of smaller tools.  These two main parts are very
@@ -32,7 +32,7 @@ subsystem will process.  The system is complex, but consists of simple
 parts; each part has distinct responsibilities.</p>
 
 
-   <h2 id="idp1548960">Data processing</h2>
+   <h2 id="idp1549872">Data processing</h2>
 
 <p>The data processing subsystem, in its turn, consists of two loosely
 coupled parts.  The first part monitors data files, tracks their
@@ -101,7 +101,7 @@ intrinsic; it is just in the way of how ACIS configures RI to
 process the metadata.</p>
 
 
-   <h3 id="idp1564192">Summary</h3>
+   <h3 id="idp1565104">Summary</h3>
 
 <ul>
 <li><p>ACIS consists of data processing part and web-interface
@@ -188,7 +188,7 @@ a similar way: they involve a certain part of the
 <code>ACIS::Web</code> and it does the rest.</p>
 
 
-   <h3 id="idp1583392">Summary</h3>
+   <h3 id="idp1584304">Summary</h3>
 
 <ul>
 <li><p>ACIS is built on top of a generic web-application
@@ -206,7 +206,7 @@ single solid application.</p></li>
 
 
 
-   <h2 id="idp1587952">A brief guide to the ACIS source files</h2>
+   <h2 id="idp1588864">A brief guide to the ACIS source files</h2>
 
 <p>Main parts and some key files</p>
 
@@ -274,13 +274,13 @@ for details</dd>
 </dl>
 
 
-   <h2 id="idp1608144">A detailed guide to the ACIS source files</h2>
+   <h2 id="idp1609056">A detailed guide to the ACIS source files</h2>
 
 <p>This is an annotated list of most files of an ACIS
 distribution. </p>
 
 
-   <h3 id="idp1609040">Traditional meta files</h3>
+   <h3 id="idp1609952">Traditional meta files</h3>
 
 <dl>
 
@@ -311,7 +311,7 @@ novel.  Serious.</dd>
 </dl>
 
 
-   <h3 id="idp1615552">Documentation</h3>
+   <h3 id="idp1616464">Documentation</h3>
 
 <dl>
 
@@ -372,7 +372,7 @@ Corresponding documentation sources in <a href="http://daringfireball.net/projec
 </dl>
 
 
-   <h3 id="idp1636656">Installation and configuration</h3>
+   <h3 id="idp1637568">Installation and configuration</h3>
 
 <dl>
 
@@ -458,10 +458,10 @@ if necessary.  Copies all the files.  Runs
 </dl>
 
 
-   <h3 id="idp1661632">Presenters and other presentation-related files</h3>
+   <h3 id="idp1662544">Presenters and other presentation-related files</h3>
 
 
-   <h4 id="idp1662064">General</h4>
+   <h4 id="idp1662976">General</h4>
 
 <dl>
 
@@ -573,7 +573,7 @@ problem in IE 6/Win and IE 5.5/Win.
 </dl>
 
 
-   <h4 id="idp1689104">Users' screens</h4>
+   <h4 id="idp1690016">Users' screens</h4>
 
 <dl>
 
@@ -602,7 +602,7 @@ problem in IE 6/Win and IE 5.5/Win.
 </dl>
 
 
-   <h4 id="idp1697024">Person-profile editing screens</h4>
+   <h4 id="idp1697936">Person-profile editing screens</h4>
 
 <dl>
 
@@ -657,7 +657,7 @@ pictures of the users.  Not in use anymore.</dd>
 </dl>
 
 
-   <h4 id="idp1712464">New user (initial registration) screens</h4>
+   <h4 id="idp1713376">New user (initial registration) screens</h4>
 
 <dl>
 
@@ -676,7 +676,7 @@ pictures of the users.  Not in use anymore.</dd>
 </dl>
 
 
-   <h4 id="idp1716912">Administrative screens</h4>
+   <h4 id="idp1717824">Administrative screens</h4>
 
 <dl>
 
@@ -728,7 +728,7 @@ useful in the future or will be thrown away.</dd>
 </dl>
 
 
-   <h4 id="idp1730976">Email generation</h4>
+   <h4 id="idp1731888">Email generation</h4>
 
 <dl>
 
@@ -745,7 +745,7 @@ useful in the future or will be thrown away.</dd>
 </dl>
 
 
-   <h4 id="idp1733792">Other</h4>
+   <h4 id="idp1734704">Other</h4>
 
 <dl>
 
@@ -789,7 +789,7 @@ phrase.</dd>
 </dl>
 
 
-   <h3 id="idp1743424">ACIS:: hierarchy</h3>
+   <h3 id="idp1744336">ACIS:: hierarchy</h3>
 
 
    <h4 id="ACIS::Web">ACIS::Web -- Web interface of ACIS</h4>
@@ -918,7 +918,7 @@ User account storage module.  Reads and writes <a href="adm.html#userdata">userd
 </dl>
 
 
-   <h4 id="idp1774336">Research Profile underlying modules</h4>
+   <h4 id="idp1775248">Research Profile underlying modules</h4>
 
 <dl> 
 <dt id="libACISResourcesSearchpm"><code class="F">lib/ACIS/Resources/Search.pm</code></dt>
@@ -938,7 +938,7 @@ variations.  May be called in a forked background process (via
 </dl>
 
 
-   <h4 id="idp1780048">APU</h4>
+   <h4 id="idp1780960">APU</h4>
 
 <dl>
 <dt id="libACISAPUpm"><code class="F">lib/ACIS/APU.pm</code></dt>
@@ -953,7 +953,7 @@ variations.  May be called in a forked background process (via
 </dl>
 
 
-   <h4 id="idp1784208">Citations</h4>
+   <h4 id="idp1785120">Citations</h4>
 
 <dl>
 <dt id="libACISCitationsInputpm"><code class="F">lib/ACIS/Citations/Input.pm</code></dt>
@@ -989,7 +989,7 @@ variations.  May be called in a forked background process (via
 </dl>
 
 
-   <h4 id="idp1795600">Other ACIS:: modules</h4>
+   <h4 id="idp1796512">Other ACIS:: modules</h4>
 
 <dl>
 
@@ -1023,7 +1023,7 @@ ARDB::Record interface.
 </dl>
 
 
-   <h3 id="idp1801776">Web::App -- the web application framework</h3>
+   <h3 id="idp1802688">Web::App -- the web application framework</h3>
 
 <dl>
 
@@ -1075,7 +1075,7 @@ other modules. </dd>
 </dl>
 
 
-   <h4 id="idp1815920">ACIS::Data::DumpXML</h4>
+   <h4 id="idp1816832">ACIS::Data::DumpXML</h4>
 
 <p>ACIS::Data::DumpXML is an XML-serializer, used by
 <a class="c" href="internal.html#ACIS::Web">ACIS::Web</a> (and <a class="c" href="internal.html#WebApp">Web::App</a>).
@@ -1096,7 +1096,7 @@ perl data structure.</dd>
 </dl>
 
 
-   <h3 id="idp1820816">ARDB -- the data-processing</h3>
+   <h3 id="idp1821728">ARDB -- the data-processing</h3>
 
 <p>Abstract metadata database system.  Analyses independent
 metadata records and stores them in a database according to
@@ -1194,7 +1194,7 @@ framework.  It is for ARDB test scripts in <code class="f BROKEN">t/</code>.</dd
 </dl>
 
 
-   <h3 id="idp1847776">SQL helper</h3>
+   <h3 id="idp1848688">SQL helper</h3>
 
 <p>SQL helper module, used throughout ACIS.  Provides a
 conveniently-wrapped interface to MySQL with problem
@@ -1217,7 +1217,7 @@ logging.</p>
 </dl>
 
 
-   <h3 id="idp1852224">Other</h3>
+   <h3 id="idp1853136">Other</h3>
 
 <dl>
 
@@ -1238,7 +1238,7 @@ collection type for RePEc-Index.  This is for the <a href="researchprofile.html#
 
   
 <address class="footer">
-<p>Generated: Mon Apr 21 17:07:44 2014</p>
+<p>Generated: Tue Apr 22 09:59:45 2014</p>
 <p><a href="http://acis.openlib.org/">ACIS project</a>,
           acis<i>@</i>openlib<span>.org</span></p>
 </address>
