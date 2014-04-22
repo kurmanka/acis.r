@@ -684,6 +684,13 @@ sub handle_request {
   my $requested_url_full = "$protocol://$hostname$unescaped_url";
   my $original_url_full  = "$protocol://$hostname$ENV{REQUEST_URI}";
   
+  my $ip = $ENV{REMOTE_ADDR};
+  # when under proxy, use X-Forwarded-For request header:
+  # http://httpd.apache.org/docs/2.2/mod/mod_proxy.html#x-headers
+  if ($ENV{HTTP_X_FORWARDED_FOR}) {
+    $ip = $ENV{HTTP_X_FORWARDED_FOR};
+  }
+  
   my $request = $self -> {request} = {
     CGI     => undef,                    # will be set later
     request_uri => $ENV{REQUEST_URI},
@@ -693,7 +700,7 @@ sub handle_request {
     agent   => $ENV{HTTP_USER_AGENT},
     method  => $ENV{REQUEST_METHOD},
     querystring => $ENV{QUERY_STRING},
-    ip      => $ENV{REMOTE_ADDR},                                     
+    ip      => $ip,                                   
   };
   debug "REQUEST_METHOD: ", $request->{method} || '';
 

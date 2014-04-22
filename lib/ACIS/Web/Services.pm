@@ -97,7 +97,7 @@ sub load_session {
     return undef;
   }
 
-  my $IP           = $ENV{'REMOTE_ADDR'};
+  my $IP           = $request->{ip};
   my $override;  
   my $sessions_dir = "$home/sessions";
   my $sfilename    = "$sessions_dir/$seid";
@@ -579,7 +579,7 @@ sub authenticate {
     
   } elsif ( $status eq 'existing-session-loaded' ) {
 
-    my $IP    = $ENV {REMOTE_ADDR};
+    my $IP    = $app ->{request}{ip};
     my $owner = $app -> session -> owner;
 
     if ( $owner -> {IP} eq $IP ) {
@@ -652,7 +652,7 @@ sub login_start_session {
                      } );
     return undef;
   }
-  $owner -> {IP} = $ENV{'REMOTE_ADDR'};
+  $owner -> {IP} = $request->{ip};
 
   # XXX
   my $session = $app -> start_session( "user", $owner,
@@ -685,13 +685,13 @@ sub login_start_session {
 
   ### redirect to the same screen, but with session id
   my $base_url = $app -> config( 'base-url' );
-  my $screen   = $app -> {request} -> {screen} || '';
+  my $screen   = $request -> {screen} || '';
   my $URI = "$base_url/$screen!$sid";  ### ZZZ application URL structure dependency
 
   $app -> userlog( "logged in", 
                    ($screen and $screen ne 'index') ? " to screen $screen" : '', 
                    ", session $sid",
-                   ", IP ", $ENV{REMOTE_ADDR} );
+                   ", IP ", $request->{ip} );
   debug "requesting a redirect to $URI";
   $app -> clear_process_queue;
   $app -> redirect( $URI );

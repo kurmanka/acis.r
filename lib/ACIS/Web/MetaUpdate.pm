@@ -55,7 +55,7 @@ sub produce_result {
   $self -> print_http_response_headers;
 
 
-  my $req_ip  = $ENV{REMOTE_ADDR};
+  my $req_ip  = $self ->{request}{ip};
   my $req_id  = $self -> form_input -> {id};
 
   my $req_str = "$req_id\@$req_ip";
@@ -79,7 +79,7 @@ sub authorize_request {
   my $allowed_clients = $self -> config( 'meta-update-clients' );
   my @clients = split /\s+/, $allowed_clients;
 
-  my $req_ip  = $ENV{REMOTE_ADDR};
+  my $req_ip  = $self ->{request}{ip};
   my $req_id  = $self -> form_input -> {id};
   my $req_o   = $self -> form_input -> {obj};
 

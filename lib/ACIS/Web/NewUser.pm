@@ -144,7 +144,7 @@ sub initial_process {
     $app -> clear_process_queue;
     return;
   }
-  $owner -> {IP} = $ENV{'REMOTE_ADDR'};
+  $owner -> {IP} = $app->{request}{ip};
 
   debug "creating a session";
   my $session = $app -> start_session( 'new-user', $login, $owner );
