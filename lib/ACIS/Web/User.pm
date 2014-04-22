@@ -477,6 +477,22 @@ sub settings {
     }
   }
 
+  # now I need to check, if the user just wanted to
+  # change his email and nothing else, i.e. nothing, 
+  # which requires a password. how?
+  # For now just this way: 
+  # if no old password given and no new password given,
+  # we assume it was just about the email address.
+  if ( not $oldp and not $input->{'pass-new'} ) {
+    if ( not $app -> error ) {
+      $app -> clear_process_queue;
+      if ($login_changed) {
+        $app -> message( "saved" );
+      }
+      return;
+    }
+  }
+
   # check the password
   # any further changes require the password
   debug "check password";
