@@ -1,4 +1,4 @@
-<screens>
+  <screens>
 <!-- <use-perl-module>ACIS::Web::NewUser</use-perl-module> -->
 <!-- <use-perl-module>ACIS::Web::User</use-perl-module> -->
 <!-- <use-perl-module>ACIS::Web::Affiliations</use-perl-module> -->
@@ -48,11 +48,32 @@
     <presentation type='xslt'
                   filename='user/records-menu.xsl'/>
   </screen>
+
+  <!-- password reset feature -->
   <screen id='forgotten-password'>
+    <use module='ACIS::Web::PasswordReset'/>
     <process>
-      <call function='ACIS::Web::forgotten_password' />
+      <call function='ACIS::Web::PasswordReset::forgotten_password' />
     </process>
     <presentation type='xslt' filename='misc/forgotten-password.xsl' />
+  </screen>
+
+  <screen id='reset'>
+    <use module='ACIS::Web::PasswordReset'/>
+    <call function='ACIS::Web::PasswordReset::password_reset' />
+
+    <param name='pass'         required='yes' type='password'  />
+    <param name='pass-confirm' required='yes' type='password'  />
+
+    <process>
+      <call function='check_input_parameters' />
+      <call function='ACIS::Web::PasswordReset::password_reset_process' />    
+    </process>
+    <presentation type='xslt' filename='misc/reset-password.xsl' />
+  </screen>
+  
+  <screen id='reset-done'>
+    <presentation type='xslt' filename='misc/reset-password-done.xsl' />
   </screen>
   
 
@@ -234,22 +255,19 @@
 
     <use module='ACIS::Web::User'/>
 
-    <param name='name'    type='name' if-not-empty='1'
-           place='owner:name' 
-           maxlen='1000'/>
+    <param name='pass'    type='password'    required='no' />
 
-    <param name='email'   required='yes' 
-           type='simpleemail'
-           />
+    <param name='name'    type='name'        if-not-empty='1'
+                          place='owner:name' maxlen='1000'  />
+
+    <param name='email'   type='simpleemail' required='yes' />
     <!-- this parameter is checked and handled carefully in
     ACIS::Web::User::set_user_login() -->
-
     <param name='record-email'/>
 
-    <param name='pass'/>
     <param name='pass-new'     type='password'/>
     <param name='pass-confirm' type='password'/>
-    <!-- also: remember-email, remember-pass -->
+    <!-- also: remember-me -->
 
     <call function='load_session_or_authenticate' />
     <call function='ACIS::Web::User::check_session_type' />
@@ -264,12 +282,18 @@
       <call function='ACIS::Web::User::settings'     />
       <call function='process_form_data' />
       <call function='prepare_form_data' />
-      <call function='ACIS::Web::User::settings_prepare'     />
     </process>
 
     <presentation type='xslt' filename='user/settings.xsl' />
   </screen>
  
+
+  <screen id='forget-me'>
+    <use module='ACIS::Web::UserPassword'/>
+    <call function='load_session_if_possible' />
+    <call function='remove_persistent_login' />
+    <presentation type='xslt' filename='user/forget-me.xsl' />
+  </screen>
 
 
   <screen id='off'>
@@ -729,8 +753,7 @@
            maxlen='10'
            place='session:registration-date/day'  />
 
-    <param name='pass'         required='yes' type='password'  
-           place='owner:password'/>
+    <param name='pass'         required='yes' type='password'  />
     <param name='pass-confirm' required='yes' type='password'  />
     <param name='homepage'                    type='url'       
            place='record:contact/homepage'/>
@@ -821,10 +844,6 @@
     <presentation type='xslt' filename='misc/login.xsl'/>
   </screen>
 
-  <screen id='relogin-password'>
-    <presentation type='xslt' filename='misc/login-pass.xsl'/>
-  </screen>
-
   <screen id='sorry'>
     <presentation type='xslt' filename='misc/sorry.xsl'/>
   </screen>
@@ -839,10 +858,13 @@
 
     <use module='ACIS::Web::User'/>
 
+    <param name='pass'    type='password'    required='yes' />
+
     <call function='load_session_or_authenticate' />
     <call function='ACIS::Web::User::check_session_type' />
 
     <process>
+      <call function='check_input_parameters' />
       <call function='ACIS::Web::User::remove_account' />
     </process>
     
@@ -876,9 +898,6 @@
 
 
   <!-- Admin screens -->
-  <screen id='adm/pass'>
-    <presentation type='xslt' filename='adm/pass.xsl'/>
-  </screen>
 
   <screen id='adm'>
     <use module='ACIS::Web::Admin'/>
@@ -918,7 +937,7 @@
   <screen id='adm/search/person'>
    <param name='key' required='yes' />
    <use module='ACIS::Web::Admin'/>
-   <call function='ACIS::Web::Admin::check_access_allow_deceased_volunteer_and_admin'/>
+   <call function='ACIS::Web::Admin::check_access_allow_deceased_volunteer'/>
    <init>
      <call function='prepare_form_data' />
    </init>
@@ -1046,6 +1065,12 @@
     <presentation type='xslt' filename='adm/move_record.xsl'/>    
   </screen>
 
+  <screen id='adm/logs'>
+    <use module='ACIS::Web::Admin'/>
+    <call function='ACIS::Web::Admin::check_access'/>
+    <call function='ACIS::Web::Admin::adm_logs'/>
+    <presentation type='xslt' filename='adm/logs.xsl'/>
+  </screen>
 
   <screen id='application-error'>
     <presentation type='xslt' filename='misc/application-error.xsl'/>

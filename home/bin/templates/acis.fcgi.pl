@@ -41,6 +41,8 @@ local $SIG{TERM} = sub {
 umask 0000;
 ## create ACIS object
 $acis = new ACIS::Web( );
+$acis -> prepare_for_work();
+
 ## the request
 my $request = FCGI::Request(\*STDIN, \*STDOUT, \*STDERR, \%ENV, FCGI::OpenSocket($homedir.'/acis.socket',5) );
 ## this variable can later be used as an indicator whether we are running fcgi

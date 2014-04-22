@@ -29,7 +29,7 @@ sub learn_known {
   ## set up sql object
   my $db_name=$acis->{'config'}->{'db-name'};
   my $db_user=$acis->{'config'}->{'db-user'};
-  my $db_pass=$acis->{'config'}->{'admin-access-pass'};
+  my $db_pass=$acis->{'config'}->{'db-pass'};
   sql_helper -> set_log_filename ( $log_file_name);
   my $sql = sql_helper -> new( $db_name, 
                                $db_user,

@@ -65,7 +65,7 @@ sub new_bootstrap {
   
   debug "try to connect to mysql database";
 
-  sql_helper -> set_log_filename ( $home . '/opt/log/sql.log' );
+  sql_helper -> set_log_filename ( $home . '/log/sql.log' );
 
   my $sql_helper = sql_helper -> new( $self -> {db_name}, 
                                       $self -> {db_user},

@@ -1,0 +1,62 @@
+ACIS: Security
+==============
+
+ACIS is a web-application. It is designed to be run on a public 
+network, accessible by folks around the world. As such, it is 
+exposed to a large number of risks and dangers.
+
+I'll briefly describe how we go about them.
+
+Basic facts
+-----------
+
+1. The user passwords are never stored or written or sent out in 
+   their clear-text form. Instead, they are salted and cryptographically 
+   hashed before storing. The salt is random and long (32 bytes) and 
+   is never re-used. Hash function used is SHA-256.
+
+   (Hacker break-in, if happens, would not reveal and 
+   compromize the user passwords.)
+
+2. The persistent login is cookie-based, and implemented with secure 
+   random tokens, that are independent of passwords, unique and hard 
+   to guess (32 random bytes).
+
+3. If a user forgets his password, he or she can reset it by requesting a 
+   reset link email. The reset link is also independent of the password,
+   unique and hard to guess. Reset links expire after 12 hours and 
+   a once-used reset link cannot be re-used again. 
+
+   (Reset feature makes account theft possible, if an attacker has access to 
+   the victim's incomming email, but mass account theft is unlikely.)
+
+4. There is no way a normal-privilege user may gain high-privilege 
+   admin access rights without first having write-access to the 
+   filesystem (specifically, to the userdata files).
+
+5. The session identifiers are long and random — 32 bytes. (Session 
+   hi-jacking is not likely.) 
+
+6. System is protected from SQL-injection by using 
+   parameterized SQL queries (bind variables).
+
+7. All HTML pages are generated via XSLT. No cross-site scripting is 
+   likely to happen, since all of the user-supplied data goes through
+   the strict XML escaping during XSLT processing.
+
+
+Brief source code guide
+-----------------------
+
+The password hashing- and password checking-related code is in 
+<c>lib/ACIS/Web/UserPassword.pm</c>.
+
+The password reset feature-related code is in 
+<c>lib/ACIS/Web/PasswordReset.pm</c>.
+
+Random data is generated using the [Bytes::Random::Secure](http://search.cpan.org/search?query=Bytes%3A%3ARandom%3A%3ASecure&mode=module) module.
+
+SHA-256 is done by the 
+[Digest::SHA](http://search.cpan.org/search?query=Digest%3A%3ASHA&mode=module) module.
+
+

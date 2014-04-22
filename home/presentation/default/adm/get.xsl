@@ -14,50 +14,12 @@
   <xsl:import href='index.xsl'/>
 
 
-<xsl:template name='menu'>
-
-<p>
-<xsl:choose>
-<xsl:when test='$dot/record and not( $dot/ardb )'>
-  <span class='here'>&#160;the&#160;record&#160;</span>
-</xsl:when>
-<xsl:otherwise>
-<span>&#160;<a ref='/adm/get/{$form-input/col}/{$form-input/id}/rec'>the record</a>&#160;</span>
-</xsl:otherwise>
-</xsl:choose>
-| 
-<xsl:choose>
-<xsl:when test='$dot/history'>
-  <span class='here'>&#160;the&#160;history&#160;</span>
-</xsl:when>
-<xsl:otherwise>
-  <span>&#160;<a ref='/adm/get/{$form-input/col}/{$form-input/id}'>
-  the history</a>&#160;</span>
-</xsl:otherwise>
-</xsl:choose>
-|
-<xsl:choose>
-<xsl:when test='$dot/record and $dot/ardb'>
-  <span class='here'>&#160;ARDB&#160;</span>
-</xsl:when>
-<xsl:otherwise>
-  <span>&#160;<a ref='/adm/get/{$form-input/col}/{$form-input/id}/ardb'>ARDB</a>&#160;</span>
-</xsl:otherwise>
-</xsl:choose>
-
-</p>
-
-</xsl:template>
 
   <xsl:template match='/data'>
     <xsl:call-template name='page'>
 
-      <xsl:with-param name='title'>
-        <xsl:choose>
-          <xsl:when test='$form-input/id'><xsl:value-of select='$form-input/id'/></xsl:when>
-          <xsl:when test='//nosuchrecord'> record not found </xsl:when>
-          <xsl:otherwise> adm/get </xsl:otherwise>
-        </xsl:choose>
+      <xsl:with-param name='title'>Logs:
+      	  <xsl:value-of select='$form-input/name'/>
       </xsl:with-param>
       
       <xsl:with-param name='content'>
@@ -67,97 +29,25 @@
             <h1>Record not found</h1>
             
             <p><big><xsl:value-of select='$form-input/id'/></big></p>
-            
-            <xsl:call-template name='menu'/>
-            
+                        
           </xsl:when>
-          <xsl:when test='$form-input/id/text()'>
+          <xsl:when test='$form-input/name/text()'>
             
-            <h1>Record <xsl:value-of select='$form-input/id'/></h1>
+            <h1>Log <xsl:value-of select='$form-input/id'/></h1>
             
             <xsl:call-template name='menu'/>
             
           </xsl:when>
           <xsl:otherwise>
             
-            <h1>Get info about a record</h1>
             
           </xsl:otherwise>
         </xsl:choose>
         
-        
-        <xsl:if test='$dot/conflict'>
-          <p class='conflict'><big>This record is in a conflict.</big></p>
-        </xsl:if>
-        
-        <xsl:if test='$dot/record'>
-          
-          <xsl:apply-templates select='$dot/record' mode='dump'/>
-          
-        </xsl:if>
-        
-        <xsl:if test='$dot/history'>
-          
-          <xsl:for-each select='$dot/history'>
-            
-            <h2>Type</h2>
-            
-            <p><xsl:value-of select='type/text()'/></p>
-            
-            
-            <h2>Present</h2>
-            
-            <table class='list'>
-              <tr><th>file</th><th>pos</th>
-              <th>checksum</th><th>time</th>
-              </tr>
-              
-              <xsl:for-each select='present/list-item'>
-                <tr>
-                  <td><xsl:value-of select='list-item[1]/text()'/></td>
-                  <td><xsl:value-of select='list-item[2]/text()'/></td>
-                  <td><xsl:value-of select='list-item[3]/text()'/></td>
-                  <td><xsl:value-of select='list-item[4]/text()'/></td>
-                </tr>
-              </xsl:for-each>
-              
-            </table>
-            
-
-            <h2>History</h2>
-            
-            <table class='list'>
-              <tr><th>time</th><th>event</th>
-              <th>file</th><th>pos</th><th>sum</th>
-              </tr>
-              <xsl:for-each select='history/list-item'>
-                <tr>
-                  <td><xsl:value-of select='list-item[1]/text()'/></td>
-                  <td><xsl:value-of select='list-item[2]/text()'/></td>
-                  <td><xsl:value-of select='list-item[3]/text()'/></td>
-                  <td><xsl:value-of select='list-item[4]/text()'/></td>
-                  <td><xsl:value-of select='list-item[5]/text()'/></td>
-                </tr>
-              </xsl:for-each>
-              
-            </table>
-            
-            
-            <h2>Last Processed</h2>
-
-            <p><xsl:value-of select='last_processed'/></p>
-            
-            
-
-          </xsl:for-each>
-          
-        </xsl:if>
-
-        
         <xsl:text> </xsl:text>
 
         <acis:form class='xxx-wide'>
-          <h2>Find a record</h2>
+          <h1>See the logs</h1>
           
           <p>
             <label for='col'>collection: </label>

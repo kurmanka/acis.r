@@ -141,11 +141,6 @@ if test $base_fcgi_script_filename; then
   chmod +x $base_cgi_script_filename
 fi
 
-if test "$cgi_pperl_reinit"; then
-    # reinitialize the PPerl persistent environment
-    /bin/bash -c "$cgi_pperl_reinit"
-fi
-
 # respect the $serialization_module param
 echo serialization via $serialization_module
 . bin/setup.data_serialization > lib/ACIS/Data/Serialization.pm
@@ -183,11 +178,13 @@ fi
 # chmod +x $cleanupscript
 
 
-test $log_browsing_cgi_filename && {
+# cgi script for log browsing; deprecated
+test $log_browsing_cgi_filename && test -f $log_browsing_cgi_filename && {
     dest=$log_browsing_cgi_filename
-    echo installing log browsing script to $dest
-    . bin/setup.logs-browsing > $dest
-    chmod +x $dest
+    echo removing unsafe log browsing script at $dest
+    echo > $dest
+    chmod -x $dest
+    rm $dest
 }
 
 

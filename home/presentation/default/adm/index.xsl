@@ -27,7 +27,9 @@
       </li>
       <li><a ref='adm/sessions'>sessions list</a></li>
       <li><a ref='adm/get'>RePEc-Index data</a></li>
-      <li><a ref='adm/sql'>sql console</a></li>
+      <li><a ref='adm/sql'>sql console</a></li><!-- XXX dangerous! -->
+      <li><a ref='adm/logs'>logs</a></li>
+      
     </ul>
   </xsl:template>
 
@@ -80,8 +82,6 @@ records and their history.
 </dd>
 
 
-
-
 <dt><code><a
 ref='adm/sessions'>/adm/sessions</a></code> 
 </dt>
@@ -90,6 +90,10 @@ ref='adm/sessions'>/adm/sessions</a></code>
 Browse all currently open sessions, their type and user name, and how
 old the session is.  Look inside any of the current sessions.
 </dd>
+
+<dt><code><a ref='adm/logs'>/adm/logs</a></code></dt>
+
+<dd id='adm-logs'> Read the tail of system's logs.</dd>
 
 
 </dl>

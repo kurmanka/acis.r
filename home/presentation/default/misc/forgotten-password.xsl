@@ -15,11 +15,13 @@
       </xsl:with-param>
       <xsl:with-param name='content'>        
         <h1>
-          <xsl:text>Request forgotten password</xsl:text>
+          <xsl:text>Request password reset</xsl:text>
         </h1>        
         <xsl:call-template name='show-status'/>
         <p>
-          <xsl:text>We will send you the password reminder by email. If you no longer have access to your email, contact the administrator.</xsl:text>
+          <xsl:text>We will send you a secure, one-time password reset link by email.
+          From there you'll be able to set a new password for your account.
+          If you no longer have access to your email, contact the administrator.</xsl:text>
         </p>
         <acis:form xsl:use-attribute-sets='form' 
                    name='theform' 
@@ -35,7 +37,7 @@
             <xsl:text> </xsl:text>            
             <input type='submit' 
                    class='important' 
-                   value='Send me my password'
+                   value='Let me reset my password'
                    title='via email'/>
             <acis:script-onload>
               document.theform.login.focus();

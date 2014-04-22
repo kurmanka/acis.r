@@ -1,9 +1,4 @@
-if test "$cgi_pperl_binary"
-then 
-   echo "#!$cgi_pperl_binary -w $perlparams"
-else
-   echo "#!$perlbin -w $perlparams"
-fi
+echo "#!$perlbin -w $perlparams"
 echo 
 echo "use lib qw( $homelib );"
 if test $perllibprepend
@@ -34,35 +29,10 @@ fi
 echo
 echo 'use ACIS::Web;'
 
-if test "$cgi_pperl_binary"; then
-   # questionable XX
-   echo 'use ACIS::Web::AllModules;'
-
-   if test $debug_log_special; then
-     echo 'BEGIN { $Web::App::DEBUG = "on"; }'
-     echo "BEGIN { \$Web::App::DEBUGLOGFILE = '$debug_log_special'; "
-     echo '}'
-     # this is for special debugging that I used to do via pperl --iku
-     echo 'if ( $PPERL::DEBUG ) {'
-     echo '  $PPerlServer::SIGUSR1HANDLERS= [ \&Web::App::Common::dump_debug ];'
-#     echo '} else {'
-#     echo '  warn "no PPerlServer::Debugging!"; '
-     echo '}'
-   fi
-
-   echo
-   echo 'BEGIN { $acis = new ACIS::Web( ); }'
-#   echo 'use Devel::LeakTrace;'
-#   echo '$acis = new ACIS::Web( );'
-   echo
-#   echo 'use Devel::DumpSizes qw/dump_sizes/;'
-#   echo 'dump_sizes("/tmp/pperl_var_dump");'
-else
-   echo '$acis = new ACIS::Web( );'
-   echo 
+echo '$acis = new ACIS::Web( );'
+echo 
 #   echo '$acis -> handle_request;'
 #   echo '$acis -> clear_after_request;'
-fi
 echo
 echo 'eval { $acis -> handle_request; };'
 echo 'my $err = $@;'

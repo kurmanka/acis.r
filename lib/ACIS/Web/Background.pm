@@ -131,7 +131,7 @@ sub run_thread {
   }
 
 
-  my $parent = $PPerlServer::child_pid || $PPerlServer::spid || $$;
+  my $parent = $$;
  
   # undefine sql object here, not in fork==0
   $app -> {'sql-object'} = undef;

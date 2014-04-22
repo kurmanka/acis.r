@@ -1,5 +1,5 @@
 # this is a special module to load all specific modules
-# to be used for persistent environments, like PPerl
+# to be used for persistent environments, like pre-fork servers
 
 # external
 require Carp::Assert;
@@ -11,6 +11,9 @@ require Exporter;
 require Storable;
 require XML::Parser;
 require Proc::Daemon;
+require MIME::Base64;
+require Bytes::Random::Secure;
+require Digest::SHA;
 
 # other components
 require ARDB;
@@ -27,13 +30,11 @@ require ACIS::Web::Admin;
 require ACIS::Web::Admin::Events;
 require ACIS::Web::Admin::EventsArchiving;
 require ACIS::Web::Affiliations;
-#require ACIS::Web::ARPM;
 require ACIS::Web::Background; # ?
 require ACIS::Web::Citations;
 require ACIS::Web::Contributions;
 require ACIS::Web::Export;
 require ACIS::Web::NewUser;
-#require ACIS::Web::MetaUpdate;
 require ACIS::Web::Person;
 require ACIS::Web::SaveProfile;
 require ACIS::Web::Services;
@@ -41,6 +42,9 @@ require ACIS::Web::Session;
 require ACIS::Web::Site;
 require ACIS::Web::SysProfile;
 require ACIS::Web::User;
+require ACIS::Web::UserPassword;
+require ACIS::Web::PasswordReset;
+require ACIS::User;
 
 # Web::App core
 require Web::App::XSLT;

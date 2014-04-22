@@ -252,15 +252,7 @@ sub contact_screen_process {
       $owner -> {name} = $full_name;
     }
     
-    my $mode = $app -> get_auto_logon_mode;
     $login = set_user_login( $app, $login );
-
-    if ( defined $login
-         and ( $mode eq 'login' 
-               or $mode eq 'full' ) ) {
-      $app -> set_auth_cookies( $login );
-    }
-
   }
 
   if ( not $app->error ) {
@@ -331,6 +323,10 @@ sub set_user_login {
 
     require ACIS::Web::SysProfile;
     ACIS::Web::SysProfile::rename_sysprof_id( $oldlc, $newlc );
+    
+    # XXXXX if there is a persistent login cookie, we may need to
+    # update the login in the table. 
+    
   } 
 
   $owner -> {login} = $new;
@@ -339,85 +335,37 @@ sub set_user_login {
 }
 
 
-sub remove_account {   
+use ACIS::User;
+
+sub remove_account {
   my $app = shift;
 
   my $paths   = $app -> paths;
   my $session = $app -> session;
   my $input   = $app -> form_input;
+  my $owner   = $session -> userdata_owner;
   
+  my $pass = $input ->{'pass'};
+  if ( $app->check_user_password( $pass, $owner ) ) {
+    # password is valid
+    # we can continue
+  } else {
+    $app -> error( 'bad-old-pass' ); ### 'bad-old-pass' ?
+    return;
+  }
+
   if ( not $input ->{'confirm-it'} ) {
     ### request the confirmation 
     return ;
   }
 
-  if ( not $session -> owner -> {type} {advanced} ) {
-    ###  SHALL NOT BE HERE, THEN.  XXX
-    ###  But, at the same time, this function very well can be used for
-    ###  advanced users as well.
+  my $ret = ACIS::User::delete_current_account( $app, 'user' );
+
+  if ($ret) {
+    $app -> message( 'account-deleted' );
+    $app -> success( 1 );
+    $app -> set_presenter( "account-deleted" );
   }
-
-  $app -> userlog( "removing the account, per user request" );
-  $app -> sevent ( -class  => 'account', 
-                   -action => 'delete request' );
-  
-
-  ### delete the profile pages
-  my $udata = $session -> userdata || die;
-  foreach ( @{ $udata-> {records} } ) {
-    my $file = $_ -> {profile} {file};
-    if ( $file and -f $file ) {
-      unlink $file;
-      $app-> userlog( "removed profile file at $file" );
-    }
-    my $exp = $_ -> {profile} {export};
-    if ( $exp ) {
-      foreach ( values %$exp ) {
-        unlink $_;
-        $app-> userlog( "removed exported profile data: $_" );
-      }
-    }
-  }
-
-
-  my $userdata = $paths -> {'user-data'};
-  my $deleted_userdata = $paths -> {'user-data-deleted'};
-  
-  while ( -e $deleted_userdata ) {
-    debug "backup file $deleted_userdata already exists";
-    $deleted_userdata =~ s/\.xml(\.(\d+))?$/".xml." . ($2 ? ($2+1) : '1')/eg;
-  }
-
-  debug "move userdata from '$userdata' to '$deleted_userdata'";
-  my $check = rename $userdata, $deleted_userdata;  
-  
-  if ( not $check ) {
-    $app -> errlog ( "Can't move $userdata file to $deleted_userdata" );
-    $app -> error ( "cant-remove-account" );
-    return;
-  }
-
-
-  ###  request RI update
-  my $udatadir = $app -> userdata_dir;
-  my $relative = substr( $userdata, length( "$udatadir/" ) );
-  $app -> send_update_request( 'ACIS', $relative );
-  
-
-  $session -> set_userdata( undef );
-  $app -> send_mail( 'email/account-deleted.xsl' );
-
-  $app -> sevent ( -class  => 'account', 
-                   -action => 'deleted',
-                   -file   => $deleted_userdata );
-
-  $app -> userlog( "deleted account; backup stored in $deleted_userdata" );
-  debug "close the session";
-
-  $app -> logoff_session;
-  $app -> message( 'account-deleted' );
-  $app -> success( 1 );
-  $app -> set_presenter( "account-deleted" );
 
 }
 
@@ -468,29 +416,22 @@ sub check_session_type {
 
 sub settings_prepare {
   my $app    = shift;
-
+  
   my $vars    = $app -> variables;
   my $session = $app -> session;
-  my $mode    = $app -> get_auto_logon_mode;
-
   my $login = $session -> userdata_owner-> {login};
+  my $persistent_login = $app -> check_persistent_login || '';
+  debug "Persistent login: $persistent_login";
+  
+  my $persistent_login_mode = ($persistent_login eq $login);
+
   $app -> set_form_value( "email", $login );
 
-  $vars -> {'auto-log-mode'} = $mode;
+  my $mode = ($persistent_login_mode ? 'true' : undef);
+  debug "Persistent login mode: ", $mode ? 'on' : 'off';
+  $app -> set_form_value( "remember-me", $mode );
+  #$vars -> {'remember-me'} = $mode;
 
-  debug "Auto-logon-mode: $mode";
-
-  if ( $mode eq 'full'
-       or $mode eq 'login' ) {
-    $app -> set_form_value( "remember-login", 1 );
-  }
-  
-  $session -> {'auto-logon-mode'} = $mode;
-
-
-  if ( $mode eq 'full' ) {
-    $app -> set_form_value( "remember-pass", 1 );
-  }
 }
 
 
@@ -501,35 +442,28 @@ sub settings {
   my $session = $app -> session;
   my $record  = $session -> current_record;
   my $owner   = $session -> userdata_owner;
+  my $persistent_login = $app -> check_persistent_login || '';
+  my $persistent_login_mode = ($persistent_login eq $owner->{login});
 
   my $OK  = 1;
 
-  my $auto_logon_mode = $app -> get_auto_logon_mode;
-
+  my $oldp  = $input -> {pass};
   my $login = $input -> {email};
+  my $pass;
 
+  # this can be done without the password, by CZ's decision
+  my $old_login = $owner->{login};
   $login = set_user_login( $app, $login );
+  $app -> set_form_value( "email", $login );
 
-  if ( defined $login ) {
-    if ( $input -> {'remember-login'} ) {
-      $app -> set_auth_cookies( $login );
+  my $login_changed = ($old_login ne $login);
+  debug "Login changed: <$login_changed>";
 
-    } else {
-
-      my $mode = $session -> {'auto-logon-mode'} || '';
-      if ( $mode eq 'full' 
-           or $mode eq 'login' ) {
-        $app -> clear_auth_cookies;
-        $app -> set_form_value( "remember-login", 0 );
-      }
-    }
-  }
-
-  if (     $record -> {'about-owner'} 
+  if ( $login_changed 
+       and $record -> {'about-owner'} 
        and $record -> {'about-owner'} eq 'yes'
        and $input -> {'record-email'} 
       ) {
-
     ### simple user mode
     $record -> {contact} {email} = $login;
     
@@ -543,53 +477,59 @@ sub settings {
     }
   }
 
-  ### password 
+  # check the password
+  # any further changes require the password
+  debug "check password";
+  if ( $oldp and $app->check_user_password( $oldp, $owner ) ) {
+      # password is valid
+      # we can continue
+  } else {
+    debug "no way";
+    $app -> error( 'bad-old-pass' ); ### 'bad-old-pass' ?
+    $app -> clear_process_queue;
+    undef $OK;
+    return;
+  }
 
-  if ( $input ->{pass} ) {{
-
-    my $old_real = $owner -> {password};
-    my $old      = $input -> {pass};
-
-    my $pass;
-
-    if ( $old_real eq $old ) {
-      $pass = $old;
-    } else {
-      $app -> error( 'bad-old-pass' ); ### 'bad-old-pass' ?
-      undef $OK;
-      last;
-    }
-    
-    if ( $input -> {'pass-new'} 
-         or $input -> {'pass-confirm'} ) { 
-
-      my $new      = $input -> {'pass-new' };
-      my $conf     = $input -> {'pass-confirm'};
+  ### setting the password 
+  if ( $input -> {'pass-new'} 
+       or $input -> {'pass-confirm'} ) { 
+           
+    my $new  = $input -> {'pass-new' };
+    my $conf = $input -> {'pass-confirm'};
       
-      if ( $old 
-           and $old_real eq $old ) {
-        if ( $new eq $conf ) {
-          $owner ->{password} = $new;
-          $pass  = $new;
-          
-        } else {
-          $app -> form_invalid_value( 'pass-new' );
-          $app -> form_invalid_value( 'pass-confirm' );
-          undef $OK;
-        }
-        
-      } else {
-        die;
-      }
-
+    if ( $new eq $conf ) {
+        $app->set_new_password( $new );
+    } else {
+        $app -> form_invalid_value( 'pass-new' );
+        $app -> form_invalid_value( 'pass-confirm' );
+        undef $OK;
     }
-    if ( $pass 
-         and $input -> {'remember-pass'} 
-         and $input -> {'remember-login'} ) {
-      $app -> set_auth_cookies( undef, $pass );
-    }
-  }}
+  }
+  
+  # handle the remember me checkbox
+  my $remember_me_input = $input->{'remember-me'} || '';
+  debug "remember-me: $remember_me_input";
 
+  if ( not $remember_me_input ) {
+    $app -> remove_persistent_login;
+    $persistent_login_mode = undef;
+
+  } else { # $remember_me_input == true
+
+    if ( $login_changed ) {
+      # if login has changed, remove the old login cookie, 
+      $app ->remove_persistent_login;
+    }
+    if ( not $persistent_login_mode or $login_changed ) {
+      # create a new one.
+      $persistent_login_mode = $app ->create_persistent_login( $login );
+    } else {
+      # renew the existing one
+      $persistent_login_mode = $app ->renew_persistent_login();
+    }
+  }
+  $app -> set_form_value( "remember-me", $persistent_login_mode );
 
 
   if ( not $app -> error 
@@ -609,6 +549,12 @@ sub rebuild_profile_url {
   if ( $record -> {settings} {static_url} ) {
     $app -> success( 1 );
   }
+}
+
+use ACIS::Web::UserPassword;
+sub ACIS::Web::userdata_bring_up_to_date {
+    my $app = shift or die;
+    $app -> upgrade_clear_password();
 }
 
 

@@ -24,11 +24,6 @@ package ACIS::Web::Admin;   ### -*-perl-*-
 #  along with this program; if not, write to the Free Software
 #  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
 #
-#  ---
-#  $Id$
-#  ---
-
-
 
 use strict;
 
@@ -41,20 +36,10 @@ use Web::App::Common;
 
 use ACIS::Data::DumpXML qw(dump_xml);
 
+
 sub check_access {
   my $acis = shift;
-  my $check = check_access_real( $acis );
-  if ( $check == 2 ) {
-    $acis ->redirect( 'http://' . $ENV{HTTP_HOST} . $ENV{REQUEST_URI} );
-    $acis ->clear_process_queue;
-  }
-}
-
-sub check_access_real {
-  my $acis = shift;
   my $allow_deceased_list_manager = shift || 0;
-  my $pass = $acis -> config( 'admin-access-pass' );
-  debug "pass real = $pass";
 
   # check for user's access
   if ( $acis -> load_session_if_possible ) {
@@ -76,32 +61,15 @@ sub check_access_real {
     }
   }
 
-  # check for the admin password given on a form, or via cookie
-  if ( $pass and length( $pass ) > 5 ) { 
-    my $form_input = $acis -> form_input();
-    my $cookie  = $acis -> get_cookie( 'admin-pass' ) || '';
-    debug "pass cook = $cookie";
-
-    my $given   = $form_input -> {pass} || $cookie;
-
-    my $cookie_set = 0;
-    if ( $given and $form_input -> {'remember-me'} ) {
-      # set cookie
-      $acis -> set_cookie( -name  => 'admin-pass', 
-                           -value => $given,
-                           -expires => '+1M' );
-      $cookie_set = 1;
-    }
-    # compare
-    if ( $given and $given eq $pass ) {  return 1 + $cookie_set;  }
-  }
-
-
   $acis -> clear_process_queue;
-  $acis -> set_presenter( 'adm/pass' );
+  $acis -> respond_403;
   return 0;
 }
 
+sub check_access_allow_deceased_volunteer {
+  my $acis = shift;
+  my $check = check_access( $acis, 'allow deceased manager' );
+}
 
 
 
@@ -262,6 +230,10 @@ sub offline_userdata_service {
   #$session -> set_userdata( $userdata, $userdata_file );
   #die Dumper( $session );
 
+  # upgrade userdata, if necessary (esp. the owner part)
+  require ACIS::Web::User;
+  $acis -> userdata_bring_up_to_date();
+
   my $user = $session->userdata_owner;
   my $ulogin= $user   ->{login};
 
@@ -276,7 +248,7 @@ sub offline_userdata_service {
                  );
 
   $acis -> {'presenter-data'} {request} {user} {name}  = $user->{name};
-  $acis -> {'presenter-data'} {request} {user} {pass}  = $user->{password};
+  $acis -> {'presenter-data'} {request} {user} {pass}  = '######'; # XXX-Password
   $acis -> {'presenter-data'} {request} {user} {login} = $ulogin;
   
   if ( $rec ) {
@@ -413,11 +385,11 @@ sub get_hands_on_userdata {
 
   ###  load the userdata
   $userdata = load ACIS::Web::UserData( $userdata_file );
+  my $owner = $userdata->{owner};
 
   if ( not defined $userdata
-       or not defined $userdata->{owner}
-       or not defined $userdata->{owner}{login}
-       or not defined $userdata->{owner}{password} 
+       or not defined $owner
+       or not defined $owner->{login}
      ) {
     # a problem
 
@@ -517,7 +489,7 @@ sub move_records {
     ### XXX this could be deferred until the session end.
     ### XXX run it via ->run_at_close()?
     if ( $should_remove ) {
-        remove_account( $acis, -login => $src_login );
+        ACIS::User::remove_account( $acis, -login => $src_login );
     }
     if ( scalar @$dest > 1 ) {
       $ud ->{owner} {type} {advanced} = 1;
@@ -528,92 +500,6 @@ sub move_records {
   return $moved;
 }
 
-
-sub remove_account {   
-  my $app    = shift;
-  my $par    = { @_ };
-
-  my $login  = $par -> {-login};
-  my $notify = $par -> {-notify};
-  my $clean  = $par -> {-clean};
-
-  assert( $login );
-
-  my $paths   = $app -> make_paths_for_login( $login );
-  
-  my $file    = $paths -> {'user-data'};
-  my $bakfile = $paths -> {'user-data-deleted'};
-
-  $app -> sevent ( -class  => 'account', 
-                   -action => 'delete',
-                   -login  => $login,
-                   -backup => $bakfile,
-                 );
-  
-  while ( -e $bakfile ) {
-    debug "backup file $bakfile already exists";
-    $bakfile =~ s/\.xml(\.(\d+))?$/".xml." . ($2+1)/eg;
-  }
-
-  debug "move '$file' to '$bakfile'";
-  my $check = rename $file, $bakfile;  
-  
-  if ( not $check ) {
-    debug "failed";
-    $app -> errlog ( "Can't move $file file to $bakfile" );
-    $app -> error ( "cant-remove-account" );
-    return 0;
-  }
-
-  ## find if there is a user. if there is no user, 
-  ## don't write anything to the userlog
-  my $user = $app->{'username'};
-  if($user) {
-    $app -> userlog( "removed $login account" );
-  }
-
-  ###  send update request to the RI UD (RePEc-Index Update Daemon)
-  my $udatadir = $app -> userdata_dir;
-  my $relative = substr( $file, length( "$udatadir/" ) );
-  $app -> send_update_request( 'ACIS', $relative );
-
-  if ( $clean ) {
-    ### delete the profile pages
-    debug "clean-up after deletion";
-    
-    require ACIS::Web::UserData;
-    my $udata = ACIS::Web::UserData -> load( $bakfile );
-    
-    foreach ( @{ $udata-> {records} } ) {
-      my $f = $_ -> {profile} {file};
-      
-      if ( $f and -f $f ) {
-        unlink $f;
-        if($user) {
-          $app-> userlog( "removed profile file $file" );
-        }
-      }      
-      my $exp = $_ -> {profile} {export};
-      if ( $exp ) {
-        foreach ( values %$exp ) {
-          unlink $_;
-          if($user) {          
-            $app-> userlog( "removed exported profile data: $_" );
-          }
-        }
-      }      
-    }    
-  }
-
-  ### XXX Further clean-up is probably needed
-
-  if ( $notify ) {
-    # $app -> send_mail( 'email/account-deleted.xsl' );
-    debug "clean-up after deletion";
-  }
-  
-  return 1; # success
-}
 
 
 
@@ -653,33 +539,48 @@ sub move_record_handler {
 }
 
 
-# this is for the deceased list manager volunteer
-sub check_access_allow_deceased_volunteer {
-    my $acis = shift;
-    if ( $acis -> load_session_if_possible ) {
-        my $session = $acis -> session;
-        if ( $session 
-             and $session -> owner -> {type} ) {
-            if ( exists $session -> owner -> {type} {'deceased-list-manager'} ) {
-                $acis->variables->{'deceased-list-manager-mode'} = 1;
-                return 1;
-            }
-            if ( $session -> owner -> {type} {admin} ) {
-                return 1;
-            }
-        }
-    }
-    
-    $acis -> clear_process_queue;
-    $acis -> set_presenter( 'adm/pass' ); # XXX this is of no use for the deceased-list-manager
-    return 0;
-}
 
-sub check_access_allow_deceased_volunteer_and_admin {
+sub adm_logs {
   my $acis = shift;
-  my $check = check_access_real( $acis, 'allow deceased manager' );
-}
+  my $input = $acis->form_input;
+  
+  # input
+  my $log  = quotemeta $input->{log}  || 'main';
+  my $tail = quotemeta $input->{tail} || 40;
+  my $key  = quotemeta $input->{key};
+  
+  # output
+  my $logdata;
 
+  # log paths
+  my $homedir = $acis->{paths}{home};
+  my $logs = {
+     main => "$homedir/acis.log",
+     err  => "$homedir/acis-err.log",
+     sql  => "$homedir/log/sql.log",
+     rid  => "$homedir/RI/daemon.log",
+     sid  => "$homedir/SID/daemon.log",
+  };
+  
+  my $logfile = $logs->{$log};
+  my $command = '';
+
+  if ( $logfile and -f $logfile ) {
+    if ( $key ) {
+      $command = " grep \"$key\" $logfile | tail -n $tail";
+    } else {
+      $command = "tail -n $tail $logfile";
+    }
+  }
+
+  if ( $command ) {  
+    # http://perldoc.perl.org/perlop.html#%60STRING%60
+    $logdata = qx($command);
+    $acis->variables->{logdata} = $logdata;
+  }
+
+
+}
 
 
 

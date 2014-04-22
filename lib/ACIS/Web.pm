@@ -49,7 +49,7 @@ require ACIS::Web::Session::SOldUser;
 require ACIS::Web::Session::SMagic;
 require ACIS::Web::Session::SAdminUser;
 
-use vars qw ( $ACIS %SESSION_CLASS $SESSION_CLASS_MAIN );
+use vars qw ( $ACIS %SESSION_CLASS $SESSION_CLASS_MAIN $UNSAFE_TO_LOG );
 *ACIS = *Web::App::APP;
 $SESSION_CLASS_MAIN = "ACIS::Web::Session";
 %SESSION_CLASS = (
@@ -58,6 +58,15 @@ $SESSION_CLASS_MAIN = "ACIS::Web::Session";
  "magic"    => "ACIS::Web::Session::SMagic",
  "admin-user" => "ACIS::Web::Session::SAdminUser",
 );
+
+# Do not log the users' passwords to debug.log
+
+$UNSAFE_TO_LOG = {
+    'pass'         => 1,
+    'pass-confirm' => 1,
+    'pass-new'     => 1,
+};
+
 
 require ACIS::Web::UserData;
 require ACIS::Web::Services;
@@ -119,7 +128,7 @@ sub sql_object {
   ### sql helper / driver module name
   my $class = 'sql_helper';
 
-  $class -> set_log_filename ( $self ->{home} . '/opt/log/sql.log' );
+  $class -> set_log_filename ( $self ->{home} . '/log/sql.log' );
 
   my $config = $self -> config;
 
@@ -266,55 +275,31 @@ sub post_process_content {
   $self->SUPER::post_process_content( $out );
 }
 
+use ACIS::Web::UserPassword;
 
 sub set_auth_cookies { 
   my $self  = shift;
   my $login = shift;
   my $pass  = shift;
-
-  if ( defined $login ) {
-    $self -> set_authentication_cookie( 'login', $login );
+  
+  if ($login and $pass) {
+    $self->create_persistent_login( $login );
   }
-  if ( defined $pass ) {
-    $self -> set_authentication_cookie( 'pass' , $pass  );
-  }
-  debug "authentication cookies set:" . ( ($login) ? " login" : "" ) . 
-    ( ($pass) ? " pass": "" );
-}
 
-
-sub clear_auth_cookies { 
-  my $self = shift;
+  # clear old auth cookies  
   $self -> set_authentication_cookie( 'login', '', 1 );
   $self -> set_authentication_cookie( 'pass' , '', 1 );
 }
 
-sub get_auto_logon_mode {
+sub clear_auth_cookies { 
   my $self = shift;
-  my $session = $self -> session;
-
-  if ( $session ) {
-    my $owner = $session -> userdata_owner;
-    my $login = $owner -> {login};
-    my $pass  = $owner -> {password};
-    my $resp_cookies = $self ->{response}{cookies};
-
-    my $cookie_login = $resp_cookies->{login} || $self -> get_cookie( 'login' );
-    my $cookie_pass  = $resp_cookies->{pass}  || $self -> get_cookie( 'pass'  );
-
-    if ( $cookie_login and $cookie_login eq $login ) {
-      if ( $cookie_pass
-#          and $cookie_pass eq $pass
-         ) { return 'full' ; }
-      else { return 'login'; }
-
-    } else { return 'off'  ; }
-
-  }
-  return undef;
+  # XXX
+  $self -> set_authentication_cookie( 'login', '', 1 );
+  $self -> set_authentication_cookie( 'pass' , '', 1 );
 }
 
 
+# XXX
 sub set_authentication_cookie { 
   my ($self, $name, $value, $clear) = @_;
   $self -> set_cookie( -name  => $name,
@@ -632,9 +617,37 @@ sub send_update_request {
 }
 
 
+# Do not log the users' passwords to debug.log
+
+sub safe_to_log_form_input { 
+    shift; 
+    my $input = shift;
+    my $out = {};
+    foreach ( keys %$input ) {
+        my $k = $_;
+        my $v = $input->{$k};
+        if (exists $UNSAFE_TO_LOG->{$k}) { $out->{$k} = '#######'; }
+        else { $out->{$k} = $v; }
+    }
+    return $out; 
+};
 
 
- 
+sub prepare_for_work () {
+  # seed the random generator
+  require ACIS::Web::UserPassword;
+  my $a = ACIS::Web::UserPassword::generate_random_bytes();
+}
+
+
+sub respond_403 () {
+  my $self = shift;
+  $self -> clear_process_queue;
+  $self -> response_status( '403' ); # 403 Forbidden
+  $self -> {presenter} = undef;
+  $self -> {response}{body} = '403 Forbidden';
+}
+
 1;
 
 __END__

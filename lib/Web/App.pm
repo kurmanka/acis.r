@@ -42,34 +42,16 @@ use Data::Dumper;
 use Encode;
 use Storable;
 
-# use CGI::Carp qw( fatalsToBrowser set_message carpout );
-
-
-#BEGIN { set_message( \&Web::App::Common::critical_message ); }
-
-#use Web::App::Config;
-
 BEGIN { 
   use Web::App::Common qw( debug debug_as_is );
   if ( $ENV{HTTP_HOST} ) {
-#    eval " use CGI::Carp qw( fatalsToBrowser set_message ); ";
-#  set_message( sub { print '<h1>fuck!</h1><p>', \$_[0], '</p>'; } ); ";
-#  set_message( \&Web::App::Common::critical_message ); ";
-    if ( $@ ) { 
-      warn "Problem when I tried to use CGI::Carp: $@";
-    }
-
   } else {
     require Carp;
     import  Carp 'verbose';
-#    eval "use Carp qw( verbose );";
   }
 }
 
-
-require Web::App::Common;
-import  Web::App::Common 'date_now';
-
+use  Web::App::Common 'date_now';
 
 
 use vars qw( $APP );
@@ -144,6 +126,10 @@ sub new {
   if ( $config -> {umask} ) {
     umask( $config -> {umask} );
   }
+  
+  if ( $config -> {'debug-log-with-time'} ) {
+    $Web::App::DEBUGWITHTIME = 1;
+  }
 
   if ( $config -> {'require-modules'} ) {
     my @list = split /\s+/, $config -> {'require-modules'};
@@ -210,36 +196,35 @@ sub configuration_parameters {
     'require-modules',  'not-defined',
     
     # web interface
-    'base-url',         'required',
-    'template-set',     'default',
-    'debug-info-visible', '',
-    'debug-log',          '',
-    'home-url', "not-defined",
-    'debug-transformations', '',
-    'umask',   'not-defined',           # '0022'
-    'requests-log',     '*stderr*',
+    'base-url',            'required',
+    'home-url',            'not-defined',
+
+    'template-set',        'default',
+    'presenters-dir',      'not-defined',
 
     'default-screen-name', "index",
     'screen-not-found',    "sorry",
 
-    'character-encoding',  'utf-8',
+    'character-encoding',    'utf-8',
     'input-space-normalize', 'true',
 
-    'presenters-dir',    'not-defined',
-    
-
+    # logging and debugging
+    'requests-log',          '*stderr*',
+    'debug-info-visible',    '',
+    'debug-log',             '',
+    'debug-log-with-time',   'not-defined',     # enables timestamps in debug log
+    'debug-transformations', '',
+    'debug-email-data-log',  'not-defined',
 
     # email-related
     'system-email',     'required',
     'sendmail',         'required',
+    'umask',            'not-defined',    # '0022'
 
     # database parameters
     'db-name',          'required',
     'db-user',          'required',
     'db-pass',          'required',
-
-    # debug 
-    'debug-email-data-log',  'not-defined',
 
 
    };
@@ -335,7 +320,7 @@ sub success {
   my $self = shift;
   my $success = shift;
 
-  if ( $success ) {
+  if ( defined $success ) {
     $self -> {'presenter-data'} {response} {success} = $success;
   } else { 
     return $self -> {'presenter-data'} {response} {success};
@@ -813,7 +798,8 @@ sub handle_request {
   }
 
   if ( scalar keys %$form_input ) {
-    my $dump = Data::Dumper->Dump( [$form_input], ['form_input'] );
+    my $safe_input = $self->safe_to_log_form_input($form_input); 
+    my $dump = Data::Dumper->Dump( [$safe_input], ['form_input'] );
     chomp $dump;
     debug $dump;
 
@@ -1438,8 +1424,7 @@ sub userlog {
   my $self    = shift;
   my $message = join '', @_;
 
-  my $user = $self->{username} || 'unknown';
-  assert( $user, "user name is not yet known to the Web::App object" );
+  my $user = $self->{username} || $0;
   $self-> log( "[$user] ", $message );
 }
 
@@ -1468,6 +1453,8 @@ sub time_checkpoint {};
 sub report_timed_checkpoints {''};
 sub log_profiling {};
 
+# a stub to be redefined in ACIS::Web
+sub safe_to_log_form_input { shift; return shift; };
  
 1;
 

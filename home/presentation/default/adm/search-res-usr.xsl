@@ -48,8 +48,6 @@
     
     <span class='name'><xsl:value-of select='name'/></span>
     
-    (pass: <code><xsl:value-of select='password'/></code>)
-    
     (<xsl:value-of select='userdata_file'/>)
 
     <xsl:text> </xsl:text>

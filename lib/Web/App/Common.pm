@@ -56,6 +56,8 @@ sub clear_undefined ($);
 $Web::App::DEBUG            ||= $ENV{WEBAPPDEBUG};
 $Web::App::DEBUGLOGFILE     ||= $ENV{WEBAPPDEBUGLOGFILE};
 $Web::App::DEBUGIMMEDIATELY ||= $ENV{WEBAPPDEBUGIMM};
+# may be set to 1 in Web::App, depending on config: 
+$Web::App::DEBUGWITHTIME    ||= $ENV{WEBAPPDEBUGWITHTIME};
 
 foreach ( @::ARGV ) {
   if ( m/^--debug$/ ) {
@@ -101,10 +103,10 @@ sub critical_message {
   }
 }
 
+use Bytes::Random::Secure qw(random_bytes_hex); 
 
 sub generate_id {
-  my $limit = 0xffffffff;  # each char - 4 bit, 0-f
-  return sprintf "%08x", $limit ^ rand ($limit);
+  return random_bytes_hex( 16 );
 }
 
 
@@ -122,12 +124,14 @@ sub debug {
   clear_undefined \@_;
   my $message = join '', @_;
 
-#  return unless $Web::App::DEBUG;
-
   my $subroutine = (caller(1))[3];
   my $line       = (caller)[2];
 
   $message = "[$subroutine($line)] $message\n";
+
+  if ($Web::App::DEBUGWITHTIME) {
+    $message = localtime() . ' ' . $message;
+  }
 
   if ( $Web::App::DEBUGLOGFILE
        and open (DEBUGLOG, ">>:utf8", $Web::App::DEBUGLOGFILE)
@@ -141,14 +145,9 @@ sub debug {
 
   $LOGCONTENTS .= $message;
 
-  if ( $PPERL::DEBUG 
-       and $PPerlServer::LOG_ERROR ) {
-    PPerlServer::log_error( $message );
-  }
 }
 
 sub dump_debug {
-  PPerlServer::log_error( "Web::App::Common::dump_debug() to $Web::App::DEBUGLOGFILE\n" );
   if ( $Web::App::DEBUGLOGFILE
        and open DEBUGLOG, ">>$Web::App::DEBUGLOGFILE" ) {
     print DEBUGLOG "\n * ", scalar( localtime ), " debug log dump\n";
@@ -180,16 +179,6 @@ if (0) {
 
 #$::SIG{USR1} = \&dump_debug;
 
-#   if ( $PPerlServer::LOG_ERROR
-#        and not $dumped_debug ) {
-#     if ( $Web::App::DEBUGLOGFILE
-#          and open DEBUGLOG, ">>$Web::App::DEBUGLOGFILE" ) {
-#       print DEBUGLOG "\n * ", scalar( localtime ), " debug log dump\n";
-#       print DEBUGLOG $LOGCONTENTS, "\n";
-#       close DEBUGLOG;
-#     }
-#     $dumped_debug=1;
-#   }
 
 
 sub debug_as_is {
