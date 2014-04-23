@@ -145,7 +145,7 @@ ACIS will send.  Required.</dd>
 </dl>
 
 
-### Perl and CGI
+### Perl 
 
 
 <dt><C>perlbin</C></dt>
@@ -176,23 +176,14 @@ into the main CGI file <co>a.cgi</co>, by saying <co>BEGIN{ push @INC,
 '</co><i>directory</i><co>'; }</co>.
 </dd>
 
-<dt><C>cgi-pperl-binary</C></dt>
+<dt><C>known-valid-proxies</C></dt>
 
-<dd>Type: string.  Enables support for Matt Sergeant's fine <a
- href='http://search.cpan.org/dist/PPerl/'>PPerl</a> instead of plain old slow
- CGI.  If set, it will be used instead of perl in the CGI script's shebang
- line (the first line of the script, which normally says
- <co>"#!/usr/bin/perl"</co>).  It will also cause the CGI script to be adapted
- in some minor ways to the PPerl environment: some modules will be preloaded
- and clean-ups will be done after each request processed.</dd>
+<dd>A list of known proxies, whose addresses should be considered 
+source of the request IPs, when logging and otherwise using 
+request IP.
 
-
-<dt><C>cgi-pperl-reinit</C></dt>
-
-<dd>Type: string.  Command to reinitialize or simply shutdown the PPerl
-process.  See previous entry for PPerl pointers.  The command will be executed
-by the <c>bin/setup</c> script after installation or configuration changes.
-</dd>
+Format: comma-separated list of numerical IP addresses.</dd>
+</dl>
 
 
 
