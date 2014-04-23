@@ -148,6 +148,8 @@ ACIS will send.  Required.</dd>
 ### Perl 
 
 
+<dl>
+
 <dt><C>perlbin</C></dt>
 
 <dd>Perl binary to use for ACIS and its utilities.  Default:
@@ -181,11 +183,10 @@ into the main CGI file <co>a.cgi</co>, by saying <co>BEGIN{ push @INC,
 <dd>A list of known proxies, whose addresses should be considered 
 source of the request IPs, when logging and otherwise using 
 request IP.
+Format: comma-separated list of numerical IP addresses.
+</dd>
 
-Format: comma-separated list of numerical IP addresses.</dd>
 </dl>
-
-
 
 
 ### Database parameters
