@@ -660,7 +660,7 @@ sub find_request_ip {
   # prepare KNOWN_PROXIES hash, if necessary
   if (not $KNOWN_PROXIES and $self->{config}{'known-valid-proxies'}) {
     $KNOWN_PROXIES = {};
-    my @prox = split( /,\s+/, $self->{config}{'known-valid-proxies'});
+    my @prox = split( /,\s*/, $self->{config}{'known-valid-proxies'});
     foreach (@prox) {
       $KNOWN_PROXIES->{$_} = 1;
     }
