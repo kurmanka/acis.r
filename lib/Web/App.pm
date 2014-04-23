@@ -207,6 +207,7 @@ sub configuration_parameters {
 
     'character-encoding',    'utf-8',
     'input-space-normalize', 'true',
+    'known-valid-proxies',   'not-defined',
 
     # logging and debugging
     'requests-log',          '*stderr*',
@@ -645,6 +646,40 @@ sub clear_after_request {
 sub _debug_leaks_after_clearing{}
 sub _debug_leaks_after_processing{}
 
+# variable to keep a hash of known-valid-proxies addresses:
+my $KNOWN_PROXIES;
+# find IP address of the request source
+sub find_request_ip {
+  my $self = shift;
+  my @ip = ( $ENV{REMOTE_ADDR} );
+  # when under proxy, use X-Forwarded-For request header:
+  # http://httpd.apache.org/docs/2.2/mod/mod_proxy.html#x-headers
+  if ($ENV{HTTP_X_FORWARDED_FOR}) {
+    push @ip, split( ', ', $ENV{HTTP_X_FORWARDED_FOR} );
+  }
+
+  # prepare KNOWN_PROXIES hash, if necessary
+  if (not $KNOWN_PROXIES and $self->{config}{'known-valid-proxies'}) {
+    $KNOWN_PROXIES = {};
+    my @prox = split( /,\s+/, $self->{config}{'known-valid-proxies'});
+    foreach (@prox) {
+      $KNOWN_PROXIES->{$_} = 1;
+    }
+  }
+
+  # filter out known & valid proxies
+  if ($KNOWN_PROXIES) {
+    foreach (@ip) {
+      if ($KNOWN_PROXIES->{$_}) {
+        undef $_;
+      }
+    }
+    clear_undefined \@ip;
+  }
+  # join the remaining ones into a string
+  my $ip = join( ',', @ip );
+  return $ip;
+}
 
 #######################################################
 ########     h a n d l e    r e q u e s t     #########
@@ -684,13 +719,8 @@ sub handle_request {
   my $requested_url_full = "$protocol://$hostname$unescaped_url";
   my $original_url_full  = "$protocol://$hostname$ENV{REQUEST_URI}";
   
-  my $ip = $ENV{REMOTE_ADDR};
-  # when under proxy, use X-Forwarded-For request header:
-  # http://httpd.apache.org/docs/2.2/mod/mod_proxy.html#x-headers
-  if ($ENV{HTTP_X_FORWARDED_FOR}) {
-    $ip = $ENV{HTTP_X_FORWARDED_FOR};
-  }
-  
+  my $ip = $self->find_request_ip();
+
   my $request = $self -> {request} = {
     CGI     => undef,                    # will be set later
     request_uri => $ENV{REQUEST_URI},
