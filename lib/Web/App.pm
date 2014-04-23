@@ -51,8 +51,7 @@ BEGIN {
   }
 }
 
-use  Web::App::Common 'date_now';
-
+use Web::App::Common;
 
 use vars qw( $APP );
 
