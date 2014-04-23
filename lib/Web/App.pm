@@ -51,7 +51,7 @@ BEGIN {
   }
 }
 
-use Web::App::Common;
+use Web::App::Common qw(date_now clear_undefined);
 
 use vars qw( $APP );
 
