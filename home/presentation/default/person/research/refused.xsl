@@ -384,8 +384,7 @@
     <!-- <script type='text/javascript'  -->
     <!-- src='{$base-url}/script/refused.js'> -->
     <!-- </script> -->
-    <script type='text/javascript' 
-            src='{$base-url}/script/research.js'></script>
+    <script type='text/javascript' src='{$static-base-url}/script/research.js'>
   </xsl:variable>
   <!--   n o w   t h e   p a g e   t e m p l a t e    -->
   <xsl:template match='/data'>

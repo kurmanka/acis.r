@@ -24,8 +24,7 @@
   <xsl:variable name='more-to-follow-count' 
                 select='$items-count - $chunk-size'/>
   <xsl:variable name='additional-head-stuff'>    
-    <script type='text/javascript'
-            src='{$base-url}/script/research.js'>
+    <script type='text/javascript' src='{$static-base-url}/script/research.js'>
     </script>
   </xsl:variable>
   <xsl:variable name='current-screen-id'>research/accepted</xsl:variable>
