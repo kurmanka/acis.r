@@ -108,7 +108,7 @@ sub homepage {
   }
 
   # try authenticating
-  $app -> authenticate;
+  $app -> authenticate('-no-presenter-change'=>1);
 
   # prepare the remember-me checkbox value
   my $remember_me = $app->get_cookie('remember-me');
