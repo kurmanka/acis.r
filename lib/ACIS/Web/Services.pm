@@ -457,6 +457,7 @@ sub check_login_and_pass {
 
 sub authenticate {
   my $app = shift;
+  my %par = (@_);
 
   ### if a session is already loaded, why authenticate?
 
@@ -520,7 +521,12 @@ sub authenticate {
         $app -> set_form_value( 'login', $login );
         $app -> variables -> {'suggest-reset-password'} = 1;
       }
-      $app -> set_presenter ( 'login' );
+      
+      if ($par{'-no-presenter-change'}) {}
+      else {
+        # show login form
+        $app -> set_presenter( 'login' );
+      }
 
       return undef;
     }
