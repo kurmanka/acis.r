@@ -475,48 +475,46 @@ sub authenticate {
   my $persistent;
   my $form_input = $app -> form_input;
 
+  # check persistent login cookie
   $login = $app->check_persistent_login;
   if ( $login ) {
+    # yes!
     $persistent = 1; 
+    # but we also need to grab the userdata
     $status = $app->attempt_userdata_access( $login );
   } 
   
-  if ( not $status 
-       and ($app->request_input('login') or $app->request_input('pass')) ) {
+  debug "check input parameters and cookies";
+  # ->request_input() checks both form_input and cookies:
+  $login  = $app->request_input('login');
+  $passwd = $app->request_input('pass');  
+  
+  # for a smooth transition from old pass & login cookies to the
+  # new persistent login cookie:
+  if ( $app->get_cookie('pass') and $app->get_cookie('login') ) {
+    debug "both pass and login cookies are present";
+    # this is checked later, in the login_start_session() func
+    $app->variables->{'pass-and-login-cookies'} = $app->get_cookie( 'pass' );
+  }
+  # remove the old insecure cookies
+  if ( $app->get_cookie( 'pass' ) or $app->get_cookie('login') ) {
+    $app->clear_auth_cookies;
+  }
 
-    debug "check CGI parameters and cookies";
-    $login  = $form_input -> {login};
-    $passwd = $form_input -> {pass};
+  # has user requested the password reset?
+  if ( $login and $form_input->{'remind-password'} ) {
+    use ACIS::Web::PasswordReset;
+    ACIS::Web::PasswordReset::forgotten_password($app);
+    return 0;
+  }
 
-    # legacy cookies
-    if ( not $login ) {
-      $login = $app -> get_cookie ( 'login' );
-    }
-    if ( not $passwd ) {
-      $passwd = $app -> get_cookie( 'pass' );
-    }
-
-    # for a smooth transition from old pass & login cookies to the
-    # new persistent login cookie:
-    if ( $app->get_cookie( 'pass' ) and $app->get_cookie('login') ) {
-      debug "both pass and login cookies are present";
-      # this is checked for later, in the login_start_session() func
-      $app->variables->{'pass-and-login-cookies'} = $app->get_cookie( 'pass' );
-    }
-    if ( $app->get_cookie( 'pass' ) or $app->get_cookie('login') ) {
-      $app->clear_auth_cookies;
-    }
-
-    if ( $login and $form_input -> {'remind-password'} ) {
-      use ACIS::Web::PasswordReset;
-      ACIS::Web::PasswordReset::forgotten_password($app);
-      return 0;
-    }
-
-
-    ### final check
+  # no persistent login?
+  if ( not $status ) {
+    # then check the login and pass
+    
+    # no login or pass
     if ( not $login or not $passwd ) {
-
+      # stop the show and show the login form
       $app -> clear_process_queue;
       if ( defined $login ) {
         $app -> set_form_value( 'login', $login );
@@ -535,6 +533,8 @@ sub authenticate {
     $status = $app -> check_login_and_pass( $login, $passwd, 1 );
   }
   
+  # okay, we should have some status by now;
+  # $status is either a string (signalling an error) or a userdata hashref
   if ( $status eq 'no-account' ) {
 
     # no such user 
@@ -622,6 +622,7 @@ sub authenticate {
       $app -> session -> set_default_current_record;
     }
     return $ret;
+
   }
   # else ?
   return undef;
