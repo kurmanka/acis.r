@@ -444,8 +444,9 @@ sub dump_sessions {
 
       ###  a little check
       if ( not $about ->{humanname} ) {
-        warn "no humanname in session's about; skipping session $sid\n";
-        next;
+        warn "no humanname in session's about\n";
+        #; skipping session $sid\n";
+        #next;
       }
 
       if ( not $about ->{login} ) {
