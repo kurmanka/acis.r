@@ -19,7 +19,7 @@ $Web::App::DEBUG            = "on";
 if (1) {
   ###  get hands on the userdata (if possible),
   ###  create a session and then do the work
-  ACIS::Web::Admin::offline_userdata_service($acis, $login, 'ACIS::User::delete_current_account', 'admin' );
+  ACIS::Web::Admin::offline_userdata_service($acis, $login, 'ACIS::User::delete_current_account', undef, 'admin' );
 }
 
 # original remove_account.pl way:
