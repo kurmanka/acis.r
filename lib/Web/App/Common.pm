@@ -120,6 +120,7 @@ use vars qw( $dumped_debug );
 $dumped_debug = 0;
 
 
+
 sub debug {
   clear_undefined \@_;
   my $message = join '', @_;
@@ -140,7 +141,8 @@ sub debug {
       close DEBUGLOG;
   }
 
-  print $message, "<br/>\n"
+  my $line_sep = ($ENV{REMOTE_ADDR}) ? "<br/>\n" : "";
+  print $message, $line_sep
     if $Web::App::DEBUGIMMEDIATELY;
 
   $LOGCONTENTS .= $message;
