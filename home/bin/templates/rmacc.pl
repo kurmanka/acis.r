@@ -11,6 +11,8 @@ my $login = shift || die "give me a login\n";
 
 my $acis = ACIS::Web -> new( home => $homedir );
 
+$Web::App::DEBUGIMMEDIATELY = "on";
+$Web::App::DEBUG            = "on"; 
 
 # original rmrec way:
 # this is safer: will fail in case a user has a running session.
@@ -25,9 +27,6 @@ if (1) {
 # no checks for an existing session
 # (hmm, and an account may actually survive this deletion, i guess; not checked)
 if (0) {
-  #$Web::App::DEBUGIMMEDIATELY = "on";
-  $Web::App::DEBUG            = "on"; 
-
   ACIS::User::remove_account($acis, -login => $login);
 }
 
