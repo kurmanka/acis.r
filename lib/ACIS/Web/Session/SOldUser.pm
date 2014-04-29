@@ -61,6 +61,10 @@ sub close {
   my $owner    = $self ->userdata_owner;
   my $save_profile = 1; # always save metadata and profile page
 
+  if ($self->{'.no_save'}) {
+    return $self->SUPER::close( $app );
+  }
+
   if ( $userdata ) {
 
     # save any unsaved changes
@@ -140,6 +144,9 @@ sub close_no_save {
 
   ### write userdata and request RI update
   $self -> save_userdata( $app );
+
+  # just close
+  $self -> {'.no_save'} = 1;
   $self -> SUPER::close( $app );
 }
 
