@@ -216,8 +216,10 @@ sub offline_userdata_service {
   eval {
     $userdata = get_hands_on_userdata( $acis );
   };
-
+  debug "eval: $@";
+  
   if ( not $userdata ) {
+    debug "no userdata file $userdata";
     return undef;
   }
 
