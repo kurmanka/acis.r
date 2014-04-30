@@ -14,7 +14,7 @@
   </xsl:variable>
   <xsl:variable name='the-screen'>autosuggest</xsl:variable>
   <xsl:variable name='items-count' select='$suggestions-count'/>
-  <xsl:variable name='current-screen-id'>research/autosuggest-chunk</xsl:variable>
+  <xsl:variable name='current-screen-id'>research/autosuggest</xsl:variable>
   <xsl:variable name='form-target'>@research/autosuggest-chunk</xsl:variable>
   <xsl:variable name='this-chunk-size' select='$chunk-size'/>
   <xsl:variable name='more-to-follow' 
