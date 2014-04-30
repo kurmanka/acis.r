@@ -483,13 +483,14 @@ sub authenticate {
     $persistent = 1; 
     # but we also need to grab the userdata
     $status = $app->attempt_userdata_access( $login );
-  } 
+  } else {
   
-  debug "check input parameters and cookies";
-  # ->request_input() checks both form_input and cookies:
-  $login  = $app->request_input('login');
-  $passwd = $app->request_input('pass');  
-  
+    debug "check input parameters and cookies";
+    # ->request_input() checks both form_input and cookies:
+    $login  = $app->request_input('login');
+    $passwd = $app->request_input('pass');
+  }
+    
   # for a smooth transition from old pass & login cookies to the
   # new persistent login cookie:
   if ( $app->get_cookie('pass') and $app->get_cookie('login') ) {
