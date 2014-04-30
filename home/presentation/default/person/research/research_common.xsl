@@ -616,7 +616,7 @@
     </acis:tab>
   </xsl:variable>
   <xsl:variable name='additional-head-stuff'>
-    <script type='text/javascript' src='{$static-base-url}/script/research.js'>
+    <script type='text/javascript' src='{$static-base-url}/script/research.js'/>
   </xsl:variable>
   <xsl:template name='item-description'>
     <xsl:variable name="wid" 
