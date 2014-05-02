@@ -352,8 +352,8 @@
 
 
   <table name='acis:threads'>
-    <field name='psid'      sql-type="CHAR(10) NOT NULL"/>
-    <field name='type'      sql-type="CHAR(15) NOT NULL"/>
+    <field name='psid'      sql-type="CHAR(32) CHARACTER SET ASCII NOT NULL"/>
+    <field name='type'      sql-type="CHAR(15) CHARACTER SET ASCII NOT NULL"/>
     <field name='started'   sql-type='DATETIME NOT NULL'/>
     <field name='checkpoint' sql-type='DATETIME'/>
     <create-table-sql> PRIMARY KEY(psid, type)</create-table-sql>
@@ -361,10 +361,10 @@
 
   <!-- research profile suggestions -->
   <table name="acis:rp_suggestions">
-    <field name="psid"      sql-type="CHAR(15) NOT NULL"/>
-    <field name="dsid"      sql-type="CHAR(15) NOT NULL"/>
-    <field name="role"      sql-type="CHAR(15) NOT NULL"/><!-- not actually used -->
-    <field name="reason"    sql-type="CHAR(30) NOT NULL"/>
+    <field name="psid"      sql-type="CHAR(32) CHARACTER SET ASCII NOT NULL"/>
+    <field name="dsid"      sql-type="CHAR(15) CHARACTER SET ASCII NOT NULL"/>
+    <field name="role"      sql-type="CHAR(15) CHARACTER SET ASCII NOT NULL"/><!-- not actually used -->
+    <field name="reason"    sql-type="CHAR(30) CHARACTER SET ASCII NOT NULL"/>
     <field name="relevance" sql-type="FLOAT"/>
     <field name='time'      sql-type='DATETIME NOT NULL'/>
     <create-table-sql> PRIMARY KEY(psid, dsid) </create-table-sql>
