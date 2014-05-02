@@ -7,16 +7,16 @@
 <body>
       
 
-   <h1 id="idp2031360">Stage D: full-text links, document-to-document links and fuzzy name searches </h1>
+   <h1 id="idp2027952">Stage D: full-text links, document-to-document links and fuzzy name searches </h1>
 
 <h3><i>Table of contents</i></h3>
-<p class="toc">   <a href="#fuzzy">Fuzzy name searching</a><br>      <a href="#idp2032864">TODO</a><br>      <a href="#idp2035296">notions</a><br>      <a href="#idp2036816">configuration</a><br>      <a href="#idp2042944">administration</a><br>      <a href="#idp2043808">implementation components</a><br>      <a href="#idp2046832">tools</a><br>   <a href="#fturls">Full-text file recognition</a><br>      <a href="#idp2048288">TODO</a><br>      <a href="#idp2053152">input</a><br>      <a href="#idp2055760">user choices</a><br>      <a href="#idp2067232">configuration</a><br>      <a href="#idp2068848">data storage</a><br>      <a href="#idp2070288">data tables</a><br>      <a href="#idp2078544">implementation components</a><br>   <a href="#d2d">Document to document links</a><br>      <a href="#idp2083296">TODO</a><br>      <a href="#idp2086912">notions</a><br>      <a href="#idp2087808">configuration</a><br>      <a href="#idp2089536">components</a><br>      <a href="#idp2099984">screen design</a><br></p>
+<p class="toc">   <a href="#fuzzy">Fuzzy name searching</a><br>      <a href="#idp2029456">TODO</a><br>      <a href="#idp2031888">notions</a><br>      <a href="#idp2033408">configuration</a><br>      <a href="#idp2039536">administration</a><br>      <a href="#idp2040400">implementation components</a><br>      <a href="#idp2043424">tools</a><br>   <a href="#fturls">Full-text file recognition</a><br>      <a href="#idp2044880">TODO</a><br>      <a href="#idp2049744">input</a><br>      <a href="#idp2052352">user choices</a><br>      <a href="#idp2063824">configuration</a><br>      <a href="#idp2065440">data storage</a><br>      <a href="#idp2066880">data tables</a><br>      <a href="#idp2075136">implementation components</a><br>   <a href="#d2d">Document to document links</a><br>      <a href="#idp2079888">TODO</a><br>      <a href="#idp2083504">notions</a><br>      <a href="#idp2084400">configuration</a><br>      <a href="#idp2086128">components</a><br>      <a href="#idp2096576">screen design</a><br></p>
 
 
    <h2 id="fuzzy">Fuzzy name searching</h2>
 
 
-   <h3 id="idp2032864">TODO</h3>
+   <h3 id="idp2029456">TODO</h3>
 
 <ul>
 <li><p>documentation</p></li>
@@ -26,7 +26,7 @@ APU)?</p></li>
 </ul>
 
 
-   <h3 id="idp2035296">notions</h3>
+   <h3 id="idp2031888">notions</h3>
 
 <p>distance level = Levenshtein distance / string length of the name variation</p>
 
@@ -36,7 +36,7 @@ length is 20, the distance level is 2/20 = 0.1 ; O.1 is less then 1/7,
 so, this would be a successful and positive match.</p>
 
 
-   <h3 id="idp2036816">configuration</h3>
+   <h3 id="idp2033408">configuration</h3>
 
 <ul>
 <li><p>fuzzy-name-search -- on or off</p></li>
@@ -64,12 +64,12 @@ APU-initiated, this is a question of <a class="c" href="conf.html#fuzzy-name-sea
 
 
 
-   <h3 id="idp2042944">administration</h3>
+   <h3 id="idp2039536">administration</h3>
 
 <p>Run bin/fuzzy_search_table script regularly to update the rare table.</p>
 
 
-   <h3 id="idp2043808">implementation components</h3>
+   <h3 id="idp2040400">implementation components</h3>
 
 <ol>
 <li><p>given a set of name expressions (i.e. document author names) compare
@@ -83,7 +83,7 @@ name expressions, which should be fuzzy-compared to that variation.</p></li>
 <p>mysql&gt; select name,count(name) from names group by name;</p>
 
 
-   <h3 id="idp2046832">tools</h3>
+   <h3 id="idp2043424">tools</h3>
 
 <p>String::Approx</p>
 
@@ -91,7 +91,7 @@ name expressions, which should be fuzzy-compared to that variation.</p></li>
    <h2 id="fturls">Full-text file recognition</h2>
 
 
-   <h3 id="idp2048288">TODO</h3>
+   <h3 id="idp2044880">TODO</h3>
 
 <ol>
 <li>
@@ -116,7 +116,7 @@ me the wording corrections and/or explanations</p></li>
 </ol>
 
 
-   <h3 id="idp2053152">input</h3>
+   <h3 id="idp2049744">input</h3>
 
 <p>authoritative:</p>
 
@@ -141,7 +141,7 @@ me the wording corrections and/or explanations</p></li>
 </code></pre>
 
 
-   <h3 id="idp2055760">user choices</h3>
+   <h3 id="idp2052352">user choices</h3>
 
 <p>In the recognition menu, there are four mutually exclusive options.</p>
 
@@ -188,7 +188,7 @@ such choices, but does not resolve them.</p>
 </ol>
 
 
-   <h3 id="idp2067232">configuration</h3>
+   <h3 id="idp2063824">configuration</h3>
 
 <p>conf parameter:</p>
 
@@ -197,7 +197,7 @@ such choices, but does not resolve them.</p>
 </ul>
 
 
-   <h3 id="idp2068848">data storage</h3>
+   <h3 id="idp2065440">data storage</h3>
 
 <p>The URLs are stored in the ft_urls table.  The user decisions (choices)
 are stored in the ft_urls_choices table.  (See below.)  <b>They are
@@ -205,7 +205,7 @@ not stored in userdata!</b> (Contrary to where every other piece of
 data given by users is stored.)</p>
 
 
-   <h3 id="idp2070288">data tables</h3>
+   <h3 id="idp2066880">data tables</h3>
 
 <p>table <strong>ft_urls</strong>:</p>
 
@@ -234,7 +234,7 @@ source_i(source(50))</code></p>
 <p><code>primary key prim(dsid, checksum, psid), index t_i(time), index psid_i(psid)</code></p>
 
 
-   <h3 id="idp2078544">implementation components</h3>
+   <h3 id="idp2075136">implementation components</h3>
 
 <ol>
 <li><p>input processing, ft_urls table making</p></li>
@@ -255,7 +255,7 @@ optionally.)</p>
    <h2 id="d2d">Document to document links</h2>
 
 
-   <h3 id="idp2083296">TODO</h3>
+   <h3 id="idp2079888">TODO</h3>
 
 <ul>
 <li><p>screen: improve destination document listing (menu); for instance,
@@ -268,13 +268,13 @@ alphabetical order.</p></li>
 </ul>
 
 
-   <h3 id="idp2086912">notions</h3>
+   <h3 id="idp2083504">notions</h3>
 
 <p>link type -- has a name, description and, possibly, a reverse link type
 name; some link types have no reverse.</p>
 
 
-   <h3 id="idp2087808">configuration</h3>
+   <h3 id="idp2084400">configuration</h3>
 
 <ul>
 <li>document-document-links-profile -- yes / no</li>
@@ -284,7 +284,7 @@ name; some link types have no reverse.</p>
 $HOME/doclinks.conf.xml and edit to your liking.</p>
 
 
-   <h3 id="idp2089536">components</h3>
+   <h3 id="idp2086128">components</h3>
 
 <ol>
 <li>
@@ -342,7 +342,7 @@ useful abstraction level</p>
 </ol>
 
 
-   <h3 id="idp2099984">screen design</h3>
+   <h3 id="idp2096576">screen design</h3>
 
 <ul>
 <li><p>use Yahoo! UI javascript library?</p></li>
@@ -351,7 +351,7 @@ useful abstraction level</p>
 
   
 <address class="footer">
-<p>Generated: Tue Apr 22 09:59:45 2014</p>
+<p>Generated: Fri May  2 18:03:53 2014</p>
 <p><a href="http://acis.openlib.org/">ACIS project</a>,
           acis<i>@</i>openlib<span>.org</span></p>
 </address>

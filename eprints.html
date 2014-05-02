@@ -7,16 +7,16 @@
 <body>
       
 
-   <h1 id="idp1206208">EPrints-related stuff in ACIS</h1>
+   <h1 id="idp1201920">EPrints-related stuff in ACIS</h1>
 
 <h3><i>Table of contents</i></h3>
-<p class="toc">   <a href="#idp1207008">Intro</a><br>   <a href="#terminology">Terminology</a><br>   <a href="#eprints-installation-brief">Installation</a><br>      <a href="#eprints-install-script">Automatic installation</a><br>   <a href="#level1">Level 1.  Export eprints metadata in
-AMF</a><br>      <a href="#metadata-export-amf">AMF metadata export module</a><br>         <a href="#idp1235392">Installation and configuration</a><br>         <a href="#idp1243856">What it does.  Techinical details</a><br>      <a href="#idp1253968">The AMF generation</a><br>         <a href="#idp1265968">From eprint's personal data to AMF <em>person</em> noun</a><br>         <a href="#idp1272896">Additional: from eprint type to AMF text type</a><br>      <a href="#amf-plugin">AMF output plugin</a><br>   <a href="#level2">Level 2.  Personal id metadata
-field</a><br>   <a href="#level3">Level 3.  Author identification aid</a><br>      <a href="#level3-ui">User interface</a><br>         <a href="#idp1335104">Search by name</a><br>         <a href="#idp1341728">Search by email address and by short-id</a><br>         <a href="#idp1356928">Problems and weaknesses</a><br>         <a href="#idp1365824">Undo feature (additional)</a><br>      <a href="#level3-tech">Implementation technical specification</a><br>         <a href="#idp1368272">Components and technology</a><br>         <a href="#pidaid-install">Installation</a><br>         <a href="#idp1390816"><code class="f BROKEN">cgi/pidaid</code> script</a><br>         <a href="#idp1411616"><code class="f BROKEN">pidaid.js</code> add-on JavaScript</a><br>   <a href="#level4">Level 4.  The metadata update request</a><br>      <a href="#idp1471216">Configuration</a><br>         <a href="#object-dir-levels"><code>object-dir-levels</code>
-parameter</a><br>      <a href="#idp1485040">Other considerations</a><br></p>
+<p class="toc">   <a href="#idp1202720">Intro</a><br>   <a href="#terminology">Terminology</a><br>   <a href="#eprints-installation-brief">Installation</a><br>      <a href="#eprints-install-script">Automatic installation</a><br>   <a href="#level1">Level 1.  Export eprints metadata in
+AMF</a><br>      <a href="#metadata-export-amf">AMF metadata export module</a><br>         <a href="#idp1231104">Installation and configuration</a><br>         <a href="#idp1239568">What it does.  Techinical details</a><br>      <a href="#idp1249680">The AMF generation</a><br>         <a href="#idp1261680">From eprint's personal data to AMF <em>person</em> noun</a><br>         <a href="#idp1268608">Additional: from eprint type to AMF text type</a><br>      <a href="#amf-plugin">AMF output plugin</a><br>   <a href="#level2">Level 2.  Personal id metadata
+field</a><br>   <a href="#level3">Level 3.  Author identification aid</a><br>      <a href="#level3-ui">User interface</a><br>         <a href="#idp1330816">Search by name</a><br>         <a href="#idp1337440">Search by email address and by short-id</a><br>         <a href="#idp1353008">Problems and weaknesses</a><br>         <a href="#idp1361904">Undo feature (additional)</a><br>      <a href="#level3-tech">Implementation technical specification</a><br>         <a href="#idp1364352">Components and technology</a><br>         <a href="#pidaid-install">Installation</a><br>         <a href="#idp1386896"><code class="f BROKEN">cgi/pidaid</code> script</a><br>         <a href="#idp1407696"><code class="f BROKEN">pidaid.js</code> add-on JavaScript</a><br>   <a href="#level4">Level 4.  The metadata update request</a><br>      <a href="#idp1467792">Configuration</a><br>         <a href="#object-dir-levels"><code>object-dir-levels</code>
+parameter</a><br>      <a href="#idp1481616">Other considerations</a><br></p>
 
 
-   <h2 id="idp1207008">Intro</h2>
+   <h2 id="idp1202720">Intro</h2>
 
 <p><a href="http://software.eprints.org">GNU EPrints</a> is an
 open-source online repository software for preprints and
@@ -151,7 +151,7 @@ it is located in the
 file.</p>
 
 
-   <h4 id="idp1235392">Installation and configuration</h4>
+   <h4 id="idp1231104">Installation and configuration</h4>
 
 <p>The <a href="eprints.html#eprints-install-script">installation script</a>
 will patch the <code class="f BROKEN">perl_lib/EPrints/EPrint.pm</code> module.
@@ -198,7 +198,7 @@ $c-&gt;{eprint_metadata_export_AMF_idprefix} = "Musasi:";
 </code></pre>
 
 
-   <h4 id="idp1243856">What it does.  Techinical details</h4>
+   <h4 id="idp1239568">What it does.  Techinical details</h4>
 
 <p>Upon a call to <code>export_metadata()</code> function in this
 module, it will:</p>
@@ -242,7 +242,7 @@ function;</p></li>
 </ol>
 
 
-   <h3 id="idp1253968">The AMF generation</h3>
+   <h3 id="idp1249680">The AMF generation</h3>
 
 <p><a href="http://acis.openlib.org/documents/saskatoon/">Saskatoon</a> 
 doc <a href="http://acis.openlib.org/documents/saskatoon/#sec3-3-1">says
@@ -276,7 +276,7 @@ data via the <code>haseditor</code> verb.  That gives us point
 number 2.</p>
 
 
-   <h4 id="idp1265968">From eprint's personal data to AMF <em>person</em> noun</h4>
+   <h4 id="idp1261680">From eprint's personal data to AMF <em>person</em> noun</h4>
 
 <p>That is made in a separate function <code>decode_person()</code>.
 First, we create an empty AMF <em>person</em> noun.</p>
@@ -295,7 +295,7 @@ adjective.  If it is a short-id, we save it into
 <code>identifier</code> adjective.  It is part of <a href="#level2">level 2</a>, actually.</p>
 
 
-   <h4 id="idp1272896">Additional: from eprint type to AMF text type</h4>
+   <h4 id="idp1268608">Additional: from eprint type to AMF text type</h4>
 
 <p>Each eprint object has a <code>type</code> field.  EPrints is
 flexible in the types of document that one can store in it.
@@ -597,10 +597,10 @@ or too many results and there is a previously-generated menu,
 then we remove the menu.</p>
 
 
-   <h4 id="idp1335104">Search by name</h4>
+   <h4 id="idp1330816">Search by name</h4>
 
 
-   <h5 id="idp1335504">Sample scenario</h5>
+   <h5 id="idp1331216">Sample scenario</h5>
 
 <p>A user has typed in the title of the work, and then switched
 to the next input field, i.e. the family name input box for
@@ -618,7 +618,7 @@ exactly identified author in the eprint's metadata.</p>
 and continues the process.</p>
 
 
-   <h5 id="idp1337408">Principles</h5>
+   <h5 id="idp1333120">Principles</h5>
 
 <p>Name search is case-insensitive.</p>
 
@@ -650,10 +650,10 @@ place.  Search results are processed only when a response
 from server has arrived.</p>
 
 
-   <h4 id="idp1341728">Search by email address and by short-id</h4>
+   <h4 id="idp1337440">Search by email address and by short-id</h4>
 
 
-   <h5 id="idp1342160">Sample email-search scenario</h5>
+   <h5 id="idp1337872">Sample email-search scenario</h5>
 
 <p>A user types in the title of a work and then enters the
 family name and the given name of an author.  ACIS doesn't
@@ -675,7 +675,7 @@ from ACIS.  The value of the email address that she entered
 is replaced with the person's short-id.</p>
 
 
-   <h5 id="idp1344304">Short-id scenario #1, basic</h5>
+   <h5 id="idp1340496">Short-id scenario #1, basic</h5>
 
 <p>A user enters personal name of an author.  For some reason
 ACIS doesn't recognize the person or user doesn't use the
@@ -696,7 +696,7 @@ characters long), she sees the name of the person she meant.
 She is now sure that she did no mistake.</p>
 
 
-   <h5 id="idp1347072">Short-id scenario #2: Advanced user</h5>
+   <h5 id="idp1343216">Short-id scenario #2: Advanced user</h5>
 
 <p>An advanced experienced user comes to the page with the
 short-id of the author at hand.  Instead of entering the
@@ -708,7 +708,7 @@ author), clicks on it and name fields are automatically
 filled in.  Everybody is happy.</p>
 
 
-   <h5 id="idp1348640">Short-id scenario #3: User makes a mistake</h5>
+   <h5 id="idp1344736">Short-id scenario #3: User makes a mistake</h5>
 
 <p>A user enters the name details for a person and then enters
 an identifier for him.  She doesn't look at the messages
@@ -732,7 +732,7 @@ next person's details.  The menu is hidden as she starts to
 type another person's family name.</p>
 
 
-   <h5 id="idp1351168">Principles</h5>
+   <h5 id="idp1347264">Principles</h5>
 
 <p>Email search and short-id search happen in the same input
 field.  The page looks at the format of the value string to
@@ -773,7 +773,7 @@ hint is removed.</p>
 value, the message is removed.</p>
 
 
-   <h4 id="idp1356928">Problems and weaknesses</h4>
+   <h4 id="idp1353008">Problems and weaknesses</h4>
 
 <p>The user interface enhancements, that are described above,
 have a number of potential problems and weak sides.</p>
@@ -837,7 +837,7 @@ those users it will work as a usual EPrints service, only
 with a differently-named email field.</p>
 
 
-   <h4 id="idp1365824">Undo feature (additional)</h4>
+   <h4 id="idp1361904">Undo feature (additional)</h4>
 
 <p>Whenever user gets names from a personal records menu
 inserted into the name and id fields, right under the id
@@ -856,7 +856,7 @@ it is capable of undoing his editing.)</p>
    <h3 id="level3-tech">Implementation technical specification</h3>
 
 
-   <h4 id="idp1368272">Components and technology</h4>
+   <h4 id="idp1364352">Components and technology</h4>
 
 <p>Our enhancement of EPrints for author/person identification
 aid consists of:</p>
@@ -943,7 +943,7 @@ start it.</p></li>
 </ol>
 
 
-   <h4 id="idp1390816">
+   <h4 id="idp1386896">
 <code class="f BROKEN">cgi/pidaid</code> script</h4>
 
 <p>This CGI script searches for personal records.  The script
@@ -995,7 +995,7 @@ script will return XML string
 string "<code>&lt;problem/&gt;</code>".</p>
 
 
-   <h5 id="idp1410240">Technical details</h5>
+   <h5 id="idp1406320">Technical details</h5>
 
 <p>The <code class="f BROKEN">cgi/pidaid</code> script employs the normal EPrints'
 infrastructure for accepting and processing requests.  It
@@ -1003,11 +1003,11 @@ creates an EPrints::Session object and uses it to get the
 input parameters parsed.</p>
 
 
-   <h4 id="idp1411616">
+   <h4 id="idp1407696">
 <code class="f BROKEN">pidaid.js</code> add-on JavaScript</h4>
 
 
-   <h5 id="idp1412304">XMLHttpRequest technology</h5>
+   <h5 id="idp1408384">XMLHttpRequest technology</h5>
 
 <p>XMLHttpRequest is a piece of browser technology that bacame
 widely known just recently, although existed for a long
@@ -1067,7 +1067,7 @@ list of cities from the server.</p></li>
 </ol>
 
 
-   <h5 id="idp1426464">Overview</h5>
+   <h5 id="idp1422544">Overview</h5>
 
 <p>This section offers a brief, simplified overview of how the
 <code class="f BROKEN">pidaid.js</code> script works.  </p>
@@ -1148,7 +1148,7 @@ into the script source if you need more details; it has some
 comments for help.</p>
 
 
-   <h5 id="idp1440768">Optimizations</h5>
+   <h5 id="idp1436848">Optimizations</h5>
 
 <p>These are the rules the script follows for minimal
 efficiency and to avoid server overload problems.</p>
@@ -1186,7 +1186,7 @@ $var =~ s/\s+/ /g;
 </code></pre>
 
 
-   <h6 id="idp1445936">Short-id / email search optimizations</h6>
+   <h6 id="idp1442528">Short-id / email search optimizations</h6>
 
 <p>There's no point to search for a short-id or email
 address until it looks like an ACIS short-id or an email
@@ -1219,7 +1219,7 @@ an ACIS service about it.  We use the <a href="cooperate.html#metaupdate-request
 module to actually send the request.</p>
 
 
-   <h3 id="idp1471216">Configuration</h3>
+   <h3 id="idp1467792">Configuration</h3>
 
 <p>Via the <code>$c</code> variable in get_conf() function in the
 <code class="f BROKEN">cfg/ArchiveConfig.pm</code> file of the EPrints archive:</p>
@@ -1269,7 +1269,7 @@ service archive.</p>
 <p>Default value for <code>object-dir-levels</code> is 0.</p>
 
 
-   <h3 id="idp1485040">Other considerations</h3>
+   <h3 id="idp1481616">Other considerations</h3>
 
 <p>It is up to the EPrints service administrator and the ACIS
 service administrator to agree on a transport technology for
@@ -1285,7 +1285,7 @@ server.  All what is left is to notify ACIS about it.</p>
 <p>
 $Id$
 </p>
-<p>Generated: Tue Apr 22 09:59:45 2014</p>
+<p>Generated: Fri May  2 18:03:53 2014</p>
 <p><a href="http://acis.openlib.org/">ACIS project</a>,
           acis<i>@</i>openlib<span>.org</span></p>
 </address>
