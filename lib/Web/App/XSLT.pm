@@ -132,7 +132,8 @@ sub run_xslt_presenter {
     };
 
     if ( $@ or $XML::LibXSLT::error ) {
-      $self -> errlog( "Can't parse xslt ($file): " . ($@ || $XML::LibXSLT::error) );
+      debug "Can't parse xslt ($file): " . ($@ || $XML::LibXSLT::error);
+      $self -> errlog( "Can't parse xslt: $file; see debug log for details" );
       $self -> sevent ( @event,
                         -type  => 'error',
                         -descr => "stylesheet XML-invalid",
@@ -180,7 +181,7 @@ sub run_xslt_presenter {
     }
 
     debug "xslt tranformation error, stylesheet: $file; details: $@";
-    $self -> errlog( "xslt transformation error, stylesheet: $file ($@)" );
+    $self -> errlog( "xslt transformation error, stylesheet: $file; see debug log for details" );
     $self -> sevent ( @event,
                       -type  => 'error',
                       -descr => "stylesheet transformation problem",
