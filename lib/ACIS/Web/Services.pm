@@ -1095,8 +1095,9 @@ sub personal_static_url {
   if ( not $reset
        and $url = $record -> {settings} {static_url} ) {
     
+    # a sanity check; probably harmless
     if ( index( $url, $static_url ) == -1 ) {
-      $app -> errlog( "user static url is out of global static url: $url" );
+      debug( "user static url is out of global static url: $url" );
     }
 
     return $url;
