@@ -431,6 +431,8 @@ sub quote {
   s/&/&amp;/g;
   s/</&lt;/g;
   s/>/&gt;/g;
+  s/"/&quot;/g;
+  s/'/&apos;/g;
 
   if ( m/[\x00-\x08\x0B\x0C\x0E-\x1F]/ ) {
     warn "DumpXML warning: some XML-invalid characters in data";
@@ -440,7 +442,7 @@ sub quote {
 
   s/([^\040-\176])/sprintf('&#x%x;', ord($1))/ge
     unless ( $ENCODING eq 'UTF-8' );
-
+  
   return qq("$_");
 }
 
