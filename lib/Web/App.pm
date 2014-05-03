@@ -943,10 +943,18 @@ sub handle_request {
         debug "presenter error: $@";
         if ( not $handler_error ) {
             $self->critical_handler_error( $@ );
-            $content = $response->{body} = $self -> run_presenter( $self->{presenter} );
-        } else {
-            $content = $response->{body} = "<html><body><h3>critical presenter error (logged)</h3></body></html>";
+            # second try, to show the error page
+            eval {
+              $content = $response->{body} = $self -> run_presenter( $self->{presenter} );
+            };
+            if ($@) {
+              debug "error page presenter error: $@";
+            }
         }
+    }
+    if (not $content) {
+      $content = 
+      $response->{body} = "<html><body><h3>Internal Application Error</h3><p>Details logged for debugging.</p></body></html>";      
     }
 
     print "</pre>\n"
@@ -984,7 +992,7 @@ sub critical_handler_error {
   $self -> set_presenter( 'application-error' );
   $self -> response_status( '500' );
   $self -> variables ->{handlererror} = $message;
-  my $req_url = $self->{request}->{url};
+  my $req_url = $self->{request}->{request_uri};
   my $message_head = substr( $message, 0, 100 ); 
 
   if ($self->config('debug-log'))      { # abridged:
