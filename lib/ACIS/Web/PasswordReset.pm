@@ -166,6 +166,18 @@ sub password_reset_process {
                                           {login => $login}, # session owner
                                           object => $udata, 
                                           file   => $udata_file );
+    # create an event
+    my $owner = $udata->{owner};
+    my $IP = $app->{request}{ip};
+    $app -> sevent(  -class => 'auth',
+                    -action => 'success',
+                     -descr => 'password reset',
+                     -file  => $udata_file,
+                     -login => $login,
+                     -IP    => $IP,
+                 -humanname => $owner->{name},
+    );
+
     debug "created a new session";
     $ok = 1;
   }
