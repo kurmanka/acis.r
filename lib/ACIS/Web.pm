@@ -634,6 +634,8 @@ sub safe_to_log_form_input {
 
 
 sub prepare_for_work () {
+  #warn "prepare_for_work";
+  require ACIS::Web::AllModules;
   # seed the random generator
   require ACIS::Web::UserPassword;
   my $a = ACIS::Web::UserPassword::generate_random_bytes();

@@ -3,6 +3,8 @@ use vars qw( $acis );
 use CGI::Emulate::PSGI;
 
 use ACIS::Web;
+use ACIS::Web::AllModules;
+
 $acis = new ACIS::Web();
 $acis -> prepare_for_work();
 
