@@ -612,18 +612,17 @@ sub check_item_names {
     # "np" means "no punctuation"
     if ( not $is_present ) {
       debug "do a no-punctuation check on the contributor names";
-      my $names_np = [];
+      my $names_np = [ @$names ]; # copy the list
       my $authors_editors_np = ' ';
       for( $authors, $editors ) {
-        $_ =~ s/,\.\-/ /g;
+        $_ =~ s/[,\.\-]/ /g;
         $_ =~ s/\s+/ /g;
         $authors_editors_np .= $_;
       }
       
-      for (@$names) {
-        $_ =~ s/,\.\-/ /g;
+      for (@$names_np) {
+        $_ =~ s/[,\.\-]/ /g;
         $_ =~ s/\s+/ /g;
-        push @$names_np, $_;
       }
 
       debug "authors editors np: $authors_editors_np";
