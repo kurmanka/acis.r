@@ -625,9 +625,8 @@ sub check_item_names {
         $_ =~ s/\s+/ /g;
       }
 
-      debug "authors editors np: $authors_editors_np";
-      debug "nice names np: ", join( "\n", @$names_np );
-            
+      #debug "authors editors np: $authors_editors_np";
+      #debug "nice names np: ", join( "\n", @$names_np );     
       foreach ( @$names_np ) {
         if ( index( $authors_editors_np, lc $_ ) > -1 ) { $is_present = 1; last; }
       }
