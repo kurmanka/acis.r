@@ -607,6 +607,34 @@ sub check_item_names {
         # the resource' data as a full string.
     }
 
+    # Issue #24 https://github.com/kurmanka/acis.r/issues/24
+    # Check the same, but this time ignore the punctuation characters.
+    # "np" means "no punctuation"
+    if ( not $is_present ) {
+      debug "do a no-punctuation check on the contributor names";
+      my $names_np = [ @$names ];
+      my $authors_np = $authors;
+      my $editors_np = $editors;
+      for( $authors_np, $editors_np ) {
+        $_ =~ s/,\.\-/ /g;
+        $_ =~ s/\s+/ /g;
+      }
+      
+      for (@$names_np) {
+        $_ =~ s/,\.\-/ /g;
+        $_ =~ s/\s+/ /g;
+      }
+
+      debug "authors np: $authors_np";
+      debug "editors np: $editors_np";
+      debug "nice names np: ", join( "\n", @$names_np );
+            
+      foreach ( @$names_np ) {
+        if ( index( $authors, lc $_ ) > -1 ) { $is_present = 1; last; }
+        if ( index( $editors, lc $_ ) > -1 ) { $is_present = 1; last; }
+      }
+    }
+
     # debug suspicious claim detection (now disabled):
     if ( 0 and not $is_present ) {
         my $app = $ACIS::Web::ACIS;
