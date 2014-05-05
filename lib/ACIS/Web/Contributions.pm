@@ -612,26 +612,25 @@ sub check_item_names {
     # "np" means "no punctuation"
     if ( not $is_present ) {
       debug "do a no-punctuation check on the contributor names";
-      my $names_np = [ @$names ];
-      my $authors_np = $authors;
-      my $editors_np = $editors;
-      for( $authors_np, $editors_np ) {
+      my $names_np = [];
+      my $authors_editors_np = ' ';
+      for( $authors, $editors ) {
         $_ =~ s/,\.\-/ /g;
         $_ =~ s/\s+/ /g;
+        $authors_editors_np .= $_;
       }
       
-      for (@$names_np) {
+      for (@$names) {
         $_ =~ s/,\.\-/ /g;
         $_ =~ s/\s+/ /g;
+        push @$names_np, $_;
       }
 
-      debug "authors np: $authors_np";
-      debug "editors np: $editors_np";
+      debug "authors editors np: $authors_editors_np";
       debug "nice names np: ", join( "\n", @$names_np );
             
       foreach ( @$names_np ) {
-        if ( index( $authors, lc $_ ) > -1 ) { $is_present = 1; last; }
-        if ( index( $editors, lc $_ ) > -1 ) { $is_present = 1; last; }
+        if ( index( $authors_editors_np, lc $_ ) > -1 ) { $is_present = 1; last; }
       }
     }
 
