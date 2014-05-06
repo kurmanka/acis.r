@@ -272,8 +272,7 @@ sub make_lock_for {
   if ( open L, '>', $lock ) {
       print L $self->id;
       CORE::close L;
-      $self ->{_}{lock} = $lock; # compatibility measure for Web::App::Session compatibility
-      $self ->{'.userdata.lock'} = $lock;
+      $self ->lock( $lock );
   } else {
       warn "can't create lock $lock";
       return undef;
