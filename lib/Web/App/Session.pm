@@ -326,7 +326,7 @@ sub set_object_file {
   if ( $newfile ) {
     my $lock = "$newfile.lock";
     if ( -f $lock ) {
-#      warn "lock file $lock present";
+      debug "lock file $lock present";
       return undef;
     }
 
@@ -336,6 +336,7 @@ sub set_object_file {
       $self ->lock( $lock );
 
     } else {
+      debug "can't obtain the lock $lock";
       warn "can't obtain the lock $lock";
       return undef;
     }
