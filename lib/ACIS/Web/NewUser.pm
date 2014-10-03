@@ -520,10 +520,18 @@ sub confirm {
   my $old_sid = $session -> id;
   my $new_sid = make_short_id ( $app, $record );
   $record -> {'about-owner'} = 'yes';
+  #$app->variables->{'current-record'} = $record;
 
   if ( $new_sid ) {
     fix_temporary_sid( $app, $old_sid, $new_sid );
     $record -> {temporarysid} = $old_sid;
+
+    # this is to get 
+    # request/session/current-record populated in the response data
+    # before session logoff. #26 on github
+    $app -> prepare_presenter_data();
+
+    # now log the session off
     $app -> logoff_session;
 
   } else { 

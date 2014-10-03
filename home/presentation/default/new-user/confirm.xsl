@@ -54,6 +54,8 @@
      <p>Your account is activated and your profile is now available at:</p>
 
      <p><a href='{$profile/link}' class='int'><xsl:value-of select='$profile/link'/></a></p>
+     
+     <p>Your short-id is: <span class='value'><xsl:value-of select='$record-sid'/></span></p>
 
      <p>Whenever you need to update your profile, you can login into our
      service.  Or you may want to login now to try your account:</p>
