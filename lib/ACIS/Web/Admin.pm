@@ -258,6 +258,11 @@ sub offline_userdata_service {
       debug "No such record $rec";
       $acis -> errlog( "No such record $rec" );
       die "can't run offline service for record $rec because the record is not found in account";
+      # session close
+      eval {
+        $session->close( $acis );
+        $acis->clear_after_request();
+      };
       return(undef);
     }
   }
